@@ -13,6 +13,35 @@ function _getCtx() {
 }
 function toggleSound() { soundEnabled = !soundEnabled; const b = document.getElementById('soundToggle'); if(b){ b.textContent = soundEnabled ? '🔊' : '🔇'; b.classList.toggle('muted', !soundEnabled); } }
 
+function exportSave() {
+  const data = JSON.stringify(state, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `sao_save_${todayKey()}.json`; a.click();
+  URL.revokeObjectURL(url);
+  showNotif('💾 Save exported!');
+}
+function importSave() {
+  const input = document.createElement('input');
+  input.type='file'; input.accept='.json,application/json';
+  input.onchange = e => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const imp = JSON.parse(ev.target.result);
+        if (!imp.stats || !imp.habitos) throw new Error('bad save');
+        Object.assign(state, imp);
+        saveState(); renderAll();
+        showNotif('✅ Save imported!');
+      } catch { showNotif('❌ Invalid save file'); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
 // Mobile audio unlock — iOS Safari requires a silent buffer played synchronously
 // during the user gesture; playing it inside .then() is too late (async context)
 function _unlockAudio() {
@@ -132,32 +161,124 @@ function playLevelUp() {
 }
 
 // FF10 · Stat Rank Up — Sphere Grid activation (crystalline arpeggio + vibrato)
+// Tier-up — sawtooth sweep → power chord → crystal cascade (unlike any other sound here)
 function playStatRankUp() {
   if (!soundEnabled || !_ACtx) return;
   try {
     const ctx = _getCtx(), t = ctx.currentTime;
-    const master = ctx.createGain(); master.gain.value = 0.46; master.connect(ctx.destination);
-    [[523.25,0,0.14],[659.25,0.12,0.14],[783.99,0.24,0.14],[1046.50,0.36,0.62]].forEach(([f,s,d])=>{
-      const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
-      const lfo=ctx.createOscillator(),lfog=ctx.createGain(); lfo.frequency.value=6.2; lfog.gain.value=f*0.007;
-      lfo.connect(lfog); lfog.connect(o.frequency);
-      g.gain.setValueAtTime(0,t+s); g.gain.linearRampToValueAtTime(0.22,t+s+0.008); g.gain.setValueAtTime(0.22,t+s+d*0.55); g.gain.exponentialRampToValueAtTime(0.001,t+s+d+0.08);
-      o.connect(g); g.connect(master); o.start(t+s); lfo.start(t+s); o.stop(t+s+d+0.12); lfo.stop(t+s+d+0.12);
-      const o2=ctx.createOscillator(),g2=ctx.createGain(); o2.type='triangle'; o2.frequency.value=f*1.5;
-      g2.gain.setValueAtTime(0,t+s); g2.gain.linearRampToValueAtTime(0.07,t+s+0.008); g2.gain.exponentialRampToValueAtTime(0.001,t+s+d*0.70);
-      o2.connect(g2); g2.connect(master); o2.start(t+s); o2.stop(t+s+d*0.75);
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value=-5; comp.knee.value=3; comp.ratio.value=4; comp.attack.value=0.001; comp.release.value=0.12;
+    comp.connect(ctx.destination);
+    // Rising sawtooth sweep through bandpass — the "power-up whoosh"
+    const sw=ctx.createOscillator(), swG=ctx.createGain(), bp=ctx.createBiquadFilter();
+    sw.type='sawtooth';
+    sw.frequency.setValueAtTime(110,t); sw.frequency.exponentialRampToValueAtTime(880,t+0.30);
+    bp.type='bandpass'; bp.Q.value=1.8;
+    bp.frequency.setValueAtTime(220,t); bp.frequency.exponentialRampToValueAtTime(1760,t+0.30);
+    swG.gain.setValueAtTime(0,t); swG.gain.linearRampToValueAtTime(0.20,t+0.04);
+    swG.gain.setValueAtTime(0.20,t+0.22); swG.gain.exponentialRampToValueAtTime(0.001,t+0.33);
+    sw.connect(bp); bp.connect(swG); swG.connect(comp); sw.start(t); sw.stop(t+0.36);
+    // G major power chord burst at t+0.26
+    [[196.00,0.20],[293.66,0.17],[392.00,0.14],[493.88,0.11],[587.33,0.08]].forEach(([f,v])=>{
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.type='triangle'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,t+0.24); g.gain.linearRampToValueAtTime(v,t+0.27);
+      g.gain.exponentialRampToValueAtTime(0.001,t+1.10);
+      o.connect(g); g.connect(comp); o.start(t+0.24); o.stop(t+1.14);
+      const o2=ctx.createOscillator(),g2=ctx.createGain(); o2.type='sine'; o2.frequency.value=f;
+      g2.gain.setValueAtTime(0,t+0.24); g2.gain.linearRampToValueAtTime(v*0.7,t+0.27);
+      g2.gain.exponentialRampToValueAtTime(0.001,t+0.92);
+      o2.connect(g2); g2.connect(comp); o2.start(t+0.24); o2.stop(t+0.96);
     });
-    [2093.00,2637.02,3135.96].forEach((f,i)=>{ const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f; const st=t+0.44+i*0.068; g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(0.046-i*0.012,st+0.010); g.gain.exponentialRampToValueAtTime(0.001,st+0.50); o.connect(g); g.connect(master); o.start(st); o.stop(st+0.55); });
+    // Crystal sparkle cascade
+    [1174.66,1567.98,2093.00,2637.02,3135.96].forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
+      const st=t+0.28+i*0.050;
+      g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(0.055-i*0.009,st+0.010);
+      g.gain.exponentialRampToValueAtTime(0.001,st+0.40);
+      o.connect(g); g.connect(comp); o.start(st); o.stop(st+0.44);
+    });
   } catch(e) {}
 }
 
+
+// Class Mastery achieved — crystalline 7-note ascending arpeggio + big chord + shimmer burst
+function playMastery() {
+  if (!soundEnabled || !_ACtx) return;
+  try {
+    const ctx = _getCtx(), t = ctx.currentTime;
+    const comp = ctx.createDynamicsCompressor(); comp.threshold.value=-6; comp.knee.value=4; comp.ratio.value=3; comp.attack.value=0.001; comp.release.value=0.12; comp.connect(ctx.destination);
+    [[261.63,0.00,0.10],[329.63,0.09,0.10],[392.00,0.18,0.10],[523.25,0.27,0.10],[659.25,0.36,0.10],[783.99,0.45,0.10],[1046.50,0.54,1.00]].forEach(([f,s,d])=>{
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.type='triangle'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,t+s); g.gain.linearRampToValueAtTime(0.18,t+s+0.008); g.gain.setValueAtTime(0.18,t+s+d*0.55); g.gain.exponentialRampToValueAtTime(0.001,t+s+d+0.06);
+      o.connect(g); g.connect(comp); o.start(t+s); o.stop(t+s+d+0.10);
+    });
+    [523.25,659.25,783.99,1046.50].forEach((f,i)=>{ const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f; const st=t+0.60; g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(0.11-i*0.022,st+0.015); g.gain.exponentialRampToValueAtTime(0.001,st+1.30); o.connect(g); g.connect(comp); o.start(st); o.stop(st+1.35); });
+    [2093.00,2637.02,3135.96,4186.01].forEach((f,i)=>{ const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f; const st=t+0.65+i*0.065; g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(0.042-i*0.008,st+0.010); g.gain.exponentialRampToValueAtTime(0.001,st+0.60); o.connect(g); g.connect(comp); o.start(st); o.stop(st+0.65); });
+  } catch(e) {}
+}
+
+// Tier Complete — royal fanfare: ascending run + big multi-layer chord + crystal cascade
+function playTierComplete() {
+  if (!soundEnabled || !_ACtx) return;
+  try {
+    const ctx = _getCtx(), t = ctx.currentTime;
+    const comp = ctx.createDynamicsCompressor(); comp.threshold.value=-4; comp.knee.value=3; comp.ratio.value=4; comp.attack.value=0.001; comp.release.value=0.10; comp.connect(ctx.destination);
+    [[261.63,0.00,0.11],[329.63,0.10,0.11],[392.00,0.20,0.11],[493.88,0.30,0.11],[587.33,0.40,0.11],[783.99,0.50,0.11],[1046.50,0.60,1.30]].forEach(([f,s,d])=>{
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.type='square'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,t+s); g.gain.linearRampToValueAtTime(0.05,t+s+0.006); g.gain.setValueAtTime(0.05,t+s+d*0.70); g.gain.exponentialRampToValueAtTime(0.001,t+s+d+0.04);
+      o.connect(g); g.connect(comp); o.start(t+s); o.stop(t+s+d+0.06);
+      const o2=ctx.createOscillator(),g2=ctx.createGain(); o2.type='sine'; o2.frequency.value=f;
+      g2.gain.setValueAtTime(0,t+s); g2.gain.linearRampToValueAtTime(0.06,t+s+0.006); g2.gain.exponentialRampToValueAtTime(0.001,t+s+d+0.06);
+      o2.connect(g2); g2.connect(comp); o2.start(t+s); o2.stop(t+s+d+0.08);
+    });
+    [523.25,659.25,783.99,987.77,1046.50].forEach((f,i)=>{ const o=ctx.createOscillator(),g=ctx.createGain(); o.type='triangle'; o.frequency.value=f; const st=t+0.70; g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(0.12-i*0.018,st+0.020); g.gain.exponentialRampToValueAtTime(0.001,st+1.80); o.connect(g); g.connect(comp); o.start(st); o.stop(st+1.85); });
+    [1567.98,2093.00,2637.02,3135.96,4186.01].forEach((f,i)=>{ const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f; const st=t+0.74+i*0.07; g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(0.048-i*0.008,st+0.012); g.gain.exponentialRampToValueAtTime(0.001,st+1.10); o.connect(g); g.connect(comp); o.start(st); o.stop(st+1.15); });
+  } catch(e) {}
+}
 
 // ============================================================
 // STATS / TIERS
 // ============================================================
 const STAT_KEYS = ['STR','DEX','CON','INT','VOL','CHA'];
 const STAT_NAMES = { STR:'Strength', DEX:'Dexterity', CON:'Constitution', INT:'Intelligence', VOL:'Volition', CHA:'Charisma' };
-const TIERS = [{t:'F',min:0},{t:'E',min:60},{t:'D',min:225},{t:'C',min:500},{t:'B',min:1350},{t:'A',min:2300},{t:'S',min:3500},{t:'SS',min:4400},{t:'SSS',min:5300}];
+const STAT_EMOJI = { STR:'⚔', DEX:'🌿', CON:'🛡', INT:'📚', VOL:'🔥', CHA:'✨' };
+const TIERS = [{t:'F',min:0},{t:'E',min:80},{t:'D',min:270},{t:'C',min:600},{t:'B',min:1500},{t:'A',min:2800},{t:'S',min:5000},{t:'SS',min:7000},{t:'SSS',min:8750}];
+const TIER_COLORS = { F:'#9e9e9e', E:'#66bb6a', D:'#42a5f5', C:'#ab47bc', B:'#ffc107', A:'#ff9800', S:'#ef5350', SS:'#e91e63', SSS:'#ffd700' };
+
+// ── Level progression ────────────────────────────────────────
+const MAX_LEVEL = 99;
+const LEVEL_BANDS = [
+  { rank:'F',   from:1,  to:9,  xpPerLevel:300   },
+  { rank:'E',   from:10, to:19, xpPerLevel:500   },
+  { rank:'D',   from:20, to:29, xpPerLevel:900   },
+  { rank:'C',   from:30, to:39, xpPerLevel:1600  },
+  { rank:'B',   from:40, to:49, xpPerLevel:2800  },
+  { rank:'A',   from:50, to:64, xpPerLevel:4500  },
+  { rank:'S',   from:65, to:79, xpPerLevel:7500  },
+  { rank:'SS',  from:80, to:94, xpPerLevel:11500 },
+  { rank:'SSS', from:95, to:99, xpPerLevel:21000 },
+];
+// LEVEL_XP_TABLE[n] = total XP needed to reach level n
+const LEVEL_XP_TABLE = (() => {
+  const t = { 1:0 };
+  for (let lv = 1; lv < MAX_LEVEL; lv++) {
+    const band = LEVEL_BANDS.find(b => lv >= b.from && lv <= b.to);
+    t[lv+1] = t[lv] + (band ? band.xpPerLevel : 21000);
+  }
+  return t;
+})();
+function xpForLevel(lv) {
+  const band = LEVEL_BANDS.find(b => lv >= b.from && lv <= b.to);
+  return band ? band.xpPerLevel : 21000;
+}
+function levelRank(lv) {
+  return LEVEL_BANDS.find(b => lv >= b.from && lv <= b.to)?.rank || 'SSS';
+}
+function getLevelUpStatBonus(lv) {
+  if (lv === 99) return 99;
+  if (lv % 10 === 0) return 10;
+  return 1;
+}
 function tierFor(pts) {
   let curr=TIERS[0],next=TIERS[1];
   for(let i=0;i<TIERS.length;i++) if(pts>=TIERS[i].min){curr=TIERS[i];next=TIERS[i+1];}
@@ -216,6 +337,188 @@ function isoWeekKey(date) {
 }
 
 // ============================================================
+// CLASS SYSTEM
+// ============================================================
+const CLASS_TIERS = { NOVICE:1, ADEPT:2, EXPERT:3, LEGEND:4, TRUE_HERO:5 };
+
+const CLASSES = {
+  // ── TIER 1 · NOVICE ─────────────────────────────────────────
+  berserker:        { id:'berserker',        name:'BERSERKER',        tier:1, stats:['STR'],           passive:0.05, multiplier:0.10, masteryDays:7,  color:'#ef5350' },
+  scout:            { id:'scout',            name:'SCOUT',            tier:1, stats:['DEX'],           passive:0.05, multiplier:0.10, masteryDays:7,  color:'#66bb6a' },
+  guardian:         { id:'guardian',         name:'GUARDIAN',         tier:1, stats:['CON'],           passive:0.05, multiplier:0.10, masteryDays:7,  color:'#ffa726' },
+  mage:             { id:'mage',             name:'MAGE',             tier:1, stats:['INT'],           passive:0.05, multiplier:0.10, masteryDays:7,  color:'#42a5f5' },
+  monk:             { id:'monk',             name:'MONK',             tier:1, stats:['VOL'],           passive:0.05, multiplier:0.10, masteryDays:7,  color:'#ab47bc' },
+  bard:             { id:'bard',             name:'BARD',             tier:1, stats:['CHA'],           passive:0.05, multiplier:0.10, masteryDays:7,  color:'#ffca28' },
+  // ── TIER 2 · ADEPT ──────────────────────────────────────────
+  paladin:          { id:'paladin',          name:'PALADIN',          tier:2, stats:['STR','CON'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#ef5350' },
+  duelist:          { id:'duelist',          name:'DUELIST',          tier:2, stats:['STR','DEX'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#ef5350' },
+  crusader:         { id:'crusader',         name:'CRUSADER',         tier:2, stats:['STR','VOL'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#ef5350' },
+  battle_mage:      { id:'battle_mage',      name:'BATTLE MAGE',      tier:2, stats:['STR','INT'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#42a5f5' },
+  warlord:          { id:'warlord',          name:'WARLORD',          tier:2, stats:['STR','CHA'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#ef5350' },
+  ranger:           { id:'ranger',           name:'RANGER',           tier:2, stats:['DEX','CON'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#66bb6a' },
+  assassin:         { id:'assassin',         name:'ASSASSIN',         tier:2, stats:['DEX','INT'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#66bb6a' },
+  ninja:            { id:'ninja',            name:'NINJA',            tier:2, stats:['DEX','VOL'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#66bb6a' },
+  trickster:        { id:'trickster',        name:'TRICKSTER',        tier:2, stats:['DEX','CHA'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#66bb6a' },
+  alchemist:        { id:'alchemist',        name:'ALCHEMIST',        tier:2, stats:['CON','INT'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#ffa726' },
+  templar:          { id:'templar',          name:'TEMPLAR',          tier:2, stats:['CON','VOL'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#ffa726' },
+  keeper:           { id:'keeper',           name:'KEEPER',           tier:2, stats:['CON','CHA'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#ffa726' },
+  archmage:         { id:'archmage',         name:'ARCHMAGE',         tier:2, stats:['INT','VOL'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#42a5f5' },
+  loremaster:       { id:'loremaster',       name:'LOREMASTER',       tier:2, stats:['INT','CHA'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#42a5f5' },
+  prophet:          { id:'prophet',          name:'PROPHET',          tier:2, stats:['VOL','CHA'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#ab47bc' },
+  // ── TIER 3 · EXPERT ─────────────────────────────────────────
+  iron_overlord:    { id:'iron_overlord',    name:'IRON OVERLORD',    tier:3, stats:['STR','CON'],     passive:0.10, multiplier:0.15, masteryDays:21, color:'#ef5350' },
+  blademaster:      { id:'blademaster',      name:'BLADEMASTER',      tier:3, stats:['STR','DEX'],     passive:0.10, multiplier:0.15, masteryDays:21, color:'#ef5350' },
+  rune_knight:      { id:'rune_knight',      name:'RUNE KNIGHT',      tier:3, stats:['STR','INT'],     passive:0.10, multiplier:0.15, masteryDays:21, color:'#42a5f5' },
+  warlord_supreme:  { id:'warlord_supreme',  name:'WARLORD SUPREME',  tier:3, stats:['STR','VOL'],     passive:0.10, multiplier:0.15, masteryDays:21, color:'#ef5350' },
+  shadow_hunter:    { id:'shadow_hunter',    name:'SHADOW HUNTER',    tier:3, stats:['DEX','CON'],     passive:0.10, multiplier:0.15, masteryDays:21, color:'#66bb6a' },
+  phantom_blade:    { id:'phantom_blade',    name:'PHANTOM BLADE',    tier:3, stats:['DEX','INT'],     passive:0.10, multiplier:0.15, masteryDays:21, color:'#66bb6a' },
+  sentinel:         { id:'sentinel',         name:'SENTINEL',         tier:3, stats:['DEX','CHA'],     passive:0.10, multiplier:0.15, masteryDays:21, color:'#66bb6a' },
+  arcane_sovereign: { id:'arcane_sovereign', name:'ARCANE SOVEREIGN', tier:3, stats:['INT','VOL'],     passive:0.10, multiplier:0.15, masteryDays:21, color:'#42a5f5' },
+  high_enchanter:   { id:'high_enchanter',   name:'HIGH ENCHANTER',   tier:3, stats:['INT','CHA'],     passive:0.10, multiplier:0.15, masteryDays:21, color:'#42a5f5' },
+  oracle:           { id:'oracle',           name:'ORACLE',           tier:3, stats:['VOL','CHA'],     passive:0.10, multiplier:0.15, masteryDays:21, color:'#ab47bc' },
+  // ── TIER 4 · LEGEND ─────────────────────────────────────────
+  godslayer:        { id:'godslayer',        name:'GODSLAYER',        tier:4, stats:['STR','DEX','CON'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
+  iron_saint:       { id:'iron_saint',       name:'IRON SAINT',       tier:4, stats:['STR','CON','VOL'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
+  void_hunter:      { id:'void_hunter',      name:'VOID HUNTER',      tier:4, stats:['DEX','CON','STR'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
+  rune_sovereign:   { id:'rune_sovereign',   name:'RUNE SOVEREIGN',   tier:4, stats:['STR','INT','VOL'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
+  emperor:          { id:'emperor',          name:'EMPEROR',          tier:4, stats:['STR','INT','CHA'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
+  spellblade:       { id:'spellblade',       name:'SPELLBLADE',       tier:4, stats:['STR','DEX','INT'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
+  void_sage:        { id:'void_sage',        name:'VOID SAGE',        tier:4, stats:['DEX','INT','VOL'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
+  warlord_sovereign:{ id:'warlord_sovereign',name:'WARLORD SOVEREIGN',tier:4, stats:['STR','CHA','CON'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
+  sovereign:        { id:'sovereign',        name:'SOVEREIGN',        tier:4, stats:['CON','INT','CHA'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
+  shadow_prophet:   { id:'shadow_prophet',   name:'SHADOW PROPHET',   tier:4, stats:['DEX','VOL','CHA'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
+  archlord:         { id:'archlord',         name:'ARCHLORD',         tier:4, stats:['INT','VOL','CHA'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
+  divine_prophet:   { id:'divine_prophet',   name:'DIVINE PROPHET',   tier:4, stats:['VOL','CHA','CON'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
+  // ── TIER 5 · TRUE HERO (hidden) ─────────────────────────────
+  true_hero:        { id:'true_hero',        name:'TRUE HERO',        tier:5, stats:['STR','DEX','CON','INT','VOL','CHA'], passive:0.20, multiplier:0.20, masteryDays:90, color:'#ffffff', hidden:true },
+};
+
+// Mastery flat reward per class (added permanently to base stats on mastery)
+const CLASS_MASTERY_REWARD = { 1:15, 2:20, 3:30, 4:50, 5:80 };
+
+// Tier completion rewards (permanent passive % on ALL stats)
+const TIER_COMPLETE_REWARD = {
+  1: { passiveAll:0.02, skill:'veteran_edge'  },
+  2: { passiveAll:0.03, skill:'battle_hardened' },
+  3: { passiveAll:0.04, skill:'iron_resolve'  },
+  4: { passiveAll:0.05, skill:'transcendence' },
+  5: { passiveAll:0.10, skill:'limitless'     },
+};
+
+// Classes grouped by tier (for completion checks)
+const CLASSES_BY_TIER = [1,2,3,4,5].reduce((acc,t) => {
+  acc[t] = Object.values(CLASSES).filter(c => c.tier === t).map(c => c.id);
+  return acc;
+}, {});
+
+function defaultClassState() {
+  return {
+    equipped: null,           // class id currently equipped
+    mastery: {},              // { classId: daysAccumulated }
+    masteredClasses: {},      // { classId: true } — permanently mastered
+    completedTiers: {},       // { tier: true } — tier completion bonus claimed
+    tierPassiveBonus: 0,      // sum of all tier completion passiveAll bonuses
+    unlockedSkills: [],       // skill ids unlocked via tier completion
+    history: [],              // [ classId, ... ] in order equipped
+    lastMasteryTick: null,    // date string of last daily tick
+  };
+}
+
+// ============================================================
+// CLASS UNLOCK LOGIC  (Paso 2)
+// ============================================================
+
+// Level + minimum stat value required to access each tier
+// Calibrated to the actual progression curve (see progression table):
+//   BEGINNER  → no class equipped (null)
+//   Novice    → ~month 1  / ~lv 35  / D stats (270)
+//   Adept     → ~month 4  / ~lv 50  / B stats (1500)
+//   Expert    → ~month 8  / ~lv 55  / A stats (2800)
+//   Legend    → ~month 14 / ~lv 70  / S stats (5000)
+//   TRUE HERO → ~month 24 / ~lv 95  / SSS stats (8750) + all Tier-4 mastered
+const CLASS_TIER_REQ = {
+  1: { level: 20, statMin: 270  },   // D tier  — ~mes 1
+  2: { level: 40, statMin: 1500 },   // B tier  — ~mes 4
+  3: { level: 60, statMin: 2800 },   // A tier  — ~mes 8
+  4: { level: 80, statMin: 5000 },   // S tier  — ~mes 14
+  5: { level: 95, statMin: 8750 },   // SSS tier — TRUE HERO (hidden)
+};
+
+// Returns { available:bool, locked:bool, reasons:string[] }
+// reasons is non-empty when locked — use to show unlock hints in UI
+function getClassUnlockStatus(classId, state) {
+  const cls = CLASSES[classId];
+  if (!cls) return { available: false, locked: true, reasons: ['Unknown class'] };
+
+  const req   = CLASS_TIER_REQ[cls.tier];
+  const level = (state.totalXp !== undefined) ? calcLevel(state.totalXp).level : 1;
+  const reasons = [];
+
+  // ── Level check ──────────────────────────────────────────
+  if (level < req.level) {
+    reasons.push(`Nivel ${req.level} requerido (actual: ${level})`);
+  }
+
+  // ── Stat check ───────────────────────────────────────────
+  if (req.statMin > 0) {
+    cls.stats.forEach(s => {
+      const val = (state.stats && state.stats[s]) || 0;
+      if (val < req.statMin) {
+        reasons.push(`${STAT_NAMES[s]} ≥ ${req.statMin} (actual: ${val})`);
+      }
+    });
+  }
+
+  // ── Mastery prerequisite (Tier 2 needs mastered Tier-1 with shared stat, etc.) ──
+  if (cls.tier >= 2) {
+    const mastered = state.classData ? state.classData.masteredClasses || {} : {};
+    const hasMasteredPrereq = Object.values(CLASSES).some(c =>
+      c.tier === cls.tier - 1 &&
+      mastered[c.id] &&
+      c.stats.some(s => cls.stats.includes(s))
+    );
+    if (!hasMasteredPrereq) {
+      const tierNames = { 1:'Novice', 2:'Adept', 3:'Expert', 4:'Legend' };
+      const prevName  = tierNames[cls.tier - 1] || 'anterior';
+      const statsStr  = cls.stats.map(s => STAT_NAMES[s]).join('/');
+      reasons.push(`Dominá una clase ${prevName} de ${statsStr} primero`);
+    }
+  }
+
+  // ── TRUE HERO: only unlocks when all Tier-4 are mastered ─
+  if (cls.tier === 5) {
+    const mastered  = state.classData ? state.classData.masteredClasses || {} : {};
+    const allTier4  = CLASSES_BY_TIER[4].every(id => mastered[id]);
+    if (!allTier4) {
+      reasons.push('???');
+    }
+  }
+
+  return { available: reasons.length === 0, locked: reasons.length > 0, reasons };
+}
+
+// Returns array of class IDs the player can currently equip
+// Hidden classes (TRUE HERO) are excluded until truly unlocked
+function getAvailableClasses(state) {
+  return Object.keys(CLASSES).filter(id => {
+    const cls = CLASSES[id];
+    if (cls.hidden) {
+      // Only expose TRUE HERO when fully unlocked
+      const mastered = state.classData ? state.classData.masteredClasses || {} : {};
+      return CLASSES_BY_TIER[4].every(cid => mastered[cid]);
+    }
+    return getClassUnlockStatus(id, state).available;
+  });
+}
+
+// Returns all classes of a given tier with their unlock status
+function getClassesByTier(tier, state) {
+  return Object.values(CLASSES)
+    .filter(c => c.tier === tier && !c.hidden)
+    .map(c => ({ ...c, ...getClassUnlockStatus(c.id, state) }));
+}
+
+// ============================================================
 // STATE
 // ============================================================
 function defaultStats() { return STAT_KEYS.reduce((a,k)=>{a[k]=0;return a;},{}); }
@@ -242,6 +545,15 @@ function loadState() {
       if (!s.hasOwnProperty('hp') || s.hp === undefined) s.hp = null;
       if (!s.hasOwnProperty('mp') || s.mp === undefined) s.mp = null;
       if (!s.hasOwnProperty('lastHpMpTick')) s.lastHpMpTick = null;
+      if (!s.classData) s.classData = defaultClassState();
+      if (!s.classData.equipped) s.classData.equipped = null;
+      if (!s.classData.mastery) s.classData.mastery = {};
+      if (!s.classData.masteredClasses) s.classData.masteredClasses = {};
+      if (!s.classData.completedTiers) s.classData.completedTiers = {};
+      if (typeof s.classData.tierPassiveBonus !== 'number') s.classData.tierPassiveBonus = 0;
+      if (!s.classData.unlockedSkills) s.classData.unlockedSkills = [];
+      if (!s.classData.history) s.classData.history = [];
+      if (!s.classData.lastMasteryTick) s.classData.lastMasteryTick = null;
       // ensure done exists on all habits
       s.habitos.forEach(h=>{ if(!h.done) h.done={}; });
       s.weekly.forEach(w=>{ if(!w.done) w.done={}; });
@@ -263,7 +575,7 @@ function loadState() {
       return { habitos, weekly, trabajo: v3.trabajo||[], stats: v3.stats||defaultStats(), totalXp: v3.totalXp||0, streak: v3.streak||0, lastActiveDay: v3.lastActiveDay||todayKey(), col: v3.col||0 };
     }
   } catch(e) { console.warn('load failed',e); }
-  return { habitos: DEFAULT_HABITOS.map(h=>({...h,done:{}})), weekly: DEFAULT_WEEKLY.map(w=>({...w,done:{}})), trabajo: [], stats: defaultStats(), totalXp:0, streak:0, lastActiveDay:todayKey(), col:0, playerName:'Tuni', playerTitle:'Beginner', achievements:{}, logros:{perfectWeekCount:0,phoenixCount:0,lastPerfectWeekDay:null,lastPhoenixDay:null}, dungeon:null, inventory:[{itemId:'iron_sword',quantity:1},{itemId:'leather_armor',quantity:1},{itemId:'iron_helm',quantity:1},{itemId:'leather_boots',quantity:1},{itemId:'hp_pot_s',quantity:5},{itemId:'mp_pot_s',quantity:2}], equipment:{earring_l:null,helmet:null,earring_r:null,weapon:null,armor:null,shield:null,necklace:null,bracelet:null,belt:null,boots:null} };
+  return { habitos: DEFAULT_HABITOS.map(h=>({...h,done:{}})), weekly: DEFAULT_WEEKLY.map(w=>({...w,done:{}})), trabajo: [], stats: defaultStats(), totalXp:0, streak:0, lastActiveDay:todayKey(), col:0, playerName:'Tuni', playerTitle:'Beginner', achievements:{}, logros:{perfectWeekCount:0,phoenixCount:0,lastPerfectWeekDay:null,lastPhoenixDay:null}, dungeon:null, inventory:[{itemId:'iron_sword',quantity:1},{itemId:'leather_armor',quantity:1},{itemId:'iron_helm',quantity:1},{itemId:'leather_boots',quantity:1},{itemId:'hp_pot_s',quantity:5},{itemId:'mp_pot_s',quantity:2}], equipment:{earring_l:null,helmet:null,earring_r:null,weapon:null,armor:null,shield:null,necklace:null,bracelet:null,belt:null,boots:null}, classData: defaultClassState() };
 }
 
 function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
@@ -398,40 +710,40 @@ const ACHIEVEMENTS = [
   // ── PROGRESIÓN — 12 hábitos reales ──────────────────────────
   // Busca el hábito por texto (textMatch) → independiente del ID
   { id:'wake7am',     name:'Early Riser',     icon:'🌅', category:'progresion', desc:'Wake up at 7am',                                 textMatch:'7am',           stat:'CON',
-    tiers:[{count:10,label:'The Sleeper Defeated',reward:5,title:null},{count:30,label:'Dawn Guardian',reward:12,title:null},{count:100,label:'Dawn Hunter',reward:50,title:'Dawn Hunter'},{count:200,label:'Lord of Time',reward:125,title:'Lord of Time'},{count:365,label:'ASCENDED',reward:250,title:'ASCENDED'}]},
+    tiers:[{count:10,label:'The Sleeper Defeated',reward:5,title:null},{count:30,label:'Dawn Guardian',reward:12,title:null},{count:100,label:'Dawn Hunter',reward:25,title:'Dawn Hunter'},{count:200,label:'Lord of Time',reward:60,title:'Lord of Time'},{count:365,label:'ASCENDED',reward:100,title:'ASCENDED'}]},
 
   { id:'hydration',   name:'Hydrated',      icon:'💧', category:'progresion', desc:'Drink 2L of water',                               textMatch:'agua',          stat:'CON',
-    tiers:[{count:10,label:'Steady',reward:5,title:null},{count:30,label:'Steady Flow',reward:12,title:null},{count:100,label:'Fountain of Life',reward:50,title:'Fountain of Life'},{count:200,label:'Pure Torrent',reward:125,title:'Pure Torrent'},{count:365,label:'INNER SEA',reward:250,title:'INNER SEA'}]},
+    tiers:[{count:10,label:'Steady',reward:5,title:null},{count:30,label:'Steady Flow',reward:12,title:null},{count:100,label:'Fountain of Life',reward:25,title:'Fountain of Life'},{count:200,label:'Pure Torrent',reward:60,title:'Pure Torrent'},{count:365,label:'INNER SEA',reward:100,title:'INNER SEA'}]},
 
   { id:'walk',        name:'Walker',      icon:'🚶', category:'progresion', desc:'Walk to the park',                             textMatch:'parque',        stat:'DEX',
-    tiers:[{count:10,label:'Stroller',reward:5,title:null},{count:30,label:'Explorer',reward:12,title:null},{count:100,label:'Ranger',reward:50,title:'Ranger'},{count:200,label:'Dawn Nomad',reward:125,title:'Dawn Nomad'},{count:365,label:'LORD OF THE PATH',reward:250,title:'LORD OF THE PATH'}]},
+    tiers:[{count:10,label:'Stroller',reward:5,title:null},{count:30,label:'Explorer',reward:12,title:null},{count:100,label:'Ranger',reward:25,title:'Ranger'},{count:200,label:'Dawn Nomad',reward:60,title:'Dawn Nomad'},{count:365,label:'LORD OF THE PATH',reward:100,title:'LORD OF THE PATH'}]},
 
   { id:'meditation',  name:'Calm Mind',   icon:'🧘', category:'progresion', desc:'Meditation (10 min)',                            textMatch:'meditac',       stat:'VOL',
-    tiers:[{count:10,label:'Zen Apprentice',reward:5,title:null},{count:30,label:'Meditator',reward:12,title:null},{count:100,label:'Crystal Mind',reward:50,title:'Crystal Mind'},{count:200,label:'Contemplative',reward:125,title:'Contemplative'},{count:365,label:'SACRED VOID',reward:250,title:'SACRED VOID'}]},
+    tiers:[{count:10,label:'Zen Apprentice',reward:5,title:null},{count:30,label:'Meditator',reward:12,title:null},{count:100,label:'Crystal Mind',reward:25,title:'Crystal Mind'},{count:200,label:'Contemplative',reward:60,title:'Contemplative'},{count:365,label:'SACRED VOID',reward:100,title:'SACRED VOID'}]},
 
   { id:'training',    name:'Warrior',       icon:'💪', category:'progresion', desc:'Physical training',                           textMatch:'entrenamiento', stat:'STR',
-    tiers:[{count:10,label:'Novice',reward:5,title:null},{count:30,label:'Soldier',reward:12,title:null},{count:100,label:'Iron Veteran',reward:50,title:'Iron Veteran'},{count:200,label:'Champion',reward:125,title:'Champion'},{count:365,label:'LIVING LEGEND',reward:250,title:'LIVING LEGEND'}]},
+    tiers:[{count:10,label:'Novice',reward:5,title:null},{count:30,label:'Soldier',reward:12,title:null},{count:100,label:'Iron Veteran',reward:25,title:'Iron Veteran'},{count:200,label:'Champion',reward:60,title:'Champion'},{count:365,label:'LIVING LEGEND',reward:100,title:'LIVING LEGEND'}]},
 
   { id:'journal',     name:'Strategist',      icon:'📝', category:'progresion', desc:'Log wins of the day and task #1 for tomorrow',    textMatch:'logros del',    stat:'INT',
-    tiers:[{count:10,label:'Note Taker',reward:5,title:null},{count:30,label:'Planner',reward:12,title:null},{count:100,label:'Strategist',reward:50,title:'Strategist'},{count:200,label:'Visionary',reward:125,title:'Visionary'},{count:365,label:'MASTER OF TIME',reward:250,title:'MASTER OF TIME'}]},
+    tiers:[{count:10,label:'Note Taker',reward:5,title:null},{count:30,label:'Planner',reward:12,title:null},{count:100,label:'Strategist',reward:25,title:'Strategist'},{count:200,label:'Visionary',reward:60,title:'Visionary'},{count:365,label:'MASTER OF TIME',reward:100,title:'MASTER OF TIME'}]},
 
   { id:'gratitude',   name:'Grateful',     icon:'🙏', category:'progresion', desc:'Write 3 things you are grateful for', textMatch:'agradecido',    stat:'CHA',
-    tiers:[{count:10,label:'Mindful',reward:5,title:null},{count:30,label:'Generous',reward:12,title:null},{count:100,label:'Open Heart',reward:50,title:'Open Heart'},{count:200,label:'Light of the Group',reward:125,title:'Light of the Group'},{count:365,label:'PURE SOUL',reward:250,title:'PURE SOUL'}]},
+    tiers:[{count:10,label:'Mindful',reward:5,title:null},{count:30,label:'Generous',reward:12,title:null},{count:100,label:'Open Heart',reward:25,title:'Open Heart'},{count:200,label:'Light of the Group',reward:60,title:'Light of the Group'},{count:365,label:'PURE SOUL',reward:100,title:'PURE SOUL'}]},
 
   { id:'dishes',      name:'Order',          icon:'🍽️', category:'progresion', desc:'Wash dishes',                                  textMatch:'platos',        stat:'VOL',
-    tiers:[{count:10,label:'The Washer',reward:5,title:null},{count:30,label:'Disciplined',reward:12,title:null},{count:100,label:'Master of Order',reward:50,title:'Master of Order'},{count:200,label:'Home Guardian',reward:125,title:'Home Guardian'},{count:365,label:'DOMESTIC MONK',reward:250,title:'DOMESTIC MONK'}]},
+    tiers:[{count:10,label:'The Washer',reward:5,title:null},{count:30,label:'Disciplined',reward:12,title:null},{count:100,label:'Master of Order',reward:25,title:'Master of Order'},{count:200,label:'Home Guardian',reward:60,title:'Home Guardian'},{count:365,label:'DOMESTIC MONK',reward:100,title:'DOMESTIC MONK'}]},
 
   { id:'bed',         name:'Solid Foundation',    icon:'🛏️', category:'progresion', desc:'Make your bed',                                    textMatch:'cama',          stat:'CHA',
-    tiers:[{count:10,label:'The Methodical',reward:5,title:null},{count:30,label:'The Consistent',reward:12,title:null},{count:100,label:'Home Artisan',reward:50,title:'Home Artisan'},{count:200,label:'Day Architect',reward:125,title:'Day Architect'},{count:365,label:'RITUAL FORGER',reward:250,title:'RITUAL FORGER'}]},
+    tiers:[{count:10,label:'The Methodical',reward:5,title:null},{count:30,label:'The Consistent',reward:12,title:null},{count:100,label:'Home Artisan',reward:25,title:'Home Artisan'},{count:200,label:'Day Architect',reward:60,title:'Day Architect'},{count:365,label:'RITUAL FORGER',reward:100,title:'RITUAL FORGER'}]},
 
   { id:'reading',     name:'Bibliophile',     icon:'📖', category:'progresion', desc:'Read',                                           textMatch:'leer',          stat:'INT',
-    tiers:[{count:10,label:'Curious',reward:5,title:null},{count:30,label:'Studious',reward:12,title:null},{count:100,label:'Scholar',reward:50,title:'Scholar'},{count:200,label:'Sage',reward:125,title:'Sage'},{count:365,label:'MASTER OF KNOWLEDGE',reward:250,title:'MASTER OF KNOWLEDGE'}]},
+    tiers:[{count:10,label:'Curious',reward:5,title:null},{count:30,label:'Studious',reward:12,title:null},{count:100,label:'Scholar',reward:25,title:'Scholar'},{count:200,label:'Sage',reward:60,title:'Sage'},{count:365,label:'MASTER OF KNOWLEDGE',reward:100,title:'MASTER OF KNOWLEDGE'}]},
 
   { id:'stretching',  name:'Agile',           icon:'🤸', category:'progresion', desc:'Stretching',                                 textMatch:'estiramiento',  stat:'DEX',
-    tiers:[{count:10,label:'Stiffness Overcome',reward:5,title:null},{count:30,label:'Flexible',reward:12,title:null},{count:100,label:'Agile',reward:50,title:'Agile'},{count:200,label:'Acrobat',reward:125,title:'Acrobat'},{count:365,label:'SPIRIT OF THE WIND',reward:250,title:'SPIRIT OF THE WIND'}]},
+    tiers:[{count:10,label:'Stiffness Overcome',reward:5,title:null},{count:30,label:'Flexible',reward:12,title:null},{count:100,label:'Agile',reward:25,title:'Agile'},{count:200,label:'Acrobat',reward:60,title:'Acrobat'},{count:365,label:'SPIRIT OF THE WIND',reward:100,title:'SPIRIT OF THE WIND'}]},
 
-  { id:'phone',       name:'Focused',       icon:'📵', category:'progresion', desc:'Mindful phone use',                    textMatch:'celular',       stat:'VOL',
-    tiers:[{count:10,label:'Mindful',reward:5,title:null},{count:30,label:'Unplugged',reward:12,title:null},{count:100,label:'Free Mind',reward:50,title:'Free Mind'},{count:200,label:'Unchained',reward:125,title:'Unchained'},{count:365,label:'DIGITAL SOVEREIGN',reward:250,title:'DIGITAL SOVEREIGN'}]},
+  { id:'phone',       name:'Focused',       icon:'📵', category:'progresion', desc:'Mindful phone use',                    textMatch:'celular',       stat:'STR',
+    tiers:[{count:10,label:'Mindful',reward:5,title:null},{count:30,label:'Unplugged',reward:12,title:null},{count:100,label:'Free Mind',reward:25,title:'Free Mind'},{count:200,label:'Unchained',reward:60,title:'Unchained'},{count:365,label:'DIGITAL SOVEREIGN',reward:100,title:'DIGITAL SOVEREIGN'}]},
 
   // ── RACHA ───────────────────────────────────────────────────
   { id:'streak_gen',  name:'On Fire',      icon:'🔥', category:'racha',       desc:'Consecutive days with ≥70% habits complete',
@@ -443,7 +755,7 @@ const ACHIEVEMENTS = [
 
   // ── RESILIENCIA ─────────────────────────────────────────────
   { id:'phoenix',     name:'Phoenix',          icon:'🦅', category:'resiliencia', desc:'100% day after a 0% day',
-    tiers:[{count:1,label:'Risen',reward:7,title:null},{count:3,label:'Fire Bird',reward:20,title:null},{count:5,label:'Indestructible',reward:40,title:'Indestructible'},{count:10,label:'No Surrender',reward:100,title:'No Surrender'},{count:20,label:'ETERNAL PHOENIX',reward:250,title:'ETERNAL PHOENIX'}]},
+    tiers:[{count:1,label:'Risen',reward:7,title:null},{count:3,label:'Fire Bird',reward:20,title:null},{count:5,label:'Indestructible',reward:40,title:'Indestructible'},{count:10,label:'No Surrender',reward:100,title:'No Surrender'},{count:20,label:'ETERNAL PHOENIX',reward:100,title:'ETERNAL PHOENIX'}]},
 ];
 
 const TIER_LABELS  = ['🥉 BRONZE','🥈 SILVER','🥇 GOLD','💎 LEGENDARY','👑 UNIQUE'];
@@ -844,17 +1156,63 @@ function getHabitStreak(habit) {
 function getCompletion(task, key) { const d=task.done[key]; if(!d) return null; if(typeof d==='object') return d; return {gains:task.gains,xp:task.xp}; }
 function applyGains(gains, mul) { Object.entries(gains||{}).forEach(([k,v])=>{ state.stats[k]=Math.max(0,(state.stats[k]||0)+v*mul); }); }
 
-function calcLevel(totalXp) { let level=1,needed=100,acc=0; while(totalXp>=acc+needed){acc+=needed;level++;needed=100+(level-1)*50;} return {level,currentLevelXp:totalXp-acc,neededForNext:needed}; }
+// ── Class passive & multiplier helpers (Paso 3) ──────────────
+
+// Flat bonus added to a stat by: equipped class passive % + tier completion bonuses
+function getClassPassiveBonus(statKey, st) {
+  const base = (st.stats && st.stats[statKey]) || 0;
+  if (!base) return 0;
+  let pct = (st.classData && st.classData.tierPassiveBonus) || 0;
+  const eqId = st.classData && st.classData.equipped;
+  if (eqId) {
+    const cls = CLASSES[eqId];
+    if (cls && cls.stats.includes(statKey)) pct += cls.passive;
+  }
+  return Math.floor(base * pct);
+}
+
+// Effective stat value (used for display, HP/MP, dungeon calcs)
+function getEffectiveStat(statKey, st) {
+  return ((st.stats && st.stats[statKey]) || 0) + getClassPassiveBonus(statKey, st);
+}
+
+// Notification string for gains — highlights boosted stats with ↑ when class multiplier applied
+function _gainsStr(applied, original) {
+  return Object.entries(applied).map(([k,v]) => {
+    const orig = (original||{})[k] || v;
+    return v > orig ? `${k}+${v}↑` : `${k}+${v}`;
+  }).join(' ');
+}
+
+// Apply gains with equipped class multiplier on matching stats.
+// Returns the actually-applied gains object (stored in task.done for correct undo).
+function applyGainsWithClass(gains) {
+  const eqId = state.classData && state.classData.equipped;
+  const cls   = eqId ? CLASSES[eqId] : null;
+  const applied = {};
+  Object.entries(gains || {}).forEach(([k, v]) => {
+    const amt = (cls && cls.stats.includes(k)) ? Math.round(v * (1 + cls.multiplier)) : v;
+    applied[k] = amt;
+    state.stats[k] = Math.max(0, (state.stats[k] || 0) + amt);
+  });
+  return applied;
+}
+
+function calcLevel(totalXp) {
+  let level = 1;
+  while (level < MAX_LEVEL && totalXp >= (LEVEL_XP_TABLE[level+1]||Infinity)) level++;
+  return { level, currentLevelXp: totalXp - (LEVEL_XP_TABLE[level]||0), neededForNext: xpForLevel(level) };
+}
 function calcHpPct() { const t=state.habitos.length; if(!t) return 100; const done=state.habitos.filter(h=>h.done[todayKey()]).length; return Math.round(60+(done/t)*40); }
 function calcMpPct() { const week=isoWeekKey(); const t=state.weekly.length; if(!t) return 100; const done=state.weekly.filter(w=>w.done[week]).length; return Math.round((done/t)*100); }
 
 function calcMaxHP() {
-  const lv=calcLevel(state.totalXp), st=state.stats, eq=getEquippedStats();
-  return 100 + ((st.CON||0)+(eq.CON||0))*3 + ((st.CHA||0)+(eq.CHA||0))*2 + lv.level*10 + (eq.HP||0);
+  const lv=calcLevel(state.totalXp), eq=getEquippedStats();
+  return 100 + (getEffectiveStat('CON',state)+(eq.CON||0))*3 + (getEffectiveStat('CHA',state)+(eq.CHA||0))*2 + lv.level*10 + (eq.HP||0);
 }
 function calcMaxMP() {
-  const lv=calcLevel(state.totalXp), st=state.stats, eq=getEquippedStats();
-  return 50 + ((st.INT||0)+(eq.INT||0))*2 + ((st.VOL||0)+(eq.VOL||0))*2 + ((st.CHA||0)+(eq.CHA||0)) + lv.level*3 + (eq.MP||0);
+  const lv=calcLevel(state.totalXp), eq=getEquippedStats();
+  return 50 + (getEffectiveStat('INT',state)+(eq.INT||0))*2 + (getEffectiveStat('VOL',state)+(eq.VOL||0))*2 + (getEffectiveStat('CHA',state)+(eq.CHA||0)) + lv.level*3 + (eq.MP||0);
 }
 
 // HP regen: 4% of maxHP per hour (full recovery ~25h passively)
@@ -894,8 +1252,203 @@ function updateStreakOnLoad() {
     const yPct=state.habitos.length ? yDone/state.habitos.length : 0;
     if (state.lastActiveDay===y && yPct>=0.7) state.streak+=1;
     else if (state.lastActiveDay!==y) state.streak=0;
+    // Queue harvest overlay — shown after renderAll()
+    const harvestInfo = _buildHarvestInfo(y);
+    if (harvestInfo.done > 0) _pendingAnims.push(() => showHarvestOverlay(harvestInfo));
     state.lastActiveDay=today; saveState();
   }
+}
+
+// ============================================================
+// MASTERY SYSTEM  (Pasos 7 + 8 + 9 + 10)
+// ============================================================
+
+// Animations queued during load (before first render) — shown after renderAll()
+const _pendingAnims = [];
+
+function _buildHarvestInfo(dateKey) {
+  const gains = {}; STAT_KEYS.forEach(k => gains[k] = 0);
+  let xp = 0, done = 0;
+  state.habitos.forEach(h => {
+    const c = getCompletion(h, dateKey);
+    if (c) { done++; xp += c.xp || 0; STAT_KEYS.forEach(k => { gains[k] += (c.gains||{})[k]||0; }); }
+  });
+  return { gains, xp, done, total: state.habitos.length, dateKey };
+}
+
+function showHarvestOverlay(info) {
+  if (soundEnabled) playDailyComplete();
+  const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const [y,m,d] = info.dateKey.split('-');
+  const dateStr = `${months[parseInt(m)-1]} ${d}, ${y}`;
+  const gainRows = STAT_KEYS
+    .filter(k => info.gains[k] > 0)
+    .map(k => `<div class="harvest-stat-row"><span class="harvest-stat-key">${k}</span><span class="harvest-stat-val">+${info.gains[k]}</span></div>`)
+    .join('');
+  const ov = document.createElement('div');
+  ov.className = 'harvest-overlay';
+  ov.innerHTML = `
+    <div class="harvest-badge">⟦ HARVEST OF YESTERDAY ⟧</div>
+    <div class="harvest-date">${dateStr}</div>
+    <div class="harvest-quests">${info.done} / ${info.total} QUESTS COMPLETED</div>
+    ${info.xp > 0 ? `<div class="harvest-xp">+${info.xp} EXP GAINED</div>` : ''}
+    ${gainRows ? `<div class="harvest-gains">${gainRows}</div>` : '<div class="harvest-no-gains">No stat gains recorded</div>'}
+    <button class="harvest-dismiss-btn" onclick="this.closest('.harvest-overlay').style.animation='masteryFadeOut 0.4s ease forwards';setTimeout(()=>this.closest('.harvest-overlay')?.remove(),400)">⟦ CONTINUE ⟧</button>
+  `;
+  document.body.appendChild(ov);
+  setTimeout(() => {
+    if (ov.isConnected) {
+      ov.style.animation = 'masteryFadeOut 0.4s ease forwards';
+      setTimeout(() => ov.remove(), 400);
+    }
+  }, 12000);
+}
+
+function tickMasteryOnLoad() {
+  const today = todayKey();
+  if (state.classData.lastMasteryTick === today) return; // already ticked today
+  state.classData.lastMasteryTick = today;
+
+  const classId = state.classData.equipped;
+  if (!classId) { saveState(); return; }
+
+  const cls = CLASSES[classId];
+  if (!cls || state.classData.masteredClasses[classId]) { saveState(); return; }
+
+  state.classData.mastery[classId] = (state.classData.mastery[classId] || 0) + 1;
+
+  if (state.classData.mastery[classId] >= cls.masteryDays) {
+    applyMasteryReward(classId);
+  }
+  saveState();
+}
+
+function applyMasteryReward(classId) {
+  if (state.classData.masteredClasses[classId]) return;
+  const cls    = CLASSES[classId];
+  const reward = CLASS_MASTERY_REWARD[cls.tier];
+  cls.stats.forEach(s => { state.stats[s] = (state.stats[s] || 0) + reward; });
+  state.classData.masteredClasses[classId] = true;
+
+  _pendingAnims.push(() => showMasteryOverlay(classId, reward));
+
+  checkTierComplete(cls.tier);
+}
+
+function checkTierComplete(tier) {
+  if (state.classData.completedTiers[tier]) return;
+  const allMastered = CLASSES_BY_TIER[tier].every(id => state.classData.masteredClasses[id]);
+  if (!allMastered) return;
+
+  const reward = TIER_COMPLETE_REWARD[tier];
+  state.classData.tierPassiveBonus = +(state.classData.tierPassiveBonus + reward.passiveAll).toFixed(4);
+  state.classData.completedTiers[tier] = true;
+  if (!state.classData.unlockedSkills.includes(reward.skill))
+    state.classData.unlockedSkills.push(reward.skill);
+
+  if (tier === 4) {
+    _pendingAnims.push(() => showTierCompleteOverlay(tier));
+    // Queue TRUE HERO reveal after the tier-complete overlay
+    _pendingAnims.push(() => setTimeout(() => showTrueHeroReveal(), 200));
+  } else {
+    _pendingAnims.push(() => showTierCompleteOverlay(tier));
+  }
+}
+
+// ── Mastery Overlay ──────────────────────────────────────────
+function showMasteryOverlay(classId, reward) {
+  const cls  = CLASSES[classId];
+  const tier = TIER_NAMES[cls.tier] || '';
+  playMastery();
+
+  const ov = document.createElement('div');
+  ov.className = 'mastery-overlay';
+  ov.style.setProperty('--mc', cls.color);
+  ov.innerHTML = `
+    <div class="mastery-badge">⟦ CLASS MASTERY ⟧</div>
+    <div class="mastery-class-name">${cls.name}</div>
+    <div class="mastery-tier-label">${tier}</div>
+    <div class="mastery-reward-box">
+      <div class="mastery-reward-title">PERMANENT REWARD</div>
+      ${cls.stats.map(s=>`<div class="mastery-reward-line">${STAT_NAMES[s]} <span class="mastery-reward-val">+${reward}</span></div>`).join('')}
+    </div>
+    <div class="mastery-dismiss">tap to continue</div>`;
+
+  document.body.appendChild(ov);
+  ov.addEventListener('click', () => {
+    ov.style.animation = 'masteryFadeOut 0.4s ease forwards';
+    setTimeout(() => { ov.remove(); renderAll(); }, 400);
+  });
+  // Auto-dismiss after 8s
+  setTimeout(() => { if (ov.isConnected) { ov.style.animation='masteryFadeOut 0.4s ease forwards'; setTimeout(()=>{ ov.remove(); renderAll(); },400); } }, 8000);
+}
+
+// ── Tier Complete Overlay ────────────────────────────────────
+function showTierCompleteOverlay(tier) {
+  const reward   = TIER_COMPLETE_REWARD[tier];
+  const tierName = TIER_NAMES[tier];
+  const tierColors= { 1:'#66bb6a', 2:'#42a5f5', 3:'#ffa726', 4:'#ffd700', 5:'#ffffff' };
+  const color    = tierColors[tier] || '#ffd700';
+  playTierComplete();
+
+  const ov = document.createElement('div');
+  ov.className = 'mastery-overlay tier-complete-overlay';
+  ov.style.setProperty('--mc', color);
+  ov.innerHTML = `
+    <div class="mastery-badge" style="color:${color}">⟦ TIER COMPLETE ⟧</div>
+    <div class="mastery-class-name" style="font-size:22px;letter-spacing:5px">${tierName}</div>
+    <div class="mastery-tier-label">ALL CLASSES MASTERED</div>
+    <div class="mastery-reward-box">
+      <div class="mastery-reward-title">PERMANENT BONUS</div>
+      <div class="mastery-reward-line">All Stats <span class="mastery-reward-val">+${Math.round(reward.passiveAll*100)}% passive</span></div>
+      <div class="mastery-reward-line" style="color:var(--sao-gold-soft);margin-top:6px">Skill unlocked: ${reward.skill.replace(/_/g,' ').toUpperCase()}</div>
+    </div>
+    <div class="mastery-dismiss">tap to continue</div>`;
+
+  document.body.appendChild(ov);
+  ov.addEventListener('click', () => {
+    ov.style.animation = 'masteryFadeOut 0.4s ease forwards';
+    setTimeout(() => { ov.remove(); renderAll(); }, 400);
+  });
+  setTimeout(() => { if (ov.isConnected) { ov.style.animation='masteryFadeOut 0.4s ease forwards'; setTimeout(()=>{ ov.remove(); renderAll(); },400); } }, 10000);
+}
+
+// ── TRUE HERO Reveal ─────────────────────────────────────────
+function showTrueHeroReveal() {
+  playTierComplete();
+  setTimeout(() => playMastery(), 1800);
+
+  const ov = document.createElement('div');
+  ov.className = 'mastery-overlay true-hero-overlay';
+  ov.innerHTML = `
+    <div class="th-stars" id="thStars"></div>
+    <div class="mastery-badge" style="color:#aaa;letter-spacing:6px">⟦ BEYOND LEGEND ⟧</div>
+    <div class="th-question-wrap">
+      <div class="th-question" id="thQuestion">???</div>
+      <div class="th-reveal" id="thReveal">TRUE HERO</div>
+    </div>
+    <div class="mastery-tier-label" style="color:rgba(255,255,255,0.5);margin-top:8px">A class beyond all limits has awakened</div>
+    <div class="mastery-reward-box" style="border-color:rgba(255,255,255,0.2)">
+      <div class="mastery-reward-title" style="color:#fff">All Stats · +20% passive · ×1.20 gains</div>
+      <div class="mastery-reward-line" style="color:rgba(255,255,255,0.6);margin-top:4px">90 days to master</div>
+    </div>
+    <div class="mastery-dismiss" style="color:rgba(255,255,255,0.3)">tap to continue</div>`;
+
+  document.body.appendChild(ov);
+
+  // Animate: ??? fades out → TRUE HERO fades in
+  setTimeout(() => {
+    const q = document.getElementById('thQuestion');
+    const r = document.getElementById('thReveal');
+    if (q) q.style.animation = 'masteryFadeOut 0.6s ease forwards';
+    setTimeout(() => { if (r) r.style.animation = 'thRevealIn 1.2s ease forwards'; }, 600);
+  }, 1200);
+
+  ov.addEventListener('click', () => {
+    ov.style.animation = 'masteryFadeOut 0.4s ease forwards';
+    setTimeout(() => { ov.remove(); renderAll(); }, 400);
+  });
+  setTimeout(() => { if (ov.isConnected) { ov.style.animation='masteryFadeOut 0.4s ease forwards'; setTimeout(()=>{ ov.remove(); renderAll(); },400); } }, 14000);
 }
 
 // ============================================================
@@ -1198,21 +1751,13 @@ function renderFooter(tabKey) {
 
 function renderPersonaje() {
   panelTitle.textContent='CHARACTER STATUS'; panelSubtitle.textContent='Player attributes';
-  const total=STAT_KEYS.reduce((s,k)=>s+state.stats[k],0);
-  const sorted=STAT_KEYS.slice().sort((a,b)=>state.stats[b]-state.stats[a]);
-  const top1=sorted[0], top2=sorted[1];
-  const COMBO={'STR+CON':{name:'PALADIN',tag:'Offensive tank. Shield and sword'},'STR+DEX':{name:'DUELIST',tag:'Agile swordsman, Kirito style'},'STR+VOL':{name:'CRUSADER',tag:'Warrior with purpose'},'STR+INT':{name:'BATTLE MAGE',tag:'Spellsword of war'},'STR+CHA':{name:'WARLORD',tag:'Leader who commands fear'},'DEX+CON':{name:'RANGER',tag:'Resilient hunter, born explorer'},'DEX+INT':{name:'ASSASSIN',tag:'Poison and calculated precision'},'DEX+VOL':{name:'NINJA',tag:'Stealth and discipline'},'DEX+CHA':{name:'TRICKSTER',tag:'Charismatic rogue'},'CON+INT':{name:'ALCHEMIST',tag:'Body and mind in balance'},'CON+VOL':{name:'TEMPLAR',tag:'Unbreakable endurance'},'CON+CHA':{name:'KEEPER',tag:'Warm and steadfast guardian'},'INT+VOL':{name:'ARCHMAGE',tag:'Sharp mind with iron will'},'INT+CHA':{name:'LOREMASTER',tag:'Influential scholar'},'VOL+CHA':{name:'PROPHET',tag:'Disciplined leader who inspires others'}};
-  const SOLO={STR:{name:'BERSERKER',tag:'Pure raw strength'},DEX:{name:'SCOUT',tag:'Speed, stealth, precision'},CON:{name:'GUARDIAN',tag:'Unbreakable endurance'},INT:{name:'MAGE',tag:'Deep knowledge'},VOL:{name:'MONK',tag:'Discipline and inner mastery'},CHA:{name:'BARD',tag:'A voice that moves hearts'}};
-  let klass;
-  if (total===0) klass={name:'BEGINNER',tag:'Your journey begins'};
-  else if (state.stats[top2]===0||state.stats[top2]<state.stats[top1]*0.4) klass=SOLO[top1];
-  else { const key=[top1,top2].sort().join('+'); klass=COMBO[key]||SOLO[top1]; }
-  panelContent.innerHTML=`<div class="character-grid"><div class="radar-card"><div class="radar-title">⟦ STAT MATRIX ⟧</div><canvas id="radarCanvas"></canvas></div><div class="stats-list" id="statsList"></div></div><div class="character-summary"><div class="summary-class">⟦ ${klass.name} ⟧</div><div class="summary-tagline">${klass.tag}</div></div><div id="combatStatsEl"></div>`;
+  panelContent.innerHTML=`<div id="classPanelEl"></div><div class="character-grid"><div class="radar-card"><div class="radar-title">⟦ STAT MATRIX ⟧</div><canvas id="radarCanvas"></canvas></div><div class="stats-list" id="statsList"></div></div><div id="combatStatsEl"></div>`;
+  renderClassPanel();
   const sl=document.getElementById('statsList');
   const SCOL = { STR:'#ff8a80', DEX:'#b9f6ca', CON:'#ffd180', INT:'#82b1ff', VOL:'#ce93d8', CHA:'#ffe082' };
 
   STAT_KEYS.forEach(k => {
-    const pts = state.stats[k], t = tierFor(pts);
+    const pts = state.stats[k], passive = getClassPassiveBonus(k, state), t = tierFor(pts);
     const nextTier = TIERS[TIERS.findIndex(x => x.t === t.tier)+1];
     const isOpen = openStatKey === k;
 
@@ -1230,7 +1775,7 @@ function renderPersonaje() {
       </div>
       <div class="stat-row-bar"><div class="stat-row-fill" style="width:${t.pctToNext}%"></div></div>
       <div class="stat-row-foot">
-        <span class="stat-points">${pts} PTS</span>
+        <span class="stat-points">${pts} PTS${passive>0?`<span class="stat-passive-bonus">+${passive}⚡</span>`:''}</span>
         <span>${t.capped?'MAX RANK':`→ ${t.nextMin-pts} pts to Rank ${nextTier.t}`}</span>
       </div>`;
     row.addEventListener('click', () => { openStatKey = openStatKey===k ? null : k; renderPersonaje(); });
@@ -1321,12 +1866,227 @@ function renderPersonaje() {
   renderCombatStats();
 }
 
+// ============================================================
+// CLASS SYSTEM — ACTIONS & UI  (Pasos 4 + 5)
+// ============================================================
+
+const TIER_NAMES = { 1:'NOVICE', 2:'ADEPT', 3:'EXPERT', 4:'LEGEND', 5:'TRUE HERO' };
+
+// Returns Tier N-1 classes that share at least one stat with this class
+function getClassPrerequisites(classId) {
+  const cls = CLASSES[classId];
+  if (cls.tier === 1) return [];
+  return Object.values(CLASSES).filter(c =>
+    c.tier === cls.tier - 1 && c.stats.some(s => cls.stats.includes(s))
+  );
+}
+
+// Returns Tier N+1 classes this class helps unlock
+function getClassUnlocks(classId) {
+  const cls = CLASSES[classId];
+  if (cls.tier >= 4) return [];
+  return Object.values(CLASSES).filter(c =>
+    !c.hidden && c.tier === cls.tier + 1 && c.stats.some(s => cls.stats.includes(s))
+  );
+}
+
+function equipClass(classId) {
+  if (classId && !getClassUnlockStatus(classId, state).available) return;
+  state.classData.equipped = classId || null;
+  if (classId && !state.classData.history.includes(classId)) state.classData.history.push(classId);
+  saveState(); renderAll();
+  if (classId) showNotif(`⟦ CLASS EQUIPPED: ${CLASSES[classId].name} ⟧`);
+}
+
+let _classPopupTier = 1;
+
+function renderClassPanel() {
+  const el = document.getElementById('classPanelEl'); if (!el) return;
+  const eqId   = state.classData.equipped;
+  const cls    = eqId ? CLASSES[eqId] : null;
+  const avail  = getAvailableClasses(state);
+  const hasNew = avail.length > 0;
+
+  const panel = document.createElement('div');
+  panel.className = 'class-panel';
+  panel.innerHTML = `<div class="class-panel-hdr">⟦ CLASS ⟧</div>`;
+
+  if (cls) {
+    const tierName  = TIER_NAMES[cls.tier] || '';
+    const days      = state.classData.mastery[eqId] || 0;
+    const mastPct   = Math.min(100, Math.round((days / cls.masteryDays) * 100));
+    const isMastered = state.classData.masteredClasses[eqId];
+    const statsStr  = cls.stats.map(s => `+${Math.round(cls.passive*100)}% ${s}`).join('  ');
+    const multStr   = cls.stats.map(s => `${s}×${(1+cls.multiplier).toFixed(2)}`).join('  ');
+
+    panel.innerHTML += `
+      <div class="class-name-row">
+        <span class="class-name-big" style="color:${cls.color}">${cls.name}</span>
+        <span class="class-tier-badge" style="color:${cls.color}">${tierName}</span>
+      </div>
+      <div class="class-tagline">Passive: ${statsStr} &nbsp;·&nbsp; Gains: ${multStr}</div>
+      <div class="class-mastery-row">
+        <div class="class-mastery-bar">
+          <div class="class-mastery-fill" style="width:${mastPct}%;background:${cls.color}"></div>
+        </div>
+        <span class="class-mastery-label">${isMastered?'✦ MASTERED':days+'/'+cls.masteryDays+' days'}</span>
+      </div>`;
+  } else {
+    panel.innerHTML += `
+      <div class="class-name-row">
+        <span class="class-name-big" style="color:var(--sao-text-dim)">BEGINNER</span>
+      </div>
+      <div class="class-tagline">Your journey begins. No class equipped.</div>`;
+    if (hasNew) {
+      panel.innerHTML += `<div class="class-unlock-alert">▶ CLASS UNLOCK AVAILABLE ◀</div>`;
+    }
+  }
+
+  const btnLabel = cls ? 'CHANGE CLASS' : 'VIEW CLASSES';
+  const btn = document.createElement('button');
+  btn.className = 'class-change-btn';
+  btn.textContent = btnLabel;
+  btn.addEventListener('click', () => showClassSelectPopup());
+  panel.appendChild(btn);
+  el.appendChild(panel);
+}
+
+function showClassSelectPopup() {
+  document.getElementById('classSelectPopup')?.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'classSelectPopup';
+  overlay.className = 'class-popup-overlay';
+
+  const allTiers = [1,2,3,4,5];
+  const tierTabsHtml = allTiers.map(t => {
+    const classes = CLASSES_BY_TIER[t];
+    if (!classes || !classes.length) return '';
+    const anyAvail = classes.some(id => !CLASSES[id].hidden && getClassUnlockStatus(id, state).available);
+    const isActive = _classPopupTier === t;
+    const isLocked = !anyAvail;
+    return `<button class="class-tier-tab${isActive?' active':''}${isLocked?' locked-tab':''}" data-tier="${t}">${TIER_NAMES[t]}${isLocked?' 🔒':''}</button>`;
+  }).join('');
+
+  // ── Progression tree overview ────────────────────────────────
+  const treeHtml = buildClassTreeHtml();
+
+  overlay.innerHTML = `
+    <div class="class-popup-header">
+      <span class="class-popup-title">⟦ SELECT CLASS ⟧</span>
+      <button class="class-popup-close">✕</button>
+    </div>
+    ${treeHtml}
+    <div class="class-tier-tabs">${tierTabsHtml}</div>
+    <div class="class-popup-body" id="classPopupBody"></div>`;
+
+  document.body.appendChild(overlay);
+  overlay.querySelector('.class-popup-close').addEventListener('click', () => overlay.remove());
+  overlay.querySelectorAll('.class-tier-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      _classPopupTier = parseInt(tab.dataset.tier);
+      renderClassPopupBody();
+      overlay.querySelectorAll('.class-tier-tab').forEach(t2 => t2.classList.toggle('active', t2===tab));
+    });
+  });
+  renderClassPopupBody();
+}
+
+function buildClassTreeHtml() {
+  const tierColors = { 1:'#66bb6a', 2:'#42a5f5', 3:'#ffa726', 4:'#ffd700', 5:'#ffffff' };
+  const tierReq    = { 1:'Lv 20 · D stats', 2:'Lv 40 · B stats', 3:'Lv 60 · A stats', 4:'Lv 80 · S stats', 5:'Lv 95 · SSS' };
+
+  const nodes = [1,2,3,4,5].map(t => {
+    const ids       = (CLASSES_BY_TIER[t] || []).filter(id => !CLASSES[id].hidden);
+    const total     = ids.length;
+    const mastered  = ids.filter(id => state.classData.masteredClasses[id]).length;
+    const anyAvail  = ids.some(id => getClassUnlockStatus(id, state).available);
+    const equipped  = ids.includes(state.classData.equipped);
+    const allDone   = total > 0 && mastered === total;
+    const color     = tierColors[t];
+
+    let status, statusClass;
+    if (allDone)       { status = '✦ COMPLETE'; statusClass = 'tree-complete'; }
+    else if (anyAvail) { status = `${mastered}/${total} mastered`; statusClass = 'tree-active'; }
+    else               { status = '🔒 LOCKED';   statusClass = 'tree-locked'; }
+
+    const equippedDot = equipped ? `<span class="tree-eq-dot">●</span>` : '';
+    const tierLabel   = t === 5 ? '???' : TIER_NAMES[t];
+
+    return `<div class="tree-node ${statusClass}" data-tier="${t}">
+      <div class="tree-node-name" style="color:${allDone||anyAvail?color:'rgba(255,255,255,0.2)'}">${equippedDot}${tierLabel}</div>
+      <div class="tree-node-req">${anyAvail||allDone ? tierReq[t] : '???'}</div>
+      <div class="tree-node-status">${status}</div>
+    </div>`;
+  });
+
+  const arrows = ['→','→','→','→'].map(a => `<div class="tree-arrow">${a}</div>`).join('');
+  const nodesWithArrows = nodes.map((n,i) => i < nodes.length-1 ? n + arrows.split('</div>')[i]+'</div>' : n).join('');
+
+  // Simpler: interleave
+  let html = '<div class="class-tree-row">';
+  nodes.forEach((n, i) => {
+    html += n;
+    if (i < nodes.length - 1) html += `<div class="tree-arrow">→</div>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+function renderClassPopupBody() {
+  const body = document.getElementById('classPopupBody'); if (!body) return;
+  const tier  = _classPopupTier;
+  const ids   = (CLASSES_BY_TIER[tier] || []).filter(id => !CLASSES[id].hidden);
+  body.innerHTML = '';
+  const grid = document.createElement('div'); grid.className = 'class-cards-grid';
+
+  ids.forEach(id => {
+    const cls    = CLASSES[id];
+    const status = getClassUnlockStatus(id, state);
+    const isEq   = state.classData.equipped === id;
+    const isMast = state.classData.masteredClasses[id];
+    const days   = state.classData.mastery[id] || 0;
+
+    const card = document.createElement('div');
+    card.className = `class-card ${status.available?'available':'locked'}${isEq?' equipped-cls':''}`;
+    card.style.setProperty('--cls-color', cls.color);
+
+    const statsStr   = cls.stats.join(' / ');
+    const passiveStr = `+${Math.round(cls.passive*100)}% · ×${(1+cls.multiplier).toFixed(2)} gains`;
+    const lockStr    = status.locked ? status.reasons.map(r=>`• ${r}`).join('<br>') : '';
+    const mastStr    = isMast ? '✦ MASTERED' : (days > 0 ? `${days}/${cls.masteryDays}d` : '');
+    const prereqs    = getClassPrerequisites(id);
+    const unlocks    = getClassUnlocks(id);
+    const prereqStr  = prereqs.length ? prereqs.map(c => `<span style="color:${c.color}">${c.name}</span>`).join(' / ') : '';
+    const unlockStr  = unlocks.length ? unlocks.map(c => `<span style="color:${c.color}">${c.name}</span>`).join(' ') : '';
+
+    card.innerHTML = `
+      ${isEq ? '<div class="class-card-eq-badge">EQUIPPED</div>' : ''}
+      <div class="class-card-name" style="color:${cls.color}">${cls.name}</div>
+      <div class="class-card-stats">${statsStr}</div>
+      <div class="class-card-passive">${passiveStr}</div>
+      ${mastStr   ? `<div class="class-card-passive" style="color:var(--sao-gold-soft);margin-top:2px">${mastStr}</div>` : ''}
+      ${prereqStr ? `<div class="class-card-prereq">← ${prereqStr}</div>` : ''}
+      ${unlockStr ? `<div class="class-card-unlock">→ ${unlockStr}</div>` : ''}
+      ${lockStr   ? `<div class="class-card-lock">${lockStr}</div>` : ''}`;
+
+    if (status.available && !isEq) {
+      card.addEventListener('click', () => {
+        equipClass(id);
+        document.getElementById('classSelectPopup')?.remove();
+      });
+    }
+    grid.appendChild(card);
+  });
+
+  body.appendChild(grid);
+}
+
 function renderCombatStats() {
   const el = document.getElementById('combatStatsEl'); if (!el) return;
-  const lv = calcLevel(state.totalXp), st = state.stats;
-  const eq = getEquippedStats();
-  const STR=(st.STR||0)+(eq.STR||0), DEX=(st.DEX||0)+(eq.DEX||0), CON=(st.CON||0)+(eq.CON||0);
-  const INT=(st.INT||0)+(eq.INT||0), VOL=(st.VOL||0)+(eq.VOL||0), CHA=(st.CHA||0)+(eq.CHA||0);
+  const lv = calcLevel(state.totalXp), eq = getEquippedStats();
+  const STR=getEffectiveStat('STR',state)+(eq.STR||0), DEX=getEffectiveStat('DEX',state)+(eq.DEX||0), CON=getEffectiveStat('CON',state)+(eq.CON||0);
+  const INT=getEffectiveStat('INT',state)+(eq.INT||0), VOL=getEffectiveStat('VOL',state)+(eq.VOL||0), CHA=getEffectiveStat('CHA',state)+(eq.CHA||0);
 
   const pAtk        = 10 + STR*2 + (eq.ATK||0);
   const pDef        = 5  + CON   + (eq.DEF||0);
@@ -1413,7 +2173,7 @@ function calcMaxDailyStatGain(statKey) {
 function drawRadar() {
   const canvas=document.getElementById('radarCanvas'); if(!canvas) return;
   if(radarChart) radarChart.destroy();
-  const rankIndex=k=>TIERS.findIndex(t=>t.t===tierFor(state.stats[k]).tier);
+  const rankIndex=k=>TIERS.findIndex(t=>t.t===tierFor(getEffectiveStat(k,state)).tier);
   const data=STAT_KEYS.map(k=>rankIndex(k)), maxData=TIERS.length-1;
   const rankPlugin={id:'radarRanks',afterDraw(chart){
     const ctx=chart.ctx, scale=chart.scales.r;
@@ -1423,7 +2183,7 @@ function drawRadar() {
     ctx.fillStyle='#ffc107';
     ctx.textBaseline='top';
     scale._pointLabelItems.forEach((item,i)=>{
-      const rank=tierFor(state.stats[STAT_KEYS[i]]).tier;
+      const rank=tierFor(getEffectiveStat(STAT_KEYS[i],state)).tier;
       ctx.textAlign=item.textAlign||'center';
       ctx.shadowColor='rgba(255,193,7,0.7)'; ctx.shadowBlur=6;
       ctx.fillText(rank, item.x, item.bottom+2);
@@ -1659,15 +2419,16 @@ function toggleQuest(listKey, periodKey, id) {
     const c=getCompletion(task,periodKey); if(c){ applyGains(c.gains,-1); state.totalXp=Math.max(0,state.totalXp-(c.xp||0)); state.col=Math.max(0,state.col-(c.xp||0)); }
     delete task.done[periodKey];
   } else {
-    task.done[periodKey]=true;
     const prevLv=calcLevel(state.totalXp).level;
     const _pt={}; STAT_KEYS.forEach(k=>{_pt[k]=tierFor(state.stats[k]).tier;});
-    state.totalXp+=(task.xp||0); state.col+=(task.xp||0); applyGains(task.gains,1);
+    state.totalXp+=(task.xp||0); state.col+=(task.xp||0);
+    const _ag=applyGainsWithClass(task.gains);
+    task.done[periodKey]={gains:_ag,xp:task.xp};
     const newLv=calcLevel(state.totalXp).level;
     playSwordSlash();
-    showNotif(`+${task.xp} EXP · ${Object.entries(task.gains||{}).map(([k,v])=>`${k}+${v}`).join(' ')}`);
+    showNotif(`+${task.xp} EXP · ${_gainsStr(_ag,task.gains)}`);
     if(newLv>prevLv) afterLevelUp(newLv);
-    else checkStatRankUps(task.gains,_pt);
+    else checkStatRankUps(_ag,_pt);
     checkAllDone(listKey,periodKey);
     if(listKey!=='trabajo'){ const fs=getHabitStreak(task); if(fs>0&&fs%7===0){ triggerStreak7Flash(task.id); showNotif(fs%15===0?`🔥 ${fs} days in a row! GOLDEN MILESTONE`:`🔥 ${fs}-day streak!`); }}
     checkAchievements();
@@ -1677,33 +2438,141 @@ function toggleQuest(listKey, periodKey, id) {
 
 function completeTiered(listKey, periodKey, id, tier) {
   const task=state[listKey].find(t=>t.id===id); if(!task||task.done[periodKey]) return;
-  task.done[periodKey]={tierId:tier.id,label:tier.label,gains:{...tier.gains},xp:tier.xp};
   const prevLv=calcLevel(state.totalXp).level;
   const _pt={}; STAT_KEYS.forEach(k=>{_pt[k]=tierFor(state.stats[k]).tier;});
-  state.totalXp+=tier.xp; applyGains(tier.gains,1);
+  state.totalXp+=tier.xp;
+  const _ag=applyGainsWithClass(tier.gains);
+  task.done[periodKey]={tierId:tier.id,label:tier.label,gains:_ag,xp:tier.xp};
   const hpmp2=gainHpMpFromHabit(tier.gains);
   const newLv=calcLevel(state.totalXp).level;
   playSwordSlash();
   const _hpmpStr2=[hpmp2.hp>0?`❤+${hpmp2.hp}`:'',hpmp2.mp>0?`💧+${hpmp2.mp}`:''].filter(Boolean).join(' ');
-  showNotif(`${tier.label} · +${tier.xp} EXP · ${Object.entries(tier.gains).map(([k,v])=>`${k}+${v}`).join(' ')}${_hpmpStr2?' · '+_hpmpStr2:''}`);
+  showNotif(`${tier.label} · +${tier.xp} EXP · ${_gainsStr(_ag,tier.gains)}${_hpmpStr2?' · '+_hpmpStr2:''}`);
   if(newLv>prevLv) afterLevelUp(newLv);
-  else checkStatRankUps(tier.gains,_pt);
+  else checkStatRankUps(_ag,_pt);
   checkAllDone(listKey,periodKey);
   if(listKey!=='trabajo'){ const fs=getHabitStreak(task); if(fs>0&&fs%7===0){ triggerStreak7Flash(task.id); showNotif(fs%15===0?`🔥 ${fs} days in a row! GOLDEN MILESTONE`:`🔥 ${fs}-day streak!`); }}
   checkAchievements();
   openTierFor=null; saveState(); renderAll();
 }
 
+function showTierUpBanner(statKey, oldTier, newTier) {
+  const color = TIER_COLORS[newTier] || '#ffd700';
+  const el = document.createElement('div');
+  el.className = 'tierup-banner';
+  el.style.setProperty('--tu-color', color);
+  el.innerHTML = `
+    <div class="tierup-label">TIER UP</div>
+    <div class="tierup-stat">${STAT_EMOJI[statKey] || ''} ${STAT_NAMES[statKey] || statKey}</div>
+    <div class="tierup-tiers">
+      <span class="tierup-old">${oldTier}</span>
+      <span class="tierup-arrow">▶</span>
+      <span class="tierup-new">${newTier}</span>
+    </div>`;
+  document.body.appendChild(el);
+  const dismiss = () => { el.classList.add('leaving'); setTimeout(() => el.remove(), 360); };
+  el.addEventListener('click', dismiss);
+  setTimeout(dismiss, 3400);
+}
+
 function checkStatRankUps(gains, prevTiers) {
-  const ups=STAT_KEYS.filter(k=>(gains||{})[k]&&tierFor(state.stats[k]).tier!==prevTiers[k]);
-  if(ups.length) setTimeout(()=>{ playStatRankUp(); ups.forEach(k=>showNotif(`⟦ ${k} RANK UP → ${tierFor(state.stats[k]).tier} ⟧`)); },1900);
+  const ups = STAT_KEYS.filter(k => (gains||{})[k] && tierFor(state.stats[k]).tier !== prevTiers[k]);
+  if (!ups.length) return;
+  setTimeout(() => {
+    playStatRankUp();
+    ups.forEach((k, i) => setTimeout(() => showTierUpBanner(k, prevTiers[k], tierFor(state.stats[k]).tier), i * 900));
+  }, 500);
+}
+
+function calcCombatSnapshot() {
+  const lv=calcLevel(state.totalXp), eq=getEquippedStats();
+  const STR=getEffectiveStat('STR',state)+(eq.STR||0), DEX=getEffectiveStat('DEX',state)+(eq.DEX||0), CON=getEffectiveStat('CON',state)+(eq.CON||0);
+  const INT=getEffectiveStat('INT',state)+(eq.INT||0), VOL=getEffectiveStat('VOL',state)+(eq.VOL||0), CHA=getEffectiveStat('CHA',state)+(eq.CHA||0);
+  return {
+    hp:    Math.round(100 + CON*3 + CHA*2 + lv.level*10),
+    mp:    Math.round(50  + INT*2 + VOL*2 + CHA + lv.level*3),
+    atk:   Math.round(10  + STR*2),
+    def:   Math.round(5   + CON),
+    crit:  Math.round(Math.min(50, DEX*1.5)*10)/10,
+    eva:   Math.round(Math.min(35, DEX*0.4)*10)/10,
+    block: Math.round(Math.min(25, CON*0.2)*10)/10,
+  };
+}
+
+function showLevelUpPopup(lv, bonus, prevStats, prevCombat, newCombat) {
+  document.getElementById('lvupOverlay')?.remove();
+  const isMilestone = lv===99 || lv%10===0;
+  const rank = levelRank(lv);
+  const RANK_COLORS = { F:'#9e9e9e',E:'#66bb6a',D:'#42a5f5',C:'#ab47bc',B:'#ffa726',A:'#ef5350',S:'#ffd700',SS:'#00e5ff',SSS:'#ff80ab' };
+  const rc = RANK_COLORS[rank]||'#4dd0e1';
+  const SCOL = { STR:'#ff8a80',DEX:'#b9f6ca',CON:'#ffd180',INT:'#82b1ff',VOL:'#ce93d8',CHA:'#ffe082' };
+
+  const statsHtml = STAT_KEYS.map(k=>`
+    <div class="lvup-stat">
+      <span class="lvup-stat-key" style="color:${SCOL[k]}">${k}</span>
+      <span class="lvup-stat-arrow">+${bonus}</span>
+      <span class="lvup-stat-new" style="color:${SCOL[k]}">${(prevStats[k]||0)+bonus}</span>
+    </div>`).join('');
+
+  const combatRows = [
+    {n:'HP',   p:prevCombat.hp,    q:newCombat.hp,    u:''},
+    {n:'MP',   p:prevCombat.mp,    q:newCombat.mp,    u:''},
+    {n:'ATK',  p:prevCombat.atk,   q:newCombat.atk,   u:''},
+    {n:'DEF',  p:prevCombat.def,   q:newCombat.def,   u:''},
+    {n:'CRIT', p:prevCombat.crit,  q:newCombat.crit,  u:'%'},
+    {n:'EVA',  p:prevCombat.eva,   q:newCombat.eva,   u:'%'},
+    {n:'BLOCK',p:prevCombat.block, q:newCombat.block, u:'%'},
+  ].filter(r=>r.p!==r.q);
+
+  const combatHtml = combatRows.map(r=>`
+    <div class="lvup-cstat">
+      <span class="lvup-cstat-name">${r.n}</span>
+      <span class="lvup-cstat-change">${r.p}${r.u} → <strong style="color:#4dd0e1">${r.q}${r.u}</strong></span>
+    </div>`).join('');
+
+  const milestoneTag = isMilestone
+    ? `<div class="lvup-milestone" style="color:${rc}">${lv===99?'✦ MAXIMUM LEVEL ✦':'⟦ MILESTONE ×'+bonus+' ⟧'}</div>` : '';
+
+  const ol = document.createElement('div');
+  ol.id = 'lvupOverlay';
+  ol.className = 'lvup-overlay';
+  ol.innerHTML = `
+    <div class="lvup-panel" style="--lvup-rc:${rc}">
+      <div class="lvup-header">
+        <div class="lvup-sparkles">✦ ✦ ✦</div>
+        <div class="lvup-title">LEVEL UP</div>
+        <div class="lvup-level">LV.<span class="lvup-lv-num">${lv}</span></div>
+        <div class="lvup-rank-badge" style="border-color:${rc};color:${rc}">RANK ${rank}</div>
+        ${milestoneTag}
+      </div>
+      <div class="lvup-section">
+        <div class="lvup-section-label">BASE STATS${isMilestone?' <span class="lvup-x">×'+bonus+'</span>':''}</div>
+        <div class="lvup-stats-grid">${statsHtml}</div>
+      </div>
+      ${combatHtml?`<div class="lvup-section">
+        <div class="lvup-section-label">COMBAT RATES</div>
+        <div class="lvup-combat-grid">${combatHtml}</div>
+      </div>`:''}
+      <button class="lvup-btn" onclick="document.getElementById('lvupOverlay').remove();renderAll();">CONTINUE</button>
+    </div>`;
+  document.body.appendChild(ol);
 }
 
 function afterLevelUp(lv) {
+  const bonus       = getLevelUpStatBonus(lv);
+  const prevStats   = { ...state.stats };
+  const prevCombat  = calcCombatSnapshot();
+  STAT_KEYS.forEach(k => { state.stats[k] = (state.stats[k]||0) + bonus; });
   state.hp = calcMaxHP();
   state.mp = calcMaxMP();
   saveState();
-  setTimeout(()=>{ playLevelUp(); showNotif(`★ LEVEL UP! → LV.${lv}  ✦ HP & MP RESTORED`); document.getElementById('mainPanel').classList.add('level-up'); setTimeout(()=>document.getElementById('mainPanel').classList.remove('level-up'),2400); },700);
+  const newCombat = calcCombatSnapshot();
+  setTimeout(() => {
+    playLevelUp();
+    document.getElementById('mainPanel').classList.add('level-up');
+    setTimeout(() => document.getElementById('mainPanel').classList.remove('level-up'), 2400);
+    showLevelUpPopup(lv, bonus, prevStats, prevCombat, newCombat);
+  }, 700);
 }
 
 function checkAllDone(listKey, periodKey) {
@@ -2622,10 +3491,12 @@ function renderDungeonReward() {
 // INIT
 setDateLabel();
 updateStreakOnLoad();
+tickMasteryOnLoad();
 checkAchievements();
 tickHpMp();
 saveState();
 renderAll();
+if (_pendingAnims.length) setTimeout(() => { const fn = _pendingAnims.shift(); if (fn) fn(); }, 600);
 initAvatar();
 setInterval(()=>{ tickHpMp(); renderHeader(); saveState(); }, 60000);
 // Restore dungeon timers if app was refreshed mid-session
