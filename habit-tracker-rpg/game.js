@@ -316,6 +316,10 @@ const DEFAULT_HABITOS = [
     {id:'1h', label:'1h o menos', sub:'',xp:80,gains:{INT:3,VOL:3,CHA:2},elite:true}
   ]}
 ];
+const DEFAULT_NEGATIVOS = [
+  { id:'neg0', text:'Más de 3hs de celular', hp:20 }
+];
+
 const DEFAULT_WEEKLY = [
   { id:'w0', text:'Fútbol',                   xp:430, gains:{DEX:15,STR:16,CON:8,CHA:4} },
   { id:'w1', text:'Pádel',                    xp:390, gains:{DEX:15,STR:12,CON:8,CHA:4} },
@@ -532,6 +536,7 @@ function loadState() {
       if (!s.habitos) s.habitos = DEFAULT_HABITOS.map(h=>({...h,done:{}}));
       if (!s.weekly)  s.weekly  = DEFAULT_WEEKLY.map(w=>({...w,done:{}}));
       if (!s.trabajo) s.trabajo = [];
+      if (!s.negativos) s.negativos = DEFAULT_NEGATIVOS.map(n=>({...n,done:{}}));
       if (typeof s.totalXp !== 'number') s.totalXp = 0;
       if (typeof s.streak  !== 'number') s.streak  = 0;
       if (!s.lastActiveDay) s.lastActiveDay = todayKey();
@@ -558,6 +563,7 @@ function loadState() {
       s.habitos.forEach(h=>{ if(!h.done) h.done={}; });
       s.weekly.forEach(w=>{ if(!w.done) w.done={}; });
       s.trabajo.forEach(t=>{ if(!t.done) t.done={}; });
+      s.negativos.forEach(n=>{ if(!n.done) n.done={}; });
       return s;
     }
     // Migrate from v3
@@ -575,7 +581,7 @@ function loadState() {
       return { habitos, weekly, trabajo: v3.trabajo||[], stats: v3.stats||defaultStats(), totalXp: v3.totalXp||0, streak: v3.streak||0, lastActiveDay: v3.lastActiveDay||todayKey(), col: v3.col||0 };
     }
   } catch(e) { console.warn('load failed',e); }
-  return { habitos: DEFAULT_HABITOS.map(h=>({...h,done:{}})), weekly: DEFAULT_WEEKLY.map(w=>({...w,done:{}})), trabajo: [], stats: defaultStats(), totalXp:0, streak:0, lastActiveDay:todayKey(), col:0, playerName:'Tuni', playerTitle:'Beginner', achievements:{}, logros:{perfectWeekCount:0,phoenixCount:0,lastPerfectWeekDay:null,lastPhoenixDay:null}, dungeon:null, inventory:[{itemId:'iron_sword',quantity:1},{itemId:'leather_armor',quantity:1},{itemId:'iron_helm',quantity:1},{itemId:'leather_boots',quantity:1},{itemId:'hp_pot_s',quantity:5},{itemId:'mp_pot_s',quantity:2}], equipment:{earring_l:null,helmet:null,earring_r:null,weapon:null,armor:null,shield:null,necklace:null,bracelet:null,belt:null,boots:null}, classData: defaultClassState() };
+  return { habitos: DEFAULT_HABITOS.map(h=>({...h,done:{}})), weekly: DEFAULT_WEEKLY.map(w=>({...w,done:{}})), negativos: DEFAULT_NEGATIVOS.map(n=>({...n,done:{}})), trabajo: [], stats: defaultStats(), totalXp:0, streak:0, lastActiveDay:todayKey(), col:0, playerName:'Tuni', playerTitle:'Beginner', achievements:{}, logros:{perfectWeekCount:0,phoenixCount:0,lastPerfectWeekDay:null,lastPhoenixDay:null}, dungeon:null, inventory:[{itemId:'iron_sword',quantity:1},{itemId:'leather_armor',quantity:1},{itemId:'iron_helm',quantity:1},{itemId:'leather_boots',quantity:1},{itemId:'hp_pot_s',quantity:5},{itemId:'mp_pot_s',quantity:2}], equipment:{earring_l:null,helmet:null,earring_r:null,weapon:null,armor:null,shield:null,necklace:null,bracelet:null,belt:null,boots:null}, classData: defaultClassState() };
 }
 
 function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
@@ -760,7 +766,7 @@ const ACHIEVEMENTS = [
 
 const TIER_LABELS  = ['🥉 BRONZE','🥈 SILVER','🥇 GOLD','💎 LEGENDARY','👑 UNIQUE'];
 const TIER_ICONS   = ['🥉','🥈','🥇','💎','👑'];
-const STAT_COLORS  = { STR:'#ff8a80', DEX:'#b9f6ca', CON:'#ffd180', INT:'#82b1ff', VOL:'#ce93d8', CHA:'#ffe082' };
+const STAT_COLORS  = { STR:'#ff6b6b', DEX:'#40e0ff', CON:'#81c784', INT:'#7b9dff', VOL:'#e060f5', CHA:'#ffe57f' };
 
 function getAchievementCount(ach) {
   if (ach.id === 'streak_gen') return state.streak;
@@ -1582,6 +1588,7 @@ function renderQuestItem(task, opts) {
   el.addEventListener('click',(e)=>{
     if(e.target.classList.contains('quest-action-btn')) return;
     if(task.tiers&&!done){ openTierFor=(openTierFor===task.id)?null:task.id; renderAll(); }
+    else if(!done){ el.classList.add('quest-completing'); setTimeout(()=>toggleQuest(opts.listKey,opts.periodKey,task.id),250); }
     else { toggleQuest(opts.listKey, opts.periodKey, task.id); }
   });
 
@@ -1649,9 +1656,43 @@ function makeSortable(listEl, listKey) {
   });
 }
 
+function renderNegativeItem(task, periodKey) {
+  const failed=!!task.done[periodKey];
+  const wrap=document.createElement('div'); wrap.dataset.wrapId=task.id;
+  const el=document.createElement('div');
+  el.className='quest negative'+(failed?' failed':'');
+  el.dataset.taskId=task.id;
+  const ring=document.createElement('div'); ring.className='neg-check-ring'+(failed?' failed':'');
+  const txt=document.createElement('div'); txt.className='quest-text'; txt.textContent=task.text;
+  const pen=document.createElement('div'); pen.className='neg-penalty'; pen.textContent=`-${task.hp||20} HP`;
+  const actions=document.createElement('div'); actions.className='quest-actions';
+  const editBtn=document.createElement('button'); editBtn.className='quest-action-btn edit'; editBtn.title='Edit'; editBtn.textContent='✎';
+  editBtn.addEventListener('click',e=>{ e.stopPropagation(); openHabitModal('edit','negativos',task.id); });
+  const delBtn=document.createElement('button'); delBtn.className='quest-action-btn del'; delBtn.title='Delete'; delBtn.textContent='✕';
+  delBtn.addEventListener('click',e=>{ e.stopPropagation(); if(confirm(`Delete "${task.text}"?`)) deleteTask('negativos',task.id); });
+  actions.appendChild(editBtn); actions.appendChild(delBtn);
+  el.appendChild(ring); el.appendChild(txt); el.appendChild(pen); el.appendChild(actions);
+  wrap.appendChild(el);
+  el.addEventListener('click',e=>{
+    if(e.target.classList.contains('quest-action-btn')) return;
+    if(!failed){ el.classList.add('neg-failing'); setTimeout(()=>toggleNegativo(task.id,periodKey),250); }
+    else toggleNegativo(task.id,periodKey);
+  });
+  return wrap;
+}
+
 function renderQuestList(list, opts) {
   const wrap=document.createElement('div'); wrap.className='quest-list';
-  list.forEach(task=>wrap.appendChild(renderQuestItem(task,opts)));
+  const pending=list.filter(t=>!t.done[opts.periodKey]);
+  const done=list.filter(t=>!!t.done[opts.periodKey]);
+  pending.forEach(task=>wrap.appendChild(renderQuestItem(task,opts)));
+  if(pending.length>0 && done.length>0){
+    const sep=document.createElement('div'); sep.className='quest-done-separator';
+    const lbl=document.createElement('span'); lbl.className='quest-done-separator-label';
+    lbl.textContent='✓ COMPLETED';
+    sep.appendChild(lbl); wrap.appendChild(sep);
+  }
+  done.forEach(task=>wrap.appendChild(renderQuestItem(task,opts)));
   if (opts.allowReorder) makeSortable(wrap, opts.listKey);
   return wrap;
 }
@@ -1692,6 +1733,20 @@ function renderHabitos() {
   dUnmarkBtn.addEventListener('click',()=>unmarkAllHabits('habitos',activeDate));
   dh.appendChild(dMarkBtn); dh.appendChild(dUnmarkBtn); dh.appendChild(dAddBtn);
   panelContent.appendChild(dh);
+  const dTotal=state.habitos.length, dDone=state.habitos.filter(h=>h.done[activeDate]).length;
+  const dPct=dTotal>0?Math.round((dDone/dTotal)*100):0;
+  const dBar=document.createElement('div'); dBar.className='progress-bar-wrap';
+  const dHdr=document.createElement('div'); dHdr.className='progress-bar-header';
+  const dLbl=document.createElement('span'); dLbl.className='progress-bar-label'; dLbl.textContent='DAILY PROGRESS';
+  const dPctTxt=document.createElement('span'); dPctTxt.className='progress-bar-pct'+(dPct===100?' complete':''); dPctTxt.textContent=dPct+'%';
+  dHdr.appendChild(dLbl); dHdr.appendChild(dPctTxt);
+  const dTrack=document.createElement('div'); dTrack.className='progress-bar-track';
+  const dFill=document.createElement('div'); dFill.className='progress-bar-fill'+(dPct===100?' complete':'');
+  dFill.style.width=dPct+'%'; dTrack.appendChild(dFill);
+  dBar.appendChild(dHdr); dBar.appendChild(dTrack);
+  const dBanner=document.createElement('div'); dBanner.className='quests-complete-banner'+(dPct===100?' active':'');
+  if(dPct===100) dBanner.textContent='⟦ ALL QUESTS COMPLETE ⟧';
+  dBar.appendChild(dBanner); panelContent.appendChild(dBar);
   panelContent.appendChild(renderQuestList(state.habitos,{listKey:'habitos',periodKey:activeDate,isWeekly:false,allowEdit:true,allowDelete:true,allowReorder:true}));
 
   // WEEKLY section
@@ -1701,7 +1756,33 @@ function renderHabitos() {
   wh.innerHTML=`<span class="section-label gold">⟦ WEEKLY ⟧</span><div class="section-line gold"></div><span class="section-meta">${state.weekly.filter(w=>w.done[week]).length}/${state.weekly.length} this week</span>`;
   wh.appendChild(wAddBtn);
   panelContent.appendChild(wh);
+  const wTotal=state.weekly.length, wDone=state.weekly.filter(w=>w.done[week]).length;
+  const wPct=wTotal>0?Math.round((wDone/wTotal)*100):0;
+  const wBar=document.createElement('div'); wBar.className='progress-bar-wrap weekly';
+  const wHdr=document.createElement('div'); wHdr.className='progress-bar-header';
+  const wLbl=document.createElement('span'); wLbl.className='progress-bar-label weekly'; wLbl.textContent='WEEKLY PROGRESS';
+  const wPctTxt=document.createElement('span'); wPctTxt.className='progress-bar-pct weekly'+(wPct===100?' complete':''); wPctTxt.textContent=wPct+'%';
+  wHdr.appendChild(wLbl); wHdr.appendChild(wPctTxt);
+  const wTrack=document.createElement('div'); wTrack.className='progress-bar-track weekly';
+  const wFill=document.createElement('div'); wFill.className='progress-bar-fill weekly'+(wPct===100?' complete':'');
+  wFill.style.width=wPct+'%'; wTrack.appendChild(wFill);
+  wBar.appendChild(wHdr); wBar.appendChild(wTrack);
+  const wBanner=document.createElement('div'); wBanner.className='quests-complete-banner weekly'+(wPct===100?' active':'');
+  if(wPct===100) wBanner.textContent='⟦ WEEKLY MISSIONS COMPLETE ⟧';
+  wBar.appendChild(wBanner); panelContent.appendChild(wBar);
   panelContent.appendChild(renderQuestList(state.weekly,{listKey:'weekly',periodKey:week,isWeekly:true,allowEdit:true,allowDelete:true,allowReorder:true}));
+
+  // AVOID section
+  const negs=state.negativos||[];
+  const nh=document.createElement('div'); nh.className='section-header';
+  const nAddBtn=document.createElement('button'); nAddBtn.className='add-habit-btn neg'; nAddBtn.textContent='+'; nAddBtn.title='New negative habit';
+  nAddBtn.addEventListener('click',()=>openHabitModal('add','negativos',null));
+  const nBroken=negs.filter(n=>n.done[activeDate]).length;
+  nh.innerHTML=`<span class="section-label neg">⟦ AVOID ⟧</span><div class="section-line neg"></div><span class="section-meta">${nBroken} broken today</span>`;
+  nh.appendChild(nAddBtn); panelContent.appendChild(nh);
+  const negList=document.createElement('div'); negList.className='quest-list';
+  negs.forEach(task=>negList.appendChild(renderNegativeItem(task,activeDate)));
+  panelContent.appendChild(negList);
 
   panelContent.appendChild(renderFooter('habitos'));
 }
@@ -1754,7 +1835,7 @@ function renderPersonaje() {
   panelContent.innerHTML=`<div id="classPanelEl"></div><div class="character-grid"><div class="radar-card"><div class="radar-title">⟦ STAT MATRIX ⟧</div><canvas id="radarCanvas"></canvas></div><div class="stats-list" id="statsList"></div></div><div id="combatStatsEl"></div>`;
   renderClassPanel();
   const sl=document.getElementById('statsList');
-  const SCOL = { STR:'#ff8a80', DEX:'#b9f6ca', CON:'#ffd180', INT:'#82b1ff', VOL:'#ce93d8', CHA:'#ffe082' };
+  const SCOL = { STR:'#ff6b6b', DEX:'#40e0ff', CON:'#81c784', INT:'#7b9dff', VOL:'#e060f5', CHA:'#ffe57f' };
 
   STAT_KEYS.forEach(k => {
     const pts = state.stats[k], passive = getClassPassiveBonus(k, state), t = tierFor(pts);
@@ -1773,7 +1854,7 @@ function renderPersonaje() {
           <span style="font-family:'Cinzel',serif;font-size:9px;color:var(--sao-text-dim)">${isOpen?'▲':'▼'}</span>
         </div>
       </div>
-      <div class="stat-row-bar"><div class="stat-row-fill" style="width:${t.pctToNext}%"></div></div>
+      <div class="stat-row-bar"><div class="stat-row-fill" style="width:${t.pctToNext}%;background:linear-gradient(90deg,${SCOL[k]}aa,${SCOL[k]})"></div></div>
       <div class="stat-row-foot">
         <span class="stat-points">${pts} PTS${passive>0?`<span class="stat-passive-bonus">+${passive}⚡</span>`:''}</span>
         <span>${t.capped?'MAX RANK':`→ ${t.nextMin-pts} pts to Rank ${nextTier.t}`}</span>
@@ -2300,9 +2381,9 @@ function renderHistory() {
     // Bar con % dentro (altura escalada al container de 90px)
     const bar=document.createElement('div');
     bar.className='chart-bar'+(isSel?' bar-sel':'');
-    if(!info||info.total===0){ bar.classList.add('bar-empty'); bar.style.height='4px'; }
+    if(!info||info.total===0){ bar.classList.add('bar-empty'); bar.style.height='12px'; }
     else {
-      const barH=Math.max(40, Math.round(pct*130/100));
+      const barH=Math.max(48, Math.round(pct*160/100));
       bar.style.height=barH+'px';
       bar.classList.add(pct>=70?'bar-good':pct>=30?'bar-mid':'bar-low');
       const pctSpan=document.createElement('span'); pctSpan.className='chart-bar-pct';
@@ -2412,6 +2493,44 @@ function triggerStreak7Flash(taskId) {
   setTimeout(()=>{ const el=document.querySelector(`[data-task-id="${taskId}"]`); if(el&&!el.classList.contains('streak-milestone')){ el.classList.add('streak-7-flash'); setTimeout(()=>el.classList.remove('streak-7-flash'),1100); }},200);
 }
 
+function showNegFloat(hp) {
+  const el=document.createElement('div'); el.className='xp-float neg-float';
+  const line=document.createElement('div'); line.className='xp-float-xp neg'; line.textContent=`-${hp} HP`;
+  el.appendChild(line); document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1400);
+}
+
+function toggleNegativo(id, periodKey) {
+  const task=(state.negativos||[]).find(t=>t.id===id); if(!task) return;
+  const wasFailed=!!task.done[periodKey];
+  tickHpMp();
+  const maxHP=calcMaxHP();
+  if(wasFailed){
+    state.hp=Math.min(maxHP,(state.hp||maxHP)+(task.hp||20));
+    delete task.done[periodKey];
+  } else {
+    state.hp=Math.max(0,(state.hp||maxHP)-(task.hp||20));
+    task.done[periodKey]=true;
+    if(navigator.vibrate) navigator.vibrate([30,50,30]);
+    showNegFloat(task.hp||20);
+  }
+  saveState(); renderAll();
+}
+
+function showXpFloat(xp, gains) {
+  const el=document.createElement('div'); el.className='xp-float';
+  const xpLine=document.createElement('div'); xpLine.className='xp-float-xp'; xpLine.textContent=`+${xp} EXP`;
+  el.appendChild(xpLine);
+  const gs=Object.entries(gains||{}).filter(([,v])=>v>0);
+  if(gs.length){
+    const gl=document.createElement('div'); gl.className='xp-float-gains';
+    gs.forEach(([k,v])=>{ const c=document.createElement('span'); c.className=`xp-float-chip xf-${k}`; c.textContent=`${k}+${v}`; gl.appendChild(c); });
+    el.appendChild(gl);
+  }
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1400);
+}
+
 function toggleQuest(listKey, periodKey, id) {
   const task=state[listKey].find(t=>t.id===id); if(!task) return;
   const wasDone=!!task.done[periodKey];
@@ -2426,7 +2545,9 @@ function toggleQuest(listKey, periodKey, id) {
     task.done[periodKey]={gains:_ag,xp:task.xp};
     const newLv=calcLevel(state.totalXp).level;
     playSwordSlash();
+    if(navigator.vibrate) navigator.vibrate(40);
     showNotif(`+${task.xp} EXP · ${_gainsStr(_ag,task.gains)}`);
+    showXpFloat(task.xp, _ag);
     if(newLv>prevLv) afterLevelUp(newLv);
     else checkStatRankUps(_ag,_pt);
     checkAllDone(listKey,periodKey);
@@ -2446,8 +2567,10 @@ function completeTiered(listKey, periodKey, id, tier) {
   const hpmp2=gainHpMpFromHabit(tier.gains);
   const newLv=calcLevel(state.totalXp).level;
   playSwordSlash();
+  if(navigator.vibrate) navigator.vibrate(40);
   const _hpmpStr2=[hpmp2.hp>0?`❤+${hpmp2.hp}`:'',hpmp2.mp>0?`💧+${hpmp2.mp}`:''].filter(Boolean).join(' ');
   showNotif(`${tier.label} · +${tier.xp} EXP · ${_gainsStr(_ag,tier.gains)}${_hpmpStr2?' · '+_hpmpStr2:''}`);
+  showXpFloat(tier.xp, _ag);
   if(newLv>prevLv) afterLevelUp(newLv);
   else checkStatRankUps(_ag,_pt);
   checkAllDone(listKey,periodKey);
@@ -2505,7 +2628,7 @@ function showLevelUpPopup(lv, bonus, prevStats, prevCombat, newCombat) {
   const rank = levelRank(lv);
   const RANK_COLORS = { F:'#9e9e9e',E:'#66bb6a',D:'#42a5f5',C:'#ab47bc',B:'#ffa726',A:'#ef5350',S:'#ffd700',SS:'#00e5ff',SSS:'#ff80ab' };
   const rc = RANK_COLORS[rank]||'#4dd0e1';
-  const SCOL = { STR:'#ff8a80',DEX:'#b9f6ca',CON:'#ffd180',INT:'#82b1ff',VOL:'#ce93d8',CHA:'#ffe082' };
+  const SCOL = { STR:'#ff6b6b', DEX:'#40e0ff', CON:'#81c784', INT:'#7b9dff', VOL:'#e060f5', CHA:'#ffe57f' };
 
   const statsHtml = STAT_KEYS.map(k=>`
     <div class="lvup-stat">
@@ -2717,6 +2840,16 @@ function openHabitModal(mode, listKey, habitId) {
   const title = document.getElementById('modalTitle');
   modalData = { mode, listKey, editId: habitId, habitMode:'single', selectedList: listKey, gains:{}, tiers:[] };
 
+  if (listKey==='negativos') {
+    title.textContent = mode==='edit' ? '⟦ EDIT AVOID HABIT ⟧' : '⟦ NEW AVOID HABIT ⟧';
+    const existing = mode==='edit' && habitId ? (state.negativos||[]).find(h=>h.id===habitId) : null;
+    renderModalBody(existing);
+    _modalSaveHandler = saveHabit;
+    modal.classList.add('open');
+    setTimeout(()=>{ const ni=document.getElementById('mNameInput'); if(ni) ni.focus(); },100);
+    return;
+  }
+
   if (mode==='edit' && habitId) {
     const habit = state[listKey].find(h=>h.id===habitId);
     if (!habit) return;
@@ -2742,6 +2875,22 @@ function closeModal() {
 
 function renderModalBody(existingHabit) {
   const body = document.getElementById('modalBody');
+
+  if (modalData.selectedList === 'negativos') {
+    const name = existingHabit ? existingHabit.text : '';
+    const hp   = existingHabit ? (existingHabit.hp||20) : 20;
+    body.innerHTML = `
+      <div class="m-field">
+        <label class="m-label">HABIT TO AVOID</label>
+        <input id="mNameInput" class="m-input" type="text" maxlength="80" placeholder="Ex: Más de 3hs de celular..." value="${name.replace(/"/g,'&quot;')}">
+      </div>
+      <div class="m-field">
+        <label class="m-label">HP PENALTY ON FAIL</label>
+        <input id="mHpInput" class="m-input narrow" type="number" min="1" max="100" value="${hp}">
+      </div>`;
+    return;
+  }
+
   const name = existingHabit ? existingHabit.text : '';
   const xp   = existingHabit && !existingHabit.tiers ? (existingHabit.xp||10) : 10;
   const isTiered = modalData.habitMode === 'tiered';
@@ -2895,6 +3044,20 @@ function saveHabit() {
   const name=nameEl.value.trim();
   if(!name){ nameEl.focus(); nameEl.style.borderColor='#ff6464'; return; }
   nameEl.style.borderColor='';
+
+  if (modalData.selectedList==='negativos') {
+    const hp=Math.max(1,parseInt(document.getElementById('mHpInput')?.value)||20);
+    if (modalData.mode==='edit' && modalData.editId) {
+      const idx=(state.negativos||[]).findIndex(n=>n.id===modalData.editId);
+      if(idx>=0){ state.negativos[idx].text=name; state.negativos[idx].hp=hp; }
+    } else {
+      if(!state.negativos) state.negativos=[];
+      state.negativos.push({id:'neg'+Date.now(),text:name,hp,done:{}});
+    }
+    saveState(); closeModal(); renderAll();
+    showNotif('⚠ Avoid habit saved');
+    return;
+  }
 
   const targetList=modalData.selectedList;
   const isTiered=modalData.habitMode==='tiered';
