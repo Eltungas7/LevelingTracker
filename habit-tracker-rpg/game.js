@@ -295,16 +295,18 @@ const TIERS = [{t:'F',min:0},{t:'E',min:80},{t:'D',min:270},{t:'C',min:600},{t:'
 const TIER_COLORS = { F:'#9e9e9e', E:'#66bb6a', D:'#42a5f5', C:'#ab47bc', B:'#ffc107', A:'#ff9800', S:'#ef5350', SS:'#e91e63', SSS:'#ffd700' };
 
 // ── Level progression ────────────────────────────────────────
-const MAX_LEVEL = 99;
+const MAX_LEVEL = 100;
 const LEVEL_BANDS = [
-  { rank:'E',   from:1,  to:10, xpPerLevel:1200  },
-  { rank:'D',   from:11, to:20, xpPerLevel:1800  },
-  { rank:'C',   from:21, to:35, xpPerLevel:2400  },
-  { rank:'B',   from:36, to:50, xpPerLevel:3200  },
-  { rank:'A',   from:51, to:69, xpPerLevel:3200  },
-  { rank:'S',   from:70, to:84, xpPerLevel:9200  },
-  { rank:'SS',  from:85, to:94, xpPerLevel:15600 },
-  { rank:'SSS', from:95, to:99, xpPerLevel:32000 },
+  // statReq = average stat value required (across all 6 stats) to display this rank
+  // Each rank requires the previous tier's stat threshold — keeps XP and stat growth in sync
+  { rank:'E',   from:1,  to:10,  xpPerLevel:1200,  statReq:0    },  // No req — start of journey
+  { rank:'D',   from:11, to:20,  xpPerLevel:1800,  statReq:80   },  // E-tier stats (≈ 0.5 months)
+  { rank:'C',   from:21, to:35,  xpPerLevel:2400,  statReq:270  },  // D-tier stats (≈ 1.2 months)
+  { rank:'B',   from:36, to:50,  xpPerLevel:3200,  statReq:600  },  // C-tier stats (≈ 2.5 months)
+  { rank:'A',   from:51, to:69,  xpPerLevel:3200,  statReq:1500 },  // B-tier stats (≈ 4.4 months)
+  { rank:'S',   from:70, to:84,  xpPerLevel:9200,  statReq:2800 },  // A-tier stats (≈ 6.7 months)
+  { rank:'SS',  from:85, to:94,  xpPerLevel:12600, statReq:5000 },  // S-tier stats (≈ 12 months)
+  { rank:'SSS', from:95, to:100, xpPerLevel:26000, statReq:7000 },  // SS-tier stats (≈ 17 months)
 ];
 // LEVEL_XP_TABLE[n] = total XP needed to reach level n
 const LEVEL_XP_TABLE = (() => {
@@ -323,7 +325,7 @@ function levelRank(lv) {
   return LEVEL_BANDS.find(b => lv >= b.from && lv <= b.to)?.rank || 'SSS';
 }
 function getLevelUpStatBonus(lv) {
-  if (lv === 99) return 99;
+  if (lv === 100) return 100;
   if (lv % 10 === 0) return 10;
   return 1;
 }
@@ -416,107 +418,71 @@ function isoWeekKey(date) {
 // ============================================================
 const CLASS_TIERS = { NOVICE:1, ADEPT:2, EXPERT:3, LEGEND:4, TRUE_HERO:5 };
 
+// 6 paths (one per primary stat) × 4 tiers = 24 classes
+// Each stat appears exactly 3× as a secondary — perfectly balanced distribution
 const CLASSES = {
-  // ── TIER 1 · NOVICE ─────────────────────────────────────────
-  berserker:        { id:'berserker',        name:'BERSERKER',        tier:1, stats:['STR'],           passive:0.05, multiplier:0.10, masteryDays:7,  color:'#ef5350' },
-  scout:            { id:'scout',            name:'SCOUT',            tier:1, stats:['DEX'],           passive:0.05, multiplier:0.10, masteryDays:7,  color:'#66bb6a' },
-  guardian:         { id:'guardian',         name:'GUARDIAN',         tier:1, stats:['CON'],           passive:0.05, multiplier:0.10, masteryDays:7,  color:'#ffa726' },
-  mage:             { id:'mage',             name:'MAGE',             tier:1, stats:['INT'],           passive:0.05, multiplier:0.10, masteryDays:7,  color:'#42a5f5' },
-  monk:             { id:'monk',             name:'MONK',             tier:1, stats:['VOL'],           passive:0.05, multiplier:0.10, masteryDays:7,  color:'#ab47bc' },
-  bard:             { id:'bard',             name:'BARD',             tier:1, stats:['CHA'],           passive:0.05, multiplier:0.10, masteryDays:7,  color:'#ffca28' },
-  // ── TIER 2 · ADEPT ──────────────────────────────────────────
-  paladin:          { id:'paladin',          name:'PALADIN',          tier:2, stats:['STR','CON'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#ef5350' },
-  duelist:          { id:'duelist',          name:'DUELIST',          tier:2, stats:['STR','DEX'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#ef5350' },
-  crusader:         { id:'crusader',         name:'CRUSADER',         tier:2, stats:['STR','VOL'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#ef5350' },
-  battle_mage:      { id:'battle_mage',      name:'BATTLE MAGE',      tier:2, stats:['STR','INT'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#42a5f5' },
-  warlord:          { id:'warlord',          name:'WARLORD',          tier:2, stats:['STR','CHA'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#ef5350' },
-  ranger:           { id:'ranger',           name:'RANGER',           tier:2, stats:['DEX','CON'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#66bb6a' },
-  assassin:         { id:'assassin',         name:'ASSASSIN',         tier:2, stats:['DEX','INT'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#66bb6a' },
-  ninja:            { id:'ninja',            name:'NINJA',            tier:2, stats:['DEX','VOL'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#66bb6a' },
-  trickster:        { id:'trickster',        name:'TRICKSTER',        tier:2, stats:['DEX','CHA'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#66bb6a' },
-  alchemist:        { id:'alchemist',        name:'ALCHEMIST',        tier:2, stats:['CON','INT'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#ffa726' },
-  templar:          { id:'templar',          name:'TEMPLAR',          tier:2, stats:['CON','VOL'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#ffa726' },
-  keeper:           { id:'keeper',           name:'KEEPER',           tier:2, stats:['CON','CHA'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#ffa726' },
-  archmage:         { id:'archmage',         name:'ARCHMAGE',         tier:2, stats:['INT','VOL'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#42a5f5' },
-  loremaster:       { id:'loremaster',       name:'LOREMASTER',       tier:2, stats:['INT','CHA'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#42a5f5' },
-  prophet:          { id:'prophet',          name:'PROPHET',          tier:2, stats:['VOL','CHA'],     passive:0.07, multiplier:0.12, masteryDays:14, color:'#ab47bc' },
-  // ── TIER 3 · EXPERT ─────────────────────────────────────────
-  iron_overlord:    { id:'iron_overlord',    name:'IRON OVERLORD',    tier:3, stats:['STR','CON'],     passive:0.10, multiplier:0.15, masteryDays:21, color:'#ef5350' },
-  blademaster:      { id:'blademaster',      name:'BLADEMASTER',      tier:3, stats:['STR','DEX'],     passive:0.10, multiplier:0.15, masteryDays:21, color:'#ef5350' },
-  rune_knight:      { id:'rune_knight',      name:'RUNE KNIGHT',      tier:3, stats:['STR','INT'],     passive:0.10, multiplier:0.15, masteryDays:21, color:'#42a5f5' },
-  warlord_supreme:  { id:'warlord_supreme',  name:'WARLORD SUPREME',  tier:3, stats:['STR','VOL'],     passive:0.10, multiplier:0.15, masteryDays:21, color:'#ef5350' },
-  shadow_hunter:    { id:'shadow_hunter',    name:'SHADOW HUNTER',    tier:3, stats:['DEX','CON'],     passive:0.10, multiplier:0.15, masteryDays:21, color:'#66bb6a' },
-  phantom_blade:    { id:'phantom_blade',    name:'PHANTOM BLADE',    tier:3, stats:['DEX','INT'],     passive:0.10, multiplier:0.15, masteryDays:21, color:'#66bb6a' },
-  sentinel:         { id:'sentinel',         name:'SENTINEL',         tier:3, stats:['DEX','CHA'],     passive:0.10, multiplier:0.15, masteryDays:21, color:'#66bb6a' },
-  arcane_sovereign: { id:'arcane_sovereign', name:'ARCANE SOVEREIGN', tier:3, stats:['INT','VOL'],     passive:0.10, multiplier:0.15, masteryDays:21, color:'#42a5f5' },
-  high_enchanter:   { id:'high_enchanter',   name:'HIGH ENCHANTER',   tier:3, stats:['INT','CHA'],     passive:0.10, multiplier:0.15, masteryDays:21, color:'#42a5f5' },
-  oracle:           { id:'oracle',           name:'ORACLE',           tier:3, stats:['VOL','CHA'],     passive:0.10, multiplier:0.15, masteryDays:21, color:'#ab47bc' },
-  // ── TIER 4 · LEGEND ─────────────────────────────────────────
-  godslayer:        { id:'godslayer',        name:'GODSLAYER',        tier:4, stats:['STR','DEX','CON'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
-  iron_saint:       { id:'iron_saint',       name:'IRON SAINT',       tier:4, stats:['STR','CON','VOL'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
-  void_hunter:      { id:'void_hunter',      name:'VOID HUNTER',      tier:4, stats:['DEX','CON','STR'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
-  rune_sovereign:   { id:'rune_sovereign',   name:'RUNE SOVEREIGN',   tier:4, stats:['STR','INT','VOL'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
-  emperor:          { id:'emperor',          name:'EMPEROR',          tier:4, stats:['STR','INT','CHA'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
-  spellblade:       { id:'spellblade',       name:'SPELLBLADE',       tier:4, stats:['STR','DEX','INT'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
-  void_sage:        { id:'void_sage',        name:'VOID SAGE',        tier:4, stats:['DEX','INT','VOL'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
-  warlord_sovereign:{ id:'warlord_sovereign',name:'WARLORD SOVEREIGN',tier:4, stats:['STR','CHA','CON'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
-  sovereign:        { id:'sovereign',        name:'SOVEREIGN',        tier:4, stats:['CON','INT','CHA'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
-  shadow_prophet:   { id:'shadow_prophet',   name:'SHADOW PROPHET',   tier:4, stats:['DEX','VOL','CHA'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
-  archlord:         { id:'archlord',         name:'ARCHLORD',         tier:4, stats:['INT','VOL','CHA'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
-  divine_prophet:   { id:'divine_prophet',   name:'DIVINE PROPHET',   tier:4, stats:['VOL','CHA','CON'], passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
-  // ── TIER 5 · TRUE HERO (hidden) ─────────────────────────────
+  // ── TIER 1 · NOVICE — one primary stat each ──────────────────
+  knight:           { id:'knight',           name:'KNIGHT',           tier:1, stats:['STR'],                       passive:0.05, multiplier:0.10, masteryDays:7,  color:'#ef5350' },
+  rogue:            { id:'rogue',            name:'ROGUE',            tier:1, stats:['DEX'],                       passive:0.05, multiplier:0.10, masteryDays:7,  color:'#66bb6a' },
+  guardian:         { id:'guardian',         name:'GUARDIAN',         tier:1, stats:['CON'],                       passive:0.05, multiplier:0.10, masteryDays:7,  color:'#ffa726' },
+  mage:             { id:'mage',             name:'MAGE',             tier:1, stats:['INT'],                       passive:0.05, multiplier:0.10, masteryDays:7,  color:'#42a5f5' },
+  monk:             { id:'monk',             name:'MONK',             tier:1, stats:['VOL'],                       passive:0.05, multiplier:0.10, masteryDays:7,  color:'#ab47bc' },
+  bard:             { id:'bard',             name:'BARD',             tier:1, stats:['CHA'],                       passive:0.05, multiplier:0.10, masteryDays:7,  color:'#ffca28' },
+  // ── TIER 2 · ADEPT — primary + 1 secondary ───────────────────
+  paladin:          { id:'paladin',          name:'PALADIN',          tier:2, stats:['STR','VOL'],                 passive:0.07, multiplier:0.12, masteryDays:14, color:'#ef5350' },
+  duelist:          { id:'duelist',          name:'DUELIST',          tier:2, stats:['DEX','STR'],                 passive:0.07, multiplier:0.12, masteryDays:14, color:'#66bb6a' },
+  sentinel:         { id:'sentinel',         name:'SENTINEL',         tier:2, stats:['CON','STR'],                 passive:0.07, multiplier:0.12, masteryDays:14, color:'#ffa726' },
+  archmage:         { id:'archmage',         name:'ARCHMAGE',         tier:2, stats:['INT','VOL'],                 passive:0.07, multiplier:0.12, masteryDays:14, color:'#42a5f5' },
+  crusader:         { id:'crusader',         name:'CRUSADER',         tier:2, stats:['VOL','STR'],                 passive:0.07, multiplier:0.12, masteryDays:14, color:'#ab47bc' },
+  enchanter:        { id:'enchanter',        name:'ENCHANTER',        tier:2, stats:['CHA','DEX'],                 passive:0.07, multiplier:0.12, masteryDays:14, color:'#ffca28' },
+  // ── TIER 3 · EXPERT — primary + 2 secondaries ────────────────
+  templar:          { id:'templar',          name:'TEMPLAR',          tier:3, stats:['STR','VOL','CON'],           passive:0.10, multiplier:0.15, masteryDays:21, color:'#ef5350' },
+  assassin:         { id:'assassin',         name:'ASSASSIN',         tier:3, stats:['DEX','STR','INT'],           passive:0.10, multiplier:0.15, masteryDays:21, color:'#66bb6a' },
+  iron_warden:      { id:'iron_warden',      name:'IRON WARDEN',      tier:3, stats:['CON','STR','DEX'],           passive:0.10, multiplier:0.15, masteryDays:21, color:'#ffa726' },
+  loremaster:       { id:'loremaster',       name:'LOREMASTER',       tier:3, stats:['INT','VOL','CHA'],           passive:0.10, multiplier:0.15, masteryDays:21, color:'#42a5f5' },
+  warlord:          { id:'warlord',          name:'WARLORD',          tier:3, stats:['VOL','STR','INT'],           passive:0.10, multiplier:0.15, masteryDays:21, color:'#ab47bc' },
+  herald:           { id:'herald',           name:'HERALD',           tier:3, stats:['CHA','DEX','CON'],           passive:0.10, multiplier:0.15, masteryDays:21, color:'#ffca28' },
+  // ── TIER 4 · LEGEND — primary + 3 secondaries ────────────────
+  godslayer:        { id:'godslayer',        name:'GODSLAYER',        tier:4, stats:['STR','VOL','CON','DEX'],     passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
+  void_hunter:      { id:'void_hunter',      name:'VOID HUNTER',      tier:4, stats:['DEX','STR','INT','VOL'],     passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
+  colossus:         { id:'colossus',         name:'COLOSSUS',         tier:4, stats:['CON','STR','DEX','CHA'],     passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
+  arcane_sovereign: { id:'arcane_sovereign', name:'ARCANE SOVEREIGN', tier:4, stats:['INT','VOL','CHA','CON'],     passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
+  iron_saint:       { id:'iron_saint',       name:'IRON SAINT',       tier:4, stats:['VOL','STR','INT','CHA'],     passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
+  divine_prophet:   { id:'divine_prophet',   name:'DIVINE PROPHET',   tier:4, stats:['CHA','DEX','CON','INT'],     passive:0.13, multiplier:0.18, masteryDays:30, color:'#ffd700' },
+  // ── TIER 5 · ??? (hidden) ────────────────────────────────────
   true_hero:        { id:'true_hero',        name:'TRUE HERO',        tier:5, stats:['STR','DEX','CON','INT','VOL','CHA'], passive:0.20, multiplier:0.20, masteryDays:90, color:'#ffffff', hidden:true },
 };
 
 // ── Class flavor descriptions ─────────────────────────────────
 const CLASS_DESCS = {
-  // Tier 1
-  berserker:         "Rage fuels every blow — STR habits strike harder",
-  scout:             "Swift and precise — DEX habits yield sharper returns",
-  guardian:          "An unyielding wall — CON habits build iron foundations",
-  mage:              "Knowledge is power — INT habits expand arcane depth",
-  monk:              "Discipline shapes destiny — VOL habits forge unbreakable will",
-  bard:              "Presence commands the room — CHA habits leave lasting impressions",
-  // Tier 2
-  paladin:           "Strength and endurance united — the bedrock of a true knight",
-  duelist:           "Speed meets power — strike first, always strike hard",
-  crusader:          "Conviction drives the blade — willpower amplifies every fight",
-  battle_mage:       "Steel guided by arcane — force and intellect as one",
-  warlord:           "Dominate through power and presence — born to lead armies",
-  ranger:            "Light-footed and resilient — adapts where others fall",
-  assassin:          "Agility meets cunning — unseen, unheard, unstoppable",
-  ninja:             "Will controls what the body executes — master of self and shadow",
-  trickster:         "Charm and speed create opportunity — the nimble face of power",
-  alchemist:         "Science and survival intertwined — knowledge tempers the body",
-  templar:           "Sacred endurance, sacred will — the immovable spiritual warrior",
-  keeper:            "Endurance with grace — silent strength behind every gathering",
-  archmage:          "Intellect and willpower transcend all limits — apex of the arcane",
-  loremaster:        "Knowledge shared becomes influence — wisdom becomes charisma",
-  prophet:           "Inner fire radiates outward — will shapes how others see you",
-  // Tier 3
-  iron_overlord:     "Unstoppable force, immovable defense — no challenge too great",
-  blademaster:       "Martial perfection — strength and speed in flawless synchrony",
-  rune_knight:       "Ancient power inscribed in flesh — intellect empowers every blow",
-  warlord_supreme:   "Absolute authority through iron will and overwhelming force",
-  shadow_hunter:     "Precision and endurance hunting as one — adapts to any terrain",
-  phantom_blade:     "Vanishes and strikes — agility and intellect fused in lethal grace",
-  sentinel:          "Reflexes backed by presence — protects through charm and speed",
-  arcane_sovereign:  "The mind bends reality — intellect and will rewrite the rules",
-  high_enchanter:    "Arcane mastery meets social brilliance — knowledge is influence",
-  oracle:            "Sees what others cannot — will and presence aligned with higher truth",
-  // Tier 4
-  godslayer:         "Forged to fell the divine — STR, DEX and CON at their apex",
-  iron_saint:        "Sacred strength, enduring body, unbreakable will — a living legend",
-  void_hunter:       "Tracks the impossible — body, speed and force as one instrument",
-  rune_sovereign:    "Commands ancient power — STR, INT and VOL fused in mastery",
-  emperor:           "Conquest through might and mind — strength, intellect and presence reign",
-  spellblade:        "Blade dances with arcane — STR, DEX and INT in perfect unity",
-  void_sage:         "Pierces the veil of reality — DEX, INT and VOL beyond mortal limits",
-  warlord_sovereign: "Authority made absolute — STR, CHA and CON bend the world",
-  sovereign:         "Endurance and intellect command respect — CON, INT and CHA reign",
-  shadow_prophet:    "Unseen yet undeniable — DEX, VOL and CHA shape fate from shadow",
-  archlord:          "Knowledge, will and presence ascend — INT, VOL and CHA as legend",
-  divine_prophet:    "The voice of destiny — VOL, CHA and CON resonate through eternity",
+  // Tier 1 — Novice
+  knight:            "Forged in steel and discipline — STR is the foundation of all power",
+  rogue:             "Speed over strength — those who strike first rarely need to strike twice",
+  guardian:          "Immovable. The one who endures outlasts all who oppose them",
+  mage:              "Knowledge is the most dangerous weapon — the mind shapes reality",
+  monk:              "Will bends what strength cannot break — inner fire transcends all limits",
+  bard:              "Presence is power — to be seen and remembered is its own kind of strength",
+  // Tier 2 — Adept
+  paladin:           "Righteous force guided by iron will — strength in service of something greater",
+  duelist:           "Precision married to power — strikes that are lightning-fast and devastating",
+  sentinel:          "The unmovable guardian — power channeled into absolute defense",
+  archmage:          "Intellect fueled by unbreakable focus — knowledge becomes unstoppable force",
+  crusader:          "Will made manifest through raw strength — a force of nature with purpose",
+  enchanter:         "Elegance in motion — charm backed by reflexes others cannot follow",
+  // Tier 3 — Expert
+  templar:           "Strength, will and endurance unified — a weapon that never dulls and never falls",
+  assassin:          "Speed, power and cunning in perfect alignment — no target is unreachable",
+  iron_warden:       "Body as fortress, movement as weapon — the eternal immovable defender",
+  loremaster:        "Mind, will and presence — the scholar who commands the room as easily as reality",
+  warlord:           "Willpower forged through strength and strategy — commands armies, breaks limits",
+  herald:            "The voice that moves masses — presence amplified by body and conviction",
+  // Tier 4 — Legend
+  godslayer:         "Strength, will, endurance and speed transcended — forged to fell the divine",
+  void_hunter:       "Moves through shadow, strikes with precision, sees what others cannot",
+  colossus:          "An immovable force with presence that reshapes the battlefield — nothing breaks what cannot be moved",
+  arcane_sovereign:  "The apex of mind and soul — commands knowledge, will, presence and endurance as one",
+  iron_saint:        "Will beyond mortal limits, strength without equal, intellect that cuts, presence that inspires",
+  divine_prophet:    "Presence, speed, endurance and intellect merged — a living legend who shapes fate itself",
   // Tier 5
   true_hero:         "Beyond all limits — every facet of being honed to absolute perfection",
 };
@@ -2083,35 +2049,6 @@ function renderQuestItem(task, opts) {
   }
   if (actions.children.length) el.appendChild(actions);
 
-  // ── 7-day history dots (daily habits only) ──
-  if (!opts.isWeekly && opts.listKey !== 'trabajo') {
-    const days7    = getLastNDayKeys(7);
-    const today7   = todayKey();
-    const dotColor = getStatDotColor(task.gains || {});
-    const dotsRow  = document.createElement('div'); dotsRow.className = 'habit-dots';
-    dotsRow.addEventListener('click', e => e.stopPropagation());
-    days7.forEach(dk => {
-      const isDone  = !!task.done[dk];
-      const isToday = dk === today7;
-      const dayLtr  = _DAY_LTRS[new Date(dk + 'T12:00:00').getDay()];
-      const wrap7   = document.createElement('div'); wrap7.className = 'habit-dot-wrap';
-      const circle  = document.createElement('div');
-      circle.className = 'habit-dot' + (isDone ? ' done' : '') + (isToday ? ' today' : '');
-      if (isDone) { circle.style.background = dotColor; circle.style.boxShadow = `0 0 5px ${dotColor}90`; circle.style.borderColor = dotColor; }
-      else if (isToday) { circle.style.borderColor = dotColor + '60'; }
-      wrap7.title = dk + (isDone ? ' ✓' : isToday ? ' (hoy)' : ' —');
-      const lbl = document.createElement('div'); lbl.className = 'habit-dot-label'; lbl.textContent = dayLtr;
-      wrap7.appendChild(circle); wrap7.appendChild(lbl);
-      dotsRow.appendChild(wrap7);
-    });
-    // Synergy tag — right-aligned inside the dots row
-    if (isSynergy) {
-      const tag = document.createElement('span'); tag.className = 'cls-synergy-tag';
-      tag.style.color = eqCls.color; tag.textContent = `✦ ${eqCls.name}`;
-      dotsRow.appendChild(tag);
-    }
-    el.appendChild(dotsRow);
-  }
 
   el.addEventListener('click',(e)=>{
     if(e.target.classList.contains('quest-action-btn')) return;
@@ -2625,7 +2562,7 @@ function renderPersonaje() {
 // CLASS SYSTEM — ACTIONS & UI  (Pasos 4 + 5)
 // ============================================================
 
-const TIER_NAMES = { 1:'NOVICE', 2:'ADEPT', 3:'EXPERT', 4:'LEGEND', 5:'TRUE HERO' };
+const TIER_NAMES = { 1:'NOVICE', 2:'ADEPT', 3:'EXPERT', 4:'LEGEND', 5:'???' };
 
 // Returns Tier N-1 classes that share at least one stat with this class
 function getClassPrerequisites(classId) {
@@ -2829,6 +2766,10 @@ function showClassSelectPopup() {
     const anyAvail = classes.some(id => !CLASSES[id].hidden && getClassUnlockStatus(id, state).available);
     const isActive = _classPopupTier === t;
     const isLocked = !anyAvail;
+    // Tier 5 (???) — always shown without lock icon, mystery is the point
+    if (t === 5) {
+      return `<button class="class-tier-tab mystery-tab${isActive?' active':''}" data-tier="5">???</button>`;
+    }
     return `<button class="class-tier-tab${isActive?' active':''}${isLocked?' locked-tab':''}" data-tier="${t}">${TIER_NAMES[t]}${isLocked?' 🔒':''}</button>`;
   }).join('');
 
@@ -2875,7 +2816,7 @@ function buildClassTreeHtml() {
     else               { status = '🔒 LOCKED';   statusClass = 'tree-locked'; }
 
     const equippedDot = equipped ? `<span class="tree-eq-dot">●</span>` : '';
-    const tierLabel   = t === 5 ? '???' : TIER_NAMES[t];
+    const tierLabel   = TIER_NAMES[t];
 
     return `<div class="tree-node ${statusClass}" data-tier="${t}">
       <div class="tree-node-name" style="color:${allDone||anyAvail?color:'rgba(255,255,255,0.2)'}">${equippedDot}${tierLabel}</div>
@@ -2900,6 +2841,23 @@ function buildClassTreeHtml() {
 function renderClassPopupBody() {
   const body = document.getElementById('classPopupBody'); if (!body) return;
   const tier  = _classPopupTier;
+
+  // ── Tier 5: mystery panel ─────────────────────────────────
+  if (tier === 5) {
+    body.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center;gap:24px">
+        <div style="font-size:52px;letter-spacing:16px;color:rgba(255,255,255,0.15);font-weight:900;text-shadow:0 0 40px rgba(255,255,255,0.1)">???</div>
+        <div style="font-size:13px;letter-spacing:3px;color:rgba(255,255,255,0.25);font-style:italic;max-width:340px;line-height:1.9">
+          "A true hero does not arise from strength alone —<br>
+          he is forged in the mastery of all things.<br>
+          Only when every limit has been conquered<br>
+          will the path reveal itself."
+        </div>
+        <div style="font-size:10px;letter-spacing:4px;color:rgba(255,255,255,0.1);margin-top:8px">⟦ BEYOND LEGEND ⟧</div>
+      </div>`;
+    return;
+  }
+
   const ids   = (CLASSES_BY_TIER[tier] || []).filter(id => !CLASSES[id].hidden);
   body.innerHTML = '';
   const grid = document.createElement('div'); grid.className = 'class-cards-grid';
@@ -3295,8 +3253,15 @@ function renderAll() { renderHeader(); if(currentTab==='habits') renderHabitos()
 const RANK_ORDER = ['F','E','D','C','B','A','S','SS','SSS'];
 function getPlayerRank() {
   const lv = calcLevel(state.totalXp).level;
-  const band = LEVEL_BANDS.find(b => lv >= b.from && lv <= b.to);
-  return band ? band.rank : 'F';
+  const statAvg = STAT_KEYS.reduce((s,k) => s + (getEffectiveStat(k,state)||0), 0) / STAT_KEYS.length;
+  // Advance rank only when BOTH the level band AND the stat average are met.
+  // If stats lag behind XP, the displayed rank is capped at the last fully-met tier.
+  let rank = 'E';
+  for (const b of LEVEL_BANDS) {
+    if (lv < b.from) break;
+    if (statAvg >= (b.statReq ?? 0)) rank = b.rank;
+  }
+  return rank;
 }
 function rankIdx(r) { return RANK_ORDER.indexOf(r); }
 function playerMeetsRank(r) { return !r || rankIdx(getPlayerRank()) >= rankIdx(r); }
