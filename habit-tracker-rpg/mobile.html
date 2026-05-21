@@ -432,32 +432,43 @@ body {
 }
 
 /* Bars layout: HP+MP side by side, EXP full width below */
-.bars-row {
-  display: flex; flex-direction: column;
-  gap: 6px;
+.exp-bar-wrap {
   margin-bottom: 8px;
 }
-.bars-hpmp {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+.exp-bar-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px;
+  margin-bottom: 5px;
 }
-.bar-block {}
-.bar-label {
-  display: flex; justify-content: space-between;
-  font-family: 'Cinzel', serif;
-  font-size: 10px; letter-spacing: 1px;
-  color: var(--sao-text-dim);
-  margin-bottom: 3px;
+.exp-bar-label {
+  color: #ffd54f;
+  text-shadow: 0 0 10px rgba(255,213,79,0.7), 0 0 3px rgba(255,255,255,0.2);
 }
-.bar-name { color: var(--sao-cyan-bright); }
-.bar-track {
-  height: 7px;
-  background: rgba(255,255,255,0.07);
-  border-radius: 3px; overflow: hidden;
+.exp-bar-val { color: rgba(255,255,255,0.55); font-size: 9px; letter-spacing: 1px; }
+.exp-track {
+  height: 14px;
+  background: rgba(255,193,7,0.06);
+  border-radius: 7px; overflow: hidden;
+  border: 1px solid rgba(255,193,7,0.22);
+  box-shadow: 0 0 8px rgba(255,193,7,0.08) inset;
 }
-.bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
-.bar-fill.hp  { background: linear-gradient(90deg, #00c853, #69f0ae); box-shadow: 0 0 8px rgba(105,240,174,0.6); }
-.bar-fill.mp  { background: linear-gradient(90deg, #00b0ff, #80d8ff); box-shadow: 0 0 8px rgba(0,176,255,0.6); }
-.bar-fill.exp { background: linear-gradient(90deg, #f9a825, #ffd54f); box-shadow: 0 0 8px rgba(255,193,7,0.6); }
+.exp-fill {
+  height: 100%; border-radius: 7px;
+  background: linear-gradient(90deg, #e65100, #f9a825, #ffd54f, #fff9c4);
+  box-shadow: 0 0 14px rgba(255,193,7,0.75), 0 0 4px rgba(255,255,255,0.25);
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  position: relative; overflow: hidden;
+}
+.exp-fill::after {
+  content: '';
+  position: absolute; top: 0; left: -100%; width: 55%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.38), transparent);
+  animation: expShimmer 2.4s ease-in-out infinite;
+}
+@keyframes expShimmer {
+  0%   { left: -100%; }
+  100% { left: 220%; }
+}
 
 /* Micro-stats: 3-col grid, STREAK visually dominant */
 .micro-stats {
@@ -1154,8 +1165,10 @@ body {
   transition: opacity 0.15s;
 }
 .quest-action-btn:active { opacity: 1; }
-.quest-action-btn.edit { color: var(--sao-cyan); }
-.quest-action-btn.del  { color: var(--sao-red); }
+.quest-action-btn.edit      { color: var(--sao-cyan); }
+.quest-action-btn.del       { color: var(--sao-red); }
+.quest-action-btn.archive   { color: var(--sao-gold); }
+.quest-action-btn.unarchive { color: var(--sao-green); }
 .quest-action-primary  { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
 
 .drag-handle {
@@ -1312,6 +1325,89 @@ body {
 }
 #radarCanvas { height: min(200px, 42vw) !important; }
 
+/* ── SOCIAL STATS CARD ── */
+.social-card {
+  background: var(--sao-bg2); border: 1px solid var(--sao-border);
+  border-radius: 6px; padding: 10px;
+}
+.social-card-title {
+  font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 2px;
+  color: var(--sao-cyan); text-align: center; margin-bottom: 8px;
+}
+.social-stats-grid { display: flex; flex-direction: column; gap: 5px; }
+.social-stat-row {
+  display: flex; align-items: center; gap: 7px;
+  background: rgba(6,26,43,0.6); border: 1px solid rgba(77,208,225,0.12);
+  border-radius: 5px; padding: 5px 8px;
+  transition: border-color 0.15s;
+}
+.social-stat-emoji { font-size: 15px; flex-shrink: 0; }
+.social-stat-info { flex: 1; min-width: 0; }
+.social-stat-name { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1px; color: var(--sao-text); }
+.social-stat-pts { font-family: 'Rajdhani', sans-serif; font-size: 10px; color: var(--sao-text-dim); }
+.social-stat-bar-wrap { height: 2px; background: rgba(77,208,225,0.12); border-radius: 2px; margin-top: 3px; }
+.social-stat-bar-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+.social-stat-add-btn {
+  background: rgba(77,208,225,0.08); border: 1px solid rgba(77,208,225,0.25);
+  color: var(--sao-cyan); font-size: 16px; font-weight: 700;
+  width: 28px; height: 28px; border-radius: 4px; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.social-stat-add-btn:active { background: rgba(77,208,225,0.18); }
+.social-act-picker {
+  background: rgba(2,13,20,0.95); border: 1px solid rgba(77,208,225,0.2);
+  border-radius: 5px; padding: 7px; margin-top: 3px; display: flex; flex-wrap: wrap; gap: 5px;
+}
+.social-act-btn {
+  background: rgba(77,208,225,0.06); border: 1px solid rgba(77,208,225,0.18);
+  color: var(--sao-text); font-family: 'Rajdhani', sans-serif; font-size: 11px;
+  padding: 5px 9px; border-radius: 4px; cursor: pointer; transition: background 0.15s;
+}
+.social-act-btn:active { background: rgba(77,208,225,0.16); border-color: var(--sao-cyan); }
+.stat-social-bonus { color: #80deea; font-size: 10px; font-weight: 600; }
+
+/* ── SOCIAL QUICK-LOG (habits tab) ── */
+.social-quicklog-chips {
+  display: flex; gap: 6px; flex-wrap: wrap; padding: 4px 0 2px;
+}
+.social-ql-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  background: rgba(77,208,225,0.05); border: 1px solid rgba(77,208,225,0.18);
+  border-radius: 8px; padding: 7px 10px; cursor: pointer; min-width: 46px;
+  font-size: 17px; transition: background 0.15s, border-color 0.15s;
+}
+.social-ql-btn:active { background: rgba(77,208,225,0.14); }
+.social-ql-btn.ql-open { background: rgba(77,208,225,0.1); }
+.social-ql-rank {
+  font-family: 'Rajdhani', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.social-ql-picker {
+  width: 100%; background: rgba(2,13,20,0.95);
+  border: 1px solid rgba(77,208,225,0.2); border-radius: 5px;
+  padding: 7px; margin-top: 4px; display: flex; flex-wrap: wrap; gap: 5px;
+}
+.social-ql-act {
+  background: rgba(77,208,225,0.06); border: 1px solid rgba(77,208,225,0.18);
+  color: var(--sao-text); font-family: 'Rajdhani', sans-serif; font-size: 11px;
+  padding: 5px 9px; border-radius: 4px; cursor: pointer;
+  transition: background 0.15s;
+}
+.social-ql-act:active { background: rgba(77,208,225,0.16); border-color: var(--sao-cyan); }
+
+/* ── WORKER LEVEL ── */
+.worker-level-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,193,7,0.07); border: 1px solid rgba(255,193,7,0.28);
+  border-radius: 5px; padding: 4px 10px;
+  font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1.5px; color: #ffc107;
+}
+.worker-xp-bar-wrap {
+  height: 3px; background: rgba(255,193,7,0.12); border-radius: 2px; margin-top: 2px;
+}
+.worker-xp-bar-fill { height: 100%; background: #ffc107; border-radius: 2px; transition: width 0.3s; }
+
 .stats-list { display: flex; flex-direction: column; gap: 5px; }
 .stat-row-wrap {}
 .stat-row {
@@ -1430,14 +1526,40 @@ body {
   background: rgba(77,208,225,0.08); border: 1px solid rgba(77,208,225,0.25);
   color: var(--sao-cyan-bright); font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1px;
 }
-.class-mastery-row {
-  display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
-}
+.class-mastery-section { margin-bottom: 10px; }
+.class-mastery-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+.class-mastery-title { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 2.5px; color: var(--sao-text-dim); }
 .class-mastery-bar {
-  flex: 1; height: 3px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden;
+  height: 7px; background: rgba(255,255,255,0.05); border-radius: 4px;
+  overflow: hidden; border: 1px solid rgba(255,255,255,0.08); position: relative;
 }
-.class-mastery-fill { height: 100%; border-radius: 2px; transition: width 0.4s; }
-.class-mastery-label { font-size: 9px; color: var(--sao-text-dim); white-space: nowrap; }
+.class-mastery-fill {
+  height: 100%; border-radius: 4px;
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+  position: relative; overflow: hidden;
+}
+.class-mastery-fill::after {
+  content: ''; position: absolute; top: 0; left: -60%; width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+  animation: mastery-bar-shimmer 2.5s ease-in-out infinite;
+}
+.class-mastery-label { font-family: 'Cinzel', serif; font-size: 9px; color: var(--sao-text-dim); white-space: nowrap; letter-spacing: 0.5px; }
+.class-mastery-trial-gate {
+  font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1.5px;
+  color: #ffc107; text-align: center; margin-top: 5px;
+  animation: mastery-trial-pulse 1.8s ease-in-out infinite;
+}
+.class-mastery-trial-pending { font-size: 8px; color: rgba(255,193,7,0.5); margin-top: 4px; text-align: right; letter-spacing: 0.5px; }
+@keyframes mastery-bar-shimmer {
+  0%   { transform: translateX(-100%); opacity: 0; }
+  30%  { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { transform: translateX(400%); opacity: 0; }
+}
+@keyframes mastery-trial-pulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; text-shadow: 0 0 10px rgba(255,193,7,0.5); }
+}
 .class-unlock-alert {
   font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px;
   color: #ffd700; text-align: center; margin-bottom: 6px;
@@ -1600,7 +1722,7 @@ body {
   font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2.5px;
   color: var(--cls-c, #4dd0e1);
 }
-.cq-mastery-label { font-size: 10px; color: var(--sao-text-dim); }
+.cq-mastery-label { font-family: 'Cinzel', serif; font-size: 9px; color: var(--sao-text-dim); letter-spacing: 0.5px; }
 .cq-collapse-chevron { font-size: 9px; color: var(--sao-text-dim); margin-left: 6px; }
 /* Class quest cards — parity with .quest cards */
 .cq-quest { align-items: flex-start; padding-top: 10px; border-left-color: color-mix(in srgb, var(--cls-c, #4dd0e1) 55%, transparent); }
@@ -1610,11 +1732,23 @@ body {
 .cq-mst-chip { color: #ffc107; border-color: rgba(255,193,7,0.35); background: rgba(255,193,7,0.08); }
 .cq-quest-progress { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
 .cq-quest-track { width: 70px; }
-.cq-mastery-bar-wrap { padding: 0 12px 8px; }
+.cq-mastery-bar-wrap { padding: 2px 12px 8px; }
 .cq-mastery-track {
-  height: 4px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden;
+  height: 7px; background: rgba(255,255,255,0.05); border-radius: 4px;
+  overflow: hidden; border: 1px solid rgba(255,255,255,0.08);
 }
-.cq-mastery-fill { height: 100%; border-radius: 2px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+.cq-mastery-fill {
+  height: 100%; border-radius: 4px;
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+  position: relative; overflow: hidden;
+}
+.cq-mastery-fill::after {
+  content: ''; position: absolute; top: 0; left: -60%; width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+  animation: mastery-bar-shimmer 2.5s ease-in-out infinite;
+}
+.cq-trial-chip { color: #ffd700; border-color: rgba(255,215,0,0.35); background: rgba(255,215,0,0.08); font-family: 'Cinzel', serif; letter-spacing: 0.5px; }
+.cq-trial-note { font-size: 9px; color: rgba(255,215,0,0.65); margin-top: 4px; font-family: 'Cinzel', serif; letter-spacing: 0.5px; }
 .cq-cards { display: flex; flex-direction: column; gap: 0; }
 .cq-card {
   padding: 11px 12px 10px;
@@ -2408,6 +2542,14 @@ body {
 }
 .aura-card-msg.msg-ready { color: var(--sao-gold); font-weight: 600; }
 .aura-card-msg.msg-almost { color: var(--sao-cyan-bright); }
+.aura-inline-chip {
+  font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.5px; flex-shrink: 0; padding-left: 2px;
+}
+.aura-preview-line {
+  font-family: 'Rajdhani', sans-serif; font-size: 10px;
+  color: var(--sao-text-dim); text-align: right; padding: 1px 2px 0;
+}
 
 /* ── INVENTORY SORT BAR ── */
 .inv-sort-bar { display: flex; gap: 4px; margin-bottom: 6px; }
@@ -2482,9 +2624,13 @@ body {
 }
 .inv-equip-slot.is-filled { border-color: rgba(77,208,225,0.4); }
 .inv-equip-slot.is-selected { border-color: var(--sao-cyan); box-shadow: 0 0 8px rgba(77,208,225,0.3); }
-.inv-equip-slot.r-rare { border-color: rgba(33,150,243,0.5); }
-.inv-equip-slot.r-epic { border-color: rgba(156,39,176,0.5); }
-.inv-equip-slot.r-legendary { border-color: rgba(255,152,0,0.7); }
+.inv-equip-slot.r-common    { border-color: rgba(200,200,200,0.35); background: rgba(200,200,200,0.05); }
+.inv-equip-slot.r-uncommon  { border-color: rgba(76,175,80,0.55);  background: rgba(76,175,80,0.08); }
+.inv-equip-slot.r-rare      { border-color: rgba(33,150,243,0.6);  background: rgba(33,150,243,0.08); }
+.inv-equip-slot.r-epic      { border-color: rgba(156,39,176,0.6);  background: rgba(156,39,176,0.08); }
+.inv-equip-slot.r-legendary { border-color: rgba(255,152,0,0.75);  background: rgba(255,152,0,0.08); }
+.inv-equip-slot.r-mythic    { border-color: rgba(244,67,54,0.65);  background: rgba(244,67,54,0.08); }
+.inv-equip-slot.r-ultra_rare{ border-color: rgba(255,255,255,0.6); background: linear-gradient(135deg,rgba(255,0,128,0.08),rgba(0,200,255,0.08),rgba(128,255,0,0.08)); }
 .inv-equip-slot-emoji { font-size: 16px; }
 .inv-equip-slot-label { font-size: 7px; color: var(--sao-text-dim); margin-top: 1px; text-align: center; }
 
@@ -2501,9 +2647,13 @@ body {
 }
 .inv-bag-slot.has-item { border-color: rgba(77,208,225,0.25); }
 .inv-bag-slot.is-selected { border-color: var(--sao-cyan); box-shadow: 0 0 6px rgba(77,208,225,0.3); }
-.inv-bag-slot.r-rare    { border-color: rgba(33,150,243,0.5); }
-.inv-bag-slot.r-epic    { border-color: rgba(156,39,176,0.5); }
-.inv-bag-slot.r-legendary { border-color: rgba(255,152,0,0.6); }
+.inv-bag-slot.r-common    { border-color: rgba(200,200,200,0.35); background: rgba(200,200,200,0.05); }
+.inv-bag-slot.r-uncommon  { border-color: rgba(76,175,80,0.55);  background: rgba(76,175,80,0.08); }
+.inv-bag-slot.r-rare      { border-color: rgba(33,150,243,0.6);  background: rgba(33,150,243,0.08); }
+.inv-bag-slot.r-epic      { border-color: rgba(156,39,176,0.6);  background: rgba(156,39,176,0.08); }
+.inv-bag-slot.r-legendary { border-color: rgba(255,152,0,0.75);  background: rgba(255,152,0,0.08); }
+.inv-bag-slot.r-mythic    { border-color: rgba(244,67,54,0.65);  background: rgba(244,67,54,0.08); }
+.inv-bag-slot.r-ultra_rare{ border-color: rgba(255,255,255,0.6); background: linear-gradient(135deg,rgba(255,0,128,0.08),rgba(0,200,255,0.08),rgba(128,255,0,0.08)); }
 .inv-slot-emoji { font-size: 16px; }
 .inv-slot-qty { position: absolute; bottom: 1px; right: 2px; font-size: 8px; color: var(--sao-gold); font-weight: 700; }
 
@@ -2511,9 +2661,12 @@ body {
 .inv-info-empty { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px; color: var(--sao-text-dim); text-align: center; padding: 10px; }
 .inv-info-name { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; margin-bottom: 2px; }
 .inv-info-name.r-common    { color: var(--sao-text); }
+.inv-info-name.r-uncommon  { color: #66bb6a; }
 .inv-info-name.r-rare      { color: #42a5f5; }
 .inv-info-name.r-epic      { color: #ab47bc; }
 .inv-info-name.r-legendary { color: #ffa726; }
+.inv-info-name.r-mythic    { color: #ef5350; }
+.inv-info-name.r-ultra_rare{ background: linear-gradient(90deg,#f06,#0cf,#0f6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 .inv-info-rarity { font-size: 9px; color: var(--sao-text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
 .inv-info-desc { font-size: 11px; color: var(--sao-text-dim); margin-bottom: 6px; }
 .inv-info-stats { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
@@ -2565,7 +2718,13 @@ body {
   border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03);
   color: var(--sao-text-dim); transition: all 0.18s; text-align: center;
 }
-.dungeon-rank-tab.locked { opacity: 0.3; cursor: not-allowed; font-size: 9px; }
+.dungeon-rank-tab.locked { opacity: 0.4; cursor: pointer; font-size: 9px; }
+.dungeon-rank-lock-info {
+  font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px;
+  color: var(--sao-text-dim); text-align: center;
+  background: rgba(255,193,7,0.06); border: 1px solid rgba(255,193,7,0.2);
+  border-radius: 6px; padding: 8px 12px; margin-bottom: 8px;
+}
 .dungeon-rank-tab.rank-E.active { border-color:#66bb6a;color:#66bb6a;background:rgba(102,187,106,0.1);box-shadow:0 0 8px rgba(102,187,106,0.25); }
 .dungeon-rank-tab.rank-D.active { border-color:#29b6f6;color:#29b6f6;background:rgba(41,182,246,0.1);box-shadow:0 0 8px rgba(41,182,246,0.25); }
 .dungeon-rank-tab.rank-C.active { border-color:#ab47bc;color:#ab47bc;background:rgba(171,71,188,0.1);box-shadow:0 0 8px rgba(171,71,188,0.25); }
@@ -3083,6 +3242,22 @@ body {
 .forge-mat-emoji { font-size:14px; }
 .forge-mat-qty { font-family:'Cinzel',serif; font-size:14px; font-weight:700; color:var(--sao-text); }
 .forge-mat-label { font-size:9px; color:var(--sao-text-dim); }
+
+.forge-quality-bar {
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 9px; padding: 8px 12px; margin-bottom: 2px;
+}
+.forge-quality-hdr { font-family:'Cinzel',serif; font-size:9px; letter-spacing:1.5px; color:var(--sao-text-dim); margin-bottom:6px; opacity:0.7; }
+.forge-quality-row { display:flex; gap:5px; flex-wrap:wrap; }
+.forge-qual-chip {
+  font-family:'Cinzel',serif; font-size:8px; letter-spacing:0.5px;
+  padding:3px 7px; border-radius:4px; border:1px solid; white-space:nowrap;
+}
+.fq-common    { color:var(--sao-text-dim); border-color:rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); }
+.fq-fine      { color:#4dd0e1; border-color:rgba(77,208,225,0.35); background:rgba(77,208,225,0.06); }
+.fq-superior  { color:#82b1ff; border-color:rgba(130,177,255,0.35); background:rgba(130,177,255,0.06); }
+.fq-masterwork{ color:#ffd700; border-color:rgba(255,215,0,0.4);  background:rgba(255,215,0,0.07); }
+.fq-pct { opacity:0.75; margin-left:3px; }
 
 .forge-section { display:flex; flex-direction:column; gap:6px; }
 .forge-section-hdr {
@@ -4569,20 +4744,18 @@ body {
           <div class="lvl-block-num" id="lvNum">1</div>
         </div>
       </div>
-      <div class="bars-row">
-        <div class="bars-hpmp">
-          <div class="bar-block">
-            <div class="bar-label"><span class="bar-name">HP</span><span id="hpText">100/100</span></div>
-            <div class="bar-track"><div class="bar-fill hp" id="hpFill" style="width:100%"></div></div>
-          </div>
-          <div class="bar-block">
-            <div class="bar-label"><span class="bar-name">MP</span><span id="mpText">100/100</span></div>
-            <div class="bar-track"><div class="bar-fill mp" id="mpFill" style="width:100%"></div></div>
-          </div>
+      <!-- HP/MP kept hidden for JS compatibility -->
+      <div style="display:none">
+        <span id="hpText"></span><div id="hpFill"></div>
+        <span id="mpText"></span><div id="mpFill"></div>
+      </div>
+      <div class="exp-bar-wrap">
+        <div class="exp-bar-meta">
+          <span class="exp-bar-label">⟦ EXP ⟧</span>
+          <span class="exp-bar-val" id="xpText">0/100</span>
         </div>
-        <div class="bar-block">
-          <div class="bar-label"><span class="bar-name">EXP</span><span id="xpText">0/100</span></div>
-          <div class="bar-track"><div class="bar-fill exp" id="xpFill" style="width:0%"></div></div>
+        <div class="exp-track">
+          <div class="exp-fill" id="xpFill" style="width:0%"></div>
         </div>
       </div>
       <div class="micro-stats">
@@ -4639,7 +4812,23 @@ body {
         <div style="color:var(--sao-text-dim);font-size:13px;margin-bottom:14px;line-height:1.5;">All XP, levels, stats, habits, streaks and history will be permanently erased. This cannot be undone.</div>
         <div style="display:flex;gap:8px;">
           <button class="m-btn cancel" style="font-size:9px;" onclick="cancelResetConfirm()">CANCEL</button>
-          <button class="m-btn" style="background:rgba(255,82,82,0.18);border-color:var(--sao-red);color:var(--sao-red);font-size:9px;" onclick="executeFullReset()">DELETE EVERYTHING</button>
+          <button class="m-btn" style="background:rgba(255,82,82,0.18);border-color:var(--sao-red);color:var(--sao-red);font-size:9px;" onclick="showResetStep3()">I UNDERSTAND — CONTINUE</button>
+        </div>
+      </div>
+      <div id="resetStep3" style="display:none;background:rgba(255,82,82,0.12);border:1px solid rgba(255,82,82,0.6);border-radius:8px;padding:14px;">
+        <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;color:var(--sao-red);margin-bottom:8px;">⚠ ARE YOU REALLY SURE?</div>
+        <div style="color:var(--sao-text-dim);font-size:13px;margin-bottom:14px;line-height:1.5;">Every class mastered, every streak built, every stat earned — gone. Your entire journey will be wiped. Are you absolutely certain you want to do this?</div>
+        <div style="display:flex;gap:8px;">
+          <button class="m-btn cancel" style="font-size:9px;" onclick="cancelResetConfirm()">CANCEL</button>
+          <button class="m-btn" style="background:rgba(255,82,82,0.25);border-color:var(--sao-red);color:var(--sao-red);font-size:9px;" onclick="showResetStep4()">YES, DELETE IT ALL</button>
+        </div>
+      </div>
+      <div id="resetStep4" style="display:none;background:rgba(255,82,82,0.20);border:2px solid var(--sao-red);border-radius:8px;padding:14px;">
+        <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;color:var(--sao-red);margin-bottom:8px;">⛔ FINAL WARNING</div>
+        <div style="color:#ff8a80;font-size:13px;margin-bottom:14px;line-height:1.5;">There is no recovery. No backup. No second chance. Once you press the button below, everything is gone forever.</div>
+        <div style="display:flex;gap:8px;">
+          <button class="m-btn cancel" style="font-size:9px;" onclick="cancelResetConfirm()">CANCEL</button>
+          <button class="m-btn" style="background:var(--sao-red);border-color:var(--sao-red);color:#fff;font-size:9px;font-weight:700;" onclick="executeFullReset()">DELETE EVERYTHING</button>
         </div>
       </div>
     </div>
@@ -4700,11 +4889,19 @@ function showResetConfirm() {
   document.getElementById('resetStep1').style.display = 'none';
   document.getElementById('resetStep2').style.display = 'block';
 }
+function showResetStep3() {
+  document.getElementById('resetStep2').style.display = 'none';
+  document.getElementById('resetStep3').style.display = 'block';
+}
+function showResetStep4() {
+  document.getElementById('resetStep3').style.display = 'none';
+  document.getElementById('resetStep4').style.display = 'block';
+}
 function cancelResetConfirm() {
-  const s1 = document.getElementById('resetStep1');
-  const s2 = document.getElementById('resetStep2');
-  if (s1) s1.style.display = 'block';
-  if (s2) s2.style.display = 'none';
+  ['resetStep1','resetStep2','resetStep3','resetStep4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = id === 'resetStep1' ? 'block' : 'none';
+  });
 }
 function executeFullReset() {
   localStorage.removeItem('sao_habit_tracker_v4');
@@ -4844,22 +5041,151 @@ function playPhoenix() {
   } catch(e) {}
 }
 
-// FF10 · Menu Confirm — crisp two-note bell chime (habit complete)
+// Daily habit tap — ascending F major triad: F4 → A4 → C5, sine-primary + soft shimmer
 function playSwordSlash() {
   if (!soundEnabled || !_ACtx) return;
   try {
     const ctx = _getCtx(), t = ctx.currentTime;
-    const master = ctx.createGain(); master.gain.value = 0.36; master.connect(ctx.destination);
-    // C5 → G5  (perfect fifth, very snappy)
-    [[523.25,0,0.19],[783.99,0.068,0.23]].forEach(([f,s,d])=>{
+    const master = ctx.createGain(); master.gain.value = 0.34; master.connect(ctx.destination);
+    // F4 → A4 → C5 ascending F major (warm, upward)
+    [[349.23,0.00,0.26],[440.00,0.10,0.28],[523.25,0.20,0.40]].forEach(([f,s,d])=>{
       const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
-      g.gain.setValueAtTime(0,t+s); g.gain.linearRampToValueAtTime(0.36,t+s+0.003);
+      g.gain.setValueAtTime(0,t+s); g.gain.linearRampToValueAtTime(0.25,t+s+0.010);
+      g.gain.setValueAtTime(0.25,t+s+d*0.44); g.gain.exponentialRampToValueAtTime(0.001,t+s+d+0.05);
+      o.connect(g); g.connect(master); o.start(t+s); o.stop(t+s+d+0.08);
+      const o2=ctx.createOscillator(),g2=ctx.createGain(); o2.type='triangle'; o2.frequency.value=f*1.5;
+      g2.gain.setValueAtTime(0,t+s); g2.gain.linearRampToValueAtTime(0.050,t+s+0.010);
+      g2.gain.exponentialRampToValueAtTime(0.001,t+s+d*0.30);
+      o2.connect(g2); g2.connect(master); o2.start(t+s); o2.stop(t+s+d*0.35);
+    });
+    // Soft shimmer tail
+    [1318.51,1760.00].forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
+      const st=t+0.22+i*0.055;
+      g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(0.030-i*0.008,st+0.010);
+      g.gain.exponentialRampToValueAtTime(0.001,st+0.32);
+      o.connect(g); g.connect(master); o.start(st); o.stop(st+0.36);
+    });
+  } catch(e) {}
+}
+
+// Weekly habit tap — ascending G major: G4 → B4 → D5 → G5, 4 notes, richer shimmer
+function playWeeklyTap() {
+  if (!soundEnabled || !_ACtx) return;
+  try {
+    const ctx = _getCtx(), t = ctx.currentTime;
+    const master = ctx.createGain(); master.gain.value = 0.32; master.connect(ctx.destination);
+    // G4 → B4 → D5 → G5 ascending G major (4 notes = fuller than daily's 3)
+    [[392.00,0.00,0.22],[493.88,0.09,0.24],[587.33,0.18,0.28],[783.99,0.27,0.44]].forEach(([f,s,d])=>{
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,t+s); g.gain.linearRampToValueAtTime(0.23,t+s+0.011);
+      g.gain.setValueAtTime(0.23,t+s+d*0.45); g.gain.exponentialRampToValueAtTime(0.001,t+s+d+0.06);
+      o.connect(g); g.connect(master); o.start(t+s); o.stop(t+s+d+0.09);
+      const o2=ctx.createOscillator(),g2=ctx.createGain(); o2.type='triangle'; o2.frequency.value=f*1.5;
+      g2.gain.setValueAtTime(0,t+s); g2.gain.linearRampToValueAtTime(0.046,t+s+0.011);
+      g2.gain.exponentialRampToValueAtTime(0.001,t+s+d*0.28);
+      o2.connect(g2); g2.connect(master); o2.start(t+s); o2.stop(t+s+d*0.33);
+    });
+    // Slightly richer 3-tone shimmer
+    [1174.66,1567.98,2093.00].forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
+      const st=t+0.30+i*0.055;
+      g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(0.034-i*0.008,st+0.010);
+      g.gain.exponentialRampToValueAtTime(0.001,st+0.38);
+      o.connect(g); g.connect(master); o.start(st); o.stop(st+0.42);
+    });
+  } catch(e) {}
+}
+
+// Avoid clean check-in — soft descending G5→E5→C5 major triad (serene / shield confirmed)
+function playAvoidClean() {
+  if (!soundEnabled || !_ACtx) return;
+  try {
+    const ctx = _getCtx(), t = ctx.currentTime;
+    const master = ctx.createGain(); master.gain.value = 0.32; master.connect(ctx.destination);
+    // Descending major triad — resolving, peaceful
+    [[783.99,0.00,0.36],[659.25,0.11,0.33],[523.25,0.22,0.46]].forEach(([f,s,d])=>{
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,t+s); g.gain.linearRampToValueAtTime(0.28,t+s+0.015);
+      g.gain.setValueAtTime(0.28,t+s+d*0.40); g.gain.exponentialRampToValueAtTime(0.001,t+s+d+0.06);
+      o.connect(g); g.connect(master); o.start(t+s); o.stop(t+s+d+0.09);
+    });
+    // Faint shimmer tail
+    [1567.98,2093.00].forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
+      const st=t+0.20+i*0.06;
+      g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(0.026-i*0.008,st+0.010);
+      g.gain.exponentialRampToValueAtTime(0.001,st+0.30);
+      o.connect(g); g.connect(master); o.start(st); o.stop(st+0.34);
+    });
+  } catch(e) {}
+}
+
+// Avoid relapse — harsh descending sawtooth sweep + low thud (HP damage feel)
+function playAvoidRelapse() {
+  if (!soundEnabled || !_ACtx) return;
+  try {
+    const ctx = _getCtx(), t = ctx.currentTime;
+    const comp = ctx.createDynamicsCompressor(); comp.threshold.value=-6; comp.knee.value=3; comp.ratio.value=5; comp.attack.value=0.001; comp.release.value=0.09; comp.connect(ctx.destination);
+    // Descending sawtooth — A4 → ~A2, jarring and harsh
+    const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sawtooth';
+    o.frequency.setValueAtTime(440,t); o.frequency.exponentialRampToValueAtTime(180,t+0.18);
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.17,t+0.004);
+    g.gain.setValueAtTime(0.17,t+0.05); g.gain.exponentialRampToValueAtTime(0.001,t+0.22);
+    o.connect(g); g.connect(comp); o.start(t); o.stop(t+0.25);
+    // Low square thud (impact)
+    const o2=ctx.createOscillator(),g2=ctx.createGain(); o2.type='square'; o2.frequency.value=110;
+    g2.gain.setValueAtTime(0,t); g2.gain.linearRampToValueAtTime(0.24,t+0.003);
+    g2.gain.exponentialRampToValueAtTime(0.001,t+0.13);
+    o2.connect(g2); g2.connect(comp); o2.start(t); o2.stop(t+0.15);
+  } catch(e) {}
+}
+
+// Work task complete — punchy metallic "gold register": low thunk + bright ping (distinct from habit bell chime)
+function playWorkComplete() {
+  if (!soundEnabled || !_ACtx) return;
+  try {
+    const ctx = _getCtx(), t = ctx.currentTime;
+    const master = ctx.createGain(); master.gain.value = 0.42; master.connect(ctx.destination);
+    // Low square thunk — weight of coins
+    const o1=ctx.createOscillator(),g1=ctx.createGain(); o1.type='square'; o1.frequency.value=146.83;
+    g1.gain.setValueAtTime(0,t); g1.gain.linearRampToValueAtTime(0.30,t+0.004);
+    g1.gain.exponentialRampToValueAtTime(0.001,t+0.13);
+    o1.connect(g1); g1.connect(master); o1.start(t); o1.stop(t+0.15);
+    // Metallic ping G4 + overtone D5 (amber tone pair)
+    [[392.00,0.048,0.26],[587.33,0.048,0.18]].forEach(([f,s,d])=>{
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.type='triangle'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,t+s); g.gain.linearRampToValueAtTime(0.22,t+s+0.003);
       g.gain.exponentialRampToValueAtTime(0.001,t+s+d);
       o.connect(g); g.connect(master); o.start(t+s); o.stop(t+s+d+0.02);
-      const o2=ctx.createOscillator(),g2=ctx.createGain(); o2.type='triangle'; o2.frequency.value=f*2;
-      g2.gain.setValueAtTime(0,t+s); g2.gain.linearRampToValueAtTime(0.09,t+s+0.003);
-      g2.gain.exponentialRampToValueAtTime(0.001,t+s+d*0.32);
-      o2.connect(g2); g2.connect(master); o2.start(t+s); o2.stop(t+s+d*0.38);
+    });
+  } catch(e) {}
+}
+
+// Class quest complete — arcane A-minor triad pulse + shimmer (distinct from major-key habit sounds)
+function playClassQuestDone() {
+  if (!soundEnabled || !_ACtx) return;
+  try {
+    const ctx = _getCtx(), t = ctx.currentTime;
+    const comp = ctx.createDynamicsCompressor(); comp.threshold.value=-8; comp.knee.value=4; comp.ratio.value=3; comp.attack.value=0.001; comp.release.value=0.14; comp.connect(ctx.destination);
+    // A4 → C5 → E5 ascending minor triad (arcane, distinct from C-major dailies)
+    [[440.00,0.00,0.22],[523.25,0.10,0.24],[659.25,0.20,0.40]].forEach(([f,s,d])=>{
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,t+s); g.gain.linearRampToValueAtTime(0.23,t+s+0.006);
+      g.gain.setValueAtTime(0.23,t+s+d*0.45); g.gain.exponentialRampToValueAtTime(0.001,t+s+d+0.05);
+      o.connect(g); g.connect(comp); o.start(t+s); o.stop(t+s+d+0.08);
+      const o2=ctx.createOscillator(),g2=ctx.createGain(); o2.type='triangle'; o2.frequency.value=f*1.5;
+      g2.gain.setValueAtTime(0,t+s); g2.gain.linearRampToValueAtTime(0.055,t+s+0.006);
+      g2.gain.exponentialRampToValueAtTime(0.001,t+s+d*0.35);
+      o2.connect(g2); g2.connect(comp); o2.start(t+s); o2.stop(t+s+d*0.40);
+    });
+    // Crystal shimmer tail
+    [1318.51,1760.00,2093.00].forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
+      const st=t+0.26+i*0.055;
+      g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(0.038-i*0.009,st+0.010);
+      g.gain.exponentialRampToValueAtTime(0.001,st+0.38);
+      o.connect(g); g.connect(comp); o.start(st); o.stop(st+0.42);
     });
   } catch(e) {}
 }
@@ -5101,6 +5427,129 @@ function playCritHit() {
   } catch(e) {}
 }
 
+// ── Social Stat sounds — one per stat, each with a distinct emotional character ──
+function playSocialKindness() {
+  // Warm flowing harp — F4→A4→C5 major arpeggio, soft sine, long shimmer tail
+  if (!soundEnabled || !_ACtx) return;
+  try {
+    const ctx = _getCtx(), t = ctx.currentTime;
+    const master = ctx.createGain(); master.gain.value = 0.34; master.connect(ctx.destination);
+    [[349.23,0.00,0.55],[440.00,0.13,0.55],[523.25,0.26,0.80]].forEach(([f,s,d]) => {
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,t+s); g.gain.linearRampToValueAtTime(0.22,t+s+0.028);
+      g.gain.setValueAtTime(0.22,t+s+d*0.48); g.gain.exponentialRampToValueAtTime(0.001,t+s+d+0.14);
+      o.connect(g); g.connect(master); o.start(t+s); o.stop(t+s+d+0.17);
+    });
+    const sh=ctx.createOscillator(),sg=ctx.createGain(); sh.type='sine'; sh.frequency.value=1046.50;
+    sg.gain.setValueAtTime(0,t+0.26); sg.gain.linearRampToValueAtTime(0.055,t+0.34);
+    sg.gain.exponentialRampToValueAtTime(0.001,t+1.10);
+    sh.connect(sg); sg.connect(master); sh.start(t+0.26); sh.stop(t+1.15);
+  } catch(e) {}
+}
+
+function playSocialCourage() {
+  // Bold rising fourth C4→G4 — square+sine layered, punchy transient, strong resolve
+  if (!soundEnabled || !_ACtx) return;
+  try {
+    const ctx = _getCtx(), t = ctx.currentTime;
+    const comp = ctx.createDynamicsCompressor(); comp.threshold.value=-8; comp.knee.value=3; comp.ratio.value=4; comp.attack.value=0.001; comp.release.value=0.12; comp.connect(ctx.destination);
+    [[261.63,0.00,0.16],[392.00,0.13,0.46]].forEach(([f,s,d]) => {
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.type='square'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,t+s); g.gain.linearRampToValueAtTime(0.042,t+s+0.005);
+      g.gain.setValueAtTime(0.042,t+s+d*0.50); g.gain.exponentialRampToValueAtTime(0.001,t+s+d+0.06);
+      o.connect(g); g.connect(comp); o.start(t+s); o.stop(t+s+d+0.08);
+      const o2=ctx.createOscillator(),g2=ctx.createGain(); o2.type='sine'; o2.frequency.value=f;
+      g2.gain.setValueAtTime(0,t+s); g2.gain.linearRampToValueAtTime(0.10,t+s+0.005);
+      g2.gain.exponentialRampToValueAtTime(0.001,t+s+d+0.08);
+      o2.connect(g2); g2.connect(comp); o2.start(t+s); o2.stop(t+s+d+0.10);
+    });
+    const ac=ctx.createOscillator(),ag=ctx.createGain(); ac.type='sine'; ac.frequency.setValueAtTime(523.25,t+0.13);
+    ac.frequency.exponentialRampToValueAtTime(392.00,t+0.22);
+    ag.gain.setValueAtTime(0,t+0.13); ag.gain.linearRampToValueAtTime(0.17,t+0.133);
+    ag.gain.exponentialRampToValueAtTime(0.001,t+0.44);
+    ac.connect(ag); ag.connect(comp); ac.start(t+0.13); ac.stop(t+0.46);
+  } catch(e) {}
+}
+
+function playSocialDiligence() {
+  // Crisp staccato rhythm — A4×3 quick taps then E5 resolve (triangle, snappy)
+  if (!soundEnabled || !_ACtx) return;
+  try {
+    const ctx = _getCtx(), t = ctx.currentTime;
+    const master = ctx.createGain(); master.gain.value = 0.36; master.connect(ctx.destination);
+    [[440.00,0.00,0.055],[440.00,0.09,0.055],[440.00,0.18,0.055],[659.25,0.28,0.26]].forEach(([f,s,d]) => {
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.type='triangle'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,t+s); g.gain.linearRampToValueAtTime(0.30,t+s+0.003);
+      g.gain.exponentialRampToValueAtTime(0.001,t+s+d);
+      o.connect(g); g.connect(master); o.start(t+s); o.stop(t+s+d+0.02);
+    });
+  } catch(e) {}
+}
+
+function playSocialWisdom() {
+  // Deep meditation bell — A2+A3+E4 sine harmonics, slow onset, long resonant decay
+  if (!soundEnabled || !_ACtx) return;
+  try {
+    const ctx = _getCtx(), t = ctx.currentTime;
+    const master = ctx.createGain(); master.gain.value = 0.32; master.connect(ctx.destination);
+    [[110.00,0.00,1.30],[220.00,0.00,0.95],[329.63,0.00,0.70]].forEach(([f,s,d],i) => {
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,t+s); g.gain.linearRampToValueAtTime(0.22-i*0.06,t+s+0.010);
+      g.gain.exponentialRampToValueAtTime(0.001,t+s+d+0.18);
+      o.connect(g); g.connect(master); o.start(t+s); o.stop(t+s+d+0.22);
+    });
+    const sh=ctx.createOscillator(),sg=ctx.createGain(); sh.type='sine'; sh.frequency.value=1318.51;
+    sg.gain.setValueAtTime(0,t); sg.gain.linearRampToValueAtTime(0.026,t+0.016);
+    sg.gain.exponentialRampToValueAtTime(0.001,t+0.65);
+    sh.connect(sg); sg.connect(master); sh.start(t); sh.stop(t+0.68);
+  } catch(e) {}
+}
+
+function playSocialExpression() {
+  // Sparkly wind-chime — C5→E5→G5→B5 ascending arpeggio, bright sines + C6 crystal top
+  if (!soundEnabled || !_ACtx) return;
+  try {
+    const ctx = _getCtx(), t = ctx.currentTime;
+    const master = ctx.createGain(); master.gain.value = 0.30; master.connect(ctx.destination);
+    [[523.25,0.00,0.30],[659.25,0.07,0.27],[783.99,0.14,0.25],[987.77,0.21,0.48]].forEach(([f,s,d]) => {
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,t+s); g.gain.linearRampToValueAtTime(0.20,t+s+0.005);
+      g.gain.exponentialRampToValueAtTime(0.001,t+s+d);
+      o.connect(g); g.connect(master); o.start(t+s); o.stop(t+s+d+0.04);
+    });
+    const cr=ctx.createOscillator(),cg=ctx.createGain(); cr.type='sine'; cr.frequency.value=2093.00;
+    cg.gain.setValueAtTime(0,t+0.28); cg.gain.linearRampToValueAtTime(0.038,t+0.284);
+    cg.gain.exponentialRampToValueAtTime(0.001,t+0.72);
+    cr.connect(cg); cg.connect(master); cr.start(t+0.28); cr.stop(t+0.74);
+  } catch(e) {}
+}
+
+function playSocialResilience() {
+  // Grounded power thud — E2+B2 sawtooth low strike + E3 sine sustain + metallic noise clank
+  if (!soundEnabled || !_ACtx) return;
+  try {
+    const ctx = _getCtx(), t = ctx.currentTime;
+    const comp = ctx.createDynamicsCompressor(); comp.threshold.value=-6; comp.knee.value=3; comp.ratio.value=4; comp.attack.value=0.001; comp.release.value=0.14; comp.connect(ctx.destination);
+    [[82.41,0.00,0.38,'sawtooth'],[123.47,0.00,0.32,'sawtooth'],[164.81,0.04,0.62,'sine']].forEach(([f,s,d,type],i) => {
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.type=type; o.frequency.value=f;
+      g.gain.setValueAtTime(0,t+s); g.gain.linearRampToValueAtTime(0.11-i*0.02,t+s+0.006);
+      g.gain.setValueAtTime(0.11-i*0.02,t+s+d*0.40); g.gain.exponentialRampToValueAtTime(0.001,t+s+d+0.10);
+      o.connect(g); g.connect(comp); o.start(t+s); o.stop(t+s+d+0.14);
+    });
+    const bufLen = Math.floor(ctx.sampleRate*0.055), nb=ctx.createBuffer(1,bufLen,ctx.sampleRate), nd=nb.getChannelData(0);
+    for (let i=0;i<bufLen;i++) nd[i]=(Math.random()*2-1)*Math.exp(-i/(ctx.sampleRate*0.010));
+    const ns=ctx.createBufferSource(); ns.buffer=nb;
+    const hpf=ctx.createBiquadFilter(); hpf.type='highpass'; hpf.frequency.value=1400;
+    const ng=ctx.createGain(); ng.gain.value=0.24;
+    ns.connect(hpf); hpf.connect(ng); ng.connect(comp); ns.start(t);
+  } catch(e) {}
+}
+
+const SOCIAL_SOUNDS = {
+  kindness: playSocialKindness, courage: playSocialCourage, diligence: playSocialDiligence,
+  wisdom: playSocialWisdom, expression: playSocialExpression, resilience: playSocialResilience,
+};
+
 // ============================================================
 // STATS / TIERS
 // ============================================================
@@ -5182,15 +5631,15 @@ const DEFAULT_HABITOS = [
 ];
 // Shared milestone definitions — reused for migration of old saves
 const DEFAULT_NEG_MILESTONES = [
-  { days:7,   xp:75,   gains:{ VOL:8 },                          label:'7 Days Clean',    icon:'🥉' },
-  { days:14,  xp:150,  gains:{ VOL:12, INT:5 },                   label:'2 Weeks Clean',   icon:'🥈' },
-  { days:30,  xp:350,  gains:{ VOL:20, INT:10, CHA:8 },           label:'1 Month Clean',   icon:'🥇' },
-  { days:60,  xp:700,  gains:{ VOL:30, INT:15, CHA:12, STR:5 },   label:'2 Months Clean',  icon:'💎' },
-  { days:90,  xp:1200, gains:{ VOL:40, INT:20, CHA:18, STR:10 },  label:'3 Months Clean',  icon:'👑' },
+  { days:7,   xp:75,   gains:{ STR:5,  DEX:5,  CON:5,  INT:5,  VOL:5,  CHA:5  }, label:'7 Days Clean',    icon:'🥉' },
+  { days:14,  xp:150,  gains:{ STR:8,  DEX:8,  CON:8,  INT:8,  VOL:8,  CHA:8  }, label:'2 Weeks Clean',   icon:'🥈' },
+  { days:30,  xp:350,  gains:{ STR:12, DEX:12, CON:12, INT:12, VOL:12, CHA:12 }, label:'1 Month Clean',   icon:'🥇' },
+  { days:60,  xp:700,  gains:{ STR:20, DEX:20, CON:20, INT:20, VOL:20, CHA:20 }, label:'2 Months Clean',  icon:'💎' },
+  { days:90,  xp:1200, gains:{ STR:30, DEX:30, CON:30, INT:30, VOL:30, CHA:30 }, label:'3 Months Clean',  icon:'👑' },
 ];
 const DEFAULT_NEGATIVOS = [
   { id:'neg0', text:'NO RELAPSES — STAY CLEAN', hp:30,
-    xp: 50, gains: { VOL: 3, INT: 1 },
+    xp: 180, gains: { STR: 3, DEX: 3, CON: 3, INT: 3, VOL: 3, CHA: 3 },
     createdDate: null,
     lastBreakDate: null,
     awardedMilestones: {},
@@ -5244,10 +5693,10 @@ const WORK_MATERIALS = {
   operational: { id:'gear',    emoji:'⚙️', label:'Gears'    },
 };
 const TASK_DIFF_CFG = {
-  easy:      { label:'Easy',      emoji:'🟢', xp:10,  gold:10,  mats:1 },
-  normal:    { label:'Normal',    emoji:'🔵', xp:20,  gold:25,  mats:2 },
-  hard:      { label:'Hard',      emoji:'🟠', xp:35,  gold:50,  mats:3 },
-  legendary: { label:'Legendary', emoji:'🔴', xp:60,  gold:100, mats:5 },
+  easy:      { label:'Easy',      emoji:'🟢', xp:25,  gold:10,  mats:1 },
+  normal:    { label:'Normal',    emoji:'🔵', xp:50,  gold:25,  mats:2 },
+  hard:      { label:'Hard',      emoji:'🟠', xp:100, gold:50,  mats:3 },
+  legendary: { label:'Legendary', emoji:'🔴', xp:175, gold:100, mats:5 },
 };
 
 // ── Shop levels (keyed on totalGoldEarned) ───────────────────
@@ -5425,7 +5874,9 @@ const CLASS_DESCS = {
 };
 
 // Mastery flat reward per class (added permanently to base stats on mastery)
-const CLASS_MASTERY_REWARD = { 1:15, 2:20, 3:30, 4:50, 5:80 };
+const CLASS_MASTERY_REWARD = { 1:25, 2:40, 3:60, 4:100, 5:999 };
+// XP bonus awarded alongside the stat reward on mastery
+const CLASS_MASTERY_XP = { 1:250, 2:800, 3:1800, 4:4000, 5:99999 };
 
 // Tier completion rewards (permanent passive % on ALL stats)
 const TIER_COMPLETE_REWARD = {
@@ -5448,38 +5899,38 @@ const CLASSES_BY_TIER = [1,2,3,4,5].reduce((acc,t) => {
 // Estimated completion with active questing:
 //   T1 ~2wk · T2 ~3-4wk · T3 ~5-6wk · T4 ~7-9wk · T5 ~12-14wk
 const CLASS_MASTERY_THRESHOLD = {
-  knight:150, rogue:150, guardian:150, mage:150, monk:150, bard:150,
-  paladin:700, duelist:700, sentinel:700, archmage:700, crusader:700, enchanter:700,
-  templar:2000, assassin:2000, iron_warden:2000, loremaster:2000, warlord:2000, herald:2000,
-  godslayer:5500, void_hunter:5500, colossus:5500, arcane_sovereign:5500, iron_saint:5500, divine_prophet:5500,
-  true_hero:13000,
+  knight:100,  rogue:100,  guardian:100,  mage:100,  monk:100,  bard:100,
+  paladin:250, duelist:250, sentinel:250, archmage:250, crusader:250, enchanter:250,
+  templar:500, assassin:500, iron_warden:500, loremaster:500, warlord:500, herald:500,
+  godslayer:1000, void_hunter:1000, colossus:1000, arcane_sovereign:1000, iron_saint:1000, divine_prophet:1000,
+  true_hero:10000,
 };
 
 // Bonus mastery point rewards per quest type, by class tier
 const CQ_MP = {
-  1:{ daily:5,  weekly:25,  onetime:60  },
-  2:{ daily:8,  weekly:35,  onetime:80  },
-  3:{ daily:12, weekly:55,  onetime:120 },
-  4:{ daily:18, weekly:80,  onetime:200 },
-  5:{ daily:30, weekly:150, onetime:500 },
+  1:{ daily:5,  weekly:25,  onetime:50   },
+  2:{ daily:10, weekly:50,  onetime:100  },
+  3:{ daily:15, weekly:75,  onetime:150  },
+  4:{ daily:20, weekly:150, onetime:300  },
+  5:{ daily:50, weekly:900, onetime:5000 },
 };
 
 // Completion targets for weekly (sessions this week) and onetime (total sessions)
 // When the player logs +1 progress and hits the target, the quest auto-claims.
 const CQ_TARGETS = {
-  knight:          { weekly:5, onetime:10 }, rogue:          { weekly:5, onetime:10 },
-  guardian:        { weekly:5, onetime:7  }, mage:           { weekly:5, onetime:10 },
-  monk:            { weekly:5, onetime:10 }, bard:           { weekly:5, onetime:10 },
-  paladin:         { weekly:5, onetime:7  }, duelist:        { weekly:5, onetime:7  },
-  sentinel:        { weekly:5, onetime:7  }, archmage:       { weekly:5, onetime:7  },
-  crusader:        { weekly:5, onetime:7  }, enchanter:      { weekly:5, onetime:7  },
-  templar:         { weekly:5, onetime:7  }, assassin:       { weekly:5, onetime:7  },
-  iron_warden:     { weekly:5, onetime:7  }, loremaster:     { weekly:5, onetime:7  },
-  warlord:         { weekly:5, onetime:7  }, herald:         { weekly:5, onetime:7  },
-  godslayer:       { weekly:5, onetime:14 }, void_hunter:    { weekly:5, onetime:14 },
-  colossus:        { weekly:5, onetime:14 }, arcane_sovereign:{ weekly:5, onetime:14 },
-  iron_saint:      { weekly:5, onetime:14 }, divine_prophet: { weekly:5, onetime:14 },
-  true_hero:       { weekly:5, onetime:30 },
+  knight:          { weekly:3, onetime:1  }, rogue:          { weekly:4, onetime:1  },
+  guardian:        { weekly:3, onetime:1  }, mage:           { weekly:5, onetime:1  },
+  monk:            { weekly:4, onetime:1  }, bard:           { weekly:3, onetime:1  },
+  paladin:         { weekly:3, onetime:1  }, duelist:        { weekly:4, onetime:1  },
+  sentinel:        { weekly:3, onetime:1  }, archmage:       { weekly:5, onetime:1  },
+  crusader:        { weekly:4, onetime:1  }, enchanter:      { weekly:3, onetime:1  },
+  templar:         { weekly:4, onetime:7  }, assassin:       { weekly:4, onetime:1  },
+  iron_warden:     { weekly:3, onetime:1  }, loremaster:     { weekly:4, onetime:1  },
+  warlord:         { weekly:4, onetime:1  }, herald:         { weekly:3, onetime:1  },
+  godslayer:       { weekly:5, onetime:30 }, void_hunter:    { weekly:5, onetime:1  },
+  colossus:        { weekly:5, onetime:1  }, arcane_sovereign:{ weekly:5, onetime:1 },
+  iron_saint:      { weekly:5, onetime:30 }, divine_prophet: { weekly:5, onetime:1  },
+  true_hero:       { weekly:6, onetime:60 },
 };
 
 // ── Class Quests definition ─────────────────────────────────────────────────
@@ -5488,133 +5939,133 @@ const CQ_TARGETS = {
 const CLASS_QUESTS = {
   // ── TIER 1 — NOVICE ──────────────────────────────────────────────────────
   knight: {
-    daily:   { title:'Temper the Steel',       desc:'Complete one strength training session today.',                    stats:{ STR:3 } },
-    weekly:  { title:"Knight's Gauntlet",       desc:'Complete 5 strength training sessions this week.',                stats:{ STR:12 } },
-    onetime: { title:'Forge the Blade',         desc:'Log 10 total strength sessions while equipped. Claim when done.', stats:{ STR:20 } },
+    daily:   { title:'Iron Ignition',           desc:'Complete 15 push-ups before your first meal of the day. No warm-up excuses — cold start, every day.', stats:{ STR:3 } },
+    weekly:  { title:'The Proving Ground',      desc:'Complete 3 strength-based training sessions this week. Any format counts: gym, bodyweight, sport.', stats:{ STR:12 } },
+    onetime: { title:'The First Oath',          desc:'Do a single continuous push-up set to absolute muscular failure. Record your rep count — this is your baseline.', stats:{ STR:20 } },
   },
   rogue: {
-    daily:   { title:'Shadow Steps',            desc:'Move actively for at least 30 minutes today.',                    stats:{ DEX:3 } },
-    weekly:  { title:'Quick Hands, Quick Feet', desc:'Complete 5 agility or movement sessions this week.',              stats:{ DEX:12 } },
-    onetime: { title:'Ghost Protocol',          desc:'Log 10 active movement sessions while equipped as Rogue.',        stats:{ DEX:20 } },
+    daily:   { title:'Phantom Footwork',        desc:'Spend 5 minutes on a coordination or balance drill: jump rope, single-leg holds, lateral shuffles, or any footwork pattern.', stats:{ DEX:3 } },
+    weekly:  { title:'The Precision Circuit',   desc:'Practice any sport, skill, or technique requiring hand-eye coordination or body control at least 4 times this week.', stats:{ DEX:12 } },
+    onetime: { title:"Apprentice's Mark",       desc:'Learn a physical trick or technique you\'ve never done before. Execute it successfully 5 times in a row to claim this quest.', stats:{ DEX:20 } },
   },
   guardian: {
-    daily:   { title:'Iron Constitution',       desc:'Drink your full water intake and keep your sleep schedule today.', stats:{ CON:3 } },
-    weekly:  { title:'The Unbroken Wall',        desc:'Maintain full hydration and sleep habits for 5 days this week.',  stats:{ CON:12 } },
-    onetime: { title:'Unbreakable',             desc:'Sustain 7 consecutive days of full hydration + sleep. Claim when done.', stats:{ CON:20 } },
+    daily:   { title:'Cold Initiation',         desc:'End today\'s shower with 30 seconds of cold water. No ramp — switch directly to cold. Brief, uncomfortable, non-negotiable.', stats:{ CON:3 } },
+    weekly:  { title:'Endurance Ledger',         desc:'Complete 3 cardio sessions of at least 20 continuous minutes each this week. Running, cycling, swimming, rowing — any sustained aerobic effort counts.',  stats:{ CON:12 } },
+    onetime: { title:'The Unbroken Mile',       desc:'Run (or row, or cycle) for 20 continuous minutes without stopping or walking. Pace is irrelevant — only the unbroken effort counts.', stats:{ CON:20 } },
   },
   mage: {
-    daily:   { title:'Arcane Study',            desc:'Read or study for at least 20 minutes today.',                    stats:{ INT:3 } },
-    weekly:  { title:'Pages of Power',          desc:'Complete 5 reading or study sessions this week.',                 stats:{ INT:12 } },
-    onetime: { title:'Ancient Tome',            desc:'Log 10 reading sessions while equipped as Mage.',                 stats:{ INT:20 } },
+    daily:   { title:'Arcane Intake',           desc:'Read at least 10 pages of a book or spend 15 minutes actively studying a concept. Audiobooks only count if you take notes.', stats:{ INT:3 } },
+    weekly:  { title:'The Knowledge Circuit',   desc:'Log 5 focused learning sessions this week (15 minutes minimum each). Passive consumption doesn\'t count — active engagement only.', stats:{ INT:12 } },
+    onetime: { title:'First Tome Sealed',       desc:'Finish one complete book — non-fiction preferred, but any work that genuinely challenged your thinking counts.', stats:{ INT:20 } },
   },
   monk: {
-    daily:   { title:'Inner Stillness',         desc:'Complete a meditation or mindfulness session today.',             stats:{ VOL:3 } },
-    weekly:  { title:'The Discipline Path',      desc:'Meditate or practice mindfulness 5 times this week.',            stats:{ VOL:12 } },
-    onetime: { title:'Empty Mind, Full Will',   desc:'Log 10 meditation sessions while equipped as Monk.',              stats:{ VOL:20 } },
+    daily:   { title:'Zero Hour',               desc:'Do not touch your phone or open any app for the first 30 minutes after waking. Use that time for anything analog: stretch, breathe, eat, think.', stats:{ VOL:3 } },
+    weekly:  { title:'The Quiet Siege',         desc:'On at least 4 days this week, do not open social media or video platforms before noon. Morning hours are fortified territory.', stats:{ VOL:12 } },
+    onetime: { title:'The Iron Fast',           desc:'Spend one full waking day — from the moment you open your eyes to the moment you sleep — with zero social media or entertainment apps.', stats:{ VOL:20 } },
   },
   bard: {
-    daily:   { title:'Silver Tongue',           desc:'Have one meaningful social interaction or genuinely help someone today.', stats:{ CHA:3 } },
-    weekly:  { title:"Crowd's Favorite",         desc:'Log 5 social interactions or acts of helpfulness this week.',    stats:{ CHA:12 } },
-    onetime: { title:'The Legend Grows',        desc:'Record 10 meaningful social connections while equipped as Bard.', stats:{ CHA:20 } },
+    daily:   { title:'The Open Question',       desc:'Ask one person in your life a genuine question about something meaningful to them — their work, a goal, a feeling. Actually listen to the answer.', stats:{ CHA:3 } },
+    weekly:  { title:'Social Cartography',      desc:'Have 3 real conversations this week — voice or face-to-face, not text threads. Each must last at least 10 minutes and go beyond surface small talk.', stats:{ CHA:12 } },
+    onetime: { title:'The Stage Debut',         desc:'Speak in front of a group of at least 5 people. A toast, a class comment, a team check-in, a short presentation — anything where your voice carries the room.', stats:{ CHA:20 } },
   },
   // ── TIER 2 — ADEPT ───────────────────────────────────────────────────────
   paladin: {
-    daily:   { title:'Sacred Resolve',          desc:'Complete a strength session AND one act of discipline or virtue today.',   stats:{ STR:4, VOL:3 } },
-    weekly:  { title:'Oath of Steel',           desc:'Fulfill 5 days of combined strength training + self-discipline this week.', stats:{ STR:15, VOL:10 } },
-    onetime: { title:'Righteous Forge',         desc:'Maintain 7 full days of strength + virtue practice while equipped.',       stats:{ STR:25, VOL:18 } },
+    daily:   { title:'The Righteous Rep',       desc:'During your strength session today, identify the one set you want to skip — and do it anyway. Log only if you finished without cutting reps, reducing weight mid-set, or checking your phone between sets.', stats:{ STR:4, VOL:3 } },
+    weekly:  { title:'Iron Vigil',              desc:'Complete 3 strength sessions this week that were also fully focused: set a clear intention before each one, no phone between sets, no abandoned reps. Body and will must both show up.', stats:{ STR:15, VOL:10 } },
+    onetime: { title:'Trial by Burden',         desc:'In a single session, reach genuine muscular failure on at least 2 different exercises without resting more than 90 seconds between sets. Your will carries you past the point your body quit. Document the session.', stats:{ STR:25, VOL:18 } },
   },
   duelist: {
-    daily:   { title:'Precision Strike',        desc:'Train both speed and power in one session today.',                         stats:{ DEX:4, STR:3 } },
-    weekly:  { title:'Lightning Blades',        desc:'Complete 5 combined agility-strength sessions this week.',                 stats:{ DEX:12, STR:12 } },
-    onetime: { title:"Duelist's Proof",         desc:'Master 7 sessions of combined speed-power training while equipped.',       stats:{ DEX:20, STR:20 } },
+    daily:   { title:'Strike and Flow',         desc:'Train a session combining explosive power and technical precision — martial arts, sport drills, sprint intervals with form work. Power without precision is brawling. Both must be present.', stats:{ DEX:4, STR:3 } },
+    weekly:  { title:'The Blade Circuit',       desc:'Complete 4 sessions this week combining explosive strength with precision skill. Each session must tax both your force output and your coordination — not two separate workouts, one compound effort.', stats:{ DEX:12, STR:12 } },
+    onetime: { title:'The Gauntlet',            desc:'Design a timed personal circuit of 5+ exercises combining explosive power and technical precision — runnable at home or outdoors. Record your time and performance on Day 1 of holding this class. Train across the mastery period. Run the same circuit again on Day 14+ and beat your opening benchmark. The Duelist needs no opponent. They build their own arena.', stats:{ DEX:20, STR:20 } },
   },
   sentinel: {
-    daily:   { title:'Fortress Body',           desc:'Combine strength training with endurance habits (water + sleep) today.',   stats:{ CON:4, STR:3 } },
-    weekly:  { title:'Immovable Guard',         desc:'Sustain 5 days of combined endurance + strength training this week.',      stats:{ CON:12, STR:12 } },
-    onetime: { title:"Sentinel's Pact",         desc:'Commit to 7 days of fortified body discipline while equipped.',           stats:{ CON:20, STR:20 } },
+    daily:   { title:'Loaded March',            desc:'Add physical resistance to your endurance effort today — weighted walk, resistance bands on a run, a circuit mixing cardio and strength without full rest. Endurance under load is the Sentinel\'s domain.', stats:{ CON:4, STR:3 } },
+    weekly:  { title:'The Fortress Circuit',    desc:'Complete 3 sessions this week where muscles and lungs both burn simultaneously: rucksack cardio, HIIT with loaded movements, swim intervals, or any format where strength is embedded inside endurance.', stats:{ CON:12, STR:12 } },
+    onetime: { title:'The Long Carry',          desc:'Complete 30 continuous minutes of effort demanding both endurance and strength at the same time — no separating them into phases. Rucksack march, loaded circuit, or rowing intervals. No full rest breaks.', stats:{ CON:20, STR:20 } },
   },
   archmage: {
-    daily:   { title:'Focused Mind',            desc:'Study 30+ minutes with full focus — no distractions today.',              stats:{ INT:4, VOL:3 } },
-    weekly:  { title:'Mastery of Mind',         desc:'Complete 5 deep study + mindfulness sessions this week.',                  stats:{ INT:12, VOL:12 } },
-    onetime: { title:'The Great Work',          desc:'Log 7 sessions of combined deep study + mindfulness while equipped.',     stats:{ INT:20, VOL:20 } },
+    daily:   { title:'The Deep Work Hour',      desc:'Block 45 uninterrupted minutes of focused study or skill work. Phone face-down, notifications off. Log only if you completed the block without a single distraction break — willpower is what keeps you in the chair.', stats:{ INT:4, VOL:3 } },
+    weekly:  { title:'The Sealed Library',      desc:'Complete 5 deep work sessions this week (45 minutes each, zero interruptions). Track your start and end times. Any session where you broke focus does not count toward the total.', stats:{ INT:12, VOL:12 } },
+    onetime: { title:'The Grand Thesis',        desc:'Complete a self-directed learning project from start to finish: a course module, a written analysis, a research summary, a technical breakdown. The output must be produced — not just consumed — and must have cost you real effort.', stats:{ INT:20, VOL:20 } },
   },
   crusader: {
-    daily:   { title:'Wrath Contained',         desc:'Push through a hard physical challenge with full mental focus today.',     stats:{ VOL:4, STR:3 } },
-    weekly:  { title:'March of Will',           desc:'Complete 5 hard sessions combining strength + willpower this week.',       stats:{ VOL:12, STR:12 } },
-    onetime: { title:"Crusader's Oath",         desc:'Complete 7 days of combined will + strength challenges while equipped.',  stats:{ VOL:20, STR:20 } },
+    daily:   { title:'The Unmoved Stand',       desc:'Do something physically uncomfortable on purpose today: train when tired, finish a set after your mind says stop, go harder than planned. Will is the force that completes it — not momentum.', stats:{ VOL:4, STR:3 } },
+    weekly:  { title:'The March of Will',       desc:'Log 4 sessions this week where you did something physically harder than your default instinct — more reps, heavier load, longer duration. Log only if willpower, not habit, was what pushed you past the line.', stats:{ VOL:12, STR:12 } },
+    onetime: { title:'The Crucible',            desc:'Design your own hard day: stack at least 2 physical challenges in a single day (early workout, hard evening session, no comfort food, cold exposure). Write down what your will overcame. This is your proof of dominion.', stats:{ VOL:20, STR:20 } },
   },
   enchanter: {
-    daily:   { title:'Fluid Presence',          desc:'Combine agility training with a meaningful social moment today.',         stats:{ CHA:4, DEX:3 } },
-    weekly:  { title:'Graceful Mastery',        desc:'Log 5 sessions combining movement + social connection this week.',        stats:{ CHA:12, DEX:12 } },
-    onetime: { title:"Enchanter's Signature",   desc:'Complete 7 days of combined grace + presence while equipped.',           stats:{ CHA:20, DEX:20 } },
+    daily:   { title:'The Embodied Word',       desc:'Have a meaningful conversation today where you were deliberately aware of your posture, voice tone, and physical presence the whole time. The body must match the message — presence is a physical skill.', stats:{ CHA:4, DEX:3 } },
+    weekly:  { title:'Stage and Motion',        desc:'Have 3 social interactions this week that also required physical expressiveness: a presentation, a performance, leading a group activity, dancing, or any moment where your body was part of the communication.', stats:{ CHA:12, DEX:12 } },
+    onetime: { title:'The Embodied Performance', desc:'Perform a physically expressive skill in front of a live group of at least 5 people: a choreographed movement sequence, a martial arts or dance demonstration, a sport skill showcase, or any display where your body is the medium. It cannot just be a speech — the Enchanter\'s presence is physical and kinetic. Document it.', stats:{ CHA:20, DEX:20 } },
   },
   // ── TIER 3 — EXPERT ──────────────────────────────────────────────────────
   templar: {
-    daily:   { title:'The Eternal Vigil',       desc:'Complete strength training, full hydration, AND a mental focus session today.', stats:{ STR:4, VOL:4, CON:3 } },
-    weekly:  { title:'Crusade of Three',        desc:'Maintain the three pillars — strength, will, and endurance — for 5 days.',      stats:{ STR:15, VOL:15, CON:12 } },
-    onetime: { title:"Templar's Trial",         desc:'Achieve a full 7-day week of perfect STR + VOL + CON habits while equipped.',   stats:{ STR:25, VOL:25, CON:20 } },
+    daily:   { title:'The Triple Standard',     desc:'Today\'s session must meet three simultaneous standards: push hardest in the last 20% of your workout (STR), refuse to cut any planned set (VOL), and include one intentional recovery action — cold shower, sleep tracking, or structured rest (CON). One session. Three non-negotiables.', stats:{ STR:4, VOL:4, CON:3 } },
+    weekly:  { title:'The Unbroken Fortress',   desc:'Log 4 days this week where all three pillars were present: a strength session, a recovery action, and a moment where your will overrode your comfort. Partial days don\'t count. The Templar holds all three or holds none.', stats:{ STR:15, VOL:15, CON:12 } },
+    onetime: { title:'The Iron Week',           desc:'Accumulate 7 logged trifecta days — strength session + recovery action + willpower moment. They don\'t need to be consecutive, but they must all be honest. This is the initiation. The Templar doesn\'t graduate without this proof.', stats:{ STR:25, VOL:25, CON:20 } },
   },
   assassin: {
-    daily:   { title:'Calculated Strike',       desc:'Train agility and strength, AND analyze or learn something today.',             stats:{ DEX:4, STR:3, INT:3 } },
-    weekly:  { title:'Precision Protocol',      desc:'Execute 5 days of combined speed, power, and mental sharpness.',                stats:{ DEX:15, STR:12, INT:12 } },
-    onetime: { title:'The Perfect Hit',         desc:'Complete 7 days of combined agility-strength-intellect training equipped.',     stats:{ DEX:25, STR:20, INT:20 } },
+    daily:   { title:'The Intel Strike',        desc:'Before training today, write three lines: what you\'re targeting, why, and what the optimal method is. Train it. After, write one line on what you\'d change. The mind must lead the body — improvised sessions don\'t count.', stats:{ DEX:4, STR:3, INT:3 } },
+    weekly:  { title:'The Shadow Protocol',     desc:'Complete 4 sessions this week that include pre-session planning AND a post-session reflection (even one sentence). Explosive training without analysis is just noise. Log only sessions where thought and movement were both present.', stats:{ DEX:15, STR:12, INT:12 } },
+    onetime: { title:'The Perfect Target',      desc:'Record yourself performing a physical skill. Identify 3 specific weaknesses from the footage. Design a correction micro-plan and execute it for 2 weeks. Document the before and after. One full research-to-execution cycle. The Assassin never strikes blind.', stats:{ DEX:25, STR:20, INT:20 } },
   },
   iron_warden: {
-    daily:   { title:'The Fortress Moves',      desc:'Combine endurance habits, strength training, AND agility work today.',          stats:{ CON:4, STR:3, DEX:3 } },
-    weekly:  { title:"Warden's Creed",          desc:'Sustain 5 days of endurance, strength, and movement mastery.',                  stats:{ CON:15, STR:12, DEX:12 } },
-    onetime: { title:'Iron Body Proven',        desc:'Complete 7 days of full physical discipline across all three areas equipped.',  stats:{ CON:25, STR:20, DEX:20 } },
+    daily:   { title:'All Terrain',             desc:'Today\'s training must tax at least two physical systems simultaneously: endurance + strength, strength + agility, or all three at once. Single-domain sessions — only cardio, only lifting, only drills — don\'t count for the Warden.', stats:{ CON:4, STR:3, DEX:3 } },
+    weekly:  { title:"The Warden's Round",      desc:'This week, complete one session per domain: a dedicated strength session, a dedicated endurance session, and a dedicated agility or skill session. Three different physical demands, seven days to fit them all. The Warden has no weak terrain.', stats:{ CON:15, STR:12, DEX:12 } },
+    onetime: { title:"The Warden's Benchmark",  desc:'Design a 3-event physical test doable at home or outdoors: a strength test (max reps or load on a compound movement), an endurance test (timed distance or sustained cardio), and an agility test (coordination circuit or skill drill). Complete all three back-to-back as your baseline on Day 1. Train each domain across the mastery period. Run all three again at the end — every single event must show measurable improvement.', stats:{ CON:25, STR:20, DEX:20 } },
   },
   loremaster: {
-    daily:   { title:'Words of Power',          desc:'Study deeply, practice self-control, AND make a meaningful connection today.',  stats:{ INT:4, VOL:3, CHA:3 } },
-    weekly:  { title:"Loremaster's Library",    desc:'Log 5 days of combined study, discipline, and social mastery.',                 stats:{ INT:15, VOL:12, CHA:12 } },
-    onetime: { title:'Complete the Manuscript', desc:'Achieve 7 days of combined intellectual + social excellence while equipped.',   stats:{ INT:25, VOL:20, CHA:20 } },
+    daily:   { title:'The Living Lecture',      desc:'Study something deeply for 30+ focused minutes today (no distractions), then teach it or explain it to someone before the day ends — in conversation, in writing, in a message. Knowledge that stays in your head is just storage. The Loremaster moves it.', stats:{ INT:4, VOL:3, CHA:3 } },
+    weekly:  { title:"The Scholar's Circle",    desc:'Log 4 days this week where the full loop closed: deep study session (30+ min, no distractions) AND the knowledge shared or applied socially before the day ended. Study without sharing, or talking without depth — neither half counts.', stats:{ INT:15, VOL:12, CHA:12 } },
+    onetime: { title:'The Magnum Opus',         desc:'Create and deliver a substantial piece of knowledge work to a real audience: a detailed essay, a workshop you facilitate, a course module you teach, a public guide you publish. Research + creation + delivery. All three stats embodied in one artifact.', stats:{ INT:25, VOL:20, CHA:20 } },
   },
   warlord: {
-    daily:   { title:'Command the Battlefield', desc:'Exercise willpower, brute strength, AND strategic thinking today.',             stats:{ VOL:4, STR:3, INT:3 } },
-    weekly:  { title:"The General's War",       desc:'Execute 5 days of disciplined, powerful, and strategic habit practice.',        stats:{ VOL:15, STR:12, INT:12 } },
-    onetime: { title:"Warlord's Dominion",      desc:'Command 7 days of combined will, strength, and strategy while equipped.',      stats:{ VOL:25, STR:20, INT:20 } },
+    daily:   { title:'Command and Conquer',     desc:'Complete a physically demanding session today AND make one deliberate strategic decision about your training or goals: cut something that\'s not working, optimize a variable, change a plan based on evidence. Raw force guided by thought. Both required.', stats:{ VOL:4, STR:3, INT:3 } },
+    weekly:  { title:"The General's Campaign",  desc:'Log 4 sessions this week that combined physical intensity with a strategic element — pre-session planning, post-session review, or applying a concept you researched. Sessions done on pure instinct, with no thought behind them, do not count.', stats:{ VOL:15, STR:12, INT:12 } },
+    onetime: { title:'Field Command',           desc:'Organize and lead a group physical challenge — a team workout, a sport event, a fitness challenge for friends. You planned it (INT), ran it without folding under pressure (VOL), and competed at full intensity yourself (STR). All three in one event you made happen.', stats:{ VOL:25, STR:20, INT:20 } },
   },
   herald: {
-    daily:   { title:'The Living Banner',       desc:'Make a social impact, train agility, AND maintain your endurance today.',       stats:{ CHA:4, DEX:3, CON:3 } },
-    weekly:  { title:'Voice and Body',          desc:'Sustain 5 days of combined presence, movement, and endurance.',                 stats:{ CHA:15, DEX:12, CON:12 } },
-    onetime: { title:"Herald's Legacy",         desc:'Embody presence, movement, and resilience for 7 full days while equipped.',    stats:{ CHA:25, DEX:20, CON:20 } },
+    daily:   { title:'The Living Display',      desc:'Your physical training today must have a social dimension: train alongside someone, teach a movement to another person, or perform your skill for a group. Solo sessions logged in private don\'t count. Excellence is only the Herald\'s when it\'s witnessed.', stats:{ CHA:4, DEX:3, CON:3 } },
+    weekly:  { title:'The Circuit of Presence', desc:'Complete 3 sessions this week with both a physical AND a social-performance component: a group class, a team sport, a workout you led, a skill you demonstrated publicly. The Warden trains alone. The Herald never does.', stats:{ CHA:15, DEX:12, CON:12 } },
+    onetime: { title:'The Open Floor',          desc:'Announce and host an open physical training session — posted in advance to a neighborhood group, WhatsApp, or social media. Show up, design the session, lead it from the front at full intensity, and sustain the group\'s energy for the whole thing. It doesn\'t matter if 3 people show or 30. The Herald opened the floor and led. Document it.', stats:{ CHA:25, DEX:20, CON:20 } },
   },
   // ── TIER 4 — LEGEND ──────────────────────────────────────────────────────
   godslayer: {
-    daily:   { title:'Forged Beyond Limits',    desc:'Push through an extreme session combining strength, will, endurance, and speed today.', stats:{ STR:5, VOL:4, CON:4, DEX:4 } },
-    weekly:  { title:'The Divine Challenge',    desc:'Complete 5 days of absolute peak physical + mental performance.',                       stats:{ STR:20, VOL:18, CON:15, DEX:15 } },
-    onetime: { title:'Slay the Impossible',     desc:'Sustain 14 consecutive days of elite performance across all four pillars while equipped.', stats:{ STR:35, VOL:30, CON:25, DEX:25 } },
+    daily:   { title:'The God Trial',           desc:'Complete a session that simultaneously demands all four: explosive compound power (STR), a precision or agility skill component (DEX), a sustained cardio block of 20+ minutes (CON), AND end with the set you planned to cut — no exceptions (VOL). Any session missing one of the four is not a God Trial. Log only what holds the full standard.', stats:{ STR:5, VOL:4, CON:4, DEX:4 } },
+    weekly:  { title:'The Divine Campaign',     desc:'Hit the God Trial on at least 5 out of 7 days this week. Two missed days maximum. Five full God Trials or the week didn\'t happen. The Divine Campaign isn\'t about streaks — it\'s about what you do when you don\'t feel like it.', stats:{ STR:20, VOL:18, CON:15, DEX:15 } },
+    onetime: { title:'Ascension Protocol',      desc:'Accumulate 30 logged God Trial days while equipped as Godslayer. They don\'t need to be consecutive — but every one must be honest. This is not completed in a weekend. This is the lifestyle. The Godslayer doesn\'t claim the title until thirty days of proof exist.', stats:{ STR:35, VOL:30, CON:25, DEX:25 } },
   },
   void_hunter: {
-    daily:   { title:'From the Shadows',        desc:'Execute precision movement, strength, strategic study, AND focused discipline today.', stats:{ DEX:5, STR:4, INT:4, VOL:4 } },
-    weekly:  { title:'Unseen and Deadly',       desc:'Maintain 5 days of combined speed, power, intellect, and will.',                       stats:{ DEX:20, STR:15, INT:15, VOL:15 } },
-    onetime: { title:'The Void Protocol',       desc:'Master 14 days of combined precision, power, strategy, and will while equipped.',      stats:{ DEX:35, STR:25, INT:25, VOL:25 } },
+    daily:   { title:"The Hunter's Ledger",     desc:'Write a 3-line pre-session plan: target, method, reason (INT). Execute a session with explosive power and precision elements (DEX + STR). Write one post-session optimization line (INT). Log one non-training discipline win — a completed focus block, a rejected distraction, a held commitment (VOL). All four must be documented. No documentation, no log.', stats:{ DEX:5, STR:4, INT:4, VOL:4 } },
+    weekly:  { title:'Eyes in the Dark',        desc:'Complete 5 full Ledger days this week — pre-plan, explosive session, post-review, and discipline win, all four documented. Partial entries don\'t count. Five out of seven, no rounding. The Void Hunter doesn\'t lower their standards because the week got hard.', stats:{ DEX:20, STR:15, INT:15, VOL:15 } },
+    onetime: { title:'The Perfect Protocol',    desc:'Before Day 1 of holding this class, write a complete 28-day self-improvement protocol covering all four domains: a week-by-week training progression (DEX + STR), a daily learning target (INT), and a daily willpower challenge (VOL). Execute all 28 days while equipped. Produce a written after-action report: what improved, what failed, and what the next protocol would look like. The Void Hunter plans the kill before drawing the bow. The report is the proof.', stats:{ DEX:35, STR:25, INT:25, VOL:25 } },
   },
   colossus: {
-    daily:   { title:'Immovable Force',         desc:'Stack endurance, strength, agility, AND powerful social presence today.',              stats:{ CON:5, STR:4, DEX:4, CHA:4 } },
-    weekly:  { title:'The Colossus Rises',      desc:'Maintain 5 days of peak physical and social mastery.',                                  stats:{ CON:20, STR:15, DEX:15, CHA:15 } },
-    onetime: { title:'Legend of the Colossus',  desc:'Embody total physical and social dominance for 14 consecutive days while equipped.',   stats:{ CON:35, STR:25, DEX:25, CHA:25 } },
+    daily:   { title:'The Colossus Protocol',   desc:'Train today in a session that is physically exhausting with 20+ minutes of sustained effort (CON), includes at least one heavy or maximal strength movement (STR), includes a technical precision or agility element (DEX), AND is witnessed — train with someone, lead a session, share it publicly, or demonstrate it to a group (CHA). The Colossus is not invisible. Every single day.', stats:{ CON:5, STR:4, DEX:4, CHA:4 } },
+    weekly:  { title:'Undeniable',              desc:'Hit the full Colossus Protocol on at least 5 days this week. Every logged day must be exhausting, strong, technical, AND witnessed. The Colossus doesn\'t train in public Monday through Friday and disappear on weekends. Five complete days. Every one must be real and witnessed.', stats:{ CON:20, STR:15, DEX:15, CHA:15 } },
+    onetime: { title:'The Colossus Record',     desc:'Choose one compound physical benchmark you can test at home or outdoors: max push-up set, fastest mile, max pull-ups, heaviest loaded carry, or equivalent. Document your starting performance on Day 1. Train across the mastery period. Complete a final max-effort attempt and share the result — video or written record — with at least 3 people. The Colossus doesn\'t quietly improve. They put the number on the record.', stats:{ CON:35, STR:25, DEX:25, CHA:25 } },
   },
   arcane_sovereign: {
-    daily:   { title:"The Sovereign's Will",    desc:'Study deeply, maintain focus, connect meaningfully, AND sustain peak endurance today.', stats:{ INT:5, VOL:4, CHA:4, CON:4 } },
-    weekly:  { title:'Absolute Domain',         desc:'Maintain 5 days of intellectual, social, and bodily mastery.',                         stats:{ INT:20, VOL:15, CHA:15, CON:15 } },
-    onetime: { title:'The Arcane Throne',       desc:'Rule all four domains of mind, will, presence, and body for 14 days equipped.',        stats:{ INT:35, VOL:25, CHA:25, CON:25 } },
+    daily:   { title:"The Sovereign's Regime",  desc:'Every day must contain all three: a 60-minute uninterrupted deep work block tracked with start and end times, phone off, zero distractions (INT + VOL); a meaningful knowledge exchange where you brought real insight to someone — not small talk but something that shifted their thinking (CHA + INT); and one physical resilience habit — cold exposure, structured sleep tracking, or 20+ minutes of intentional physical activity (CON). The Sovereign rules all three domains every day or reigns over none.', stats:{ INT:5, VOL:4, CHA:4, CON:4 } },
+    weekly:  { title:'The Court of Mastery',    desc:'Complete 5 Sovereign\'s Regime days this week. Deep work block + knowledge exchange + physical resilience — all three, five times. This is not a flexible standard. Five days minimum. The Sovereign doesn\'t crown themselves with a partial record.', stats:{ INT:20, VOL:15, CHA:15, CON:15 } },
+    onetime: { title:"The Sovereign's Decree",  desc:'Build and publicly deliver a complete knowledge system to a real audience: a structured multi-session course (3+ sessions), a published series of 5+ essays or guides, or a mentorship program you ran for at least 4 weeks with documented participants and outcomes. This is not a single post or talk. It is a body of work. Research it, structure it, deliver it, and prove it reached someone.', stats:{ INT:35, VOL:25, CHA:25, CON:25 } },
   },
   iron_saint: {
-    daily:   { title:"The Saint's Burden",      desc:'Exercise supreme willpower, raw strength, sharp intellect, AND radiant presence today.', stats:{ VOL:5, STR:4, INT:4, CHA:4 } },
-    weekly:  { title:'Holy Discipline',         desc:'Sustain 5 days of combined will, strength, intellect, and presence.',                    stats:{ VOL:20, STR:15, INT:15, CHA:15 } },
-    onetime: { title:'Iron and Holy Fire',      desc:'Embody all four virtues of the Iron Saint for 14 consecutive days while equipped.',      stats:{ VOL:35, STR:25, INT:25, CHA:25 } },
+    daily:   { title:"The Saint's Covenant",    desc:'Every day must hold three things without exception: a physically demanding session where you overcame a moment of genuine resistance — the rep you wanted to skip, the distance you wanted to cut (VOL + STR); a focused intellectual block of 30+ minutes producing something tangible (INT); and one act of leadership or mentorship — real advice given, a person genuinely inspired, a team or situation moved forward (CHA). The Iron Saint doesn\'t lead on good days only. Every day is the covenant.', stats:{ VOL:5, STR:4, INT:4, CHA:4 } },
+    weekly:  { title:'The Iron Covenant',       desc:'Log 5 Saint\'s Covenant days this week. Physical resistance overcome + intellectual output + leadership action — all three, five times. Two days maximum of absence. The Iron Saint who misses more than that isn\'t leading. They\'re resting.', stats:{ VOL:20, STR:15, INT:15, CHA:15 } },
+    onetime: { title:'The Canonization',        desc:'Accumulate 30 logged Saint\'s Covenant days while equipped as Iron Saint. Thirty days of physical dominance, intellectual work, and leadership impact — all documented, all honest. This is not passed in a burst. It is earned over the month you hold this class. The canon is written slowly, by those who show up every single day.', stats:{ VOL:35, STR:25, INT:25, CHA:25 } },
   },
   divine_prophet: {
-    daily:   { title:'Words That Shape Worlds', desc:'Combine social mastery, precision movement, endurance, AND intellectual depth today.', stats:{ CHA:5, DEX:4, CON:4, INT:4 } },
-    weekly:  { title:"The Prophet's Path",      desc:'Walk the path of wisdom, movement, resilience, and connection for 5 days.',            stats:{ CHA:20, DEX:15, CON:15, INT:15 } },
-    onetime: { title:'The Prophecy Fulfilled',  desc:'Live as the Divine Prophet for 14 consecutive days of mastery while equipped.',        stats:{ CHA:35, DEX:25, CON:25, INT:25 } },
+    daily:   { title:"The Prophet's Declaration", desc:'Your day must contain all three: a physical session that is both technically demanding and aerobically sustained — agility within endurance, not just a run (DEX + CON); a focused intellectual or creative block of 30+ minutes that produces a tangible output — a written note, a plan, a piece of content (INT); and a social moment of genuine impact where you inspired, led, taught, or visibly moved someone (CHA). The Prophet doesn\'t drift through days. Every day is a declaration.', stats:{ CHA:5, DEX:4, CON:4, INT:4 } },
+    weekly:  { title:'The Vision Protocol',     desc:'Complete 5 Prophet\'s Declaration days this week. Agile endurance session + intellectual output + social impact — all three, five times. Five out of seven. The Prophet who speaks inconsistently is not a Prophet. They are a rumor.', stats:{ CHA:20, DEX:15, CON:15, INT:15 } },
+    onetime: { title:'The Revelation',          desc:'Conceive, develop, and publicly launch a project that embodies all four stat domains: physical performance or competition (DEX + CON), research-backed intellectual content (INT), and builds or leads a community around it (CHA). A public fitness challenge you ran and documented, an educational program with a live audience, an athletic performance paired with a published reflection — all valid. It must go public, involve others, and be documented. The Prophet doesn\'t whisper. They reveal.', stats:{ CHA:35, DEX:25, CON:25, INT:25 } },
   },
   // ── TIER 5 — TRUE HERO ───────────────────────────────────────────────────
   true_hero: {
-    daily:   { title:'A Perfect Day',           desc:'Complete every single habit across all stats today. No exceptions.',                  stats:{ STR:5, DEX:5, CON:5, INT:5, VOL:5, CHA:5 } },
-    weekly:  { title:"The Hero's Week",          desc:'Achieve 5 perfect days this week — all habits done every day.',                       stats:{ STR:20, DEX:20, CON:20, INT:20, VOL:20, CHA:20 } },
-    onetime: { title:'True Heroism',            desc:'Sustain 30 days of near-perfect habit performance while equipped as True Hero.',       stats:{ STR:60, DEX:60, CON:60, INT:60, VOL:60, CHA:60 } },
+    daily:   { title:'The Standard',            desc:'Today must be lived at the True Hero standard — all six domains present, no shortcuts, no passive completions: a training session taxing both power and coordination (STR + DEX); a sustained cardio effort or deliberate recovery habit (CON); a 30+ minute focused block that produces something tangible — something that didn\'t exist before you sat down (INT); one moment where the lesser version of you wanted to stop, and you didn\'t (VOL); and one genuine social impact — a person you moved, taught, led, or inspired (CHA). Not a checklist. A way of being. The day either holds this standard or it doesn\'t.', stats:{ STR:5, DEX:5, CON:5, INT:5, VOL:5, CHA:5 } },
+    weekly:  { title:'The Unbroken Standard',   desc:'Hit The Standard on 6 out of 7 days this week. One day of rest or failure allowed — no more. Six complete days across all six domains, six times. The True Hero\'s week is not measured by what they did on their best days. It is measured by what they refused to skip on their worst.', stats:{ STR:20, DEX:20, CON:20, INT:20, VOL:20, CHA:20 } },
+    onetime: { title:'The True Chronicle',      desc:'Accumulate 60 logged Standard days while equipped as True Hero. Sixty days of living at the full six-domain standard — spread across the entire mastery period, built one honest day at a time. This is the highest accumulation target in the game. It cannot be rushed, cannot be faked, and cannot be completed in a burst of motivation. By the time the Chronicle is sealed, the standard is no longer a quest. It is who you are.', stats:{ STR:60, DEX:60, CON:60, INT:60, VOL:60, CHA:60 } },
   },
 };
 
@@ -5640,18 +6091,19 @@ function defaultClassState() {
 // ============================================================
 
 // Level + minimum stat value required to access each tier
-// Aligned with tier progression table:
-//   NOVICE  → lv 1-19  / Rank E-D  / no stat req    — from the start
-//   ADEPT   → lv 20-39 / Rank D-C-B / D stats (270) — ~mes 1
-//   EXPERT  → lv 40-69 / Rank B-A  / B stats (1500) — ~mes 3
-//   LEGEND  → lv 70-94 / Rank S-SS  / S stats (5000) — ~mes 14
-//   HERO    → lv 95-100/ Rank SSS  / SSS stats (8750) + all Tier-4 mastered
+// Each stat gate is set one rank above the level gate's implied rank so it
+// stays meaningful alongside the level + mastery prerequisite:
+//   NOVICE  → lv 1-19  / no stat req              — from the start
+//   ADEPT   → lv 20-39 / Rank C stats (600)        — ~6 weeks
+//   EXPERT  → lv 40-69 / Rank A stats (2800)       — ~6 months
+//   LEGEND  → lv 70-94 / Rank SS stats (7000)      — ~20+ months
+//   HERO    → lv 95-100/ Rank SSS stats (8750) + all Tier-4 mastered
 const CLASS_TIER_REQ = {
   1: { level: 1,  statMin: 0    },   // NOVICE  — disponible desde el inicio
-  2: { level: 20, statMin: 270  },   // ADEPT   — Rank D
-  3: { level: 40, statMin: 1500 },   // EXPERT  — Rank B
+  2: { level: 20, statMin: 600  },   // ADEPT   — Rank C
+  3: { level: 40, statMin: 2000 },   // EXPERT
   4: { level: 70, statMin: 5000 },   // LEGEND  — Rank S
-  5: { level: 95, statMin: 8750 },   // HERO    — Rank SSS (hidden)
+  5: { level: 95, statMin: 9999 },   // HERO    — beyond SSS (hidden)
 };
 
 // Returns { available:bool, locked:bool, reasons:string[] }
@@ -5770,6 +6222,12 @@ function loadState() {
       if (typeof s.totalGoldEarned !== 'number') s.totalGoldEarned = s.gold || 0;
       if (!s.shopMaterials) s.shopMaterials = { timber:0, scroll:0, crystal:0, gear:0 };
       if (!s.hasOwnProperty('commissions')) s.commissions = null;
+      if (typeof s.totalCommissionsDone !== 'number') s.totalCommissionsDone = 0;
+      if (typeof s.totalItemsCrafted !== 'number') s.totalItemsCrafted = 0;
+      if (typeof s.totalForgePomos !== 'number') s.totalForgePomos = 0;
+      if (typeof s.workStreak !== 'number') s.workStreak = 0;
+      if (!s.hasOwnProperty('workStreakCountedDay')) s.workStreakCountedDay = null;
+      if (!s.hasOwnProperty('workStreakLastDay')) s.workStreakLastDay = null;
       if (!s.playerName) s.playerName = 'Tuni';
       if (!s.playerTitle) s.playerTitle = 'Beginner';
       if (!s.achievements) s.achievements = {};
@@ -5798,6 +6256,18 @@ function loadState() {
       const _HMIG = {'Levantarse a las 7am':'Wake up at 7am','Tomar 2L de agua':'Drink 2L of water','Caminata al parque':'Walk to the park','Meditación (10 min)':'Meditation (10 min)','Entrenamiento físico':'Physical training','Anotar logros del día y tarea #1 de mañana':"Log today's wins & task #1 for tomorrow",'Escribir 3 cosas por las que estás agradecido':"Write 3 things you're grateful for",'Lavar platos':'Wash the dishes','Hacer cama':'Make your bed','Leer':'Read','Estiramientos':'Stretching','Uso del celular':'Phone usage','NO RECAER EN ADICCIONES':'NO RELAPSES — STAY CLEAN'};
       s.habitos.forEach(h=>{ if(_HMIG[h.text]) h.text=_HMIG[h.text]; });
       s.negativos.forEach(n=>{ if(_HMIG[n.text]) n.text=_HMIG[n.text]; });
+      // Migrate default avoid habit to all-stats gains
+      s.negativos.forEach(n => {
+        if (n.id === 'neg0' && n.gains && !n.gains.STR) {
+          n.gains = { STR:3, DEX:3, CON:3, INT:3, VOL:3, CHA:3 };
+          n.xp = 180;
+        }
+        // Migrate milestone gains to all-stats
+        if (n.milestones) {
+          const _MS_GAINS = { 7:{STR:5,DEX:5,CON:5,INT:5,VOL:5,CHA:5}, 14:{STR:8,DEX:8,CON:8,INT:8,VOL:8,CHA:8}, 30:{STR:12,DEX:12,CON:12,INT:12,VOL:12,CHA:12}, 60:{STR:20,DEX:20,CON:20,INT:20,VOL:20,CHA:20}, 90:{STR:30,DEX:30,CON:30,INT:30,VOL:30,CHA:30} };
+          n.milestones.forEach(ms => { if (_MS_GAINS[ms.days] && !ms.gains.STR) ms.gains = _MS_GAINS[ms.days]; });
+        }
+      });
       if (!s.inventory) s.inventory = [{itemId:'iron_sword',quantity:1},{itemId:'leather_armor',quantity:1},{itemId:'iron_helm',quantity:1},{itemId:'leather_boots',quantity:1},{itemId:'hp_pot_s',quantity:5},{itemId:'mp_pot_s',quantity:2}];
       if (!s.equipment) s.equipment = {earring_l:null,helmet:null,earring_r:null,weapon:null,armor:null,shield:null,necklace:null,bracelet:null,belt:null,boots:null};
       if (!s.guildUpgrades) {
@@ -5876,6 +6346,9 @@ function loadState() {
       if (typeof s.dailyCritCount !== 'number') s.dailyCritCount = 0;
       if (!s.lastCritDay) s.lastCritDay = '';
       if (!Array.isArray(s.craftQueue)) s.craftQueue = [];
+      if (typeof s.workXp !== 'number') s.workXp = 0;
+      if (!s.socialStats) s.socialStats = {kindness:0,courage:0,diligence:0,wisdom:0,expression:0,resilience:0};
+      if (!s.socialStats.hasOwnProperty('resilience')) s.socialStats.resilience = 0;
       if (!s.hasOwnProperty('penaltyQuest')) s.penaltyQuest = null;
       // ensure done exists on all habits
       s.habitos.forEach(h=>{ if(!h.done) h.done={}; });
@@ -5925,7 +6398,7 @@ function loadState() {
       return { habitos, weekly, trabajo: v3.trabajo||[], stats: v3.stats||defaultStats(), totalXp: v3.totalXp||0, streak: v3.streak||0, lastActiveDay: v3.lastActiveDay||todayKey(), col: v3.col||0 };
     }
   } catch(e) { console.warn('load failed',e); }
-  return { habitos: DEFAULT_HABITOS.map(h=>({...h,done:{}})), weekly: DEFAULT_WEEKLY.map(w=>({...w,done:{}})), negativos: DEFAULT_NEGATIVOS.map(n=>({...n,done:{},createdDate:todayKey(),lastBreakDate:null,awardedMilestones:{},checkins:{},shownOverlayAt:{},milestones:DEFAULT_NEG_MILESTONES.map(m=>({...m}))})), trabajo: [], stats: defaultStats(), totalXp:0, streak:0, lastActiveDay:todayKey(), col:0, playerName:'Tuni', playerTitle:'Beginner', achievements:{}, logros:{perfectWeekCount:0,phoenixCount:0,lastPerfectWeekDay:null,lastPhoenixDay:null}, dungeon:null, inventory:[{itemId:'iron_sword',quantity:1},{itemId:'leather_armor',quantity:1},{itemId:'iron_helm',quantity:1},{itemId:'leather_boots',quantity:1},{itemId:'hp_pot_s',quantity:5},{itemId:'mp_pot_s',quantity:2}], equipment:{earring_l:null,helmet:null,earring_r:null,weapon:null,armor:null,shield:null,necklace:null,bracelet:null,belt:null,boots:null}, classData: defaultClassState(), lastWeeklyReport:null, pomodoroWorkMins:25 };
+  return { habitos: DEFAULT_HABITOS.map(h=>({...h,done:{}})), weekly: DEFAULT_WEEKLY.map(w=>({...w,done:{}})), negativos: DEFAULT_NEGATIVOS.map(n=>({...n,done:{},createdDate:todayKey(),lastBreakDate:null,awardedMilestones:{},checkins:{},shownOverlayAt:{},milestones:DEFAULT_NEG_MILESTONES.map(m=>({...m}))})), trabajo: [], stats: defaultStats(), totalXp:0, streak:0, lastActiveDay:todayKey(), col:0, playerName:'Tuni', playerTitle:'Beginner', achievements:{}, logros:{perfectWeekCount:0,phoenixCount:0,lastPerfectWeekDay:null,lastPhoenixDay:null}, dungeon:null, inventory:[{itemId:'iron_sword',quantity:1},{itemId:'leather_armor',quantity:1},{itemId:'iron_helm',quantity:1},{itemId:'leather_boots',quantity:1},{itemId:'hp_pot_s',quantity:5},{itemId:'mp_pot_s',quantity:2}], equipment:{earring_l:null,helmet:null,earring_r:null,weapon:null,armor:null,shield:null,necklace:null,bracelet:null,belt:null,boots:null}, classData: defaultClassState(), lastWeeklyReport:null, pomodoroWorkMins:25, workXp:0, socialStats:{kindness:0,courage:0,diligence:0,wisdom:0,expression:0,resilience:0} };
 }
 
 function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
@@ -6214,37 +6687,157 @@ const CRAFT_RECIPES = [
   { id:'rc_celestial_plate', itemId:'work_celestial_plate', cost:{ gear:60, scroll:36, timber:24 } },
 ];
 
-// ── Guild Upgrades ────────────────────────────────────────────
-// cost(level) = baseCost × level  (L1 = baseCost×1, L2 = baseCost×2, ...)
+// ── Guild Upgrades — cost(level) = baseCost × 1.7^(level-1), rounded to nearest 5
+// Ordered by utility: Growth → Forge → Power
 const GUILD_UPGRADES = [
-  // ── PRODUCTION tier ───────────────────────────────────────────────────────
-  { id:'warehouse',   name:'Material Cache',     emoji:'📦', maxLevel:5,  baseCost:50,
-    effect:'bonusMat',        perLevel:'+1 mat per dungeon stage',
-    desc:'Adds bonus materials to every dungeon stage cleared.' },
-  { id:'alchemy',     name:'Alchemist\'s Lab',   emoji:'🧪', maxLevel:5,  baseCost:100,
-    effect:'potionBoost',     perLevel:'+15% HP/MP from potions',
-    desc:'Increases HP and MP restored by all consumable potions.' },
-  // ── ECONOMY tier ──────────────────────────────────────────────────────────
+  // ── GROWTH tier (habit & economy) ─────────────────────────────────────────
+  { id:'hall',        name:'Grand Guild Hall',   emoji:'🏛️', maxLevel:10, baseCost:200,
+    effect:'habitAura',       perLevel:'+0.5% habit stat gains',
+    desc:'Permanently boosts stat gains from all daily habits.' },
   { id:'trade',       name:'Trade Post',         emoji:'🪙', maxLevel:5,  baseCost:150,
     effect:'goldBonus',       perLevel:'+10% gold from work tasks',
     desc:'Increases gold earned from completing work tasks.' },
-  { id:'scriptorium', name:'Scriptorium',        emoji:'📜', maxLevel:5,  baseCost:200,
+  { id:'scriptorium', name:'Scriptorium',        emoji:'📜', maxLevel:5,  baseCost:250,
     effect:'commissionBonus', perLevel:'+15% gold from commissions',
     desc:'Increases bonus gold awarded by completed commissions.' },
+  // ── FORGE tier (crafting & supply) ────────────────────────────────────────
   { id:'anvil',       name:'Forge Mastery',      emoji:'⚒️', maxLevel:5,  baseCost:300,
     effect:'craftDiscount',   perLevel:'-8% craft material cost',
     desc:'Reduces the material cost of all forge recipes.' },
-  // ── POWER tier ────────────────────────────────────────────────────────────
+  { id:'warehouse',   name:'Material Cache',     emoji:'📦', maxLevel:5,  baseCost:100,
+    effect:'bonusMat',        perLevel:'+1 mat per dungeon stage',
+    desc:'Adds bonus materials to every dungeon stage cleared.' },
+  // ── POWER tier (combat) ───────────────────────────────────────────────────
   { id:'barracks',    name:'Barracks',           emoji:'⚔️', maxLevel:5,  baseCost:400,
     effect:'strengthAura',    perLevel:'+5% STR & CON from gear',
     desc:'Increases STR and CON granted by equipped gear.' },
   { id:'sanctum',     name:'Enchanting Sanctum', emoji:'✨', maxLevel:5,  baseCost:600,
     effect:'gearAura',        perLevel:'+4% all stats from gear',
     desc:'Increases all stat bonuses from equipped gear.' },
-  { id:'hall',        name:'Grand Guild Hall',   emoji:'🏛️', maxLevel:10, baseCost:150,
-    effect:'habitAura',       perLevel:'+0.5% habit stat gains',
-    desc:'Permanently boosts stat gains from all daily habits.' },
+  { id:'alchemy',     name:'Alchemist\'s Lab',   emoji:'🧪', maxLevel:5,  baseCost:120,
+    effect:'potionBoost',     perLevel:'+15% HP/MP from potions',
+    desc:'Increases HP and MP restored by all consumable potions.' },
 ];
+
+// ── Social Stats ──────────────────────────────────────────────
+const SOCIAL_STATS = [
+  { id:'kindness',   name:'Kindness',   emoji:'💙', color:'#64b5f6', bonusStat:'CHA', bonusRate:50,
+    acts:['Helped someone','Gave a compliment','Donated','Random act of kindness','Checked on a friend'] },
+  { id:'courage',    name:'Courage',    emoji:'🔥', color:'#ff8a80', bonusStat:'STR', bonusRate:50,
+    acts:['Spoke up','Tried something new','Faced a fear','Took initiative','Had a hard conversation'] },
+  { id:'diligence',  name:'Diligence',  emoji:'⚡', color:'#ffd54f', bonusStat:'VOL', bonusRate:50,
+    acts:['Finished on time','No excuses','Extra effort','Started immediately','Kept a promise'] },
+  { id:'wisdom',     name:'Wisdom',     emoji:'📖', color:'#82b1ff', bonusStat:'INT', bonusRate:50,
+    acts:['Reflected deeply','Learned something new','Gave good advice','Planned ahead','Read non-fiction'] },
+  { id:'expression', name:'Expression', emoji:'✨', color:'#ea80fc', bonusStat:'DEX', bonusRate:50,
+    acts:['Created something','Shared an idea','Connected genuinely','Expressed feelings','Performed/presented'] },
+  { id:'resilience', name:'Resilience', emoji:'🛡', color:'#80deea', bonusStat:'CON', bonusRate:50,
+    acts:['Pushed through fatigue','Kept going when it was hard','Recovered after a setback','Held composure under pressure','Completed the set anyway'] },
+];
+
+function getSocialStatBonuses() {
+  const out = {STR:0,DEX:0,CON:0,INT:0,VOL:0,CHA:0};
+  const ss = state.socialStats || {};
+  SOCIAL_STATS.forEach(def => {
+    const bonus = (getSocialRank(ss[def.id] || 0) - 1) * 10;
+    if (bonus > 0) out[def.bonusStat] = (out[def.bonusStat]||0) + bonus;
+  });
+  return out;
+}
+
+// ── Social Stat Confidant Ranks ───────────────────────────────
+const SOCIAL_RANK_THRESHOLDS = [0, 50, 150, 300, 500, 750];
+const SOCIAL_RANK_BONUSES    = [0, 10,  30,  60, 100, 150]; // core stat bonus at each rank (index = rank-1)
+const SOCIAL_RANK_NAMES = {
+  kindness:   ['Indifferent','Friendly','Caring','Compassionate','Generous','Saint'],
+  courage:    ['Timid','Daring','Brave','Fearless','Heroic','Legend'],
+  diligence:  ['Idle','Consistent','Focused','Driven','Relentless','Iron Will'],
+  wisdom:     ['Naive','Thoughtful','Insightful','Perceptive','Sage','Oracle'],
+  expression: ['Reserved','Expressive','Creative','Inspired','Visionary','Muse'],
+  resilience: ['Fragile','Recovering','Steadfast','Tough','Forged','Unbreakable'],
+};
+
+function getSocialRank(pts) {
+  let rank = 0;
+  for (const t of SOCIAL_RANK_THRESHOLDS) {
+    if (pts >= t) rank++; else break;
+  }
+  return rank; // 1..10
+}
+
+function getSocialRankProgress(pts) {
+  const rank = getSocialRank(pts);
+  if (rank >= 10) return { rank, pct: 100, toNext: 0 };
+  const curr = SOCIAL_RANK_THRESHOLDS[rank - 1];
+  const next = SOCIAL_RANK_THRESHOLDS[rank];
+  const pct  = Math.min(100, Math.round((pts - curr) / (next - curr) * 100));
+  return { rank, pct, toNext: next - pts };
+}
+
+function showSocialRankUp(statId, rank) {
+  const def = SOCIAL_STATS.find(s => s.id === statId); if (!def) return;
+  const rankName = (SOCIAL_RANK_NAMES[statId] || [])[rank - 1] || `Rank ${rank}`;
+  const bonus = (SOCIAL_RANK_BONUSES[rank - 1] || 0);
+  document.getElementById('socialRankOverlay')?.remove();
+  const ol = document.createElement('div');
+  ol.id = 'socialRankOverlay'; ol.className = 'lvup-overlay';
+  ol.innerHTML = `
+    <div class="lvup-panel" style="--lvup-rc:${def.color}">
+      <div class="lvup-header">
+        <div class="lvup-sparkles">${def.emoji} ${def.emoji} ${def.emoji}</div>
+        <div class="lvup-title">CONFIDANT RANK UP</div>
+        <div class="lvup-level"><span style="font-size:30px">${def.emoji}</span></div>
+        <div class="lvup-rank-badge" style="border-color:${def.color};color:${def.color}">${def.name.toUpperCase()} · RANK ${rank}</div>
+        <div style="font-family:'Cinzel',serif;font-size:12px;color:${def.color};margin-top:6px;letter-spacing:1.5px">${rankName.toUpperCase()}</div>
+      </div>
+      <div class="lvup-section">
+        <div class="lvup-section-label">BOND BONUS</div>
+        <div style="text-align:center;font-family:'Rajdhani',sans-serif;font-size:18px;color:var(--sao-text);padding:8px 0">
+          ${def.bonusStat} <span style="color:${def.color};font-weight:700">+${bonus}</span>
+        </div>
+      </div>
+      <button class="lvup-btn" onclick="document.getElementById('socialRankOverlay')?.remove()">CONTINUE</button>
+    </div>`;
+  document.body.appendChild(ol);
+}
+
+// ── Worker Level System ───────────────────────────────────────
+const WORKER_RANK_BANDS = [
+  { from:1,  to:4,  rank:'F',   xpPerLevel:50    },
+  { from:5,  to:14, rank:'E',   xpPerLevel:120   },
+  { from:15, to:24, rank:'D',   xpPerLevel:280   },
+  { from:25, to:34, rank:'C',   xpPerLevel:600   },
+  { from:35, to:44, rank:'B',   xpPerLevel:1200  },
+  { from:45, to:54, rank:'A',   xpPerLevel:2500  },
+  { from:55, to:69, rank:'S',   xpPerLevel:5000  },
+  { from:70, to:84, rank:'SS',  xpPerLevel:9000  },
+  { from:85, to:99, rank:'SSS', xpPerLevel:15000 },
+];
+
+function calcWorkerLevel(workXp) {
+  let lv = 1, xpLeft = workXp || 0;
+  for (const band of WORKER_RANK_BANDS) {
+    const lvInBand = band.to - band.from + 1;
+    for (let i = 0; i < lvInBand; i++) {
+      if (xpLeft < band.xpPerLevel) {
+        return { level:lv, rank:band.rank, xpProgress:xpLeft, xpPerLevel:band.xpPerLevel };
+      }
+      xpLeft -= band.xpPerLevel; lv++;
+      if (lv >= 99) return { level:99, rank:'SSS', xpProgress:0, xpPerLevel:15000 };
+    }
+  }
+  return { level:99, rank:'SSS', xpProgress:0, xpPerLevel:15000 };
+}
+
+function grantWorkXp(amount) {
+  if (!amount || amount <= 0) return;
+  const prevWlv = calcWorkerLevel(state.workXp || 0);
+  state.workXp = (state.workXp || 0) + amount;
+  const newWlv = calcWorkerLevel(state.workXp);
+  if (newWlv.level > prevWlv.level) {
+    setTimeout(() => showNotif(`⚒ WORKER RANK UP · Lv.${newWlv.level} · Rank ${newWlv.rank}`), 700);
+  }
+}
 
 const DEFAULT_INVENTORY = [
   {itemId:'iron_sword',    quantity:1},
@@ -6353,7 +6946,7 @@ function getStageDrop(cfg, preview=false) {
 //
 // Budget: daily(324) + weekly(110) + ranks(32) + classes(19) +
 //   stat_mastery(90) + balance(11) + streak(21) + perf_week(40) +
-//   perf_day(13) + phoenix(19) + avoid(21) = 700
+//   perf_day(13) + phoenix(19) + avoid(21) + work(167) = 867
 const ACHIEVEMENTS = [
   // ── ONBOARDING — pre-claimable on first load ─────────────────
   { id:'system_online', name:'System Online', icon:'⚡', category:'hitos',
@@ -6457,6 +7050,34 @@ const ACHIEVEMENTS = [
     tiers:[{count:1,label:'Risen',reward:1,title:null},{count:3,label:'Fire Bird',reward:2,title:null},{count:5,label:'Indestructible',reward:4,title:'Indestructible'},{count:10,label:'No Surrender',reward:5,title:'No Surrender'},{count:20,label:'ETERNAL PHOENIX',reward:7,title:'ETERNAL PHOENIX'}]},
   { id:'avoid_clean', name:'Iron Will', icon:'🛡️', category:'racha', desc:'Consecutive days clean from addiction', stat:'VOL', statAll:true,
     tiers:[{count:7,label:'First Week',reward:1,title:null},{count:30,label:'Month of Clarity',reward:2,title:null},{count:90,label:'Iron Mind',reward:4,title:'Iron Mind'},{count:180,label:'Liberated',reward:6,title:'Liberated'},{count:365,label:'UNBREAKABLE',reward:8,title:'UNBREAKABLE'}]},
+
+  // ── WORK — QUESTS  (1+2+4+7+11 = 25) ───────────────────────
+  { id:'quest_runner', name:'Quest Runner', icon:'⚒', category:'trabajo', desc:'Complete work tasks across all days', statAll:true,
+    tiers:[{count:5,label:'First Contracts',reward:1,title:null},{count:25,label:'Field Agent',reward:2,title:null},{count:75,label:'Veteran Contractor',reward:4,title:'Veteran Contractor'},{count:200,label:'Elite Operative',reward:7,title:'Elite Operative'},{count:500,label:'SHADOW LEGEND',reward:11,title:'SHADOW LEGEND'}]},
+
+  // ── WORK — GOLD  (1+3+5+8+12 = 29) ─────────────────────────
+  { id:'gold_earner', name:'Gold Hunter', icon:'🪙', category:'trabajo', desc:'Accumulate lifetime gold earned', statAll:true,
+    tiers:[{count:100,label:'First Pouch',reward:1,title:null},{count:500,label:'Prospector',reward:3,title:null},{count:2000,label:'Merchant Lord',reward:5,title:'Merchant Lord'},{count:5000,label:'Tycoon',reward:8,title:'Tycoon'},{count:10000,label:'GOLD SOVEREIGN',reward:12,title:'GOLD SOVEREIGN'}]},
+
+  // ── WORK — COMMISSIONS  (1+2+4+7+11 = 25) ──────────────────
+  { id:'commission_ace', name:'Commission Ace', icon:'📋', category:'trabajo', desc:'Fulfill commissions from the board', statAll:true,
+    tiers:[{count:1,label:'First Brief',reward:1,title:null},{count:10,label:'Regular Client',reward:2,title:null},{count:30,label:'Trusted Agent',reward:4,title:'Trusted Agent'},{count:75,label:'Commission Master',reward:7,title:'Commission Master'},{count:150,label:'SOVEREIGN CONTRACTOR',reward:11,title:'SOVEREIGN CONTRACTOR'}]},
+
+  // ── WORK — FORGE  (1+2+4+7+11 = 25) ────────────────────────
+  { id:'master_forger', name:'Master Forger', icon:'🔨', category:'trabajo', desc:'Craft items in the Forge', statAll:true,
+    tiers:[{count:1,label:'First Craft',reward:1,title:null},{count:5,label:'Apprentice Smith',reward:2,title:null},{count:15,label:'Journeyman',reward:4,title:'Journeyman'},{count:40,label:'Master Smith',reward:7,title:'Master Smith'},{count:100,label:'LEGENDARY ARTISAN',reward:11,title:'LEGENDARY ARTISAN'}]},
+
+  // ── WORK — POMODORO  (1+2+4+7+11 = 25) ─────────────────────
+  { id:'pomo_warrior', name:'Pomo Warrior', icon:'🍅', category:'trabajo', desc:'Complete forge sessions (25-min work blocks)', statAll:true,
+    tiers:[{count:1,label:'First Session',reward:1,title:null},{count:10,label:'Focused',reward:2,title:null},{count:50,label:'Iron Focus',reward:4,title:'Iron Focus'},{count:150,label:'Flow State',reward:7,title:'Flow State'},{count:300,label:'ETERNAL GRINDER',reward:11,title:'ETERNAL GRINDER'}]},
+
+  // ── WORK — GUILD  (2+5+10 = 17) ─────────────────────────────
+  { id:'guild_patron', name:'Guild Patron', icon:'🏛', category:'trabajo', desc:'Purchase upgrades in the Guild', statAll:true,
+    tiers:[{count:1,label:'Initiate',reward:2,title:null},{count:3,label:'Benefactor',reward:5,title:'Benefactor'},{count:5,label:'GUILD SOVEREIGN',reward:10,title:'GUILD SOVEREIGN'}]},
+
+  // ── WORK — STREAK  (1+2+4+6+8 = 21) ────────────────────────
+  { id:'work_streak', name:'Iron Contractor', icon:'🔩', category:'trabajo', desc:'Consecutive days completing at least 1 work task', statAll:true,
+    tiers:[{count:3,label:'On the Clock',reward:1,title:null},{count:7,label:'Weekly Grind',reward:2,title:null},{count:14,label:'Relentless',reward:4,title:'Relentless'},{count:30,label:'Iron Month',reward:6,title:'Iron Month'},{count:100,label:'UNBREAKABLE GRINDER',reward:8,title:'UNBREAKABLE GRINDER'}]},
 ];
 
 const TIER_LABELS  = ['🥉 BRONZE','🥈 SILVER','🥇 GOLD','💎 LEGENDARY','👑 UNIQUE'];
@@ -6476,6 +7097,13 @@ const STAT_COLORS  = { STR:'#ff8a80', DEX:'#b9f6ca', CON:'#ffd180', INT:'#82b1ff
 })();
 
 function getAchievementCount(ach) {
+  if (ach.id === 'quest_runner')    return state.trabajo.reduce((s,t) => s + Object.keys(t.done||{}).length, 0);
+  if (ach.id === 'gold_earner')     return state.totalGoldEarned || 0;
+  if (ach.id === 'commission_ace')  return state.totalCommissionsDone || 0;
+  if (ach.id === 'master_forger')   return state.totalItemsCrafted || 0;
+  if (ach.id === 'pomo_warrior')    return state.totalForgePomos || 0;
+  if (ach.id === 'guild_patron')    return Object.values(state.guildUpgrades||{}).filter(Boolean).length;
+  if (ach.id === 'work_streak')     return state.workStreak || 0;
   if (ach.id === 'streak_gen') return state.streak;
   if (ach.id === 'perf_week')  return state.logros.perfectWeekCount || 0;
   if (ach.id === 'phoenix')    return state.logros.phoenixCount || 0;
@@ -6799,6 +7427,7 @@ function getDailyMatRate() {
 
 // A trabajo task is archived if it has at least one completion and none in the last 30 days
 function isArchivedTask(task) {
+  if (task.manuallyArchived) return true;
   const doneKeys = Object.keys(task.done||{});
   if (doneKeys.length === 0) return false;
   const d = new Date(); d.setDate(d.getDate() - 30);
@@ -6847,6 +7476,10 @@ function craftItem(recipeId) {
     qualityLabel: qRoll.label,
   };
   state.craftQueue.push(entry);
+  state.totalItemsCrafted = (state.totalItemsCrafted||0) + 1;
+  // Grant Work XP based on total material cost
+  const _craftMatTotal = Object.values(cost).reduce((a,b)=>a+b,0);
+  grantWorkXp(_craftMatTotal >= 70 ? 100 : _craftMatTotal >= 40 ? 50 : _craftMatTotal >= 20 ? 25 : 10);
   // Forge log
   if (!state.forgeLog) state.forgeLog = [];
   state.forgeLog.unshift({ itemId: recipe.itemId, date: todayKey() });
@@ -6899,13 +7532,18 @@ function completePenaltyQuest() {
   setTimeout(() => showNotif(`[SYSTEM] Penalty Quest verified. Streak restored: ${restored} days.`), 50);
 }
 
+function calcGuildCost(upg, nextLvl) {
+  const mul = upg.id === 'hall' ? 1.5 : 1.7;
+  return Math.max(5, Math.round(upg.baseCost * Math.pow(mul, nextLvl - 1) / 5) * 5);
+}
+
 function purchaseGuildUpgrade(id) {
   const upg = GUILD_UPGRADES.find(u => u.id === id); if (!upg) return;
   if (!state.guildUpgrades) state.guildUpgrades = {};
   const curLvl = state.guildUpgrades[id] || 0;
   if (curLvl >= upg.maxLevel) { showNotif('⚠ Already at max level.'); return; }
   const nextLvl = curLvl + 1;
-  const cost = upg.baseCost * nextLvl;
+  const cost = calcGuildCost(upg, nextLvl);
   if ((state.gold||0) < cost) { showNotif(`⚠ Need 🪙${cost}g — you have ${state.gold||0}g.`); return; }
   state.gold = (state.gold||0) - cost;
   state.guildUpgrades[id] = nextLvl;
@@ -7248,6 +7886,7 @@ function renderLogros() {
     { key:'hitos',        label:'MILESTONES'  },
     { key:'maestria',     label:'MASTERY'     },
     { key:'racha',        label:'STREAK'      },
+    { key:'trabajo',      label:'WORK'        },
   ];
 
   const filterBar = document.createElement('div'); filterBar.className = 'logro-filter-bar';
@@ -7888,6 +8527,7 @@ function updateCommissionProgress(periodKey) {
     }).length;
     if (comm.progress >= comm.count) {
       comm.completed = true;
+      state.totalCommissionsDone = (state.totalCommissionsDone||0) + 1;
       const _scriptLvl = (state.guildUpgrades||{}).scriptorium || 0;
       const _commGold  = Math.floor(comm.bonusGold * (1 + _scriptLvl * 0.15));
       state.gold = (state.gold||0) + _commGold;
@@ -7962,16 +8602,7 @@ function applyGainsWithClass(gains) {
   });
   // Track daily stat gains from all sources
   recordDailyGains(applied, 1);
-  // Accumulate mastery points from class-stat gains (the engine that drives mastery)
-  if (eqId && cls && !state.classData.masteredClasses[eqId]) {
-    let mpGain = 0;
-    cls.stats.forEach(k => { if ((applied[k] || 0) > 0) mpGain += applied[k]; });
-    if (mpGain > 0) {
-      if (!state.classData.masteryPoints) state.classData.masteryPoints = {};
-      state.classData.masteryPoints[eqId] = parseFloat(((state.classData.masteryPoints[eqId] || 0) + mpGain).toFixed(1));
-      checkMasteryByPoints(eqId);
-    }
-  }
+  // Mastery points come exclusively from class quests — not from habit completions
   return applied;
 }
 
@@ -8298,9 +8929,11 @@ function showHarvestOverlay(info) {
 
 function checkMasteryByPoints(classId) {
   if (state.classData.masteredClasses[classId]) return;
-  const threshold = CLASS_MASTERY_THRESHOLD[classId] || 150;
+  const threshold = CLASS_MASTERY_THRESHOLD[classId] || 100;
   const pts = (state.classData.masteryPoints || {})[classId] || 0;
-  if (pts >= threshold) applyMasteryReward(classId);
+  // One-time quest (The Trial) must be completed before mastery is granted
+  const trialDone = !!(state.classData.classQuests?.[classId]?.onetimeDone);
+  if (pts >= threshold && trialDone) applyMasteryReward(classId);
 }
 
 function tickMasteryOnLoad() {
@@ -8326,10 +8959,12 @@ function applyMasteryReward(classId) {
   if (state.classData.masteredClasses[classId]) return;
   const cls    = CLASSES[classId];
   const reward = CLASS_MASTERY_REWARD[cls.tier];
+  const xpReward = CLASS_MASTERY_XP[cls.tier] || 0;
   cls.stats.forEach(s => { state.stats[s] = (state.stats[s] || 0) + reward; });
+  state.totalXp = (state.totalXp || 0) + xpReward;
   state.classData.masteredClasses[classId] = true;
 
-  _pendingAnims.push(() => showMasteryOverlay(classId, reward));
+  _pendingAnims.push(() => showMasteryOverlay(classId, reward, xpReward));
 
   checkTierComplete(cls.tier);
 }
@@ -8355,7 +8990,7 @@ function checkTierComplete(tier) {
 }
 
 // ── Mastery Overlay ──────────────────────────────────────────
-function showMasteryOverlay(classId, reward) {
+function showMasteryOverlay(classId, reward, xpReward) {
   const cls  = CLASSES[classId];
   const tier = TIER_NAMES[cls.tier] || '';
   playMastery();
@@ -8370,6 +9005,7 @@ function showMasteryOverlay(classId, reward) {
     <div class="mastery-reward-box">
       <div class="mastery-reward-title">PERMANENT REWARD</div>
       ${cls.stats.map(s=>`<div class="mastery-reward-line">${STAT_NAMES[s]} <span class="mastery-reward-val">+${reward}</span></div>`).join('')}
+      ${xpReward ? `<div class="mastery-reward-line" style="margin-top:6px;color:#ffd700">EXP <span class="mastery-reward-val">+${xpReward.toLocaleString()}</span></div>` : ''}
     </div>
     <div class="mastery-dismiss">tap to continue</div>`;
 
@@ -8532,6 +9168,7 @@ function toggleClassQuest(classId, questType) {
   const statStr = Object.entries(q.stats).map(([k, v]) => `${k}+${v}`).join(' · ');
   const mpStr   = bonusMP > 0 ? ` · +${bonusMP} MP` : '';
   showNotif(`⟦ CLASS QUEST ⟧ ${q.title} · ${statStr}${mpStr}`);
+  playClassQuestDone(); if(navigator.vibrate) navigator.vibrate([30,20,60]);
 
   // Check if all three class quests are now complete — show class overlay once per day+week combo
   const _cqToday = todayKey(); const _cqWeek = isoWeekKey();
@@ -8846,6 +9483,16 @@ function renderQuestItem(task, opts) {
       forgeBtn.addEventListener('click',(e)=>{ e.stopPropagation(); setForgeTask(isActiveForge?null:task.id); });
       actions.appendChild(forgeBtn);
     }
+    if (opts.listKey==='trabajo' && done && !task.manuallyArchived) {
+      const archBtn=document.createElement('button'); archBtn.className='quest-action-btn archive'; archBtn.title='Archive task'; archBtn.textContent='▾';
+      archBtn.addEventListener('click',(e)=>{ e.stopPropagation(); archiveWorkTask(task.id); });
+      actions.appendChild(archBtn);
+    }
+    if (opts.listKey==='trabajo' && task.manuallyArchived) {
+      const unarchBtn=document.createElement('button'); unarchBtn.className='quest-action-btn unarchive'; unarchBtn.title='Restore to active'; unarchBtn.textContent='▴';
+      unarchBtn.addEventListener('click',(e)=>{ e.stopPropagation(); unarchiveWorkTask(task.id); });
+      actions.appendChild(unarchBtn);
+    }
     if (opts.allowDelete) {
       const delBtn=document.createElement('button'); delBtn.className='quest-action-btn del'; delBtn.title='Delete'; delBtn.textContent='✕';
       delBtn.addEventListener('click',(e)=>{
@@ -9082,13 +9729,9 @@ function renderHabitos() {
   const today=todayKey();
   const isToday=activeDate===today;
   panelSubtitle.textContent=isToday?"Today's Missions":`Viewing: ${activeDate}`;
-  // Weekly report button in panel header
   const headerActions=document.getElementById('panelHeaderActions');
   if (headerActions) {
     headerActions.innerHTML='';
-    const wrBtn=document.createElement('button'); wrBtn.className='wr-report-btn-header'; wrBtn.textContent='📊'; wrBtn.title='Weekly Report';
-    wrBtn.addEventListener('click', () => showWeeklyReport());
-    headerActions.appendChild(wrBtn);
     // Shield badge
     const _shields = state.streakShields || 0;
     const shieldBadge = document.createElement('button');
@@ -9167,8 +9810,7 @@ function renderHabitos() {
     panelContent.appendChild(wm);
   }
 
-  // ── Aura Bonus card — only show when viewing today ──
-  if (isToday) renderCompoundEffect(panelContent);
+  // Aura info is now embedded in the daily progress bar row below
 
   const week=isoWeekKey(new Date(activeDate+'T12:00:00'));
 
@@ -9188,7 +9830,25 @@ function renderHabitos() {
   const dFill=document.createElement('div'); dFill.className='progress-bar-fill'+(dPct===100?' complete':dPct===0?' no-shimmer':'');
   dFill.style.width=dPct+'%'; dTrack.appendChild(dFill);
   const dPctTxt=document.createElement('span'); dPctTxt.className='progress-bar-pct-inline'+(dPct===100?' complete':''); dPctTxt.textContent=dPct+'%';
-  dRow.appendChild(dTrack); dRow.appendChild(dPctTxt); dBar.appendChild(dRow);
+  dRow.appendChild(dTrack); dRow.appendChild(dPctTxt);
+  if (isToday) {
+    const _mult = getHabitCompoundMultiplier();
+    const _auraColor = _mult >= 1.5 ? '#ffd54f' : _mult > 1 ? 'var(--sao-gold)' : 'rgba(255,193,7,0.35)';
+    const _chip = document.createElement('span');
+    _chip.className = 'aura-inline-chip'; _chip.style.color = _auraColor;
+    _chip.textContent = '⚡×' + _mult;
+    dRow.appendChild(_chip);
+  }
+  dBar.appendChild(dRow);
+  if (isToday) {
+    const _streakBonus = Math.min(0.25, (state.streak||0) * 0.005);
+    const _prevMult = dTotal ? Math.round((1 + (dDone/dTotal)*0.5 + _streakBonus)*100)/100 : 1;
+    const _curMult = getHabitCompoundMultiplier();
+    const _pc = _prevMult > _curMult ? '#69f0ae' : _prevMult < _curMult ? '#ff5252' : 'var(--sao-text-dim)';
+    const _prevEl = document.createElement('div'); _prevEl.className = 'aura-preview-line';
+    _prevEl.innerHTML = `Tomorrow aura: <span style="color:${_pc};font-weight:600">×${_prevMult}${_prevMult>_curMult?' ↑':_prevMult<_curMult?' ↓':''}</span>`;
+    dBar.appendChild(_prevEl);
+  }
   const dBanner=document.createElement('div'); dBanner.className='quests-complete-banner'+(dPct===100?' active':'');
   if(dPct===100) dBanner.textContent='⟦ ALL QUESTS COMPLETE ⟧';
   dBar.appendChild(dBanner); dailyGroup.appendChild(dBar);
@@ -9248,6 +9908,43 @@ function renderHabitos() {
   avoidGroup.appendChild(negList);
   panelContent.appendChild(avoidGroup);
 
+  // ── SOCIAL QUICK-LOG ──
+  if (isToday) {
+    const socialGroup = document.createElement('div'); socialGroup.className = 'section-group';
+    const ssh = document.createElement('div'); ssh.className = 'section-header';
+    ssh.innerHTML = `<span class="section-label" style="color:#ea80fc;opacity:0.85">⟦ SOCIAL LOG ⟧</span><div class="section-line" style="background:rgba(234,128,252,0.25)"></div>`;
+    socialGroup.appendChild(ssh);
+    const qlWrap = document.createElement('div');
+    const chipsRow = document.createElement('div'); chipsRow.className = 'social-quicklog-chips';
+    SOCIAL_STATS.forEach(def => {
+      const pts = (state.socialStats || {})[def.id] || 0;
+      const rank = getSocialRank(pts);
+      const isOpen = _habitSocialPickerOpen === def.id;
+      const btn = document.createElement('button');
+      btn.className = 'social-ql-btn' + (isOpen ? ' ql-open' : '');
+      btn.style.borderColor = isOpen ? def.color + '88' : def.color + '33';
+      btn.innerHTML = `${def.emoji}<span class="social-ql-rank" style="color:${def.color}">Lv.${rank}</span>`;
+      btn.addEventListener('click', () => { _habitSocialPickerOpen = _habitSocialPickerOpen === def.id ? null : def.id; renderHabitos(); });
+      chipsRow.appendChild(btn);
+    });
+    qlWrap.appendChild(chipsRow);
+    if (_habitSocialPickerOpen) {
+      const openDef = SOCIAL_STATS.find(s => s.id === _habitSocialPickerOpen);
+      if (openDef) {
+        const picker = document.createElement('div'); picker.className = 'social-ql-picker';
+        picker.style.borderColor = openDef.color + '44';
+        openDef.acts.forEach(act => {
+          const ab = document.createElement('button'); ab.className = 'social-ql-act'; ab.textContent = act;
+          ab.addEventListener('click', () => logSocialAct(openDef.id, act));
+          picker.appendChild(ab);
+        });
+        qlWrap.appendChild(picker);
+      }
+    }
+    socialGroup.appendChild(qlWrap);
+    panelContent.appendChild(socialGroup);
+  }
+
   panelContent.appendChild(renderFooter('habitos'));
 }
 
@@ -9302,6 +9999,18 @@ function renderForge() {
       }).join('')}
     </div>`;
   wrap.appendChild(matBar);
+
+  // ── Craft quality chances ────────────────────────────────
+  const qualBar = document.createElement('div'); qualBar.className = 'forge-quality-bar';
+  qualBar.innerHTML = `
+    <div class="forge-quality-hdr">⟦ CRAFT QUALITY ⟧</div>
+    <div class="forge-quality-row">
+      <span class="forge-qual-chip fq-common">COMMON <span class="fq-pct">70%</span></span>
+      <span class="forge-qual-chip fq-fine">✦ FINE <span class="fq-pct">20%</span></span>
+      <span class="forge-qual-chip fq-superior">★ SUPERIOR <span class="fq-pct">8%</span></span>
+      <span class="forge-qual-chip fq-masterwork">👑 MASTERWORK <span class="fq-pct">2%</span></span>
+    </div>`;
+  wrap.appendChild(qualBar);
 
   // ── Craft Queue ──────────────────────────────────────────
   const _queue = (state.craftQueue || []);
@@ -9527,9 +10236,9 @@ function renderGuild() {
   wrap.appendChild(hdr);
 
   const TIERS = [
-    { label:'PRODUCTION', color:'#80deea', ids:['warehouse','alchemy'] },
-    { label:'ECONOMY',    color:'#ffc107', ids:['trade','scriptorium','anvil'] },
-    { label:'POWER',      color:'#ff8a80', ids:['barracks','sanctum','hall'] },
+    { label:'GROWTH', color:'#69f0ae', ids:['hall','trade','scriptorium'] },
+    { label:'FORGE',  color:'#ffd54f', ids:['anvil','warehouse'] },
+    { label:'POWER',  color:'#ff8a80', ids:['barracks','sanctum','alchemy'] },
   ];
 
   TIERS.forEach(tier => {
@@ -9544,7 +10253,7 @@ function renderGuild() {
       const lvl = gu[id] || 0;
       const isMaxed = lvl >= upg.maxLevel;
       const nextLvl = lvl + 1;
-      const cost = isMaxed ? 0 : upg.baseCost * nextLvl;
+      const cost = isMaxed ? 0 : calcGuildCost(upg, nextLvl);
       const canAfford = !isMaxed && (state.gold||0) >= cost;
 
       const pips = Array.from({length: upg.maxLevel}, (_,i) =>
@@ -9682,6 +10391,13 @@ function renderTrabajo() {
   // Divider
   const div=document.createElement('div'); div.className='dungeon-divider';
   div.innerHTML='<span>⟦ WORK QUESTS ⟧</span>'; panelContent.appendChild(div);
+  // Worker level badge
+  const _wlv = calcWorkerLevel(state.workXp || 0);
+  const _wlvEl = document.createElement('div');
+  _wlvEl.style.cssText = 'display:flex;flex-direction:column;align-items:center;padding:2px 0 8px;gap:3px;';
+  const _wlvPct = _wlv.level < 99 ? Math.round((_wlv.xpProgress / _wlv.xpPerLevel) * 100) : 100;
+  _wlvEl.innerHTML = `<span class="worker-level-badge">⚒ WORKER LV.${_wlv.level} · RANK ${_wlv.rank}</span><div class="worker-xp-bar-wrap" style="width:160px"><div class="worker-xp-bar-fill" style="width:${_wlvPct}%"></div></div><span style="font-family:'Rajdhani',sans-serif;font-size:9px;color:var(--sao-text-dim)">${_wlv.level<99?`${_wlv.xpProgress}/${_wlv.xpPerLevel} WXP to Lv.${_wlv.level+1}`:'MAX RANK'}</span>`;
+  panelContent.appendChild(_wlvEl);
   // Commission board
   panelContent.appendChild(renderCommissionBoard());
   const today=todayKey();
@@ -9820,7 +10536,7 @@ function renderCharStatusHeader() {
 
 function renderPersonaje() {
   panelTitle.textContent='CHARACTER STATUS'; panelSubtitle.textContent='Player attributes';
-  panelContent.innerHTML=`<div id="charStatusHeader" class="char-status-header"></div><div id="classPanelEl"></div><div id="combatMiniEl"></div><div class="character-grid"><div class="radar-card"><div class="radar-title">⟦ STAT MATRIX ⟧</div><canvas id="radarCanvas"></canvas></div><div class="stats-list" id="statsList"></div></div><div id="combatStatsEl"></div><div id="lockedClassGalleryEl"></div>`;
+  panelContent.innerHTML=`<div id="charStatusHeader" class="char-status-header"></div><div id="classPanelEl"></div><div class="stats-list" id="statsList"></div><div class="social-card" id="socialCardEl"></div><div id="combatStatsEl"></div><div id="lockedClassGalleryEl"></div>`;
   renderCharStatusHeader();
   renderClassPanel();
   const sl=document.getElementById('statsList');
@@ -9839,9 +10555,11 @@ function renderPersonaje() {
   }
 
   const _eqStats = getEquippedStats();
+  const _socialBonuses = getSocialStatBonuses();
   STAT_KEYS.forEach(k => {
     const pts = state.stats[k], passive = getClassPassiveBonus(k, state), t = tierFor(pts);
     const gearBonus = _eqStats[k] || 0;
+    const socialBonus = _socialBonuses[k] || 0;
     const nextTier = TIERS[TIERS.findIndex(x => x.t === t.tier)+1];
     const isOpen = openStatKey === k;
 
@@ -9881,7 +10599,7 @@ function renderPersonaje() {
       </div>
       <div class="stat-row-bar"><div class="stat-row-fill" style="width:${t.pctToNext}%;background:linear-gradient(90deg,${SCOL[k]}aa,${SCOL[k]})"></div></div>
       <div class="stat-row-foot">
-        <span class="stat-points">${fmtStat(pts)} PTS${passive>0?`<span class="stat-passive-bonus">+${passive}⚡</span>`:''}${gearBonus>0?`<span class="stat-gear-bonus">+${gearBonus}⚔</span>`:''}${statDeltas[k]?`<span class="stat-delta-badge">+${fmtStat(statDeltas[k])} ↑</span>`:''}</span>
+        <span class="stat-points">${fmtStat(pts)} PTS${passive>0?`<span class="stat-passive-bonus">+${passive}⚡</span>`:''}${gearBonus>0?`<span class="stat-gear-bonus">+${gearBonus}⚔</span>`:''}${socialBonus>0?`<span class="stat-social-bonus">+${socialBonus}💙</span>`:''}${statDeltas[k]?`<span class="stat-delta-badge">+${fmtStat(statDeltas[k])} ↑</span>`:''}</span>
         <span>${t.capped?'MAX RANK':`→ ${fmtStat(parseFloat((t.nextMin-pts).toFixed(1)))} pts to Rank ${nextTier.t}`}</span>
       </div>
       ${masteryTeaseHtml ? `<div class="stat-mastery-row">${masteryTeaseHtml}</div>` : ''}`;
@@ -9987,8 +10705,7 @@ function renderPersonaje() {
     }
     sl.appendChild(wrap);
   });
-  drawRadar();
-  renderCombatMini();
+  renderSocialStats();
   renderCombatStats();
   renderLockedClassGallery();
 }
@@ -10315,7 +11032,9 @@ function renderClassQuests() {
   if (!cls) return null;
 
   const today = todayKey();
-  const week  = isoWeekKey();
+  const viewDay = activeDate;
+  const isViewingToday = (viewDay === today);
+  const week  = isoWeekKey(new Date(viewDay + 'T12:00:00'));
   const cqs   = (state.classData.classQuests || {})[classId] || {};
   const isMastered = state.classData.masteredClasses[classId];
   const prog  = (state.classData.classQuestProgress || {})[classId] || {};
@@ -10324,6 +11043,8 @@ function renderClassQuests() {
   const threshold = CLASS_MASTERY_THRESHOLD[classId] || 150;
   const mastPct   = Math.min(100, Math.round((pts / threshold) * 100));
   const mastBarColor = isMastered ? 'var(--sao-gold)' : cls.color;
+  const trialDone    = !!(cqs.onetimeDone);
+  const barFull      = mastPct >= 100;
 
   // Panel wrapper
   const panel = document.createElement('div');
@@ -10347,6 +11068,8 @@ function renderClassQuests() {
   mastSpan.className = 'cq-mastery-label';
   if (isMastered) {
     mastSpan.innerHTML = '<span style="color:var(--sao-gold)">✦ CLASS MASTERED</span>';
+  } else if (barFull && !trialDone) {
+    mastSpan.innerHTML = '<span style="color:#ffc107">⚔ TRIAL PENDING</span>';
   } else {
     mastSpan.textContent = `${pts} / ${threshold} MST`;
   }
@@ -10366,7 +11089,9 @@ function renderClassQuests() {
     barWrap.style.marginTop = '6px';
     const barTrack = document.createElement('div'); barTrack.className = 'cq-mastery-track';
     const barFill = document.createElement('div'); barFill.className = 'cq-mastery-fill';
-    barFill.style.cssText = `width:${mastPct}%;background:${cls.color};box-shadow:0 0 6px ${cls.color}50`;
+    const fillColor = (barFull && !trialDone) ? '#ffc107' : cls.color;
+    const fillGlow  = (barFull && !trialDone) ? 'rgba(255,193,7,0.55)' : `${cls.color}50`;
+    barFill.style.cssText = `width:${mastPct}%;background:${fillColor};box-shadow:0 0 8px ${fillGlow}`;
     barTrack.appendChild(barFill); barWrap.appendChild(barTrack);
     hdr.appendChild(barWrap);
   }
@@ -10393,7 +11118,7 @@ function renderClassQuests() {
     const isIncremental = target > 1;
 
     let isDone = false;
-    if (key === 'daily')   isDone = !!(cqs.dailyDone  || {})[today];
+    if (key === 'daily')   isDone = !!(cqs.dailyDone  || {})[viewDay];
     if (key === 'weekly')  isDone = !!(cqs.weeklyDone || {})[week];
     if (key === 'onetime') isDone = !!cqs.onetimeDone;
 
@@ -10444,9 +11169,23 @@ function renderClassQuests() {
     xpChip.textContent = `+${xpAmt} EXP`;
     gains.appendChild(xpChip);
 
+    if (key === 'onetime') {
+      const trialChip = document.createElement('span');
+      trialChip.className = 'gain-chip cq-trial-chip';
+      trialChip.textContent = '⚔ MASTERY TRIAL';
+      gains.appendChild(trialChip);
+    }
+
     col.appendChild(txt);
     col.appendChild(desc);
     col.appendChild(gains);
+
+    if (key === 'onetime' && !isDone) {
+      const trialNote = document.createElement('div');
+      trialNote.className = 'cq-trial-note';
+      trialNote.textContent = '↑ Required to unlock class mastery';
+      col.appendChild(trialNote);
+    }
 
     // Incremental progress row
     if (isIncremental && !isDone) {
@@ -10464,7 +11203,12 @@ function renderClassQuests() {
       const plusBtn = document.createElement('button'); plusBtn.className = 'cq-plus-btn';
       plusBtn.style.setProperty('--cls-c', cls.color);
       plusBtn.textContent = '+1';
-      plusBtn.addEventListener('click', (e) => { e.stopPropagation(); incrementClassQuestProgress(classId, key); });
+      if (isViewingToday) {
+        plusBtn.addEventListener('click', (e) => { e.stopPropagation(); incrementClassQuestProgress(classId, key); });
+      } else {
+        plusBtn.disabled = true;
+        plusBtn.style.opacity = '0.35';
+      }
 
       progWrap.appendChild(track); progWrap.appendChild(countLbl); progWrap.appendChild(plusBtn);
       col.appendChild(progWrap);
@@ -10473,8 +11217,9 @@ function renderClassQuests() {
     card.appendChild(ring);
     card.appendChild(col);
 
-    // Tap-to-complete / tap-to-undo (onetime stays permanent)
+    // Tap-to-complete / tap-to-undo — locked when viewing a past/future day
     card.addEventListener('click', (e) => {
+      if (!isViewingToday) return;
       if (isIncremental) return;
       if (isDone && key === 'onetime') return;
       card.classList.add('quest-completing');
@@ -10512,9 +11257,20 @@ function renderClassPanel() {
     const chipsHtml  = cls.stats.map(s =>
       `<span class="cls-stat-chip" style="--chip-c:${STAT_COLORS[s]}">${s}</span>`
     ).join('');
+    const trialDone  = !!(state.classData.classQuests?.[eqId]?.onetimeDone);
+    const barFull    = mastPct >= 100;
+    const barColor   = isMastered ? 'var(--sao-gold)' : (barFull && !trialDone) ? '#ffc107' : cls.color;
+    const barGlow    = isMastered ? 'rgba(255,215,0,0.5)' : (barFull && !trialDone) ? 'rgba(255,193,7,0.55)' : `${cls.color}70`;
     const mastLabel  = isMastered
       ? `<span style="color:var(--sao-gold-soft)">✦ MASTERED</span>`
-      : `${pts} / ${threshold} MST`;
+      : (barFull && !trialDone)
+        ? `<span style="color:#ffc107">⚔ TRIAL PENDING</span>`
+        : `${pts} / ${threshold} MST`;
+    const trialHtml  = !isMastered
+      ? (barFull && !trialDone
+          ? `<div class="class-mastery-trial-gate">⚔ COMPLETE THE TRIAL TO UNLOCK MASTERY</div>`
+          : (!trialDone ? `<div class="class-mastery-trial-pending">⚔ Trial required for mastery</div>` : ''))
+      : '';
 
     panel.innerHTML += `
       <div class="class-equipped-display">
@@ -10525,11 +11281,15 @@ function renderClassPanel() {
         <div class="class-stats-chips">${chipsHtml}</div>
         <div class="class-passive-row">${passiveStr}</div>
         ${CLASS_DESCS[eqId] ? `<div class="class-panel-desc">${CLASS_DESCS[eqId]}</div>` : ''}
-        <div class="class-mastery-row">
-          <div class="class-mastery-bar">
-            <div class="class-mastery-fill" style="width:${mastPct}%;background:${cls.color};box-shadow:0 0 8px ${cls.color}"></div>
+        <div class="class-mastery-section">
+          <div class="class-mastery-header-row">
+            <span class="class-mastery-title">⟦ MASTERY ⟧</span>
+            <span class="class-mastery-label">${mastLabel}</span>
           </div>
-          <span class="class-mastery-label">${mastLabel}</span>
+          <div class="class-mastery-bar">
+            <div class="class-mastery-fill" style="width:${mastPct}%;background:${barColor};box-shadow:0 0 10px ${barGlow}"></div>
+          </div>
+          ${trialHtml}
         </div>
       </div>`;
   } else {
@@ -10924,6 +11684,53 @@ function drawRadar() {
     ctx.restore();
   }};
   radarChart=new Chart(canvas,{type:'radar',plugins:[rankPlugin],data:{labels:STAT_KEYS,datasets},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:14,bottom:26,left:12,right:12}},plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(6,26,43,0.95)',borderColor:'#4dd0e1',borderWidth:1,titleColor:'#ffc107',bodyColor:'#e0f7fa',titleFont:{family:'Cinzel',size:12},bodyFont:{family:'Rajdhani',size:13}}},scales:{r:{min:0,max:maxData,angleLines:{color:'rgba(77,208,225,0.25)'},grid:{color:'rgba(77,208,225,0.18)'},pointLabels:{color:'#e0f7fa',font:{family:'Cinzel',size:13,weight:'700'},padding:18},ticks:{display:false,stepSize:maxData/4}}}}});
+}
+
+let _socialPickerOpen = null;
+let _habitSocialPickerOpen = null;
+
+function renderSocialStats() {
+  const card = document.getElementById('socialCardEl'); if (!card) return;
+  const ss = state.socialStats || {};
+  card.innerHTML = `<div class="social-card-title">⟦ SOCIAL STATS ⟧</div><div class="social-stats-grid" id="socialGrid"></div>`;
+  const grid = card.querySelector('#socialGrid');
+  SOCIAL_STATS.forEach(def => {
+    const pts = ss[def.id] || 0;
+    const { rank, pct, toNext } = getSocialRankProgress(pts);
+    const bonus = (SOCIAL_RANK_BONUSES[rank - 1] || 0);
+    const rankName = (SOCIAL_RANK_NAMES[def.id] || [])[rank - 1] || '';
+    const isOpen = _socialPickerOpen === def.id;
+    const row = document.createElement('div');
+    row.innerHTML = `
+      <div class="social-stat-row" style="border-color:${isOpen ? def.color+'55' : 'rgba(77,208,225,0.12)'}">
+        <span class="social-stat-emoji">${def.emoji}</span>
+        <div class="social-stat-info">
+          <div class="social-stat-name">${def.name.toUpperCase()} <span style="color:${def.color};font-size:9px">Rank ${rank} · ${rankName}</span>${bonus>0?` <span style="color:${def.color};font-size:9px;font-weight:600">+${bonus} ${def.bonusStat}</span>`:''}</div>
+          <div class="social-stat-pts">${pts} pts${rank < 10 ? ` · ${toNext} to Rank ${rank+1}` : ' · MAX RANK'}</div>
+          <div class="social-stat-bar-wrap"><div class="social-stat-bar-fill" style="width:${pct}%;background:${def.color}"></div></div>
+        </div>
+        <button class="social-stat-add-btn" style="color:${def.color};border-color:${def.color}44" onclick="_socialPickerOpen=(_socialPickerOpen==='${def.id}'?null:'${def.id}');renderSocialStats()">+</button>
+      </div>
+      ${isOpen ? `<div class="social-act-picker">${def.acts.map(a=>`<button class="social-act-btn" onclick="logSocialAct('${def.id}','${a.replace(/'/g,'\\x27')}')">${a}</button>`).join('')}</div>` : ''}`;
+    grid.appendChild(row);
+  });
+}
+
+function logSocialAct(statId, actLabel) {
+  (SOCIAL_SOUNDS[statId] || (() => {}))();
+  if (!state.socialStats) state.socialStats = {};
+  const prevPts = state.socialStats[statId] || 0;
+  const prevRank = getSocialRank(prevPts);
+  state.socialStats[statId] = prevPts + 10;
+  const newRank = getSocialRank(state.socialStats[statId]);
+  _socialPickerOpen = null;
+  _habitSocialPickerOpen = null;
+  saveState();
+  const def = SOCIAL_STATS.find(s => s.id === statId);
+  showNotif(`${def?.emoji || '✨'} ${actLabel} · +10 ${def?.name || statId} pts`);
+  if (newRank > prevRank) setTimeout(() => showSocialRankUp(statId, newRank), 500);
+  if (currentTab === 'character') renderCharTab();
+  if (currentTab === 'habits') renderHabitos();
 }
 
 // ============================================================
@@ -12712,11 +13519,39 @@ function checkAvoidMilestones() {
   });
 }
 
+function _retroAwardAvoidMilestones(habit) {
+  const streak = getAvoidStreak(habit);
+  // Mark all past overlay thresholds as already-seen so they don't fire retroactively
+  [7,14,21,30,60,90,180,365].forEach(d => { if (streak >= d) habit.shownOverlayAt[d] = true; });
+  let totalXp = 0; const totalGains = {};
+  (habit.milestones || []).forEach(ms => {
+    if (streak >= ms.days && !habit.awardedMilestones[ms.days]) {
+      habit.awardedMilestones[ms.days] = true;
+      totalXp += ms.xp;
+      Object.entries(ms.gains || {}).forEach(([k,v]) => { totalGains[k] = (totalGains[k]||0) + v; });
+    }
+  });
+  if (totalXp > 0 || Object.keys(totalGains).length > 0) {
+    state.totalXp += totalXp; state.col = (state.col||0) + totalXp;
+    applyGainsWithClass(totalGains);
+    saveState();
+  }
+  if (streak >= 1) {
+    const earned = (habit.milestones||[]).filter(ms => streak >= ms.days).map(ms => ms.label);
+    setTimeout(() => {
+      showNotif(`🛡 ${streak}-day streak recognized${totalXp ? ` · +${totalXp} XP` : ''}${earned.length ? ` · ${earned.join(', ')}` : ''}`);
+    }, 700);
+  }
+}
+
 function confirmCleanToday(id, periodKey) {
   const task = (state.negativos||[]).find(t=>t.id===id); if (!task) return;
   if (!task.checkins)       task.checkins       = {};
   if (!task.shownOverlayAt) task.shownOverlayAt = {};
   if (task.checkins[periodKey]) return; // already checked in
+
+  // Initialise HP/MP to max before applying gains (prevents null → 0 making bars drop)
+  tickHpMp();
 
   // Grant XP + stats immediately, store so relapse can reverse
   const prevLv = calcLevel(state.totalXp).level;
@@ -12743,6 +13578,7 @@ function confirmCleanToday(id, periodKey) {
     task.shownOverlayAt[streak] = true;
   }
 
+  gainHpMpFromHabit(_ag);
   checkAvoidMilestones();
   saveState();
 
@@ -12750,7 +13586,7 @@ function confirmCleanToday(id, periodKey) {
   if (newLv > prevLv) afterLevelUp(newLv, prevLv, _ag, _pt);
   else checkStatRankUps(_ag, _pt);
 
-  if (navigator.vibrate) navigator.vibrate([30, 20, 60]);
+  playAvoidClean(); if (navigator.vibrate) navigator.vibrate([30, 20, 60]);
   renderAll();
 
   if (overlayMs) {
@@ -12794,7 +13630,7 @@ function showAvoidMilestoneOverlay(days, label, icon, rewards) {
 
   if (gold > 0) { state.col=(state.col||0)+gold; state.gold=Math.max(0,(state.gold||0)+gold); state.totalGoldEarned=(state.totalGoldEarned||0)+gold; }
   // XP comes exclusively from stat gains × 10; ignore rewards.xp
-  const _statGainsAms = statBonus > 0 ? {VOL: statBonus, INT: statBonus} : null;
+  const _statGainsAms = statBonus > 0 ? {STR:statBonus,DEX:statBonus,CON:statBonus,INT:statBonus,VOL:statBonus,CHA:statBonus} : null;
   const _autoXp = _statGainsAms ? Math.round(Object.values(_statGainsAms).reduce((s,v)=>s+v,0) * 10) : (xp > 0 ? xp : 0);
   if (_statGainsAms) awardStatsWithXP(_statGainsAms);
   else if (xp > 0) { state.totalXp=(state.totalXp||0)+xp; state.col=(state.col||0)+xp; }
@@ -12802,7 +13638,7 @@ function showAvoidMilestoneOverlay(days, label, icon, rewards) {
 
   const bonusParts = [];
   if (_autoXp > 0)    bonusParts.push(`+${_autoXp} EXP`);
-  if (statBonus > 0)  bonusParts.push(`VOL+${statBonus} · INT+${statBonus}`);
+  if (statBonus > 0)  bonusParts.push(`ALL STATS +${statBonus}`);
   if (gold > 0)       bonusParts.push(`🪙${gold}g`);
   const bonusStr = bonusParts.join(' · ');
 
@@ -12864,7 +13700,7 @@ function toggleNegativo(id, periodKey) {
     task.done[periodKey]=true;
     task.lastBreakDate = periodKey;
     task.cleanSinceDate = null;
-    if(navigator.vibrate) navigator.vibrate([30,50,30]);
+    playAvoidRelapse(); if(navigator.vibrate) navigator.vibrate([30,50,30]);
     showNegFloat(task.hp||30);
   }
   saveState(); renderAll();
@@ -12915,10 +13751,17 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
         ? { ..._tradeDrops, gold: (_tradeDrops.gold||0) * 2, matQty: (_tradeDrops.matQty||0) * 2 }
         : _tradeDrops;
       applyWorkDrops(_drops, 1);
+      const _wxpByDiff = {easy:15,normal:30,hard:50,legendary:80};
+      grantWorkXp(_wxpByDiff[task.difficulty] || 20);
       task.done[periodKey] = { gains:{}, xp:task.xp, drops:_drops, wasCrit:_isCritWork };
+      if (periodKey === todayKey() && state.workStreakCountedDay !== periodKey) {
+        state.workStreak = (state.workStreakLastDay === yesterdayKey()) ? (state.workStreak||0)+1 : 1;
+        state.workStreakLastDay    = periodKey;
+        state.workStreakCountedDay = periodKey;
+      }
       completedExpanded[listKey]=false;
       const newLv=calcLevel(state.totalXp).level;
-      playSwordSlash(); if(navigator.vibrate) navigator.vibrate(40);
+      playWorkComplete(); if(navigator.vibrate) navigator.vibrate([20,20,40]);
       const _matStr = _drops.matId ? ` · ${_drops.matEmoji}×${_drops.matQty}` : '';
       const _critTagWork = _isCritWork ? ' ⚡CRIT' : '';
       showNotif(`[SYSTEM] Task logged. +${task.xp} EXP · 🪙${_drops.gold}g${_matStr}${_critTagWork}`);
@@ -12941,7 +13784,7 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
       if (_isCrit) { if(navigator.vibrate) navigator.vibrate([10,20,80,25,160,25,80]); setTimeout(()=>showCritFloat(_scaledGains), _isPhoenix ? 650 : 180); }
       if(isFirst) { setTimeout(()=>showFirstHabitOverlay(), 320); }
       else if(isLast) { playLastHabit(); if(navigator.vibrate) navigator.vibrate([40,20,80]); }
-      else { playSwordSlash(); if(navigator.vibrate) navigator.vibrate(40); }
+      else { if(listKey==='weekly') { playWeeklyTap(); } else { playSwordSlash(); } if(navigator.vibrate) navigator.vibrate(40); }
       // HP restore: each completed habit restores 4% of max HP
       { const _mhp = calcMaxHP(); if (state.hp === null || state.hp === undefined) state.hp = _mhp; state.hp = Math.min(_mhp, state.hp + Math.round(_mhp * 0.04)); }
       const _tags = []; if(_isPhoenix) _tags.push(`×${_phoenixMult}🔥`); if(_isCrit) _tags.push('⚡CRIT');
@@ -13044,13 +13887,12 @@ function showPerfectDayOverlay() {
     <div class="pd-title">PERFECT<br>DAY</div>
     <div class="pd-divider"></div>
     <div class="pd-sub">ALL DAILY QUESTS CLEARED<br>STREAK PROTECTED</div>
-    <div class="pd-bonus">✦ +1 ALL STATS · +60 EXP · 🪙500g ✦</div>
+    <div class="pd-bonus">✦ +1 ALL STATS · +60 EXP ✦</div>
     <div class="pd-tap">TAP TO CONTINUE</div>
   `;
   document.body.appendChild(el);
   const _pdStatGains = {}; STAT_KEYS.forEach(k => _pdStatGains[k] = 1);
   awardStatsWithXP(_pdStatGains);
-  state.col = (state.col || 0) + 500;
   saveState();
   const dismiss = () => { el.classList.add('leaving'); setTimeout(() => el.remove(), 620); };
   el.addEventListener('click', dismiss);
@@ -13145,13 +13987,12 @@ function showWeeklyCompleteOverlay() {
     <div class="wc-title">ALL WEEKLIES<br>CLEARED</div>
     <div class="wc-divider"></div>
     <div class="wc-sub">EVERY WEEKLY QUEST COMPLETED<br>YOUR DEDICATION IS LEGENDARY</div>
-    <div class="wc-bonus">✦ +10 ALL STATS · +600 EXP · 🪙5000g ✦</div>
+    <div class="wc-bonus">✦ +10 ALL STATS · +600 EXP ✦</div>
     <div class="wc-tap">TAP TO CONTINUE</div>
   `;
   document.body.appendChild(el);
   const _wcGains = {}; STAT_KEYS.forEach(k => _wcGains[k] = 10);
   awardStatsWithXP(_wcGains);
-  state.col = (state.col || 0) + 5000;
   saveState();
   const dismiss = () => { el.classList.add('leaving'); setTimeout(() => el.remove(), 700); };
   el.addEventListener('click', dismiss);
@@ -13189,14 +14030,13 @@ function showPerfectWeekOverlay() {
     <div class="pw-stars-row">★ ★ ★ ★ ★ ★ ★</div>
     <div class="pw-divider"></div>
     <div class="pw-sub">7 CONSECUTIVE PERFECT DAYS<br>ALL DAILY QUESTS COMPLETED<br>YOU ARE UNSTOPPABLE</div>
-    <div class="pw-bonus">✦ +10 ALL STATS · +600 EXP · 🪙5000g ✦</div>
+    <div class="pw-bonus">✦ +10 ALL STATS · +600 EXP ✦</div>
     <div class="pw-count">PERFECT WEEKS: ${weekCount}</div>
     <div class="pw-tap">TAP TO CONTINUE</div>
   `;
   document.body.appendChild(el);
   const _pwStatGains = {}; STAT_KEYS.forEach(k => _pwStatGains[k] = 10);
   awardStatsWithXP(_pwStatGains);
-  state.col = (state.col || 0) + 5000;
   saveState();
   const dismiss = () => { el.classList.add('leaving'); setTimeout(() => el.remove(), 800); };
   el.addEventListener('click', dismiss);
@@ -13659,6 +14499,8 @@ function checkAllDone(listKey, periodKey) {
 }
 
 function deleteTask(listKey, id) { state[listKey]=state[listKey].filter(t=>t.id!==id); saveState(); renderAll(); }
+function archiveWorkTask(id) { const t=state.trabajo.find(t=>t.id===id); if(!t) return; t.manuallyArchived=true; saveState(); renderAll(); showNotif('[SYSTEM] Task archived.'); }
+function unarchiveWorkTask(id) { const t=state.trabajo.find(t=>t.id===id); if(!t) return; t.manuallyArchived=false; saveState(); renderAll(); showNotif('[SYSTEM] Task restored to active.'); }
 
 function applyMarkAll(simpleTasks, tieredSelections, listKey, periodKey) {
   simpleTasks.forEach(task=>{
@@ -13850,9 +14692,9 @@ function renderModalBody(existingHabit) {
     const name = existingHabit ? existingHabit.text : '';
     const hp   = existingHabit ? (existingHabit.hp||20) : 20;
     const xp   = existingHabit ? (existingHabit.xp||5) : 5;
-    const cleanSince = existingHabit && !existingHabit.lastBreakDate
-      ? (existingHabit.cleanSinceDate || existingHabit.createdDate || todayKey())
-      : null;
+    const cleanSince = existingHabit && existingHabit.lastBreakDate
+      ? null
+      : (existingHabit ? (existingHabit.cleanSinceDate || existingHabit.createdDate) : null) || todayKey();
     body.innerHTML = `
       <div class="m-field">
         <label class="m-label">HABIT TO AVOID</label>
@@ -14055,6 +14897,7 @@ function saveHabit() {
     const hp  = Math.max(1, parseInt(document.getElementById('mHpInput')?.value)||20);
     const xp  = Math.max(1, parseInt(document.getElementById('mXpInput')?.value)||5);
     const gains = {...modalData.gains};
+    let _retroNeg = null;
     if (modalData.mode==='edit' && modalData.editId) {
       const idx=(state.negativos||[]).findIndex(n=>n.id===modalData.editId);
       if(idx>=0){
@@ -14064,10 +14907,19 @@ function saveHabit() {
       }
     } else {
       if(!state.negativos) state.negativos=[];
-      state.negativos.push({id:'neg'+Date.now(),text:name,hp,xp,gains,done:{},passiveDates:{}});
+      const csdVal = document.getElementById('mCleanSinceInput')?.value || todayKey();
+      const cleanSinceDate = csdVal && csdVal <= todayKey() ? csdVal : todayKey();
+      _retroNeg = {
+        id:'neg'+Date.now(), text:name, hp, xp, gains,
+        done:{}, passiveDates:{}, checkins:{}, shownOverlayAt:{}, awardedMilestones:{},
+        createdDate:todayKey(), lastBreakDate:null, cleanSinceDate,
+        milestones:DEFAULT_NEG_MILESTONES.map(m=>({...m}))
+      };
+      state.negativos.push(_retroNeg);
     }
     saveState(); closeModal(); renderAll();
     showNotif('⚠ Avoid habit saved');
+    if (_retroNeg) _retroAwardAvoidMilestones(_retroNeg);
     return;
   }
 
@@ -14229,6 +15081,7 @@ function tickDungeon() {
       // Forge task: partial gold + 1 category mat per session
       if (d.activeWorkTaskId) {
         d.forgeTaskPomoCount=(d.forgeTaskPomoCount||0)+1;
+        state.totalForgePomos=(state.totalForgePomos||0)+1;
         const fTask=(state.trabajo||[]).find(t=>t.id===d.activeWorkTaskId);
         const CAT_MAT={mental:{id:'scroll',emoji:'📜'},physical:{id:'timber',emoji:'🪵'},creative:{id:'crystal',emoji:'💎'},operational:{id:'gear',emoji:'⚙️'}};
         const fm=fTask&&fTask.category?CAT_MAT[fTask.category]:null;
@@ -14236,6 +15089,7 @@ function tickDungeon() {
         applyWorkDrops(forgeDrop,1);
         const fMatStr=fm?` · ${fm.emoji}×1`:'';
         showNotif(`⚒ Session ${d.forgeTaskPomoCount} · +5g${fMatStr}`);
+        grantWorkXp(15);
       }
     } else {
       d.pomodoroPhase='work';
@@ -14618,10 +15472,18 @@ function renderDungeonSelect() {
     btn.className=`dungeon-rank-tab rank-${rank}${selectedDungeonRank===rank?' active':''}${!unlocked?' locked':''}`;
     btn.textContent=unlocked?rank:`${rank} 🔒`;
     btn.title=unlocked?`Rank ${rank}`:`Unlocks at level ${DUNGEON_RANK_UNLOCK[rank]}`;
-    if (unlocked) btn.addEventListener('click',()=>{ selectedDungeonRank=rank; selectedDungeonId=null; renderAll(); });
+    btn.addEventListener('click',()=>{ selectedDungeonRank=rank; selectedDungeonId=null; renderAll(); });
     tabs.appendChild(btn);
   });
   w.appendChild(tabs);
+
+  // Lock info banner when viewing a locked rank
+  const _selRankLocked = playerLevel < (DUNGEON_RANK_UNLOCK[selectedDungeonRank]||1);
+  if (_selRankLocked) {
+    const lockInfo = document.createElement('div'); lockInfo.className = 'dungeon-rank-lock-info';
+    lockInfo.innerHTML = `🔒 Rank <strong>${selectedDungeonRank}</strong> — Reach <strong style="color:var(--sao-gold)">Level ${DUNGEON_RANK_UNLOCK[selectedDungeonRank]}</strong> to unlock these dungeons`;
+    w.appendChild(lockInfo);
+  }
 
   // Session length toggle (inline with rank label)
   const pomoRow=document.createElement('div');
@@ -14662,7 +15524,7 @@ function renderDungeonSelect() {
       <div class="dcc-name">${cfg.name}</div>
       <div class="dcc-badges"><span class="dcc-stat-badge">+${cfg.rewardStatAmt} ${cfg.rewardStat}</span></div>
       <div class="dcc-info-row">
-        <span class="dcc-xp">🪙 ~${getStageDrop(cfg).gold * cfg.stages}g</span>
+        <span class="dcc-xp">🪙 ${(()=>{ const _b=getStageDrop(cfg,true); return `${Math.round(_b.gold*0.8)*cfg.stages}–${Math.round(_b.gold*1.2)*cfg.stages}`; })()}g</span>
         <span class="dcc-time">⏱ ${cfg.minHours}h</span>
       </div>
       ${!isUnlocked?`<div class="dcc-lock-overlay"><span>🔒</span><span>LV ${cfg.unlockLevel}</span></div>`:''}`;
@@ -14718,7 +15580,8 @@ function renderDungeonExplore() {
 
   // Stage reward preview (uses base values — no randomness)
   const previewDrop=getStageDrop(cfg,true);
-  const rewardPreview=`<span class="dexp-rwd-chip dexp-rwd-xp">+${previewDrop.xp}XP</span><span class="dexp-rwd-chip dexp-rwd-gold">~${previewDrop.gold}g</span><span class="dexp-rwd-chip dexp-rwd-mat">${previewDrop.matEmoji}×${previewDrop.matQty}</span>`;
+  const _minG=Math.round(previewDrop.gold*0.8), _maxG=Math.round(previewDrop.gold*1.2);
+  const rewardPreview=`<span class="dexp-rwd-chip dexp-rwd-xp">+${previewDrop.xp}XP</span><span class="dexp-rwd-chip dexp-rwd-gold">${_minG}–${_maxG}g</span><span class="dexp-rwd-chip dexp-rwd-mat">${previewDrop.matEmoji}×${previewDrop.matQty}</span>`;
 
   // Total gold earned so far this expedition
   const earnedGold=(d.stageRewardsLog||[]).reduce((s,r)=>s+(r.gold||0),0);
