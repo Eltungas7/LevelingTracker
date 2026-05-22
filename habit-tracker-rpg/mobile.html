@@ -7,6 +7,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>SAO // Daily Quests</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="theme-color" content="#020d14">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -351,6 +354,159 @@ body {
 }
 .lvup-cstat-name { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1px; color: var(--sao-text-dim); }
 .lvup-cstat-change { font-size: 10px; color: var(--sao-text); }
+
+/* ── Hunter Grade Up Overlay ─────────────────────────────── */
+.hg-overlay {
+  position: fixed; inset: 0; z-index: 8000;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.97) 70%);
+  backdrop-filter: blur(14px);
+  animation: hgFadeIn 0.5s cubic-bezier(0.22,1,0.36,1);
+  cursor: pointer; user-select: none;
+}
+@keyframes hgFadeIn { from{opacity:0} to{opacity:1} }
+.hg-overlay.hg-epic-4 { animation: hgFadeIn 0.5s, hgFlashPulse 0.6s 0.1s; }
+.hg-overlay.hg-epic-5 { animation: hgFadeIn 0.5s, hgFlashPulse 0.5s 0.05s, hgShake 0.55s 0.15s; }
+.hg-overlay.hg-epic-6 { animation: hgFadeIn 0.5s, hgFlashPulse 0.4s 0.0s, hgShake 0.6s 0.1s; }
+.hg-overlay.hg-epic-7 { animation: hgFadeIn 0.8s cubic-bezier(0,1,0.3,1); }
+@keyframes hgFlashPulse { 0%{filter:brightness(1)} 30%{filter:brightness(3)} 60%{filter:brightness(1.5)} 100%{filter:brightness(1)} }
+@keyframes hgShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-7px)} 40%{transform:translateX(7px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+.hg-panel {
+  text-align: center; padding: 36px 28px 26px;
+  max-width: min(340px, 92vw); width: 100%;
+  position: relative; z-index: 1;
+  animation: hgPanelIn 0.55s cubic-bezier(0.17,0.67,0.35,1.25);
+}
+.hg-epic-7 .hg-panel { animation: hgSSSReveal 1.4s cubic-bezier(0,1,0.3,1); }
+@keyframes hgPanelIn { from{transform:scale(0.75) translateY(24px);opacity:0} to{transform:scale(1) translateY(0);opacity:1} }
+@keyframes hgSSSReveal { 0%{transform:scale(0.4);opacity:0;filter:brightness(4)} 50%{transform:scale(1.06);filter:brightness(1.5)} 100%{transform:scale(1);opacity:1;filter:brightness(1)} }
+.hg-eyebrow {
+  font-family:'Cinzel',serif; font-size:8px; letter-spacing:6px;
+  color:rgba(255,255,255,0.3); margin-bottom:18px; text-transform:uppercase;
+}
+.hg-transition-row {
+  display:flex; align-items:center; justify-content:center;
+  gap:18px; margin-bottom:22px;
+}
+.hg-old-grade {
+  font-family:'Cinzel',serif; font-size:30px; font-weight:700;
+  opacity:0.3; letter-spacing:2px;
+}
+.hg-arrow-sym { font-size:18px; color:rgba(255,255,255,0.25); }
+.hg-new-grade {
+  font-family:'Cinzel',serif; font-size:58px; font-weight:700;
+  letter-spacing:4px; line-height:1;
+  color:var(--hg-color,#ffd700);
+  text-shadow:0 0 25px var(--hg-color,#ffd700), 0 0 55px color-mix(in srgb,var(--hg-color,#ffd700) 45%,transparent);
+  animation:hgGlow 2s ease-in-out infinite alternate;
+}
+@keyframes hgGlow {
+  from { text-shadow:0 0 20px var(--hg-color,#ffd700), 0 0 45px color-mix(in srgb,var(--hg-color,#ffd700) 30%,transparent); }
+  to   { text-shadow:0 0 45px var(--hg-color,#ffd700), 0 0 90px color-mix(in srgb,var(--hg-color,#ffd700) 55%,transparent), 0 0 140px color-mix(in srgb,var(--hg-color,#ffd700) 20%,transparent); }
+}
+.hg-epic-5 .hg-new-grade, .hg-epic-6 .hg-new-grade, .hg-epic-7 .hg-new-grade {
+  animation:hgGlow 1.4s ease-in-out infinite alternate, hgIntensePulse 0.8s ease-in-out infinite;
+}
+@keyframes hgIntensePulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
+.hg-main-title {
+  font-family:'Cinzel',serif; font-size:13px; font-weight:700;
+  letter-spacing:4px; color:#fff; margin-bottom:10px;
+  text-shadow:0 0 12px rgba(255,255,255,0.35);
+}
+.hg-epic-5 .hg-main-title, .hg-epic-6 .hg-main-title, .hg-epic-7 .hg-main-title {
+  font-size:15px; letter-spacing:5px; color:var(--hg-color,#ffd700);
+  text-shadow:0 0 20px var(--hg-color,#ffd700), 0 0 40px color-mix(in srgb,var(--hg-color,#ffd700) 30%,transparent);
+}
+.hg-subtitle {
+  font-family:'Rajdhani',sans-serif; font-size:12px;
+  color:rgba(255,255,255,0.5); letter-spacing:1px; line-height:1.7;
+  margin-bottom:20px; max-width:260px; margin-left:auto; margin-right:auto;
+  white-space:pre-line;
+}
+.hg-epic-7 .hg-subtitle { color:rgba(255,255,255,0.7); font-size:13px; }
+.hg-stat-info {
+  font-family:'Rajdhani',sans-serif; font-size:10px; letter-spacing:2px;
+  color:rgba(255,255,255,0.22); margin-bottom:22px;
+}
+.hg-dismiss {
+  font-family:'Cinzel',serif; font-size:9px; letter-spacing:3px;
+  color:rgba(255,255,255,0.2);
+  animation:hgBlink 2s ease-in-out infinite;
+}
+@keyframes hgBlink { 0%,100%{opacity:0.2} 50%{opacity:0.55} }
+/* Expanding rings (C and above) */
+.hg-ring {
+  position:fixed; top:50%; left:50%;
+  border-radius:50%; border:1px solid var(--hg-color,#ffd700);
+  transform:translate(-50%,-50%); pointer-events:none;
+  animation:hgRingExpand var(--rdur,2.5s) ease-out infinite var(--rdelay,0s);
+}
+@keyframes hgRingExpand { 0%{width:80px;height:80px;opacity:0.7} 100%{width:500px;height:500px;opacity:0} }
+/* Floating particles (B and above) */
+.hg-particle {
+  position:fixed; border-radius:50%;
+  background:var(--hg-color,#ffd700);
+  pointer-events:none; opacity:0;
+  animation:hgParticle var(--pdur,3s) ease-in-out infinite var(--pdelay,0s);
+}
+@keyframes hgParticle {
+  0%   { opacity:0; transform:translate(var(--px,0px),var(--py,0px)) scale(0); }
+  20%  { opacity:0.9; transform:translate(var(--px,0px),calc(var(--py,0px) - 20px)) scale(1); }
+  100% { opacity:0; transform:translate(calc(var(--px,0px) + var(--dx,0px)), calc(var(--py,0px) - 120px)) scale(0.2); }
+}
+/* Grade-specific overlay tints */
+.hg-epic-2 { background:radial-gradient(ellipse at center,rgba(80,0,80,0.25) 0%,rgba(0,0,0,0.97) 65%); }
+.hg-epic-3 { background:radial-gradient(ellipse at center,rgba(60,40,0,0.3) 0%,rgba(0,0,0,0.97) 65%); }
+.hg-epic-4 { background:radial-gradient(ellipse at center,rgba(80,20,0,0.35) 0%,rgba(0,0,0,0.97) 65%); }
+.hg-epic-5 { background:radial-gradient(ellipse at center,rgba(60,0,0,0.4) 0%,rgba(0,0,0,0.98) 65%); }
+.hg-epic-6 { background:radial-gradient(ellipse at center,rgba(0,40,60,0.4) 0%,rgba(0,0,0,0.98) 65%); }
+.hg-epic-7 { background:radial-gradient(ellipse at center,rgba(40,30,0,0.35) 0%,rgba(0,0,0,0.99) 60%); }
+/* Adventure title on char header */
+.char-adventure-title {
+  font-family:'Cinzel',serif; font-size:10px; letter-spacing:3px;
+  text-align:center; margin:3px 0 0; opacity:0.75;
+}
+/* Hunter grade badge on header */
+.hg-badge-inline {
+  font-family:'Cinzel',serif; font-size:9px; letter-spacing:2px;
+  display:inline-block; padding:1px 7px; border-radius:3px;
+  border:1px solid; margin-left:5px; vertical-align:middle;
+}
+/* Hunter Grade section in char status header */
+.char-hunter-grade-row { margin-bottom:10px; }
+.char-hg-top {
+  display:flex; align-items:center; justify-content:space-between; margin-bottom:5px;
+}
+.char-hg-left { display:flex; align-items:center; gap:7px; }
+.char-hunter-grade-label {
+  font-family:'Cinzel',serif; font-size:8px; letter-spacing:3px;
+  color:rgba(255,255,255,0.28); text-transform:uppercase;
+}
+.char-hunter-grade-badge {
+  font-family:'Cinzel',serif; font-size:10px; font-weight:700; letter-spacing:2px;
+  padding:1px 8px; border-radius:3px; border:1px solid;
+  text-shadow:0 0 10px currentColor;
+}
+.char-hg-next-badge {
+  font-family:'Cinzel',serif; font-size:9px; font-weight:700; letter-spacing:2px;
+  padding:1px 7px; border-radius:3px; border:1px dashed;
+  opacity:0.55;
+}
+.char-hg-arrow { font-size:10px; color:rgba(255,255,255,0.22); }
+.char-hg-pct {
+  font-family:'Cinzel',serif; font-size:10px; font-weight:700; letter-spacing:1px;
+}
+.char-hg-bar-track {
+  height:3px; background:rgba(255,255,255,0.07); border-radius:2px; overflow:hidden; margin-bottom:4px;
+}
+.char-hg-bar-fill {
+  height:100%; border-radius:2px; box-shadow:0 0 6px currentColor;
+  transition:width 0.4s ease;
+}
+.char-hg-bar-sub {
+  display:flex; justify-content:space-between;
+  font-size:9px; color:var(--sao-text-dim); letter-spacing:0.3px;
+}
 .lvup-btn {
   width: 100%; margin-top: 4px;
   background: none; border: 1px solid var(--lvup-rc, #4dd0e1);
@@ -764,6 +920,51 @@ body {
 .streak-badge.streak-ultra { color: #ff1744; text-shadow: 0 0 16px rgba(255,23,68,0.9); animation: streak-ultra-pulse 1.5s ease-in-out infinite; }
 @keyframes streak-hot-pulse { 0%,100%{opacity:0.85} 50%{opacity:1;text-shadow:0 0 18px rgba(255,87,34,0.95);} }
 @keyframes streak-ultra-pulse { 0%,100%{text-shadow:0 0 16px rgba(255,23,68,0.8),0 0 32px rgba(255,23,68,0.3);} 50%{text-shadow:0 0 26px rgba(255,23,68,1),0 0 50px rgba(255,23,68,0.55);} }
+
+/* ── MASTERED HABIT (66-day streak) ── */
+.quest.mastered-habit { animation: mastered-border-pulse 3s ease-in-out infinite; }
+@keyframes mastered-border-pulse {
+  0%,100% { border-color: rgba(255,213,79,0.55); box-shadow: 0 0 10px rgba(255,193,7,0.12); }
+  50%      { border-color: rgba(255,215,0,0.9);  box-shadow: 0 0 22px rgba(255,193,7,0.38), 0 0 40px rgba(255,193,7,0.12); }
+}
+.streak-badge.streak-mastered { color: #ffd700; font-size: 12px; animation: mastered-badge-pulse 2.5s ease-in-out infinite; }
+@keyframes mastered-badge-pulse {
+  0%,100% { text-shadow: 0 0 10px rgba(255,215,0,0.8), 0 0 20px rgba(255,193,7,0.4); }
+  50%      { text-shadow: 0 0 18px rgba(255,215,0,1),  0 0 36px rgba(255,193,7,0.7); }
+}
+/* mastery ceremony overlay */
+.mastery-ceremony-ov {
+  position: fixed; inset: 0; z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.78); backdrop-filter: blur(6px);
+  animation: mco-in 0.45s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes mco-in { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:scale(1); } }
+.mastery-ceremony-ov.mco-out { animation: mco-out 0.35s ease forwards; }
+@keyframes mco-out { to { opacity:0; transform:scale(1.04); } }
+.mco-inner {
+  position: relative; width: min(340px, 88vw);
+  background: linear-gradient(160deg, rgba(30,26,18,0.98) 0%, rgba(18,15,8,0.99) 100%);
+  border: 1px solid rgba(255,213,79,0.65);
+  border-radius: 12px; padding: 34px 28px 28px;
+  box-shadow: 0 0 40px rgba(255,193,7,0.25), 0 0 80px rgba(255,193,7,0.08);
+  text-align: center; animation: mco-glow-pulse 2.5s ease-in-out infinite;
+}
+@keyframes mco-glow-pulse {
+  0%,100% { box-shadow: 0 0 30px rgba(255,193,7,0.2), 0 0 60px rgba(255,193,7,0.07); }
+  50%      { box-shadow: 0 0 50px rgba(255,193,7,0.38), 0 0 90px rgba(255,193,7,0.14); }
+}
+.mco-scan { position:absolute;inset:0;border-radius:12px;overflow:hidden;pointer-events:none; }
+.mco-scan::after { content:'';position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,213,79,0.6),transparent);animation:mco-scan-anim 2s linear 1; }
+@keyframes mco-scan-anim { from{top:-2px} to{top:100%} }
+.mco-crown { font-size: 42px; margin-bottom: 10px; animation: mco-crown-drop 0.55s cubic-bezier(0.34,1.56,0.64,1) 0.15s both; }
+@keyframes mco-crown-drop { from{opacity:0;transform:translateY(-18px) scale(0.7)} to{opacity:1;transform:translateY(0) scale(1)} }
+.mco-eyebrow { font-family:'Cinzel',serif; font-size:9px; letter-spacing:3px; color:rgba(255,213,79,0.65); margin-bottom:8px; }
+.mco-title { font-family:'Cinzel',serif; font-size:18px; letter-spacing:2px; color:#ffd700; font-weight:700; margin-bottom:14px; text-shadow:0 0 16px rgba(255,215,0,0.7); }
+.mco-habit { font-family:'Cinzel',serif; font-size:13px; color:#fff8e1; margin-bottom:10px; line-height:1.5; }
+.mco-body { font-family:'Rajdhani',sans-serif; font-size:13px; color:rgba(255,213,79,0.75); letter-spacing:0.5px; line-height:1.6; margin-bottom:18px; }
+.mco-bonus { display:inline-block; font-family:'Rajdhani',sans-serif; font-size:11px; letter-spacing:1.5px; color:rgba(255,213,79,0.55); border:1px solid rgba(255,213,79,0.25); border-radius:4px; padding:4px 10px; margin-bottom:18px; }
+.mco-tap { font-family:'Cinzel',serif; font-size:8px; letter-spacing:2px; color:rgba(255,213,79,0.4); }
 
 /* ── WEEKLY URGENCY ── */
 .section-meta.urgent-warn { color: #ffc107; }
@@ -4373,6 +4574,59 @@ body {
   color: var(--sao-weekly); padding: 11px 32px; border-radius: 4px;
 }
 .wr-dismiss-btn:active { background: rgba(179,157,219,0.12); }
+.wr-action-row { display: flex; gap: 8px; margin-top: 28px; }
+.wr-reflect-btn {
+  flex: 2; background: rgba(179,157,219,0.14); border: 1px solid rgba(179,157,219,0.7);
+  cursor: pointer; font-family: 'Cinzel', serif; font-size: 10px;
+  letter-spacing: 1.5px; color: #fff; padding: 11px 18px; border-radius: 4px;
+  transition: background 0.2s;
+}
+.wr-reflect-btn:active { background: rgba(179,157,219,0.28); }
+.wr-reflected-badge {
+  font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px;
+  color: var(--sao-green); text-align: center; margin-top: 18px; opacity: 0.75;
+}
+.wr-reflect-section { margin-bottom: 20px; }
+.wr-reflect-label {
+  font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 3px;
+  color: var(--sao-weekly); opacity: 0.7; text-align: center; margin-bottom: 10px;
+}
+.wr-stars { display: flex; justify-content: center; gap: 14px; margin-bottom: 4px; }
+.wr-star {
+  font-size: 28px; cursor: pointer; color: rgba(179,157,219,0.2);
+  transition: color 0.12s, transform 0.12s; user-select: none;
+}
+.wr-star.active { color: var(--sao-weekly); transform: scale(1.12); }
+.wr-note-input {
+  width: 100%; background: rgba(179,157,219,0.06); border: 1px solid rgba(179,157,219,0.25);
+  border-radius: 6px; padding: 11px 12px; color: var(--sao-text);
+  font-family: 'Rajdhani', sans-serif; font-size: 14px; resize: none; outline: none; line-height: 1.4;
+}
+.wr-note-input:focus { border-color: rgba(179,157,219,0.5); }
+.wr-note-input::placeholder { color: rgba(224,247,250,0.28); }
+.wr-reflect-reward {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  margin: 16px 0 0; font-size: 12px; color: var(--sao-text-dim);
+  padding: 9px 12px; background: rgba(179,157,219,0.05); border-radius: 5px;
+  border: 1px solid rgba(179,157,219,0.13);
+}
+.wr-begin-btn {
+  display: block; margin: 22px auto 0;
+  background: rgba(179,157,219,0.15); border: 1px solid rgba(179,157,219,0.7);
+  cursor: pointer; font-family: 'Cinzel', serif; font-size: 11px;
+  letter-spacing: 2px; color: #fff; padding: 12px 32px; border-radius: 4px;
+  transition: background 0.2s;
+}
+.wr-begin-btn:active { background: rgba(179,157,219,0.3); }
+.wr-refl-list { display: flex; flex-direction: column; gap: 8px; margin: 8px 0 16px; }
+.wr-refl-item {
+  background: rgba(179,157,219,0.05); border: 1px solid rgba(179,157,219,0.15);
+  border-radius: 6px; padding: 9px 12px;
+}
+.wr-refl-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
+.wr-refl-week { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 2px; color: var(--sao-weekly); opacity: 0.7; }
+.wr-refl-stars { font-size: 11px; letter-spacing: 1px; color: var(--sao-weekly); }
+.wr-refl-note { font-size: 12px; color: var(--sao-text-dim); font-style: italic; line-height: 1.4; }
 .hist-footer { display: flex; justify-content: center; gap: 10px; padding: 20px 0 8px; }
 .hist-wr-btn { font-size: 9px; padding: 7px 18px; letter-spacing: 2px; }
 
@@ -4712,6 +4966,47 @@ body {
 .quality-masterwork { color: #ffd700; }
 .quality-superior   { color: #82b1ff; }
 .quality-fine       { color: #4dd0e1; }
+
+/* ── BACKUP NUDGE ── */
+#backupNudge {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  background: rgba(255,193,7,0.07);
+  border-bottom: 1px solid rgba(255,193,7,0.22);
+  flex-shrink: 0;
+}
+.nudge-msg {
+  flex: 1;
+  font-size: 12px;
+  color: #ffc107;
+  font-family: 'Rajdhani', sans-serif;
+  line-height: 1.3;
+}
+.nudge-export {
+  background: rgba(255,193,7,0.12);
+  border: 1px solid rgba(255,193,7,0.4);
+  color: #ffc107;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.nudge-dismiss {
+  background: none;
+  border: none;
+  color: rgba(255,193,7,0.4);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  flex-shrink: 0;
+}
 </style>
 </head>
 <body>
@@ -4772,6 +5067,12 @@ body {
     <div class="tab" data-tab="work"><span class="tab-icon">⚒</span>WORK</div>
     <div class="tab" data-tab="log"><span class="tab-icon">📋</span>LOG</div>
   </nav>
+
+  <div id="backupNudge">
+    <span class="nudge-msg">⚠ Never backed up — data lives in this browser only</span>
+    <button class="nudge-export" onclick="exportSave()">EXPORT NOW</button>
+    <button class="nudge-dismiss" onclick="dismissBackupNudge()">✕</button>
+  </div>
 
   <div class="panel" id="mainPanel">
     <div class="panel-header">
@@ -4858,6 +5159,10 @@ body {
 const STORAGE_KEY = 'sao_habit_tracker_v4';
 const OLD_KEY_V3  = 'sao_habit_tracker_v3';
 
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
 // ============================================================
 // SOUND ENGINE — Final Fantasy X inspired
 // ============================================================
@@ -4910,12 +5215,15 @@ function executeFullReset() {
 }
 
 function exportSave() {
+  state.lastExportTs = Date.now();
+  saveState();
   const data = JSON.stringify(state, null, 2);
   const blob = new Blob([data], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url; a.download = `sao_save_${todayKey()}.json`; a.click();
   URL.revokeObjectURL(url);
+  dismissBackupNudge();
   showNotif('💾 Save exported!');
 }
 function importSave() {
@@ -5562,14 +5870,14 @@ const TIER_COLORS = { F:'#9e9e9e', E:'#66bb6a', D:'#42a5f5', C:'#ab47bc', B:'#ff
 // ── Level progression ────────────────────────────────────────
 const MAX_LEVEL = 99;
 const LEVEL_BANDS = [
-  { rank:'E',   from:1,  to:10, xpPerLevel:1200  },
-  { rank:'D',   from:11, to:20, xpPerLevel:1800  },
-  { rank:'C',   from:21, to:35, xpPerLevel:2400  },
-  { rank:'B',   from:36, to:50, xpPerLevel:3200  },
-  { rank:'A',   from:51, to:69, xpPerLevel:3200  },
-  { rank:'S',   from:70, to:84, xpPerLevel:9200  },
-  { rank:'SS',  from:85, to:94, xpPerLevel:15600 },
-  { rank:'SSS', from:95, to:99, xpPerLevel:32000 },
+  { rank:'E',   from:1,  to:10, xpPerLevel:1200,  title:'Beginner Adventurer'     },
+  { rank:'D',   from:11, to:20, xpPerLevel:1800,  title:'Adept Adventurer'        },
+  { rank:'C',   from:21, to:35, xpPerLevel:2400,  title:'Experienced Adventurer'  },
+  { rank:'B',   from:36, to:50, xpPerLevel:3200,  title:'Renowned Adventurer'     },
+  { rank:'A',   from:51, to:69, xpPerLevel:3200,  title:'Legendary Adventurer'    },
+  { rank:'S',   from:70, to:84, xpPerLevel:9200,  title:'Mythic Adventurer'       },
+  { rank:'SS',  from:85, to:94, xpPerLevel:15600, title:'Transcendent Adventurer' },
+  { rank:'SSS', from:95, to:99, xpPerLevel:32000, title:'Absolute Adventurer'     },
 ];
 // LEVEL_XP_TABLE[n] = total XP needed to reach level n
 const LEVEL_XP_TABLE = (() => {
@@ -5584,6 +5892,74 @@ function xpForLevel(lv) {
   const band = LEVEL_BANDS.find(b => lv >= b.from && lv <= b.to);
   return band ? band.xpPerLevel : 21000;
 }
+
+// ── Hunter Grade (stat-based prestige rank) ──────────────────
+// Uses the same TIERS thresholds applied to the average of all 6 stats.
+// Each threshold × 6 = total stats required (e.g. S=5000 → 30,000 total).
+const HUNTER_GRADE_CONFIGS = {
+  E:   { title:'AWAKENING CONFIRMED',
+         sub:'The Hunter System has acknowledged your presence.\nThe journey begins now.',
+         epic:0 },
+  D:   { title:'GRADE ADVANCEMENT',
+         sub:'Your discipline has been recorded.\nYou are no longer the person who started.',
+         epic:1 },
+  C:   { title:'VETERAN STANDING',
+         sub:'The ordinary path is behind you.\nYou have crossed a threshold most never reach.',
+         epic:2 },
+  B:   { title:'ELITE THRESHOLD CROSSED',
+         sub:'You have entered territory few will ever see.\nThe System acknowledges your relentless discipline.',
+         epic:3 },
+  A:   { title:'⟦ CHAMPION ASCENDANT ⟧',
+         sub:'You have surpassed what most believe is possible.\nThis is no longer a habit — this is who you are.',
+         epic:4 },
+  S:   { title:'⟦ SOVEREIGN HUNTER ⟧',
+         sub:'A force that reshapes the world.\nFew will ever stand where you now stand.\nRemember this moment.',
+         epic:5 },
+  SS:  { title:'⟦ BEYOND ALL LIMITS ⟧',
+         sub:'The word Legendary is no longer enough.\nYou have become something\nthe world has no name for yet.',
+         epic:6 },
+  SSS: { title:'⟦ THE ABSOLUTE · THE APEX ⟧',
+         sub:'There is no ceiling above you. There never was.\nYou did not reach the top — you became it.\nThe System will never forget your name.',
+         epic:7 },
+};
+
+function getAdventureTitle(level) {
+  const band = LEVEL_BANDS.find(b => level >= b.from && level <= b.to);
+  return band?.title || 'APEX';
+}
+
+function getHunterGrade() {
+  const avg = STAT_KEYS.reduce((s, k) => s + (state.stats[k] || 0), 0) / STAT_KEYS.length;
+  return tierFor(avg);
+}
+
+function getHunterGradeTotal() {
+  return STAT_KEYS.reduce((s, k) => s + Math.floor(state.stats[k] || 0), 0);
+}
+
+function checkHunterGradeUp() {
+  const newGrade  = getHunterGrade().tier;
+  const prevGrade = state.hunterGrade || 'F';
+  const newMin    = TIERS.find(t => t.t === newGrade)?.min  ?? 0;
+  const prevMin   = TIERS.find(t => t.t === prevGrade)?.min ?? 0;
+  if (newMin > prevMin) {
+    // Preserve original "from" in case of rapid multi-grade skip
+    const from = _pendingHunterGradeUp ? _pendingHunterGradeUp.from : prevGrade;
+    state.hunterGrade = newGrade;
+    _pendingHunterGradeUp = { from, to: newGrade };
+    // If not mid-level-up, fire overlay directly after a short delay.
+    // Guard inside the callback against same-tick level-ups that set _lvUpInProgress=true.
+    setTimeout(() => {
+      if (!_pendingHunterGradeUp || _lvUpInProgress) return;
+      const { from: f, to: t } = _pendingHunterGradeUp;
+      _pendingHunterGradeUp = null;
+      showHunterGradeUpOverlay(f, t);
+    }, 900);
+  } else if (!state.hunterGrade) {
+    state.hunterGrade = newGrade;
+  }
+}
+
 function levelRank(lv) {
   return LEVEL_BANDS.find(b => lv >= b.from && lv <= b.to)?.rank || 'SSS';
 }
@@ -6346,6 +6722,8 @@ function loadState() {
       if (typeof s.dailyCritCount !== 'number') s.dailyCritCount = 0;
       if (!s.lastCritDay) s.lastCritDay = '';
       if (!Array.isArray(s.craftQueue)) s.craftQueue = [];
+      if (!s.hasOwnProperty('lastExportTs')) s.lastExportTs = 0;
+      if (!Array.isArray(s.weeklyReflections)) s.weeklyReflections = [];
       if (typeof s.workXp !== 'number') s.workXp = 0;
       if (!s.socialStats) s.socialStats = {kindness:0,courage:0,diligence:0,wisdom:0,expression:0,resilience:0};
       if (!s.socialStats.hasOwnProperty('resilience')) s.socialStats.resilience = 0;
@@ -6398,7 +6776,7 @@ function loadState() {
       return { habitos, weekly, trabajo: v3.trabajo||[], stats: v3.stats||defaultStats(), totalXp: v3.totalXp||0, streak: v3.streak||0, lastActiveDay: v3.lastActiveDay||todayKey(), col: v3.col||0 };
     }
   } catch(e) { console.warn('load failed',e); }
-  return { habitos: DEFAULT_HABITOS.map(h=>({...h,done:{}})), weekly: DEFAULT_WEEKLY.map(w=>({...w,done:{}})), negativos: DEFAULT_NEGATIVOS.map(n=>({...n,done:{},createdDate:todayKey(),lastBreakDate:null,awardedMilestones:{},checkins:{},shownOverlayAt:{},milestones:DEFAULT_NEG_MILESTONES.map(m=>({...m}))})), trabajo: [], stats: defaultStats(), totalXp:0, streak:0, lastActiveDay:todayKey(), col:0, playerName:'Tuni', playerTitle:'Beginner', achievements:{}, logros:{perfectWeekCount:0,phoenixCount:0,lastPerfectWeekDay:null,lastPhoenixDay:null}, dungeon:null, inventory:[{itemId:'iron_sword',quantity:1},{itemId:'leather_armor',quantity:1},{itemId:'iron_helm',quantity:1},{itemId:'leather_boots',quantity:1},{itemId:'hp_pot_s',quantity:5},{itemId:'mp_pot_s',quantity:2}], equipment:{earring_l:null,helmet:null,earring_r:null,weapon:null,armor:null,shield:null,necklace:null,bracelet:null,belt:null,boots:null}, classData: defaultClassState(), lastWeeklyReport:null, pomodoroWorkMins:25, workXp:0, socialStats:{kindness:0,courage:0,diligence:0,wisdom:0,expression:0,resilience:0} };
+  return { habitos: DEFAULT_HABITOS.map(h=>({...h,done:{}})), weekly: DEFAULT_WEEKLY.map(w=>({...w,done:{}})), negativos: DEFAULT_NEGATIVOS.map(n=>({...n,done:{},createdDate:todayKey(),lastBreakDate:null,awardedMilestones:{},checkins:{},shownOverlayAt:{},milestones:DEFAULT_NEG_MILESTONES.map(m=>({...m}))})), trabajo: [], stats: defaultStats(), totalXp:0, streak:0, lastActiveDay:todayKey(), col:0, playerName:'Tuni', playerTitle:'Beginner', achievements:{}, logros:{perfectWeekCount:0,phoenixCount:0,lastPerfectWeekDay:null,lastPhoenixDay:null}, dungeon:null, inventory:[{itemId:'iron_sword',quantity:1},{itemId:'leather_armor',quantity:1},{itemId:'iron_helm',quantity:1},{itemId:'leather_boots',quantity:1},{itemId:'hp_pot_s',quantity:5},{itemId:'mp_pot_s',quantity:2}], equipment:{earring_l:null,helmet:null,earring_r:null,weapon:null,armor:null,shield:null,necklace:null,bracelet:null,belt:null,boots:null}, classData: defaultClassState(), lastWeeklyReport:null, pomodoroWorkMins:25, workXp:0, socialStats:{kindness:0,courage:0,diligence:0,wisdom:0,expression:0,resilience:0}, lastExportTs:0, weeklyReflections:[] };
 }
 
 function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
@@ -8602,6 +8980,8 @@ function applyGainsWithClass(gains) {
   });
   // Track daily stat gains from all sources
   recordDailyGains(applied, 1);
+  // Check if stat gains triggered a Hunter Grade up
+  checkHunterGradeUp();
   // Mastery points come exclusively from class quests — not from habit completions
   return applied;
 }
@@ -9303,15 +9683,15 @@ function renderHeader() {
   const isHpCritical = hpPct <= 30;
   const statusPanel = document.getElementById('statusPanel');
   if (statusPanel) statusPanel.classList.toggle('hp-critical', isHpCritical);
-  // Rank badge + avatar border (red override when HP critical)
-  const rank = getPlayerRank();
-  const rankColor = TIER_COLORS[rank] || '#9e9e9e';
+  // Hunter Grade badge + avatar border (red override when HP critical)
+  const hunterGrade = state.hunterGrade || 'F';
+  const gradeColor  = TIER_COLORS[hunterGrade] || '#9e9e9e';
   const rankBadgeEl = document.getElementById('rankBadgeEl');
   if (rankBadgeEl) {
-    rankBadgeEl.textContent = `RANK ${rank}`;
-    rankBadgeEl.style.color = rankColor;
-    rankBadgeEl.style.borderColor = rankColor + '55';
-    rankBadgeEl.style.textShadow = `0 0 8px ${rankColor}70`;
+    rankBadgeEl.textContent = `GRADE ${hunterGrade}`;
+    rankBadgeEl.style.color = gradeColor;
+    rankBadgeEl.style.borderColor = gradeColor + '55';
+    rankBadgeEl.style.textShadow = `0 0 8px ${gradeColor}70`;
   }
   const avatarFrame = document.getElementById('avatarFrame');
   if (avatarFrame) {
@@ -9319,8 +9699,8 @@ function renderHeader() {
       avatarFrame.style.borderColor = 'var(--sao-red)';
       avatarFrame.style.boxShadow = '0 0 20px rgba(255,82,82,0.75)';
     } else {
-      avatarFrame.style.borderColor = rankColor;
-      avatarFrame.style.boxShadow = `0 0 14px ${rankColor}60`;
+      avatarFrame.style.borderColor = gradeColor;
+      avatarFrame.style.boxShadow = `0 0 14px ${gradeColor}60`;
     }
   }
 }
@@ -9429,7 +9809,12 @@ function renderQuestItem(task, opts) {
       }
     } else {
       const streak=getHabitStreak(task);
-      if (streak>0) {
+      if (streak >= 66) {
+        el.classList.add('mastered-habit', 'streak-milestone');
+        const badge=document.createElement('div'); badge.className='streak-badge streak-mastered';
+        badge.innerHTML=`<div class="streak-main"><span class="streak-fire">👑</span><span>${streak}</span></div>`;
+        el.appendChild(badge);
+      } else if (streak>0) {
         const t30=streak>=30, t14=streak>=14, t7=streak>=7, t3=streak>=3;
         const streakTier = t30?'ultra':t14?'hot':t7?'warm':t3?'spark':'base';
         if (t30) el.classList.add('streak-milestone');
@@ -10505,33 +10890,54 @@ function renderFooter(tabKey) {
 
 function renderCharStatusHeader() {
   const el = document.getElementById('charStatusHeader'); if (!el) return;
-  const { level, currentLevelXp, neededForNext } = calcLevel(state.totalXp);
-  const rank      = getPlayerRank();
-  const rankColor = TIER_COLORS[rank] || '#9e9e9e';
-  const pct       = Math.min(100, Math.round((currentLevelXp / neededForNext) * 100));
-  const remaining = neededForNext - currentLevelXp;
-  const isMaxLevel = level >= MAX_LEVEL;
-  const titleStr  = state.playerTitle && state.playerTitle !== 'Beginner' ? state.playerTitle : null;
 
-  el.style.setProperty('--rank-color', rankColor);
+  // ── XP / level ──────────────────────────────────────────────
+  const { level } = calcLevel(state.totalXp);
+  const adventureTitle = getAdventureTitle(level);
+
+  // ── Hunter Grade (stat-based) ────────────────────────────────
+  const avgStat    = STAT_KEYS.reduce((s, k) => s + (state.stats[k] || 0), 0) / STAT_KEYS.length;
+  const gradeInfo  = tierFor(avgStat);
+  const hunterGrade = gradeInfo.tier;
+  const gradeColor  = TIER_COLORS[hunterGrade] || '#9e9e9e';
+  const gradePct    = Math.min(100, Math.round(gradeInfo.pctToNext));
+  const nextTierObj = TIERS[TIERS.findIndex(t => t.t === hunterGrade) + 1];
+  const nextGrade      = nextTierObj ? nextTierObj.t : null;
+  const nextColor      = nextGrade ? (TIER_COLORS[nextGrade] || '#9e9e9e') : gradeColor;
+  const totalStatPts   = STAT_KEYS.reduce((s, k) => s + Math.floor(state.stats[k] || 0), 0);
+  const totalNeeded    = nextTierObj ? Math.ceil((nextTierObj.min - avgStat) * STAT_KEYS.length) : 0;
+
+  const titleStr = state.playerTitle && state.playerTitle !== 'Beginner' ? state.playerTitle : null;
+
+  el.style.setProperty('--rank-color', gradeColor);
   el.innerHTML = `
     <div class="char-status-top-row">
-      <div class="char-status-rank" style="color:${rankColor}">⟦ RANK ${rank} ⟧</div>
+      <div class="char-status-rank" style="color:${gradeColor}">${adventureTitle.toUpperCase()}</div>
       <div class="char-status-level">
         <span class="char-status-lv-label">LV.</span>
-        <span class="char-status-lv-num" style="color:${rankColor}">${level}</span>
+        <span class="char-status-lv-num" style="color:${gradeColor}">${level}</span>
       </div>
     </div>
-    ${titleStr ? `<div class="char-active-title">「${titleStr.toUpperCase()}」</div>` : ''}
-    <div class="char-status-xp">
-      <div class="char-status-xp-bar">
-        <div class="char-status-xp-fill" style="width:${pct}%;background:${rankColor};color:${rankColor}"></div>
+    <div class="char-hunter-grade-row">
+      <div class="char-hg-top">
+        <div class="char-hg-left">
+          <span class="char-hunter-grade-label">HUNTER GRADE</span>
+          <span class="char-hunter-grade-badge" style="color:${gradeColor};border-color:${gradeColor}55">${hunterGrade}</span>
+          ${nextGrade ? `<span class="char-hg-arrow">→</span><span class="char-hg-next-badge" style="color:${nextColor};border-color:${nextColor}55">${nextGrade}</span>` : ''}
+        </div>
+        <span class="char-hg-pct" style="color:${gradeColor}">${gradeInfo.capped ? '✦ MAX' : `${gradePct}%`}</span>
       </div>
-      <div class="char-status-xp-text">
-        <span>${currentLevelXp.toLocaleString()} / ${neededForNext.toLocaleString()} XP</span>
-        <span style="color:${rankColor}">${isMaxLevel ? '✦ MAX LEVEL' : `${remaining.toLocaleString()} → Lv ${level + 1}`}</span>
+      <div class="char-hg-bar-track">
+        <div class="char-hg-bar-fill" style="width:${gradePct}%;background:${gradeColor};color:${gradeColor}"></div>
       </div>
-    </div>`;
+      <div class="char-hg-bar-sub">
+        <span>${totalStatPts.toLocaleString()} stat pts</span>
+        ${gradeInfo.capped
+          ? `<span style="color:${gradeColor}">✦ APEX GRADE</span>`
+          : `<span style="color:${nextColor}">${totalNeeded.toLocaleString()} pts to Grade ${nextGrade}</span>`}
+      </div>
+    </div>
+    ${titleStr ? `<div class="char-active-title">「${titleStr.toUpperCase()}」</div>` : ''}`;
 }
 
 function renderPersonaje() {
@@ -11932,6 +12338,36 @@ function renderYearHeatmap(container) {
   requestAnimationFrame(() => { scrollWrap.scrollLeft = scrollWrap.scrollWidth; });
 }
 
+function renderWeeklyReflections(container) {
+  const list = (state.weeklyReflections || []).slice().reverse().slice(0, 6);
+  if (!list.length) return;
+  const sec = document.createElement('div');
+  sec.style.cssText = 'padding: 0 12px;';
+  const title = document.createElement('div');
+  title.className = 'wr-section-title';
+  title.style.margin = '16px 0 10px';
+  title.textContent = '⟦ WEEKLY REFLECTIONS ⟧';
+  sec.appendChild(title);
+  const listEl = document.createElement('div');
+  listEl.className = 'wr-refl-list';
+  list.forEach(r => {
+    const stars = r.rating > 0 ? '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating) : '—';
+    const [,wNum] = (r.weekKey||'').split('-W');
+    const item = document.createElement('div');
+    item.className = 'wr-refl-item';
+    item.innerHTML = `
+      <div class="wr-refl-meta">
+        <span class="wr-refl-week">WEEK ${wNum||'?'}</span>
+        <span class="wr-refl-stars">${stars}</span>
+      </div>
+      ${r.note ? `<div class="wr-refl-note">"${r.note}"</div>` : ''}
+    `;
+    listEl.appendChild(item);
+  });
+  sec.appendChild(listEl);
+  container.appendChild(sec);
+}
+
 function renderHistory() {
   panelTitle.textContent='HISTORY'; panelSubtitle.textContent='Past performance';
   panelContent.innerHTML='';
@@ -12038,6 +12474,7 @@ function renderHistory() {
     repRow.appendChild(wrBtn); repRow.appendChild(mrBtn);
     panelContent.appendChild(repRow);
   }
+  renderWeeklyReflections(panelContent);
 
   // Period selector
   const PERIODS=[{k:'today',l:'TODAY'},{k:'thisweek',l:'THIS WEEK'},{k:'lastweek',l:'LAST WEEK'},{k:'month',l:'MONTH'},{k:'custom',l:'CUSTOM'}];
@@ -13131,6 +13568,7 @@ function renderHistory() {
 }
 
 function renderAll() {
+  checkBackupNudge();
   const _ha=document.getElementById('panelHeaderActions'); if(_ha&&currentTab!=='habits') _ha.innerHTML='';
   if (currentTab!=='habits') panelContent.classList.remove('habits-paused');
   renderHeader();
@@ -13772,12 +14210,15 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
       const _isPhoenix = listKey==='habitos' && periodKey===todayKey() && !task.done[yesterdayKey()] && Object.keys(task.done).length > 0;
       const _phoenixMult = _isPhoenix ? 1.5 : 1.0;
       const _isCrit = rollCrit();
-      const _totalMult = _phoenixMult * (_isCrit ? 2.0 : 1.0);
+      const _prevStreak = listKey==='habitos' ? getHabitStreak(task) : 0;
+      const _masteryMult = _prevStreak >= 65 ? 1.2 : 1.0;
+      const _totalMult = _phoenixMult * (_isCrit ? 2.0 : 1.0) * _masteryMult;
       const _scaledXp = Math.round((task.xp||0) * _totalMult);
       if (_scaledXp > (task.xp||0)) { state.totalXp += _scaledXp-(task.xp||0); state.col += _scaledXp-(task.xp||0); }
       const _scaledGains = {}; Object.entries(task.gains||{}).forEach(([k,v])=>{ _scaledGains[k]=Math.round(v*_totalMult); });
       const _ag=applyGainsWithClass(_scaledGains);
       task.done[periodKey]={gains:_ag,xp:_scaledXp,wasCrit:_isCrit};
+      if (listKey==='habitos' && _prevStreak===65 && !task.masteredAt) { task.masteredAt=periodKey; setTimeout(()=>showMasteryCeremony(task.text),450); }
       completedExpanded[listKey]=false;
       const newLv=calcLevel(state.totalXp).level;
       if (_isPhoenix) { if(navigator.vibrate) navigator.vibrate([40,30,80,30,120]); setTimeout(()=>showNotif('[SYSTEM] ⚡ RESURRECTION PROTOCOL — ×1.5 COMEBACK OVERRIDE'), 300); }
@@ -13787,7 +14228,7 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
       else { if(listKey==='weekly') { playWeeklyTap(); } else { playSwordSlash(); } if(navigator.vibrate) navigator.vibrate(40); }
       // HP restore: each completed habit restores 4% of max HP
       { const _mhp = calcMaxHP(); if (state.hp === null || state.hp === undefined) state.hp = _mhp; state.hp = Math.min(_mhp, state.hp + Math.round(_mhp * 0.04)); }
-      const _tags = []; if(_isPhoenix) _tags.push(`×${_phoenixMult}🔥`); if(_isCrit) _tags.push('⚡CRIT');
+      const _tags = []; if(_isPhoenix) _tags.push(`×${_phoenixMult}🔥`); if(_isCrit) _tags.push('⚡CRIT'); if(_masteryMult>1) _tags.push('👑×1.2');
       const _multTag = _tags.length ? ' '+_tags.join(' ') : '';
       showNotif(`[SYSTEM] +${_scaledXp} EXP${_multTag} · ${_gainsStr(_ag,_scaledGains)}`);
       if (!_isCrit) showXpFloat(_scaledXp, _ag, anchorY);
@@ -13844,6 +14285,29 @@ function showEliteCompleteOverlay(task, tier, gains) {
   };
   ov.addEventListener('click', dismiss);
   setTimeout(dismiss, 2600);
+}
+
+function showMasteryCeremony(habitName) {
+  if (navigator.vibrate) navigator.vibrate([40, 60, 120, 60, 200, 60, 120]);
+  const ov = document.createElement('div'); ov.className = 'mastery-ceremony-ov';
+  ov.innerHTML = `
+    <div class="mco-inner">
+      <div class="mco-scan"></div>
+      <div class="mco-crown">👑</div>
+      <div class="mco-eyebrow">⟦ SKILL MASTERED ⟧</div>
+      <div class="mco-title">${habitName}</div>
+      <div class="mco-body">is now a mastered skill.<br>It lives in your muscle memory.</div>
+      <div class="mco-bonus">REWARD BONUS: ×1.2 PERMANENT</div>
+      <div class="mco-tap">TAP TO CONTINUE</div>
+    </div>`;
+  document.body.appendChild(ov);
+  const dismiss = () => {
+    if (ov._dismissed) return; ov._dismissed = true;
+    ov.classList.add('mco-out');
+    setTimeout(() => ov.remove(), 380);
+  };
+  ov.addEventListener('click', dismiss);
+  setTimeout(dismiss, 6000);
 }
 
 function showFirstHabitOverlay() {
@@ -14228,6 +14692,85 @@ function showGradeUpOverlay(fromRank, toRank) {
   document.body.appendChild(el);
 }
 
+function showHunterGradeUpOverlay(fromGrade, toGrade, onDone) {
+  const cfg   = HUNTER_GRADE_CONFIGS[toGrade] || { title:'GRADE UP', sub:'', epic:0 };
+  const color = TIER_COLORS[toGrade] || '#ffd700';
+  const fromColor = TIER_COLORS[fromGrade] || '#9e9e9e';
+  const epic  = cfg.epic || 0;
+
+  if (navigator.vibrate) {
+    if      (epic >= 7) navigator.vibrate([80,40,80,40,80,60,200,80,400,200,600]);
+    else if (epic >= 5) navigator.vibrate([80,60,80,60,80,100,200,100,350]);
+    else if (epic >= 3) navigator.vibrate([80,60,120,80,220]);
+    else                navigator.vibrate([50,30,80]);
+  }
+
+  // Expanding rings (C-grade epic≥2 and above)
+  const ringCount = Math.min(Math.max(epic - 1, 0), 5);
+  const rings = Array.from({length: ringCount}, (_, i) => {
+    const dur   = (2.2 + i * 0.55).toFixed(1);
+    const delay = (i  * 0.45).toFixed(1);
+    return `<div class="hg-ring" style="--rdur:${dur}s;--rdelay:${delay}s;border-color:${color}44;"></div>`;
+  }).join('');
+
+  // Floating particles (B-grade epic≥3 and above)
+  const pCount = epic >= 7 ? 38 : epic >= 6 ? 26 : epic >= 5 ? 18 : epic >= 3 ? 12 : 0;
+  const pSyms  = ['✦','★','◆','⬟','✧','⭐','⟡','◈','✴'];
+  const particles = Array.from({length: pCount}, () => {
+    const x    = (Math.random() * 88 + 6).toFixed(1);
+    const y    = (Math.random() * 78 + 11).toFixed(1);
+    const size = (5 + Math.random() * 7).toFixed(1);
+    const dur  = (2.2 + Math.random() * 2.2).toFixed(2);
+    const del  = (Math.random() * 3.2).toFixed(2);
+    const dx   = ((Math.random() - 0.5) * 90).toFixed(1);
+    return `<div class="hg-particle" style="left:${x}%;top:${y}%;width:${size}px;height:${size}px;--pdur:${dur}s;--pdelay:${del}s;--px:0px;--py:0px;--dx:${dx}px;background:${color};"></div>`;
+  }).join('');
+
+  // SSS-exclusive: giant radiant sigil behind the grade letter
+  const sssExtra = epic >= 7
+    ? `<div style="position:absolute;font-size:280px;opacity:0.04;pointer-events:none;user-select:none;top:50%;left:50%;transform:translate(-50%,-54%);filter:blur(6px);color:${color};">⬟</div>`
+    : '';
+
+  // Line-break the subtitle correctly
+  const subHtml = cfg.sub.replace(/\n/g, '<br>');
+
+  const el = document.createElement('div');
+  el.className = `hg-overlay${epic > 0 ? ` hg-epic-${epic}` : ''}`;
+  el.style.setProperty('--hg-color', color);
+  el.innerHTML = `
+    ${rings}
+    ${particles}
+    ${sssExtra}
+    <div class="hg-panel">
+      <div class="hg-eyebrow">⟦ HUNTER SYSTEM — GRADE ASCENSION ⟧</div>
+      <div class="hg-transition-row">
+        <span class="hg-old-grade" style="color:${fromColor}">${fromGrade}</span>
+        <span class="hg-arrow-sym">→</span>
+        <span class="hg-new-grade">${toGrade}</span>
+      </div>
+      <div class="hg-main-title">${cfg.title}</div>
+      <div class="hg-subtitle">${subHtml}</div>
+      <div class="hg-stat-info">⬟ TOTAL STATS · ${getHunterGradeTotal().toLocaleString()}</div>
+      <div class="hg-dismiss">— TAP TO CONTINUE —</div>
+    </div>`;
+
+  document.body.appendChild(el);
+  if (epic >= 5) playGradeUp();
+
+  const dismiss = () => {
+    if (el._dismissed) return;
+    el._dismissed = true;
+    el.style.transition = 'opacity 0.35s ease';
+    el.style.opacity = '0';
+    setTimeout(() => {
+      el.remove();
+      if (onDone) onDone();
+    }, 380);
+  };
+  el.addEventListener('click', dismiss);
+  setTimeout(dismiss, epic >= 7 ? 9000 : epic >= 5 ? 7500 : 6000);
+}
+
 function showPhoenixOverlay() {
   if (navigator.vibrate) navigator.vibrate([50,30,50,30,100,80,150]);
   const SYMS = ['◆','✦','⬟','★','✧'];
@@ -14289,32 +14832,39 @@ function _drainStatTierQueue() {
 }
 
 // ── Level-up notification chain ──────────────────────────────
-let _pendingLvUpStatTiers = null;
-let _lvUpInProgress       = false;
+let _pendingLvUpStatTiers  = null;
+let _pendingHunterGradeUp  = null;   // { from, to } set by checkHunterGradeUp
+let _lvUpInProgress        = false;
 
 function _onLvUpContinue() {
-  const ol       = document.getElementById('lvupOverlay');
-  const rankFrom = ol && ol.dataset.rankFrom;
-  const rankTo   = ol && ol.dataset.rankTo;
-  ol && ol.remove();
+  document.getElementById('lvupOverlay')?.remove();
   renderAll();
-  if (rankFrom && rankTo) {
-    setTimeout(() => showGradeUpOverlay(rankFrom, rankTo), 200);
-  } else {
-    setTimeout(_afterAllLvUpOverlays, 100);
-  }
+  setTimeout(_afterAllLvUpOverlays, 100);
 }
 
 function _afterAllLvUpOverlays() {
   _lvUpInProgress = false;
   renderAll();
-  if (_pendingLvUpStatTiers) {
-    const { preTiers, gains } = _pendingLvUpStatTiers;
-    _pendingLvUpStatTiers = null;
-    _statTierDoneCallback = () => checkAndShowClassUnlocks(400);
-    setTimeout(() => checkStatRankUps(gains, preTiers), 200);
+
+  // Continuation shared by both branches
+  const continueChain = () => {
+    if (_pendingLvUpStatTiers) {
+      const { preTiers, gains } = _pendingLvUpStatTiers;
+      _pendingLvUpStatTiers = null;
+      _statTierDoneCallback = () => checkAndShowClassUnlocks(400);
+      setTimeout(() => checkStatRankUps(gains, preTiers), 200);
+    } else {
+      checkAndShowClassUnlocks(400);
+    }
+  };
+
+  // Show Hunter Grade overlay first if grade changed during this level-up sequence
+  if (_pendingHunterGradeUp) {
+    const { from, to } = _pendingHunterGradeUp;
+    _pendingHunterGradeUp = null;
+    setTimeout(() => showHunterGradeUpOverlay(from, to, continueChain), 500);
   } else {
-    checkAndShowClassUnlocks(400);
+    continueChain();
   }
 }
 
@@ -14337,9 +14887,10 @@ function showLevelUpPopup(lv, bonus, prevStats, prevCombat, newCombat, rankUp, p
   document.getElementById('lvupOverlay')?.remove();
   const levelsGained = (prevLv != null) ? lv - prevLv : 1;
   const isMilestone = hitMilestone !== undefined ? hitMilestone : (lv===99 || lv%10===0);
-  const rank = levelRank(lv);
-  const RANK_COLORS = { F:'#9e9e9e',E:'#66bb6a',D:'#42a5f5',C:'#ab47bc',B:'#ffa726',A:'#ef5350',S:'#ffd700',SS:'#00e5ff',SSS:'#ff80ab' };
-  const rc = RANK_COLORS[rank]||'#4dd0e1';
+  const adventureTitle = getAdventureTitle(lv);
+  const lvBandRank = levelRank(lv);
+  const BAND_COLORS = { E:'#66bb6a', D:'#42a5f5', C:'#ab47bc', B:'#ffa726', A:'#ef5350', S:'#ffd700', SS:'#00e5ff', SSS:'#ff80ab' };
+  const rc = BAND_COLORS[lvBandRank] || '#4dd0e1';
   const SCOL = STAT_COLORS;
 
   const statsHtml = STAT_KEYS.map(k=>`
@@ -14371,14 +14922,13 @@ function showLevelUpPopup(lv, bonus, prevStats, prevCombat, newCombat, rankUp, p
   const ol = document.createElement('div');
   ol.id = 'lvupOverlay';
   ol.className = 'lvup-overlay';
-  if (rankUp) { ol.dataset.rankFrom = rankUp.from; ol.dataset.rankTo = rankUp.to; }
   ol.innerHTML = `
     <div class="lvup-panel" style="--lvup-rc:${rc}">
       <div class="lvup-header">
         <div class="lvup-sparkles">✦ ✦ ✦</div>
         <div class="lvup-title">LEVEL UP</div>
         <div class="lvup-level">LV.<span class="lvup-lv-num">${lv}</span></div>
-        <div class="lvup-rank-badge" style="border-color:${rc};color:${rc}">RANK ${rank}</div>
+        <div class="lvup-rank-badge" style="border-color:${rc};color:${rc}">${adventureTitle.toUpperCase()}</div>
         ${milestoneTag}
       </div>
       <div class="lvup-section">
@@ -14389,7 +14939,7 @@ function showLevelUpPopup(lv, bonus, prevStats, prevCombat, newCombat, rankUp, p
         <div class="lvup-section-label">COMBAT RATES</div>
         <div class="lvup-combat-grid">${combatHtml}</div>
       </div>`:''}
-      <button class="lvup-btn" onclick="_onLvUpContinue();">${rankUp?`CONTINUE → RANK ${rankUp.to}`:'CONTINUE'}</button>
+      <button class="lvup-btn" onclick="_onLvUpContinue();">CONTINUE</button>
     </div>`;
   document.body.appendChild(ol);
 }
@@ -14403,7 +14953,6 @@ function afterLevelUp(newLv, prevLv, habitGains, habitPreTiers) {
 
   const prevStats  = { ...state.stats };
   const prevCombat = calcCombatSnapshot();
-  const prevRank   = levelRank(prevLv);
 
   // Apply bonuses for EVERY level between prevLv and newLv (handles multi-level skips)
   let totalBonus = 0;
@@ -14417,11 +14966,11 @@ function afterLevelUp(newLv, prevLv, habitGains, habitPreTiers) {
 
   state.hp = calcMaxHP();
   state.mp = calcMaxMP();
+  // Level bonuses also count toward Hunter Grade — check after all bonuses applied
+  checkHunterGradeUp();
   saveState();
 
   const newCombat = calcCombatSnapshot();
-  const newRank   = levelRank(newLv);
-  const rankUp    = prevRank !== newRank ? { from: prevRank, to: newRank } : null;
 
   // Detect stat tier-ups from BOTH habit gains AND level bonuses.
   // Use habitPreTiers as the true baseline (before anything was applied this tick).
@@ -14439,7 +14988,7 @@ function afterLevelUp(newLv, prevLv, habitGains, habitPreTiers) {
     playLevelUp();
     document.getElementById('mainPanel').classList.add('level-up');
     setTimeout(() => document.getElementById('mainPanel').classList.remove('level-up'), 2400);
-    showLevelUpPopup(newLv, totalBonus, prevStats, prevCombat, newCombat, rankUp, prevLv, hitMilestone);
+    showLevelUpPopup(newLv, totalBonus, prevStats, prevCombat, newCombat, null, prevLv, hitMilestone);
   }, 700);
 }
 
@@ -14597,6 +15146,34 @@ function addTask() {
     done:{}
   });
   input.value=''; saveState(); renderAll();
+}
+
+// ── BACKUP NUDGE ──────────────────────────────────────────────
+let _backupNudgeDismissed = false;
+function dismissBackupNudge() {
+  _backupNudgeDismissed = true;
+  const el = document.getElementById('backupNudge');
+  if (el) el.style.display = 'none';
+}
+function checkBackupNudge() {
+  const el = document.getElementById('backupNudge');
+  if (!el || _backupNudgeDismissed) return;
+  const ts = state.lastExportTs || 0;
+  const sevenDays = 7 * 24 * 3600 * 1000;
+  const hasData = (state.totalXp || 0) >= 50;
+  const show = (ts === 0 && hasData) || (ts > 0 && Date.now() - ts > sevenDays);
+  el.style.display = show ? 'flex' : 'none';
+  if (show) {
+    const msgEl = el.querySelector('.nudge-msg');
+    if (msgEl) {
+      if (ts === 0) {
+        msgEl.textContent = '⚠ Never backed up — data lives in this browser only';
+      } else {
+        const days = Math.floor((Date.now() - ts) / (24 * 3600 * 1000));
+        msgEl.textContent = `⚠ No backup in ${days}d — data lives in this browser only`;
+      }
+    }
+  }
 }
 
 const _notifQ=[];
@@ -15847,6 +16424,7 @@ function showWeeklyReport(weekKey) {
 
   const isLevelUpWeek = xpDiff > 0 && xpPct >= 20 && prevStats.xp > 0;
   const perfLabel = thisStats.perfectDays===7 ? '🏆 FLAWLESS WEEK' : thisStats.perfectDays>=5 ? '⭐ EXCELLENT' : thisStats.perfectDays>=3 ? '✓ SOLID' : 'keep going';
+  const hasReflected = (state.weeklyReflections||[]).some(r => r.weekKey === reportWeek);
 
   if (soundEnabled) playDailyComplete();
 
@@ -15901,12 +16479,75 @@ function showWeeklyReport(weekKey) {
         <div class="wr-highlight best">🏆 Most consistent: <strong>${mostDone.text.split(' ').slice(0,5).join(' ')}</strong> — ${mostDone.count}/7 days</div>
         ${leastDone && leastDone.text!==mostDone.text ? `<div class="wr-highlight worst">⚡ Room to grow: <strong>${leastDone.text.split(' ').slice(0,5).join(' ')}</strong> — ${leastDone.count}/7 days</div>` : ''}
       </div>` : ''}
-      <button class="wr-dismiss-btn" id="wrCloseBtn">⟦ CLOSE REPORT ⟧</button>
+      ${hasReflected
+        ? `<div class="wr-reflected-badge">✓ Already reflected this week</div>
+           <button class="wr-dismiss-btn" id="wrCloseBtn">⟦ CLOSE REPORT ⟧</button>`
+        : `<div class="wr-action-row">
+             <button class="wr-dismiss-btn" id="wrCloseBtn" style="flex:1;margin:0;opacity:0.55">SKIP</button>
+             <button class="wr-reflect-btn" id="wrReflectBtn">⟦ REFLECT · +50 XP ⟧</button>
+           </div>`}
     </div>`;
   document.body.appendChild(ov);
   const _wrDismiss = () => { ov.style.animation='masteryFadeOut 0.4s ease forwards'; setTimeout(()=>ov.remove(),400); };
   ov.addEventListener('click', e => { if (e.target === ov) _wrDismiss(); });
   ov.querySelector('#wrCloseBtn').addEventListener('click', _wrDismiss);
+  ov.querySelector('#wrReflectBtn')?.addEventListener('click', () => _showReflectionStep(ov, reportWeek, _wrDismiss));
+}
+
+function _showReflectionStep(ov, reportWeek, onDismiss) {
+  let selectedRating = 0;
+  const inner = ov.querySelector('.wr-inner');
+  const [,wNum] = (reportWeek||'').split('-W');
+  inner.innerHTML = `
+    <div class="wr-badge">⟦ WEEKLY REFLECTION ⟧</div>
+    <div class="wr-week" style="margin-bottom:6px">Week ${wNum}</div>
+    <div style="font-size:12px;color:var(--sao-text-dim);text-align:center;margin-bottom:24px;line-height:1.6">
+      Take 30 seconds. This is for you, not the stats.
+    </div>
+    <div class="wr-reflect-section">
+      <div class="wr-reflect-label">RATE YOUR WEEK</div>
+      <div class="wr-stars">
+        <span class="wr-star" data-v="1">★</span>
+        <span class="wr-star" data-v="2">★</span>
+        <span class="wr-star" data-v="3">★</span>
+        <span class="wr-star" data-v="4">★</span>
+        <span class="wr-star" data-v="5">★</span>
+      </div>
+    </div>
+    <div class="wr-reflect-section">
+      <div class="wr-reflect-label">ONE THING FOR NEXT WEEK</div>
+      <textarea class="wr-note-input" id="wrNoteInput" rows="3"
+        placeholder="What will you do differently?" maxlength="120"></textarea>
+    </div>
+    <div class="wr-reflect-reward">
+      <span style="opacity:0.7">Complete for</span>
+      <span style="color:#82b1ff;font-weight:600">+50 XP</span>
+      <span style="color:#ffc107;font-weight:600">+20🪙</span>
+    </div>
+    <button class="wr-begin-btn" id="wrBeginBtn">⟦ BEGIN NEW WEEK ⟧</button>
+  `;
+  const stars = inner.querySelectorAll('.wr-star');
+  stars.forEach(star => {
+    star.addEventListener('click', () => {
+      selectedRating = parseInt(star.dataset.v);
+      stars.forEach((s, i) => s.classList.toggle('active', i < selectedRating));
+    });
+  });
+  inner.querySelector('#wrBeginBtn').addEventListener('click', () => {
+    const note = (inner.querySelector('#wrNoteInput')?.value || '').trim();
+    if (!Array.isArray(state.weeklyReflections)) state.weeklyReflections = [];
+    state.weeklyReflections.push({ weekKey: reportWeek, date: todayKey(), rating: selectedRating, note });
+    if (selectedRating > 0 || note) {
+      state.totalXp = (state.totalXp || 0) + 50;
+      state.gold = Math.max(0, (state.gold || 0) + 20);
+      state.totalGoldEarned = (state.totalGoldEarned || 0) + 20;
+      saveState(); renderAll();
+      showNotif('📖 Reflection logged · +50 XP · +20g');
+    } else {
+      saveState();
+    }
+    onDismiss();
+  });
 }
 
 // ============================================================
