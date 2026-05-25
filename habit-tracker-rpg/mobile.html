@@ -1794,6 +1794,15 @@ body {
 .stat-detail-td { padding: 3px 4px; }
 .stat-detail-tr.is-current td { background: rgba(77,208,225,0.05); }
 .stat-detail-maxgain { font-size: 10px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; padding-top: 6px; border-top: 1px solid var(--sao-border); }
+.stat-week-cap { margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--sao-border); }
+.stat-week-cap-label { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 2px; color: var(--sao-text-dim); display: block; margin-bottom: 5px; }
+.stat-week-cap-bar { height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; margin-bottom: 5px; }
+.stat-week-cap-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+.stat-week-cap-row { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 4px; font-size: 10px; color: var(--sao-text-dim); }
+.stat-week-cap-total { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; }
+.stat-week-cap-remain { font-family: 'Cinzel', serif; font-size: 10px; }
+.stat-week-cap-remain.capped { color: #69f0ae; }
+.stat-week-cap-breakdown { font-size: 9px; color: var(--sao-text-dim); margin-top: 3px; }
 
 .character-summary {
   background: var(--sao-bg2); border: 1px solid var(--sao-border);
@@ -12906,6 +12915,32 @@ function renderPersonaje() {
 
       const detail = document.createElement('div'); detail.className = 'stat-detail';
 
+      // ── Weekly attribution widget ─────────────────────────────
+      const _wkData = calcWeeklyStatAttribution(k);
+      const _wkPct  = Math.min(100, (_wkData.total / STAT_WEEK_CAP) * 100);
+      const _wkFull = _wkData.remaining === 0;
+      const wkEl = document.createElement('div'); wkEl.className = 'stat-week-cap';
+      const _wkBreakdownParts = [];
+      if (_wkData.fromDailyWeekly > 0) _wkBreakdownParts.push(`<span style="color:var(--sao-cyan-bright)">daily ${_wkData.perDay > 0 ? `+${_wkData.perDay}/day ×7 = +${_wkData.fromDailyWeekly}` : '+0'}</span>`);
+      if (_wkData.fromWeekly > 0)      _wkBreakdownParts.push(`<span style="color:var(--sao-gold-soft)">weekly +${_wkData.fromWeekly}</span>`);
+      const _wkRemainLabel = _wkFull
+        ? '✓ FULLY ASSIGNED'
+        : `${_wkData.remaining} pts free`;
+      wkEl.innerHTML = `
+        <span class="stat-week-cap-label">⟦ WEEKLY ATTRIBUTION ⟧</span>
+        <div class="stat-week-cap-bar">
+          <div class="stat-week-cap-fill" style="width:${_wkPct}%;background:linear-gradient(90deg,${sc}88,${sc})"></div>
+        </div>
+        <div class="stat-week-cap-row">
+          <span class="stat-week-cap-total" style="color:${sc}">${_wkData.total} <span style="color:var(--sao-text-dim);font-size:9px;font-weight:400">/ ${STAT_WEEK_CAP} pts/week</span></span>
+          <span class="stat-week-cap-remain ${_wkFull?'capped':''}" style="${_wkFull?'':'color:'+sc+'99'}">${_wkRemainLabel}</span>
+        </div>
+        ${_wkBreakdownParts.length
+          ? `<div class="stat-week-cap-breakdown">${_wkBreakdownParts.join('<span style="opacity:0.4"> · </span>')}</div>`
+          : `<div class="stat-week-cap-breakdown" style="color:rgba(255,100,100,0.5)">No habits assigned to ${k}</div>`}
+      `;
+      detail.appendChild(wkEl);
+
       const srcEl = document.createElement('div'); srcEl.className = 'stat-detail-sources';
       if (srcParts.length) {
         srcEl.innerHTML = `<strong>⟦ SOURCES ⟧</strong>  ${srcParts.join('  ·  ')}`;
@@ -13934,6 +13969,28 @@ function calcMaxDailyStatGain(statKey) {
   state.weekly.forEach(w => { weeklyTotal += (w.gains || {})[statKey] || 0; });
   const weeklyPerDay = weeklyTotal / 7;
   return { daily, weeklyPerDay, total: daily + weeklyPerDay };
+}
+
+const STAT_WEEK_CAP = 100;
+
+// Returns how many pts/week are ASSIGNED to a stat across all habits (not what was earned).
+// Daily gain × 7 + weekly gain × 1 = total weekly attribution.
+function calcWeeklyStatAttribution(statKey) {
+  let perDay = 0;
+  state.habitos.forEach(h => {
+    const g = h.tiers && h.tiers.length
+      ? (h.tiers[h.tiers.length-1].gains || {})[statKey] || 0
+      : (h.gains || {})[statKey] || 0;
+    perDay += g;
+  });
+  const fromDailyWeekly = perDay * 7;
+
+  let fromWeekly = 0;
+  state.weekly.forEach(w => { fromWeekly += (w.gains || {})[statKey] || 0; });
+
+  const total = fromDailyWeekly + fromWeekly;
+  const remaining = Math.max(0, STAT_WEEK_CAP - total);
+  return { perDay, fromDailyWeekly, fromWeekly, total, remaining };
 }
 
 function drawRadar() {
