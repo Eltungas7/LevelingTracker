@@ -1,7 +1,8 @@
 # SAO // Daily Quests — Habit Tracker RPG
 
 ## Project basics
-- Single file app: **always edit `mobile.html` only — never `index.html`**
+- Primary logic: **always edit `mobile.html` — never `index.html`**
+- Data tables live in `data/*.js` (loaded before the main script) — edit those files for data-only changes
 - All UI text in English
 - Respond to the user in English
 - Stack: vanilla JS + HTML/CSS, localStorage persistence, Chart.js for radar
@@ -112,23 +113,38 @@ At 10,000g `totalGoldEarned`, offer a prestige reset with a cosmetic badge.
 
 ---
 
-## Key functions reference
-| Function | Location | Purpose |
+## Data files (grep target, not mobile.html)
+| File | Contents |
+|---|---|
+| `data/classes.js` | `CLASS_TIERS`, `CLASSES`, `CLASS_DESCS`, mastery rewards, `CQ_MP`, `CQ_TARGETS`, **`CLASS_QUESTS`** (all 25 class quest definitions) |
+| `data/dungeons.js` | **`DUNGEON_CONFIG`** (all 18 dungeons + weekly boss) |
+| `data/items.js` | `EQUIP_SLOTS`, **`ITEMS_DB`** (55 items), `SELL_PRICES`, `CRAFT_DURATION_MS` |
+| `data/recipes.js` | **`CRAFT_RECIPES`** (20 recipes), **`GUILD_UPGRADES`** (8 upgrades) |
+| `data/achievements.js` | **`ACHIEVEMENTS`** (54 entries, full tier definitions) |
+| `data/content.js` | **`DAILY_QUOTES`** (31 entries) |
+
+## Key functions reference (mobile.html)
+| Function | Grep pattern | Purpose |
 |---|---|---|
-| `applyWorkDrops(drops, mul)` | ~line 6850 | Awards/reverses gold + materials |
-| `applyGainsWithClass(gains)` | ~line 6940 | Awards stat gains with class+guild hall multiplier |
-| `getWorkTaskDrops(catId, diffId)` | ~line 4700 | Returns drop payload for a work task |
-| `generateCommissions(dateKey)` | ~line 6870 | Creates today's 3 commissions |
-| `updateCommissionProgress(periodKey)` | ~line 6890 | Checks and awards commission rewards |
-| `getEffectiveCraftCost(recipe)` | ~line 5965 | Cost after anvil discount |
-| `craftItem(recipeId)` | ~line 5978 | Forge a gear item from materials |
-| `purchaseGuildUpgrade(id)` | ~line 6001 | Buy a guild upgrade with gold |
-| `renderForge()` | ~line 8108 | 🔥 FORGE view — recipe browser |
-| `renderGuild()` | ~line 8260 | 🏛 GUILD view — upgrades |
-| `renderCommissionBoard()` | ~line 8390 | Commission board widget |
-| `getEquippedStats()` | ~line 5830 | Total gear stats (incl. guild auras) |
-| `setForgeTask(taskId)` | ~line 11200 | Links/unlinks dungeon to a work task |
-| `toggleQuest(listKey, periodKey, id)` | ~line 11260 | Task check/uncheck — branches for trabajo |
+| `applyWorkDrops` | `function applyWorkDrops` | Awards/reverses gold + materials |
+| `applyGainsWithClass` | `function applyGainsWithClass` | Awards stat gains with class+guild hall multiplier |
+| `getWorkTaskDrops` | `function getWorkTaskDrops` | Returns drop payload for a work task |
+| `generateCommissions` | `function generateCommissions` | Creates today's 3 commissions |
+| `updateCommissionProgress` | `function updateCommissionProgress` | Checks and awards commission rewards |
+| `getEffectiveCraftCost` | `function getEffectiveCraftCost` | Cost after anvil discount |
+| `craftItem` | `function craftItem` | Forge a gear item from materials |
+| `purchaseGuildUpgrade` | `function purchaseGuildUpgrade` | Buy a guild upgrade with gold |
+| `renderForge` | `function renderForge` | 🔥 FORGE view — recipe browser |
+| `renderGuild` | `function renderGuild` | 🏛 GUILD view — upgrades |
+| `renderCommissionBoard` | `function renderCommissionBoard` | Commission board widget |
+| `getEquippedStats` | `function getEquippedStats` | Total gear stats (incl. guild auras) |
+| `setForgeTask` | `function setForgeTask` | Links/unlinks dungeon to a work task |
+| `toggleQuest` | `function toggleQuest` | Task check/uncheck — branches for trabajo |
+| `renderHabits` | `function renderHabits` | HABITS tab render |
+| `renderChar` | `function renderChar` | CHAR tab render |
+| `renderDungeon` | `function renderDungeon` | DUNGEON tab render |
+| `renderLog` | `function renderLog` | LOG tab render |
+| `loadState` / `saveState` | `function loadState` | LocalStorage persistence + migration |
 
 ## CSS color conventions
 - Habit stat chips: per-stat colors (STR=#ff8a80, INT=#82b1ff, etc.)
