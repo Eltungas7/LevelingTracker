@@ -7905,10 +7905,12 @@ function loadState() {
         if (!n.habitType) {
           n.habitType = n.id === 'neg0' ? 'porn' : n.id === 'neg1' ? 'mindless_escape' : 'general';
         }
-        if (typeof n.fortitudeXp !== 'number') {
-          n.fortitudeXp = computeFortitudeForStreak(getAvoidStreak(n), n.habitType);
+        const _expFort = computeFortitudeForStreak(getAvoidStreak(n), n.habitType);
+        if (typeof n.fortitudeXp !== 'number' || n.fortitudeXp < _expFort) {
+          n.fortitudeXp = _expFort;
         }
         if (typeof n.fortitudePeak !== 'number') n.fortitudePeak = n.fortitudeXp;
+        n.fortitudePeak = Math.max(n.fortitudePeak, n.fortitudeXp);
         if (!Array.isArray(n.relapseLog))           n.relapseLog   = [];
         if (!n.parryLog || typeof n.parryLog !== 'object') n.parryLog = {};
         if (!n.hasOwnProperty('chaserExpiry'))       n.chaserExpiry = null;
@@ -7924,6 +7926,58 @@ function loadState() {
           milestones:DEFAULT_NEG_MILESTONES.map(m=>({...m})),
           fortitudeXp:0, fortitudePeak:0, relapseLog:[], parryLog:{},
           chaserExpiry:null, chaserRelapseCount:0, done:{},
+        });
+      }
+      // ── One-time habit reset to exact final state (2026-05) ──
+      if (!s._habitReset2026) {
+        s._habitReset2026 = true;
+        const _nr = t => t.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+        const _m  = (text, key) => key === 'read' ? /\bread\b/.test(_nr(text)) : _nr(text).includes(key);
+        // Exact daily habit plan — order defines display order
+        const PLAN_H = [
+          { key:'training',       tod:'morning', gains:{STR:9,DEX:4,CON:4,VOL:2}, xp:190 },
+          { key:'wake up early',  tod:'morning', gains:{VOL:3,CON:1},              xp:40  },
+          { key:'make your bed',  tod:'morning', gains:{VOL:1,CHA:2},              xp:30  },
+          { key:'sun exposure',   tod:'morning', gains:{CON:1},                    xp:10  },
+          { key:'stretching',     tod:'morning', gains:{DEX:5,CON:1},              xp:60  },
+          { key:'wash clothes',   tod:'morning', gains:{VOL:1},                    xp:10  },
+          { key:'grateful',       tod:'night',   gains:{CHA:3,INT:2},              xp:50  },
+          { key:'drink 2',        tod:'night',   gains:{CON:2},                    xp:20  },
+          { key:'dishes',         tod:'night',   gains:{VOL:1,CHA:1},              xp:20  },
+          { key:'meditation',     tod:'night',   gains:{INT:3,VOL:1},              xp:40  },
+          { key:'read',           tod:'night',   gains:{INT:5},                    xp:50  },
+          { key:'brush teeth',    tod:'night',   gains:{CON:1,CHA:1},              xp:20  },
+          { key:'phone',          tod:'night',   gains:{},                         xp:10, newText:'NO PHONE USAGE 📵' },
+        ];
+        let _hId = Math.max(99, ...s.habitos.map(h => parseInt((h.id||'').replace(/\D/g,''))||0)) + 1;
+        s.habitos = PLAN_H.map(p => {
+          const ex = s.habitos.find(h => _m(h.text, p.key));
+          return ex
+            ? { ...ex, timeOfDay:p.tod, gains:{...p.gains}, xp:p.xp }
+            : { id:`h${_hId++}`, text:(p.newText||p.key), timeOfDay:p.tod, gains:{...p.gains}, xp:p.xp, done:{} };
+        });
+        // Exact weekly habit plan
+        const PLAN_W = [
+          { key:'futbol',        gains:{STR:13,DEX:14,CON:6,CHA:5}, xp:380 },
+          { key:'padel',         gains:{STR:10,DEX:12,CON:5,CHA:4}, xp:310 },
+          { key:'home cleaning', gains:{DEX:4,VOL:6,CHA:7},          xp:170 },
+          { key:'complex meal',  gains:{CON:6,INT:5,VOL:5,CHA:5},   xp:210 },
+          { key:'shaving',       gains:{CON:6,VOL:2,CHA:14},         xp:220 },
+          { key:'water plants',  gains:{VOL:2,CHA:2},                xp:40  },
+          { key:'expenses',      gains:{INT:5},                       xp:50  },
+          { key:'analyze',       gains:{INT:6,VOL:1},                 xp:70  },
+        ];
+        let _wId = Math.max(99, ...s.weekly.map(w => parseInt((w.id||'').replace(/\D/g,''))||0)) + 1;
+        s.weekly = PLAN_W.map(p => {
+          const ex = s.weekly.find(w => _nr(w.text).includes(p.key));
+          return ex
+            ? { ...ex, gains:{...p.gains}, xp:p.xp }
+            : { id:`w${_wId++}`, text:p.key, gains:{...p.gains}, xp:p.xp, done:{} };
+        });
+        // Avoid habit stats
+        s.negativos.forEach(n => {
+          if (n.id === 'neg0') { n.gains = {STR:2,DEX:1,CON:1,INT:1,VOL:1,CHA:2}; n.xp = 80; }
+          if (n.id === 'neg1') { n.gains = {INT:1,VOL:2}; n.xp = 30; }
         });
       }
       return s;
