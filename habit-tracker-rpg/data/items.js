@@ -11,6 +11,61 @@ const EQUIP_SLOTS = [
   { id:'boots',     name:'Boots',    emoji:'👟', area:'boot' },
 ];
 
+// ── Crafted-instance RARITY + AFFIXES ───────────────────────────────
+// This is the rolled "quality" of a CRAFTED INSTANCE (stored on the inventory
+// entry as entry.quality/qualityMult/qualityLabel + entry.affixes). It is
+// SEPARATE from the fixed `item.rarity` definition field used to colour recipe
+// cards. Rarity gates a flat-stat multiplier AND the number of random % affix
+// slots; both flat stats and affix magnitude also scale with refine grade.
+const RARITY_TIERS = [
+  { id:'common',    label:'COMMON',    icon:'',   color:'#b0bec5', chance:0.50, statMult:1.00, slotBonus:0 },
+  { id:'uncommon',  label:'UNCOMMON',  icon:'✦',  color:'#81c784', chance:0.27, statMult:1.12, slotBonus:0 },
+  { id:'rare',      label:'RARE',      icon:'★',  color:'#64b5f6', chance:0.15, statMult:1.28, slotBonus:0 },
+  { id:'epic',      label:'EPIC',      icon:'✷',  color:'#ce93d8', chance:0.06, statMult:1.50, slotBonus:1 },
+  { id:'legendary', label:'LEGENDARY', icon:'👑', color:'#ffb300', chance:0.02, statMult:1.75, slotBonus:2 },
+];
+const RARITY_BY_ID = Object.fromEntries(RARITY_TIERS.map(r => [r.id, r]));
+// affix-magnitude multiplier per rarity (bigger rolls on rarer gear)
+const RARITY_AFFIX_MULT = { common:1.00, uncommon:1.15, rare:1.30, epic:1.50, legendary:1.70 };
+
+// Affix pool — rolled on T4+ gear. kind 'pct' = % combat multiplier, 'pts' = flat points.
+const AFFIX_POOL = [
+  { stat:'atkPct',   label:'ATK',   suffix:'%', kind:'pct', min:5, max:15, color:'#ff8a80' },
+  { stat:'hpPct',    label:'HP',    suffix:'%', kind:'pct', min:5, max:15, color:'#69f0ae' },
+  { stat:'defPct',   label:'DEF',   suffix:'%', kind:'pct', min:5, max:15, color:'#90caf9' },
+  { stat:'mpPct',    label:'MP',    suffix:'%', kind:'pct', min:5, max:15, color:'#b39ddb' },
+  { stat:'critPts',  label:'CRIT',  suffix:'%', kind:'pts', min:2, max:6,  color:'#ffd54f' },
+  { stat:'dodgePts', label:'DODGE', suffix:'%', kind:'pts', min:1, max:4,  color:'#4dd0e1' },
+];
+const AFFIX_BY_STAT = Object.fromEntries(AFFIX_POOL.map(a => [a.stat, a]));
+
+// Affix SLOT count = base-by-tier (T1-3:0 · T4-7:1 · T8-9:2) + rarity slotBonus.
+function affixBaseSlotsForTier(tier) { if (!tier || tier < 4) return 0; return tier < 8 ? 1 : 2; }
+function affixSlots(tier, rarityId) { return affixBaseSlotsForTier(tier) + (RARITY_BY_ID[rarityId]?.slotBonus || 0); }
+// Refine-grade scaling for affix magnitude (G1..G5): +12% per grade above 1.
+function affixGradeMult(grade) { return 1 + 0.12 * ((grade || 1) - 1); }
+// Display helpers (single source of truth for instance-rarity look).
+function rarityMeta(id) { return RARITY_BY_ID[id] || RARITY_BY_ID.common; }
+function affixLabel(a) { const m = AFFIX_BY_STAT[a.stat]; return m ? `+${a.val}${m.suffix} ${m.label}` : `+${a.val} ${a.stat}`; }
+
+// ── GEAR SETS — cross-slot bonuses that reward COMPLETING a loadout ──────
+// A slot "counts" toward a set when it holds a CRAFTED (forge) item. Sets span
+// multiple slots (one item per slot, so per-tree sets are impossible). Bonuses
+// use the affix stat vocabulary and fold into the SAME capped combat dimensions
+// (AFFIX_*_CAP), so they stay a bounded complement — they reward breadth of
+// forging, not a power blowup.
+const SET_BONUSES = [
+  { id:'warmonger', name:"Warmonger's Arsenal", icon:'⚔️', color:'#ff8a80',
+    slots:['weapon','shield','armor','belt'],
+    tiers:[ {pieces:2, bonus:{atkPct:6}}, {pieces:3, bonus:{atkPct:12, hpPct:8}}, {pieces:4, bonus:{atkPct:20, hpPct:14, critPts:4}} ] },
+  { id:'arcanist', name:"Arcanist's Regalia", icon:'✨', color:'#b39ddb',
+    slots:['helmet','necklace','bracelet','earring_l','earring_r'],
+    tiers:[ {pieces:2, bonus:{mpPct:10}}, {pieces:3, bonus:{mpPct:20, atkPct:8}}, {pieces:4, bonus:{mpPct:30, atkPct:14, critPts:4}} ] },
+  { id:'juggernaut', name:"Juggernaut's Bulwark", icon:'🛡️', color:'#90caf9',
+    slots:['armor','shield','helmet','belt','boots'],
+    tiers:[ {pieces:2, bonus:{hpPct:8}}, {pieces:3, bonus:{hpPct:16, defPct:10}}, {pieces:4, bonus:{hpPct:26, defPct:18, dodgePts:3}} ] },
+];
+
 const ITEMS_DB = {
   // ── DUNGEON DROP WEAPONS ─────────────────────────────────────
   iron_sword:       {id:'iron_sword',       name:'Iron Sword',       slot:'weapon',   rarity:'common',    emoji:'🗡️', stats:{STR:3,ATK:8},                           desc:'A reliable iron sword for beginners.'},

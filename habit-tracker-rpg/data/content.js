@@ -65,6 +65,17 @@ function _buildHarvestInfo(dateKey) {
     const c = getCompletion(h, dateKey);
     if (c) { done++; xp += c.xp || 0; STAT_KEYS.forEach(k => { gains[k] += (c.gains||{})[k]||0; }); }
   });
-  return { gains, xp, done, total: state.habitos.length, dateKey };
+  // Work tasks completed that day + gold earned from them
+  let workDone = 0, workGold = 0;
+  (state.trabajo || []).forEach(t => {
+    const c = t.done && t.done[dateKey];
+    if (c) { workDone++; workGold += (c.drops && c.drops.gold) || 0; }
+  });
+  // Avoid habits: clean if none logged a relapse that day
+  const avoidTotal = (state.negativos || []).length;
+  const avoidClean = avoidTotal > 0 && !(state.negativos || []).some(n => !!(n.done && n.done[dateKey]));
+  const total = state.habitos.length;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  return { gains, xp, done, total, pct, perfect: total > 0 && done === total, workDone, workGold, avoidTotal, avoidClean, dateKey };
 }
 

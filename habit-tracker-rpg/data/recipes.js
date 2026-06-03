@@ -146,6 +146,18 @@ const CRAFT_RECIPES = [
   { id:'r_boot_9', itemId:'f_boot_9', tree:'boot', tier:9, cost:{ crystal:245, timber:90, gear:36 },  reqCraft:{ f_boot_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
 ];
 
+// ── Item Mastery ───────────────────────────────────────────────
+// Craft-count thresholds per item. On crossing each threshold the player gets:
+//   tier 1 (5 crafts)  → -10% mat cost on this item forever
+//   tier 2 (15 crafts) → -20% mat cost
+//   tier 3 (40 crafts) → -25% mat cost + 3 shard one-time payout + MASTERED tag
+// Logic lives in mobile.html (getMasteryTier / checkForgeItemMastery).
+const MASTERY_TIERS = [
+  { at:5,  tier:1, matDisc:0.10, label:'Apprentice', emoji:'🔧' },
+  { at:15, tier:2, matDisc:0.20, label:'Journeyman', emoji:'⚒️' },
+  { at:40, tier:3, matDisc:0.25, label:'MASTERED',   emoji:'👑', shards:3 },
+];
+
 // ── Item Refinement ────────────────────────────────────────────
 // Stat multipliers at each grade (index 0 = Grade I)
 const GRADE_MULT = [1.0, 1.35, 1.80, 2.40, 3.20];
@@ -181,6 +193,9 @@ const GUILD_UPGRADES = [
   { id:'warehouse',    name:'Material Cache',     emoji:'📦', maxLevel:5,  baseCost:240, minWorkerLevel:15,
     effect:'bonusMat',        perLevel:'+1 mat per dungeon stage',
     desc:'Adds bonus materials to every dungeon stage cleared.' },
+  { id:'refinery',     name:'Transmuter',         emoji:'♻️', maxLevel:3,  baseCost:300, minWorkerLevel:12,
+    effect:'matRefine',       perLevel:'better material conversion ratio',
+    desc:'Unlocks the Transmuter — convert surplus materials into the type you need. Higher levels improve the ratio (Lv1 3→1 · Lv2 2→1 · Lv3 3→2).' },
   { id:'chronoforge',  name:'Chronoforge',        emoji:'⏱️', maxLevel:5,  baseCost:750, minWorkerLevel:25,
     effect:'forgeTime',       perLevel:'-10% forge craft time',
     desc:'Reduces the time required to complete all forge crafts. Stacks with Worker rank bonuses.' },
