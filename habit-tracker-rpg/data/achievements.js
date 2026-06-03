@@ -2,55 +2,58 @@
 // ACHIEVEMENTS (LOGROS)
 // ============================================================
 // Achievement reward design: ALL rewards use statAll:true — every tier's reward is added to
-// ALL 6 stats equally. Sum of all reward values across every tier = 700, so each stat gains
-// exactly 700 points from achievements (700 × 6 × 10 = 42,000 XP total).
+// ALL 6 stats equally.
 //
-// Budget: daily(324) + weekly(110) + ranks(32) + classes(19) +
-//   stat_mastery(90) + balance(11) + streak(21) + perf_week(40) +
-//   perf_day(13) + phoenix(19) + avoid(21) + work(167) = 867
+// Habit-linked achievements track 1:1 with the actual habits:
+//   daily = 10 (one per daily habit, each 1/1/2/4/7/13 = 28)
+//   weekly = 8 (one per weekly habit, each 1/2/3/5/11 = 22)
+// The rest (ranks, classes, stat mastery, balance, streak, perfection, resilience, work)
+// are progress/milestone achievements unrelated to specific habits.
 const ACHIEVEMENTS = [
   // ── ONBOARDING — pre-claimable on first load ─────────────────
   { id:'system_online', name:'System Online', icon:'⚡', category:'hitos',
     desc:'Connected to the Hunter System for the first time.',
     statAll:true, tiers:[{count:1, label:'The Awakening', reward:1, title:'The Awakened'}] },
 
-  // ── PROGRESIÓN — 12 hábitos diarios  (each: 1/2/4/7/13 = 27 × 12 = 324) ──
-  { id:'wake7am',    name:'Early Riser',      icon:'🌅', category:'progresion', desc:'Wake up at 7am',                              textMatch:'7am',           stat:'CON', statAll:true,
+  // ── PROGRESIÓN — 10 hábitos diarios  (one achievement per daily habit; each: 1/1/2/4/7/13) ──
+  { id:'wake7am',    name:'Early Riser',      icon:'🌅', category:'progresion', desc:'Wake up early',                               textMatch:'wake up',       stat:'CON', statAll:true,
     tiers:[{count:1,label:'First Dawn',reward:1,title:null},{count:10,label:'The Sleeper Defeated',reward:1,title:null},{count:30,label:'Dawn Guardian',reward:2,title:null},{count:100,label:'Dawn Hunter',reward:4,title:'Dawn Hunter'},{count:200,label:'Lord of Time',reward:7,title:'Lord of Time'},{count:365,label:'ASCENDED',reward:13,title:'ASCENDED'}]},
-  { id:'hydration',  name:'Hydrated',         icon:'💧', category:'progresion', desc:'Drink 2L of water',                           textMatch:'water',         stat:'CON', statAll:true,
-    tiers:[{count:1,label:'First Drop',reward:1,title:null},{count:10,label:'Steady',reward:1,title:null},{count:30,label:'Steady Flow',reward:2,title:null},{count:100,label:'Fountain of Life',reward:4,title:'Fountain of Life'},{count:200,label:'Pure Torrent',reward:7,title:'Pure Torrent'},{count:365,label:'INNER SEA',reward:13,title:'INNER SEA'}]},
-  { id:'walk',       name:'Walker',           icon:'🚶', category:'progresion', desc:'Walk to the park',                            textMatch:'park',          stat:'DEX', statAll:true,
-    tiers:[{count:1,label:'First Steps',reward:1,title:null},{count:10,label:'Stroller',reward:1,title:null},{count:30,label:'Explorer',reward:2,title:null},{count:100,label:'Ranger',reward:4,title:'Ranger'},{count:200,label:'Dawn Nomad',reward:7,title:'Dawn Nomad'},{count:365,label:'LORD OF THE PATH',reward:13,title:'LORD OF THE PATH'}]},
-  { id:'meditation', name:'Calm Mind',        icon:'🧘', category:'progresion', desc:'Meditation (10 min)',                         textMatch:'meditation',    stat:'VOL', statAll:true,
-    tiers:[{count:1,label:'First Breath',reward:1,title:null},{count:10,label:'Zen Apprentice',reward:1,title:null},{count:30,label:'Meditator',reward:2,title:null},{count:100,label:'Crystal Mind',reward:4,title:'Crystal Mind'},{count:200,label:'Contemplative',reward:7,title:'Contemplative'},{count:365,label:'SACRED VOID',reward:13,title:'SACRED VOID'}]},
-  { id:'training',   name:'Warrior',          icon:'💪', category:'progresion', desc:'Physical training',                           textMatch:'training',      stat:'STR', statAll:true,
-    tiers:[{count:1,label:'First Rep',reward:1,title:null},{count:10,label:'Novice',reward:1,title:null},{count:30,label:'Soldier',reward:2,title:null},{count:100,label:'Iron Veteran',reward:4,title:'Iron Veteran'},{count:200,label:'Champion',reward:7,title:'Champion'},{count:365,label:'LIVING LEGEND',reward:13,title:'LIVING LEGEND'}]},
-  { id:'journal',    name:'Strategist',       icon:'📝', category:'progresion', desc:'Log wins of the day and task #1 for tomorrow', textMatch:"log today",    stat:'INT', statAll:true,
-    tiers:[{count:1,label:'First Entry',reward:1,title:null},{count:10,label:'Note Taker',reward:1,title:null},{count:30,label:'Planner',reward:2,title:null},{count:100,label:'Strategist',reward:4,title:'Strategist'},{count:200,label:'Visionary',reward:7,title:'Visionary'},{count:365,label:'MASTER OF TIME',reward:13,title:'MASTER OF TIME'}]},
-  { id:'gratitude',  name:'Grateful',         icon:'🙏', category:'progresion', desc:'Write 3 things you are grateful for',         textMatch:'grateful',      stat:'CHA', statAll:true,
-    tiers:[{count:1,label:'First Thanks',reward:1,title:null},{count:10,label:'Mindful',reward:1,title:null},{count:30,label:'Generous',reward:2,title:null},{count:100,label:'Open Heart',reward:4,title:'Open Heart'},{count:200,label:'Light of the Group',reward:7,title:'Light of the Group'},{count:365,label:'PURE SOUL',reward:13,title:'PURE SOUL'}]},
-  { id:'dishes',     name:'Order',            icon:'🍽️', category:'progresion', desc:'Wash dishes',                                 textMatch:'dishes',        stat:'VOL', statAll:true,
-    tiers:[{count:1,label:'First Wash',reward:1,title:null},{count:10,label:'The Washer',reward:1,title:null},{count:30,label:'Disciplined',reward:2,title:null},{count:100,label:'Master of Order',reward:4,title:'Master of Order'},{count:200,label:'Home Guardian',reward:7,title:'Home Guardian'},{count:365,label:'DOMESTIC MONK',reward:13,title:'DOMESTIC MONK'}]},
   { id:'bed',        name:'Solid Foundation', icon:'🛏️', category:'progresion', desc:'Make your bed',                               textMatch:'your bed',      stat:'CHA', statAll:true,
     tiers:[{count:1,label:'First Made',reward:1,title:null},{count:10,label:'The Methodical',reward:1,title:null},{count:30,label:'The Consistent',reward:2,title:null},{count:100,label:'Home Artisan',reward:4,title:'Home Artisan'},{count:200,label:'Day Architect',reward:7,title:'Day Architect'},{count:365,label:'RITUAL FORGER',reward:13,title:'RITUAL FORGER'}]},
-  { id:'reading',    name:'Bibliophile',      icon:'📖', category:'progresion', desc:'Read',                                        textMatch:'read',          stat:'INT', statAll:true,
-    tiers:[{count:1,label:'First Page',reward:1,title:null},{count:10,label:'Curious',reward:1,title:null},{count:30,label:'Studious',reward:2,title:null},{count:100,label:'Scholar',reward:4,title:'Scholar'},{count:200,label:'Sage',reward:7,title:'Sage'},{count:365,label:'MASTER OF KNOWLEDGE',reward:13,title:'MASTER OF KNOWLEDGE'}]},
   { id:'stretching', name:'Agile',            icon:'🤸', category:'progresion', desc:'Stretching',                                  textMatch:'stretching',    stat:'DEX', statAll:true,
     tiers:[{count:1,label:'First Stretch',reward:1,title:null},{count:10,label:'Stiffness Overcome',reward:1,title:null},{count:30,label:'Flexible',reward:2,title:null},{count:100,label:'Agile',reward:4,title:'Agile'},{count:200,label:'Acrobat',reward:7,title:'Acrobat'},{count:365,label:'SPIRIT OF THE WIND',reward:13,title:'SPIRIT OF THE WIND'}]},
-  { id:'phone',      name:'Focused',          icon:'📵', category:'progresion', desc:'Mindful phone use',                           textMatch:'phone usage',   stat:'VOL', statAll:true,
-    tiers:[{count:1,label:'First Limit',reward:1,title:null},{count:10,label:'Mindful',reward:1,title:null},{count:30,label:'Unplugged',reward:2,title:null},{count:100,label:'Free Mind',reward:4,title:'Free Mind'},{count:200,label:'Unchained',reward:7,title:'Unchained'},{count:365,label:'DIGITAL SOVEREIGN',reward:13,title:'DIGITAL SOVEREIGN'}]},
+  { id:'reading',    name:'Bibliophile',      icon:'📖', category:'progresion', desc:'Read',                                        textMatch:'read',          stat:'INT', statAll:true,
+    tiers:[{count:1,label:'First Page',reward:1,title:null},{count:10,label:'Curious',reward:1,title:null},{count:30,label:'Studious',reward:2,title:null},{count:100,label:'Scholar',reward:4,title:'Scholar'},{count:200,label:'Sage',reward:7,title:'Sage'},{count:365,label:'MASTER OF KNOWLEDGE',reward:13,title:'MASTER OF KNOWLEDGE'}]},
+  { id:'gratitude',  name:'Grateful',         icon:'🙏', category:'progresion', desc:'Write 3 things you are grateful for',         textMatch:'grateful',      stat:'CHA', statAll:true,
+    tiers:[{count:1,label:'First Thanks',reward:1,title:null},{count:10,label:'Mindful',reward:1,title:null},{count:30,label:'Generous',reward:2,title:null},{count:100,label:'Open Heart',reward:4,title:'Open Heart'},{count:200,label:'Light of the Group',reward:7,title:'Light of the Group'},{count:365,label:'PURE SOUL',reward:13,title:'PURE SOUL'}]},
+  { id:'training',   name:'Warrior',          icon:'💪', category:'progresion', desc:'Physical training',                           textMatch:'training',      stat:'STR', statAll:true,
+    tiers:[{count:1,label:'First Rep',reward:1,title:null},{count:10,label:'Novice',reward:1,title:null},{count:30,label:'Soldier',reward:2,title:null},{count:100,label:'Iron Veteran',reward:4,title:'Iron Veteran'},{count:200,label:'Champion',reward:7,title:'Champion'},{count:365,label:'LIVING LEGEND',reward:13,title:'LIVING LEGEND'}]},
+  { id:'hydration',  name:'Hydrated',         icon:'💧', category:'progresion', desc:'Drink 2L of water',                           textMatch:'water',         stat:'CON', statAll:true,
+    tiers:[{count:1,label:'First Drop',reward:1,title:null},{count:10,label:'Steady',reward:1,title:null},{count:30,label:'Steady Flow',reward:2,title:null},{count:100,label:'Fountain of Life',reward:4,title:'Fountain of Life'},{count:200,label:'Pure Torrent',reward:7,title:'Pure Torrent'},{count:365,label:'INNER SEA',reward:13,title:'INNER SEA'}]},
+  { id:'dishes',     name:'Order',            icon:'🍽️', category:'progresion', desc:'Wash dishes / clean room',                    textMatch:'dishes',        stat:'VOL', statAll:true,
+    tiers:[{count:1,label:'First Wash',reward:1,title:null},{count:10,label:'The Washer',reward:1,title:null},{count:30,label:'Disciplined',reward:2,title:null},{count:100,label:'Master of Order',reward:4,title:'Master of Order'},{count:200,label:'Home Guardian',reward:7,title:'Home Guardian'},{count:365,label:'DOMESTIC MONK',reward:13,title:'DOMESTIC MONK'}]},
+  { id:'meditation', name:'Calm Mind',        icon:'🧘', category:'progresion', desc:'Meditation (10 min)',                         textMatch:'meditation',    stat:'VOL', statAll:true,
+    tiers:[{count:1,label:'First Breath',reward:1,title:null},{count:10,label:'Zen Apprentice',reward:1,title:null},{count:30,label:'Meditator',reward:2,title:null},{count:100,label:'Crystal Mind',reward:4,title:'Crystal Mind'},{count:200,label:'Contemplative',reward:7,title:'Contemplative'},{count:365,label:'SACRED VOID',reward:13,title:'SACRED VOID'}]},
+  { id:'brush_teeth',name:'Pristine Smile',   icon:'🦷', category:'progresion', desc:'Brush your teeth',                            textMatch:'brush teeth',   stat:'CON', statAll:true,
+    tiers:[{count:1,label:'First Brush',reward:1,title:null},{count:10,label:'Fresh',reward:1,title:null},{count:30,label:'Spotless',reward:2,title:null},{count:100,label:'Pristine',reward:4,title:'Pristine'},{count:200,label:'Enamel Guardian',reward:7,title:'Enamel Guardian'},{count:365,label:'IVORY SOVEREIGN',reward:13,title:'IVORY SOVEREIGN'}]},
 
-  // ── PROGRESIÓN — 5 hábitos semanales  (each: 1/2/3/5/11 = 22 × 5 = 110) ──
-  { id:'weekly_futbol',   name:'Football',      icon:'⚽', category:'progresion', desc:'Play football',            weeklyId:'w0', weeklyTextMatch:'futbol', stat:'STR', statAll:true,
+  // ── PROGRESIÓN — 8 hábitos semanales  (one achievement per weekly habit; each: 1/2/3/5/11) ──
+  { id:'weekly_futbol',   name:'Football',      icon:'⚽', category:'progresion', desc:'Play football',            weeklyId:'w0', weeklyTextMatch:'fútbol', stat:'STR', statAll:true,
     tiers:[{count:1,label:'First Match',reward:1,title:null},{count:3,label:'Regular',reward:2,title:null},{count:10,label:'Seasoned Player',reward:3,title:'Seasoned Player'},{count:25,label:'Field General',reward:5,title:'Field General'},{count:50,label:'LIVING BALL',reward:11,title:'LIVING BALL'}]},
-  { id:'weekly_padel',    name:'Padel',         icon:'🎾', category:'progresion', desc:'Play padel',               weeklyId:'w1', weeklyTextMatch:'padel', stat:'DEX', statAll:true,
+  { id:'weekly_padel',    name:'Padel',         icon:'🎾', category:'progresion', desc:'Play padel',               weeklyId:'w1', weeklyTextMatch:'pádel', stat:'DEX', statAll:true,
     tiers:[{count:1,label:'First Rally',reward:1,title:null},{count:3,label:'Regular',reward:2,title:null},{count:10,label:'Court Regular',reward:3,title:'Court Regular'},{count:25,label:'Net Master',reward:5,title:'Net Master'},{count:50,label:'PADEL KING',reward:11,title:'PADEL KING'}]},
-  { id:'weekly_cleaning', name:'Home Guardian', icon:'🧹', category:'progresion', desc:'Deep clean the house',     weeklyId:'w2', weeklyTextMatch:'limpie', stat:'VOL', statAll:true,
+  { id:'weekly_cleaning', name:'Home Guardian', icon:'🏠', category:'progresion', desc:'Deep clean the house',     weeklyId:'w2', weeklyTextMatch:'home cleaning', stat:'VOL', statAll:true,
     tiers:[{count:1,label:'Swept',reward:1,title:null},{count:3,label:'Consistent',reward:2,title:null},{count:10,label:'Order Keeper',reward:3,title:'Order Keeper'},{count:25,label:'Sanctuary Builder',reward:5,title:'Sanctuary Builder'},{count:50,label:'DOMAIN SOVEREIGN',reward:11,title:'DOMAIN SOVEREIGN'}]},
-  { id:'weekly_cooking',  name:'Chef',          icon:'🍳', category:'progresion', desc:'Cook a complex dish',      weeklyId:'w3', weeklyTextMatch:'cocinar', stat:'INT', statAll:true,
+  { id:'weekly_cooking',  name:'Chef',          icon:'🍳', category:'progresion', desc:'Cook a complex meal',      weeklyId:'w3', weeklyTextMatch:'cook', stat:'INT', statAll:true,
     tiers:[{count:1,label:'First Dish',reward:1,title:null},{count:3,label:'Home Cook',reward:2,title:null},{count:10,label:'Culinary Student',reward:3,title:'Culinary Student'},{count:25,label:'Master Chef',reward:5,title:'Master Chef'},{count:50,label:'GASTRONOMIC LEGEND',reward:11,title:'GASTRONOMIC LEGEND'}]},
-  { id:'weekly_grooming', name:'Polished',      icon:'💈', category:'progresion', desc:'Deep grooming session',    weeklyId:'w4', weeklyTextMatch:'acicala', stat:'CHA', statAll:true,
+  { id:'weekly_grooming', name:'Polished',      icon:'🪒', category:'progresion', desc:'Deep grooming session',    weeklyId:'w4', weeklyTextMatch:'shaving', stat:'CHA', statAll:true,
     tiers:[{count:1,label:'First Polish',reward:1,title:null},{count:3,label:'Presentable',reward:2,title:null},{count:10,label:'Sharp',reward:3,title:'Sharp'},{count:25,label:'Immaculate',reward:5,title:'Immaculate'},{count:50,label:'SOVEREIGN IMAGE',reward:11,title:'SOVEREIGN IMAGE'}]},
+  { id:'weekly_plants',   name:'Gardener',      icon:'🪴', category:'progresion', desc:'Water the plants',         weeklyId:'w5', weeklyTextMatch:'plants', stat:'CHA', statAll:true,
+    tiers:[{count:1,label:'First Sprout',reward:1,title:null},{count:3,label:'Green Thumb',reward:2,title:null},{count:10,label:'Cultivator',reward:3,title:'Cultivator'},{count:25,label:'Garden Keeper',reward:5,title:'Garden Keeper'},{count:50,label:'LIFE GIVER',reward:11,title:'LIFE GIVER'}]},
+  { id:'weekly_expenses', name:'Treasurer',     icon:'📊', category:'progresion', desc:"Log the week's expenses",  weeklyId:'w6', weeklyTextMatch:'expenses', stat:'INT', statAll:true,
+    tiers:[{count:1,label:'First Ledger',reward:1,title:null},{count:3,label:'Bookkeeper',reward:2,title:null},{count:10,label:'Accountant',reward:3,title:'Accountant'},{count:25,label:'Treasurer',reward:5,title:'Treasurer'},{count:50,label:'COIN SOVEREIGN',reward:11,title:'COIN SOVEREIGN'}]},
+  { id:'weekly_review',   name:'Analyst',       icon:'🔍', category:'progresion', desc:"Analyze the week's results", weeklyId:'w7', weeklyTextMatch:'analyze', stat:'INT', statAll:true,
+    tiers:[{count:1,label:'First Review',reward:1,title:null},{count:3,label:'Reflective',reward:2,title:null},{count:10,label:'Strategist',reward:3,title:'Strategist'},{count:25,label:'Visionary',reward:5,title:'Visionary'},{count:50,label:'GRAND ANALYST',reward:11,title:'GRAND ANALYST'}]},
 
   // ── HITOS DE RANGO  (1+1+2+3+4+5+7+9 = 32) ─────────────────
   { id:'rank_e',   name:'Rank E',   icon:'🟢', category:'hitos', desc:'Reach Rank E',   rankMinLevel:1,  statAll:true, tiers:[{count:1,label:'The Journey Begins',  reward:1, title:null}]},

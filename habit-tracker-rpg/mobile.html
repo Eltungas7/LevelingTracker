@@ -8126,23 +8126,29 @@ function playSocialExpression() {
 }
 
 function playSocialResilience() {
-  // Grounded power thud — E2+B2 sawtooth low strike + E3 sine sustain + metallic noise clank
+  // Rising-up resolve — grounded C3 warmth swelling into a bright C4→E4→G4→C5 major
+  // arpeggio with a soft shimmer tail. Steadfast but uplifting (you bounce back), not heavy.
   if (!soundEnabled || !_ACtx) return;
   try {
     const ctx = _getCtx(), t = ctx.currentTime;
-    const comp = ctx.createDynamicsCompressor(); comp.threshold.value=-6; comp.knee.value=3; comp.ratio.value=4; comp.attack.value=0.001; comp.release.value=0.14; comp.connect(ctx.destination);
-    [[82.41,0.00,0.38,'sawtooth'],[123.47,0.00,0.32,'sawtooth'],[164.81,0.04,0.62,'sine']].forEach(([f,s,d,type],i) => {
-      const o=ctx.createOscillator(),g=ctx.createGain(); o.type=type; o.frequency.value=f;
-      g.gain.setValueAtTime(0,t+s); g.gain.linearRampToValueAtTime(0.11-i*0.02,t+s+0.006);
-      g.gain.setValueAtTime(0.11-i*0.02,t+s+d*0.40); g.gain.exponentialRampToValueAtTime(0.001,t+s+d+0.10);
-      o.connect(g); g.connect(comp); o.start(t+s); o.stop(t+s+d+0.14);
+    const master = ctx.createGain(); master.gain.value = 0.34; master.connect(ctx.destination);
+    // Grounded warm root — soft swell, no harsh attack
+    const root=ctx.createOscillator(),rg=ctx.createGain(); root.type='triangle'; root.frequency.value=130.81;
+    rg.gain.setValueAtTime(0,t); rg.gain.linearRampToValueAtTime(0.16,t+0.05);
+    rg.gain.setValueAtTime(0.16,t+0.40); rg.gain.exponentialRampToValueAtTime(0.001,t+0.95);
+    root.connect(rg); rg.connect(master); root.start(t); root.stop(t+1.0);
+    // Confident rising major arpeggio — C4 → E4 → G4 → C5
+    [[261.63,0.00,0.40],[329.63,0.10,0.40],[392.00,0.20,0.46],[523.25,0.32,0.70]].forEach(([f,s,d]) => {
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,t+s); g.gain.linearRampToValueAtTime(0.20,t+s+0.018);
+      g.gain.setValueAtTime(0.20,t+s+d*0.46); g.gain.exponentialRampToValueAtTime(0.001,t+s+d+0.14);
+      o.connect(g); g.connect(master); o.start(t+s); o.stop(t+s+d+0.17);
     });
-    const bufLen = Math.floor(ctx.sampleRate*0.055), nb=ctx.createBuffer(1,bufLen,ctx.sampleRate), nd=nb.getChannelData(0);
-    for (let i=0;i<bufLen;i++) nd[i]=(Math.random()*2-1)*Math.exp(-i/(ctx.sampleRate*0.010));
-    const ns=ctx.createBufferSource(); ns.buffer=nb;
-    const hpf=ctx.createBiquadFilter(); hpf.type='highpass'; hpf.frequency.value=1400;
-    const ng=ctx.createGain(); ng.gain.value=0.24;
-    ns.connect(hpf); hpf.connect(ng); ng.connect(comp); ns.start(t);
+    // Soft bright shimmer over the resolve
+    const sh=ctx.createOscillator(),sg=ctx.createGain(); sh.type='sine'; sh.frequency.value=1046.50;
+    sg.gain.setValueAtTime(0,t+0.32); sg.gain.linearRampToValueAtTime(0.045,t+0.40);
+    sg.gain.exponentialRampToValueAtTime(0.001,t+1.05);
+    sh.connect(sg); sg.connect(master); sh.start(t+0.32); sh.stop(t+1.10);
   } catch(e) {}
 }
 
@@ -8342,21 +8348,18 @@ function tierFor(pts) {
 // DEFAULT DATA
 // ============================================================
 const DEFAULT_HABITOS = [
-  // ── Morning ──
-  { id:'h0',  text:'Training 🏋️',          xp:190, gains:{STR:9,DEX:4,CON:4,VOL:2}, timeOfDay:'morning' },
+  // ── Morning (4) ──
   { id:'h1',  text:'Wake up early 🕐',      xp:40,  gains:{VOL:3,CON:1},              timeOfDay:'morning' },
   { id:'h2',  text:'Make your bed 🛏️',      xp:30,  gains:{VOL:1,CHA:2},              timeOfDay:'morning' },
-  { id:'h3',  text:'Sun exposure ☀️',       xp:10,  gains:{CON:1},                    timeOfDay:'morning' },
   { id:'h4',  text:'Stretching 🤸',         xp:60,  gains:{DEX:5,CON:1},              timeOfDay:'morning' },
-  { id:'h5',  text:'Wash clothes 👕',       xp:10,  gains:{VOL:1},                    timeOfDay:'morning' },
-  // ── Night ──
-  { id:'h6',  text:'Gratitude 🙏',          xp:50,  gains:{CHA:3,INT:2},              timeOfDay:'night' },
+  { id:'h10', text:'Read 📖',               xp:50,  gains:{INT:5},                    timeOfDay:'morning' },
+  // ── Night (6) ──
+  { id:'h6',  text:'Be grateful for 3 things today 🙏', xp:50, gains:{CHA:3,INT:2},   timeOfDay:'night' },
+  { id:'h0',  text:'Training 🏋️',          xp:190, gains:{STR:9,DEX:4,CON:4,VOL:2}, timeOfDay:'night' },
   { id:'h7',  text:'Drink 2L water 💧',     xp:20,  gains:{CON:2},                    timeOfDay:'night' },
   { id:'h8',  text:'Dishes / clean room 🍽️',xp:20,  gains:{VOL:1,CHA:1},              timeOfDay:'night' },
   { id:'h9',  text:'Meditation 🧘',         xp:40,  gains:{INT:3,VOL:1},              timeOfDay:'night' },
-  { id:'h10', text:'Read 📖',               xp:50,  gains:{INT:5},                    timeOfDay:'night' },
   { id:'h11', text:'Brush teeth 🦷',        xp:20,  gains:{CON:1,CHA:1},              timeOfDay:'night' },
-  { id:'h12', text:'NO PHONE USAGE 📵',     xp:10,  gains:{},                         timeOfDay:'night' },
 ];
 // Shared milestone definitions — reused for migration of old saves
 const DEFAULT_NEG_MILESTONES = [
@@ -8434,12 +8437,21 @@ const WORK_MATERIALS = {
 const MAT_ICONS = { timber:'img/icons/mat-timber.png', scroll:'img/icons/mat-scroll.png', crystal:'img/icons/mat-crystal.png', gear:'img/icons/mat-gear.png' };
 function matIconImg(matId, sz) { sz = sz||16; const s = MAT_ICONS[matId]; return s ? `<img src="${s}" style="width:${sz}px;height:${sz}px;object-fit:contain;vertical-align:middle;image-rendering:auto">` : ''; }
 function goldImg(sz) { sz = sz||20; return `<img src="img/gold.png" style="width:${sz}px;height:${sz}px;object-fit:contain;vertical-align:middle;image-rendering:auto">`; }
-const TASK_DIFF_CFG = {
-  easy:      { label:'Easy',      emoji:'🟢', xp:25,  gold:10,  mats:1 },
-  normal:    { label:'Normal',    emoji:'🔵', xp:50,  gold:25,  mats:2 },
-  hard:      { label:'Hard',      emoji:'🟠', xp:100, gold:50,  mats:3 },
-  legendary: { label:'Legendary', emoji:'🔴', xp:175, gold:100, mats:5 },
+// Work tasks have NO self-rated difficulty. Every completion pays a single BASE
+// reward; completing a task INSIDE one focus session pays the IN-FLOW reward (the
+// highest — it rewards small tasks and breaking big ones into session-sized steps).
+// Tasks give Worker XP + gold + RANDOM materials — never character XP, never shards.
+const WORK_TASK_REWARD = {
+  base:   { gold:12, wxp:15, mats:1 },
+  inflow: { gold:45, wxp:50, mats:3 },
 };
+const WORK_MAT_POOL = [
+  { id:'timber',  emoji:'🪵', label:'Timber'   },
+  { id:'scroll',  emoji:'📜', label:'Scrolls'  },
+  { id:'crystal', emoji:'💎', label:'Crystals' },
+  { id:'gear',    emoji:'⚙️', label:'Gears'    },
+];
+function rollWorkMat() { return WORK_MAT_POOL[Math.floor(Math.random() * WORK_MAT_POOL.length)]; }
 
 // ── Shop levels (keyed on totalGoldEarned) ───────────────────
 const SHOP_LEVELS = [
@@ -8536,17 +8548,16 @@ const CLIENT_MAT_FLAVORS = {
 const CLIENT_TITLES = ['Client Request', 'Private Commission', 'Merchant Order', "Patron's Request", 'Bespoke Contract'];
 
 // Returns the drop payload for a work task: gold + material.
-function getWorkTaskDrops(categoryId, difficultyId) {
-  const diff = TASK_DIFF_CFG[difficultyId] || TASK_DIFF_CFG.normal;
-  const mat  = categoryId ? WORK_MATERIALS[categoryId] : null;
+function getWorkTaskDrops(categoryId) {
+  // Base preview drops for a work task. The actual material is rolled at completion
+  // (random), so the stored preview leaves matId null and just carries the base qty.
   return {
-    gold:     diff.gold,
-    matId:    mat ? mat.id    : null,
-    matTier:  1, // work tasks always drop T1; dungeons may drop T2/T3 (Step B)
-    matQty:   diff.mats,
-    matEmoji: mat ? mat.emoji : null,
-    matLabel: mat ? mat.label : null,
-    shards:   difficultyId === 'legendary' ? 2 : 0, // prestige drop for real hard work
+    gold:     WORK_TASK_REWARD.base.gold,
+    matId:    null,
+    matTier:  1,
+    matQty:   WORK_TASK_REWARD.base.mats,
+    matEmoji: null,
+    matLabel: null,
   };
 }
 
@@ -8958,7 +8969,9 @@ function loadState() {
       s.weekly.forEach(w=>{ if(!w.done) w.done={}; });
       s.trabajo.forEach(t=>{ if(!t.done) t.done={}; });
       // Migrate old trabajo tasks: swap stat gains → shop drops
-      s.trabajo.forEach(t=>{ if(!t.drops){ t.drops=getWorkTaskDrops(t.category,t.difficulty); t.gains={}; } });
+      // Difficulty retired: work tasks now pay Worker XP + gold + random mats (no
+      // character XP). Strip difficulty, zero character XP, refresh base drop preview.
+      s.trabajo.forEach(t=>{ t.xp=0; delete t.difficulty; t.gains={}; t.drops=getWorkTaskDrops(t.category); });
       s.negativos.forEach(n=>{ if(!n.done) n.done={}; });
       // ── Migrate avoid habits to new streak format ──────────────
       s.negativos.forEach(n => {
@@ -10124,22 +10137,29 @@ let selectedTaskCategory   = null;   // null = no category (VOL-only)
 let selectedTaskDifficulty = 'normal';
 
 // ── Per-archetype primary attack value ───────────────────────────────────────
-function calcPrimaryAtk(archetype, st, eq) {
-  const S = k => (st[k]||0)+(eq[k]||0);
+// Takes an EFFECTIVE stat pool { STR,DEX,CON,INT,VOL,CHA } (base stats + gear folded
+// in pre-√ + affix scaling), so gear is valued exactly like earned stats.
+function calcPrimaryAtk(archetype, S) {
+  const q = k => Math.sqrt(S[k]||0);
   switch(archetype) {
-    case 'warrior': return 12+Math.round(Math.sqrt(S('STR'))*2.6)+Math.round(Math.sqrt(S('CON'))*0.8);
-    case 'guardian':return 10+Math.round(Math.sqrt(S('CON'))*2.1)+Math.round(Math.sqrt(S('STR'))*0.6);
-    case 'rogue':   return 10+Math.round(Math.sqrt(S('DEX'))*2.4)+Math.round(Math.sqrt(S('CHA'))*0.7);
-    case 'bard':    return  6+Math.round(Math.sqrt(S('CHA'))*1.9)+Math.round(Math.sqrt(S('INT'))*0.5);
-    case 'mage':    return  6+Math.round(Math.sqrt(S('INT'))*3.2)+Math.round(Math.sqrt(S('VOL'))*0.9);
-    case 'monk':    return 10+Math.round(Math.sqrt(S('CON'))*2.0)+Math.round(Math.sqrt(S('STR'))*1.2)+Math.round(Math.sqrt(S('VOL'))*0.6);
-    default:        return 10+Math.round(Math.sqrt(S('STR'))*2.5);
+    case 'warrior': return 12+Math.round(q('STR')*2.6)+Math.round(q('CON')*0.8);
+    case 'guardian':return 10+Math.round(q('CON')*2.1)+Math.round(q('STR')*0.6);
+    case 'rogue':   return 10+Math.round(q('DEX')*2.4)+Math.round(q('CHA')*0.7);
+    case 'bard':    return  6+Math.round(q('CHA')*1.9)+Math.round(q('INT')*0.5);
+    case 'mage':    return  6+Math.round(q('INT')*3.2)+Math.round(q('VOL')*0.9);
+    case 'monk':    return 10+Math.round(q('CON')*2.0)+Math.round(q('STR')*1.2)+Math.round(q('VOL')*0.6);
+    default:        return 10+Math.round(q('STR')*2.5);
   }
 }
 
-// Affix dimension caps — total bonus a full loadout can stack in one dimension.
-// Keeps gear a strong COMPLEMENT (per the 70/30 philosophy), not a runaway ×3.
-const AFFIX_ATK_CAP = 60, AFFIX_HP_CAP = 60, AFFIX_MP_CAP = 60;
+// Affix dimension caps — total % bonus a full loadout can stack in one dimension.
+// Tuned so a full best-in-game set lands near ×2 combat ("doubles you"), honestly —
+// these % scale the STAT POOLS (pre-√), so they're a real but bounded mirror.
+const AFFIX_ATK_CAP = 15, AFFIX_HP_CAP = 15, AFFIX_MP_CAP = 15;
+// Stat-points granted per point of gear ATK/HP/DEF/MP when folded into the pools.
+// Calibrated (with the affix caps + chance bounds above) so a full best-in-game set
+// lands near ×2 combat — "doubles you" (Gear Power ≈ +130-150% of base CP at endgame).
+const GEAR_FOLD_K = 0.04;
 // Active gear sets: for each SET_BONUSES def, count equipped slots holding a
 // CRAFTED item, return the highest tier threshold met (+ its bonus). Drives both
 // combat (folded into affix dimensions) and the FORGE/CHAR set-progress display.
@@ -10178,60 +10198,66 @@ function getEquippedAffixTotals() {
 function calcPlayerCombatStats(includeGear) {
   if (includeGear === undefined) includeGear = true; // combat = with gear; pass false for the Hunter-Grade roll-up
   const lv = calcLevel(state.totalXp), eq = includeGear ? getEquippedStats() : {}, st = state.stats;
-  const STR = (st.STR||0)+(eq.STR||0), DEX = (st.DEX||0)+(eq.DEX||0);
-  const CON = (st.CON||0)+(eq.CON||0), INT = (st.INT||0)+(eq.INT||0);
-  const VOL = (st.VOL||0)+(eq.VOL||0), CHA = (st.CHA||0)+(eq.CHA||0);
   const level = lv.level;
   const archetype  = getPlayerArchetype();
+  // ── GEAR = bonus stat-points (mirror) + % affixes (the player-scaling lever) ──
+  // 1) FLAT MIRROR: gear's combat stats fold into the relevant pool BEFORE the √
+  //    (ATK→STR, HP/DEF→CON, MP→INT) at GEAR_FOLD_K points each — so a gear stat is
+  //    valued like an earned one, √-compressed, never dwarfing your pools. Gear's own
+  //    STR/DEX/… are already stats, so they stay 1:1.
+  // 2) % AFFIXES: applied to the FINAL combat outputs (post-√, below), so a % affix
+  //    is a real % of your CURRENT power ("varies with the player"). Bounded per
+  //    dimension so a full best-in-game set lands near ×2 combat ("doubles you").
+  let aff = { atkPct:0, hpPct:0, defPct:0, mpPct:0, critPts:0, dodgePts:0 };
+  if (includeGear) aff = _addSetBonuses(getEquippedAffixTotals());
+  const K = GEAR_FOLD_K;
+  const STR = (st.STR||0)+(eq.STR||0)+(eq.ATK||0)*K;
+  const DEX = (st.DEX||0)+(eq.DEX||0);
+  const CON = (st.CON||0)+(eq.CON||0)+((eq.HP||0)+(eq.DEF||0))*K;
+  const INT = (st.INT||0)+(eq.INT||0)+(eq.MP||0)*K;
+  const VOL = (st.VOL||0)+(eq.VOL||0);
+  const CHA = (st.CHA||0)+(eq.CHA||0);
+  const Spool = { STR, DEX, CON, INT, VOL, CHA };
   let pMaxHP   = 200 + Math.round(Math.sqrt(CON)*12) + Math.round(Math.sqrt(CHA)*4) + level*4;
   let pMaxMP   = 80  + Math.round(Math.sqrt(INT)*8)  + Math.round(Math.sqrt(VOL)*4) + level*2;
   let pAtk     = 10  + Math.round(Math.sqrt(STR)*2.5);
   let magicAtk = Math.round(Math.sqrt(INT)*2.5);
-  // Derived chances — √-based; equipped bonuses EXTEND the caps (Step 4) so crit/
-  // dodge/block/DEF gear has somewhere to go at endgame. (eq.* = 0 when no gear.)
-  let pCrit    = Math.min(40, Math.min(15, parseFloat((Math.sqrt(DEX)*0.20).toFixed(1))) + (eq.critBonus||0));
-  let pDodge   = Math.min(25, Math.min(10, parseFloat((Math.sqrt(DEX)*0.13).toFixed(1))) + (eq.dodgeBonus||0));
+  // Base √-derived chances (item crit/dodge/block bonuses included; affixes added below).
+  let pCrit    = Math.min(15, parseFloat((Math.sqrt(DEX)*0.20).toFixed(1))) + (eq.critBonus||0);
+  let pDodge   = Math.min(10, parseFloat((Math.sqrt(DEX)*0.13).toFixed(1))) + (eq.dodgeBonus||0);
   const pDblAtk  = Math.min(12,  parseFloat((Math.sqrt(DEX)*0.15).toFixed(1)));
-  let pDmgRed  = Math.min(75, Math.min(50, parseFloat((Math.sqrt(CON)*0.65).toFixed(1))) + (eq.DEF||0)*0.04 + (eq.blockBonus||0));
+  let pDmgRed  = Math.min(50, parseFloat((Math.sqrt(CON)*0.65).toFixed(1))) + (eq.blockBonus||0);
   const pVolMult = 1 + Math.min(0.35, parseFloat((Math.sqrt(VOL)*0.004).toFixed(3)));
   const pIntMult = 1 + Math.min(0.30, parseFloat((Math.sqrt(INT)*0.003).toFixed(3)));
   const pMpRegen = Math.max(3, Math.round(Math.sqrt(INT)*0.4));
   const pPetAtk  = Math.round(Math.sqrt(CHA)*1.2);
   const pPetSpd  = CHA >= 2000 ? 2 : 1;
-  let primaryAtk = calcPrimaryAtk(archetype, st, eq);
-  // ── GEAR ACTUALLY MATTERS (Steps 1 & 3) ──
-  // The gear's flat combat stats (ATK/HP/MP) were display-only — consume them
-  // post-√ so a forged/refined weapon is a real upgrade (melee via ATK, casters
-  // via MP). Then apply the guild POWER-tier auras as % on the FINAL output.
+  let primaryAtk = calcPrimaryAtk(archetype, Spool);
   if (includeGear) {
-    pAtk     += (eq.ATK||0);
-    magicAtk += Math.round((eq.MP||0) * 0.30);
-    pMaxHP   += (eq.HP||0);
-    pMaxMP   += (eq.MP||0);
+    // Guild POWER tiers — a final-output multiplier (separate from gear stats).
     const gu = state.guildUpgrades || {};
     const sanctumMul  = 1 + (gu.sanctum  || 0) * 0.04; // +4%/lvl → all combat output
     const barracksMul = 1 + (gu.barracks || 0) * 0.05; // +5%/lvl → physical might + durability
-    pAtk     = Math.round(pAtk     * sanctumMul * barracksMul);
-    magicAtk = Math.round(magicAtk * sanctumMul);
-    pMaxHP   = Math.round(pMaxHP   * sanctumMul * barracksMul);
-    pMaxMP   = Math.round(pMaxMP   * sanctumMul);
-    // ── GEAR AFFIXES (T4+ rolled % bonuses) — applied to the FINAL combat output. ──
-    // atkPct hits primaryAtk (the value the fight engine + CP actually read), so a
-    // forged weapon's affixes finally matter in dungeons. The % bonuses sum across
-    // all 10 slots, so each dimension is CAPPED — gear stays a strong COMPLEMENT
-    // (≤+AFFIX_*_CAP%), never a multiplicative blowup that trivialises content.
-    const ax = getEquippedAffixTotals();
-    _addSetBonuses(ax); // gear-set bonuses fold into the SAME capped dimensions
-    const atkPct = Math.min(AFFIX_ATK_CAP, ax.atkPct);
-    const hpPct  = Math.min(AFFIX_HP_CAP,  ax.hpPct);
-    const mpPct  = Math.min(AFFIX_MP_CAP,  ax.mpPct);
-    if (atkPct)     { const m = 1 + atkPct/100; primaryAtk = Math.round(primaryAtk * m); pAtk = Math.round(pAtk * m); magicAtk = Math.round(magicAtk * m); }
-    if (hpPct)      pMaxHP = Math.round(pMaxHP * (1 + hpPct/100));
-    if (mpPct)      pMaxMP = Math.round(pMaxMP * (1 + mpPct/100));
-    if (ax.defPct)  pDmgRed = Math.min(75, pDmgRed + ax.defPct * 0.5);
-    if (ax.critPts) pCrit  = Math.min(40, pCrit + ax.critPts);
-    if (ax.dodgePts)pDodge = Math.min(25, pDodge + ax.dodgePts);
+    primaryAtk = Math.round(primaryAtk * sanctumMul * barracksMul);
+    pAtk       = Math.round(pAtk       * sanctumMul * barracksMul);
+    magicAtk   = Math.round(magicAtk   * sanctumMul);
+    pMaxHP     = Math.round(pMaxHP     * sanctumMul * barracksMul);
+    pMaxMP     = Math.round(pMaxMP     * sanctumMul);
+    // ── % AFFIXES — real % of your current combat output, bounded per dimension. ──
+    const atkPct = Math.min(AFFIX_ATK_CAP, aff.atkPct);
+    const hpPct  = Math.min(AFFIX_HP_CAP,  aff.hpPct);
+    const mpPct  = Math.min(AFFIX_MP_CAP,  aff.mpPct);
+    if (atkPct) { const m = 1 + atkPct/100; primaryAtk = Math.round(primaryAtk*m); pAtk = Math.round(pAtk*m); magicAtk = Math.round(magicAtk*m); }
+    if (hpPct)  pMaxHP = Math.round(pMaxHP * (1 + hpPct/100));
+    if (mpPct)  pMaxMP = Math.round(pMaxMP * (1 + mpPct/100));
+    // Chance affixes stay tightly bounded (the effHP reciprocal makes these volatile).
+    pDmgRed += Math.min(6, (aff.defPct  ||0) * 0.15);
+    pCrit   += Math.min(7, (aff.critPts ||0));
+    pDodge  += Math.min(6, (aff.dodgePts||0));
   }
+  pCrit   = Math.min(22, pCrit);
+  pDodge  = Math.min(16, pDodge);
+  pDmgRed = Math.min(56, pDmgRed);
   pCrit = parseFloat(pCrit.toFixed(1)); pDodge = parseFloat(pDodge.toFixed(1)); pDmgRed = parseFloat(pDmgRed.toFixed(1));
   return { pMaxHP, pMaxMP, pAtk, magicAtk, pCrit, pDodge, pDblAtk, pDmgRed, pVolMult, pIntMult, pMpRegen, pPetAtk, pPetSpd, archetype, primaryAtk };
 }
@@ -10277,84 +10303,19 @@ function calcPowerLevel(cs) {
   return { cp, effAtk: Math.round(effAtk), effHP: Math.round(effHP), raw: Math.round(raw) };
 }
 
-// ── GEAR POWER — a bounded COMPLEMENT to base CP, never a multiplier ──
-// Design rule (owner): habits are the spine. BASE stats are ~70% of your power;
-// gear + guild ("work-life advantages") add AT MOST ~30% on top, scaled by how
-// complete & refined your loadout is. We deliberately do NOT run gear through the
-// effAtk×effHP snowball (that produced a 10×+ blowup) — instead gear earns a flat
-// share of your base CP. A fully kitted hero at 200k base reads ~260k, not millions.
-const GEAR_CP_MAX_FRAC    = 0.30; // gear+guild ceiling as a fraction of base CP
-const GEAR_LOADOUT_WEIGHT = 0.80; // of that ceiling: equipped gear …
-const GUILD_POWER_WEIGHT  = 0.20; // … and guild POWER tiers (sanctum+barracks)
-// Relative combat value of a single gear stat point (so a sword's ATK and an
-// armor's HP can be summed into one "gear points" figure).
-function _gearItemPoints(stats) {
-  let p = 0;
-  Object.entries(stats || {}).forEach(([k, v]) => {
-    if      (k === 'ATK') p += v * 2.5;
-    else if (k === 'MP')  p += v * 0.5;
-    else if (k === 'HP')  p += v * 0.25;
-    else if (k === 'DEF') p += v * 1.0;
-    else if (['STR','DEX','CON','INT','VOL','CHA'].includes(k)) p += v * 1.0;
-  });
-  return p;
-}
-// Points contributed by a crafted instance's rolled % affixes (so rarity/affix
-// chasing nudges gear CP toward — but never past — the 30% cap).
-function _affixPoints(affixes) {
-  let p = 0;
-  (affixes || []).forEach(a => { p += a.val * (AFFIX_BY_STAT[a.stat]?.kind === 'pts' ? 6 : 4); });
-  return p;
-}
-// The reference slot is a LEGENDARY, fully-affixed, G5 item — so a plain common
-// set reads well under 100% and rarity/affixes are what climb toward the cap.
-const GEAR_REF_MULT = 2.2;
-// Best-in-slot G5 points per item-slot = the 100%-geared reference loadout.
-let _maxSlotPointsCache = null;
-function getMaxSlotPoints() {
-  if (_maxSlotPointsCache) return _maxSlotPointsCache;
-  const best = {};
-  Object.entries(ITEMS_DB).forEach(([id, it]) => {
-    if (!it.slot) return;
-    const pts = _gearItemPoints(it.crafted ? getGradedStats(id, 5) : (it.stats || {}));
-    if (pts > (best[it.slot] || 0)) best[it.slot] = pts;
-  });
-  _maxSlotPointsCache = best;
-  return best;
-}
-// 0..1 — how close your equipped kit is to a full best-in-slot, G5, legendary-affixed set.
-function getGearLoadoutFrac() {
-  const best = getMaxSlotPoints();
-  const eqGrades = state.equipmentGrades || {};
-  const eqMods = state.equipmentMods || {};
-  const equip = state.equipment || {};
-  let have = 0, max = 0;
-  EQUIP_SLOTS.forEach(s => {
-    const itemSlot = s.id.replace(/_[lr]$/, ''); // earring_l/_r → earring
-    max += (best[itemSlot] || 0) * GEAR_REF_MULT;
-    const id = equip[s.id];
-    if (id && ITEMS_DB[id]) {
-      const grade = eqGrades[s.id] || 1;
-      const it = ITEMS_DB[id];
-      const mod = eqMods[s.id];
-      have += _gearItemPoints(it.crafted ? getGradedStats(id, grade) : (it.stats || {})) * (mod?.rarityMult || 1)
-            + _affixPoints(mod?.affixes);
-    }
-  });
-  // Active set bonuses also read in Gear Power (treated like affix points).
-  getActiveSets().forEach(s => { if (s.active) have += _affixPoints(Object.entries(s.active.bonus).map(([stat, val]) => ({ stat, val }))); });
-  return max > 0 ? Math.min(1, have / max) : 0;
-}
-// 0..1 — guild POWER investment (sanctum + barracks, max Lv5 each).
-function getGuildPowerFrac() {
-  const gu = state.guildUpgrades || {};
-  return Math.min(1, ((gu.sanctum || 0) + (gu.barracks || 0)) / 10);
-}
-// The headline number: gear + guild contribution to CP, capped at 30% of base.
+// ── GEAR POWER — the HONEST mirror of your gear's stats ──────────────────────
+// Gear's CP contribution is simply (your CP WITH gear) − (your base CP), through
+// the exact same √ → effAtk×effHP → snowball pipeline that values base stats. So a
+// gear stat point is worth precisely what an earned stat point is worth — a true
+// mirror, no separate scoring model, no artificial %-target. For this to read sanely
+// gear must live in the SAME space as base stats: gear's ATK/HP/DEF/MP are folded
+// into stat-point space (see calcPlayerCombatStats), so no stat sits "post-√" and
+// dwarfs your pools. Endgame power then comes from % affixes (which scale with you).
+// (Grade ladder stays base-only — gear shows as "Gear Power", never shortcuts Grade.)
 function calcGearCP(baseCP) {
-  const frac = GEAR_LOADOUT_WEIGHT * getGearLoadoutFrac()
-             + GUILD_POWER_WEIGHT  * getGuildPowerFrac();
-  return Math.round(baseCP * GEAR_CP_MAX_FRAC * Math.min(1, frac));
+  if (baseCP == null) baseCP = calcPowerLevel(calcPlayerCombatStats(false)).cp;
+  const withGear = calcPowerLevel(calcPlayerCombatStats(true)).cp;
+  return Math.max(0, withGear - baseCP);
 }
 
 // CP → grade tier. Returns the same shape as tierFor() so it can power getHunterGrade().
@@ -11365,19 +11326,8 @@ function collectCraft(entryId) {
 }
 
 // ── Penalty Quest ─────────────────────────────────────────────
-const PENALTY_QUEST_TASKS = ['100 Push-ups', '100 Sit-ups', '100 Abs', '5km Run'];
-
-function completePenaltyQuest() {
-  if (!state.penaltyQuest || state.penaltyQuest.completed) return;
-  state.penaltyQuest.completed = true;
-  // Restore streak as if yesterday was counted
-  const restored = state.lastStreakPeak || 1;
-  state.streak = restored;
-  state.streakCountedDay = yesterdayKey();
-  state.streakBrokenAt = null;
-  saveState(); renderAll();
-  setTimeout(() => showNotif(`[SYSTEM] Penalty Quest verified. Streak restored: ${restored} days.`), 50);
-}
+// Penalty Quest system removed — a broken streak simply resets. Shields are the
+// only redemption path. (PENALTY_QUEST_TASKS / completePenaltyQuest deleted.)
 
 function calcGuildCost(upg, nextLvl) {
   if (upg.customLevelCosts && upg.customLevelCosts[nextLvl - 1] !== undefined) {
@@ -12644,6 +12594,7 @@ function generateCommissions(dateKey) {
   // Bucket pool by tier, filter to viable commissions, then shuffle
   const byTier = { bronze: [], silver: [], gold: [] };
   COMMISSION_POOL.forEach(t => {
+    if (t.difficulty) return; // difficulty-gated commissions retired (no self-rated difficulty)
     if (byTier[t.tier] && _commissionIsViable(t, activeTasks)) byTier[t.tier].push({ ...t });
   });
   // Fallback: if a tier is empty after viability filter, use any same-tier commission with no category restriction
@@ -12946,14 +12897,14 @@ function computeLastMonthWorkStats() {
   const lastYear  = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
   const prefix    = `${lastYear}-${String(lastMonth + 1).padStart(2, '0')}`;
   const MONTHS_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  let tasksCompleted = 0, goldEarned = 0, hardOrLegendary = 0;
+  let tasksCompleted = 0, goldEarned = 0, inFlowCount = 0;
   const catCounts = { mental:0, creative:0, physical:0, operational:0 };
   (state.trabajo || []).forEach(task => {
     Object.entries(task.done || {}).forEach(([dk, c]) => {
       if (!dk.startsWith(prefix)) return;
       tasksCompleted++;
       goldEarned += (c.drops && c.drops.gold) || 0;
-      if (task.difficulty === 'hard' || task.difficulty === 'legendary') hardOrLegendary++;
+      if (c.inFlow) inFlowCount++;
       if (task.category) catCounts[task.category] = (catCounts[task.category] || 0) + 1;
     });
   });
@@ -12961,7 +12912,7 @@ function computeLastMonthWorkStats() {
   const SPEC = { mental:'Arcane Scholar 📚', creative:'Creative Virtuoso ✨', physical:'Iron Champion ⚔️', operational:'Field Commander ⚙️' };
   return {
     monthName: MONTHS_EN[lastMonth],
-    tasksCompleted, goldEarned, hardOrLegendary,
+    tasksCompleted, goldEarned, inFlowCount,
     topCat: topCat ? topCat[0] : null,
     topCatLabel: topCat ? SPEC[topCat[0]] : null,
     topCatCount: topCat ? topCat[1] : 0,
@@ -12975,8 +12926,8 @@ function showMonthlyWorkReport(stats) {
   const catRow = stats.topCatLabel
     ? `<div class="mwr-stat-row mwr-spec-row"><span class="mwr-stat-label">SPECIALTY</span><span class="mwr-stat-val">${stats.topCatLabel}</span></div>`
     : '';
-  const hardRow = stats.hardOrLegendary > 0
-    ? `<div class="mwr-stat-row"><span class="mwr-stat-label">HARD / LEGENDARY</span><span class="mwr-stat-val">${stats.hardOrLegendary}</span></div>`
+  const hardRow = stats.inFlowCount > 0
+    ? `<div class="mwr-stat-row"><span class="mwr-stat-label">⚡ IN-FLOW</span><span class="mwr-stat-val">${stats.inFlowCount}</span></div>`
     : '';
   ov.innerHTML = `
     <div class="gm-inner" style="border-color:rgba(255,193,7,0.4)">
@@ -13156,34 +13107,17 @@ function updateStreakOnLoad() {
       if (!state.vacationDays) state.vacationDays = [];
       if (!state.vacationDays.includes(today)) state.vacationDays.push(today);
     }
-    // If yesterday wasn't counted toward the streak, the chain is broken (unless paused)
+    // If yesterday wasn't counted toward the streak, the chain is broken (unless paused).
+    // No penalty quest, no HP drain — the streak simply resets. Shields (earned at
+    // 14-day milestones) are the deliberate mercy mechanic; missing a day is its own cost.
     if (!state.habitsPaused && state.streakCountedDay !== y) {
       if (state.streak > 0) state.lastStreakPeak = state.streak;
       state.streakBrokenAt = today;
       state.streak=0;
       state.streakCountedDay=null;
-      // Generate penalty quest if player missed ≥30% of yesterday's habits
-      const _yDone = state.habitos.filter(h => h.done && h.done[y]).length;
-      const _yTotal = state.habitos.length;
-      if (_yTotal > 0 && _yDone / _yTotal < 0.7) {
-        state.penaltyQuest = { dateKey: today, completed: false };
-      }
     }
-    // Expire any penalty quest from a previous day
-    if (state.penaltyQuest && state.penaltyQuest.dateKey !== today) state.penaltyQuest = null;
-    // HP drain: each missed yesterday habit costs HP (up to 60% of max)
-    if (!state.habitsPaused) {
-      const _yDoneHp = state.habitos.filter(h => h.done && h.done[y]).length;
-      const _yTotalHp = state.habitos.length;
-      if (_yTotalHp > 0 && _yDoneHp < _yTotalHp) {
-        const _maxHP = calcMaxHP();
-        if (state.hp === null || state.hp === undefined) state.hp = _maxHP;
-        // Softened: lead with the carrot (Phoenix ×1.5), not a punishing HP gut.
-        // Drain caps at 30% of max (was 60%) and never drops below 25% of max (was 10%).
-        const _drain = Math.round(_maxHP * ((_yTotalHp - _yDoneHp) / _yTotalHp) * 0.30);
-        state.hp = Math.max(Math.round(_maxHP * 0.25), state.hp - _drain);
-      }
-    }
+    // Clear any legacy penalty quest left over from before the penalty system was removed
+    if (state.penaltyQuest) state.penaltyQuest = null;
     // If streakCountedDay === y, streak carries over as-is (already includes yesterday)
     // Queue harvest overlay — shown after renderAll()
     const harvestInfo = _buildHarvestInfo(y);
@@ -13772,60 +13706,10 @@ function renderHeader() {
     }
   }
 
-  // ── Month Pulse ─────────────────────────────────────────────
+  // ── Month Pulse ── removed: the month-vs-month comparison was demotivating on
+  // rough weeks (all red). Long-term trends still live in the History tab.
   const mpEl = document.getElementById('monthPulse');
-  if (mpEl && state.habitos.length > 0) {
-    const MPNAMES = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-    const nowD = new Date();
-    const curM  = todayKey().slice(0, 7);
-    const prevD = new Date(nowD.getFullYear(), nowD.getMonth() - 1, 1);
-    const prevM = `${prevD.getFullYear()}-${String(prevD.getMonth()+1).padStart(2,'0')}`;
-
-    const curEff  = _effectiveMonthStats(curM);
-    const prevEff = _effectiveMonthStats(prevM);
-
-    const hasPrev = prevEff.effectiveDaysTracked > 0;
-    const hDelta  = hasPrev ? curEff.habitPct - prevEff.habitPct : null;
-    const pDelta  = hasPrev ? curEff.effectivePerfectDays - prevEff.effectivePerfectDays : null;
-
-    const mkDelta = d => {
-      if (d === null) return '';
-      const cls  = d > 0 ? 'up' : d < 0 ? 'dn' : 'same';
-      const sign = d > 0 ? '↑+' : d < 0 ? '↓' : '=';
-      return `<span class="mp-delta ${cls}">${sign}${Math.abs(d)}</span>`;
-    };
-
-    const trendCls = hDelta === null ? '' : hDelta > 0 ? 'mp-up' : hDelta < 0 ? 'mp-dn' : '';
-    mpEl.className = `month-pulse${trendCls ? ' '+trendCls : ''}`;
-    mpEl.style.display = '';
-
-    const vsLabel = hasPrev ? `vs ${MPNAMES[prevD.getMonth()]}` : 'this month';
-    mpEl.innerHTML = `
-      <span class="mp-month-tag">⟦ ${MPNAMES[nowD.getMonth()]} '${String(nowD.getFullYear()).slice(2)} ⟧</span>
-      <div class="mp-sep"></div>
-      <div class="mp-block">
-        <div class="mp-block-label">HABIT RATE · ${vsLabel}</div>
-        <div class="mp-block-val">${curEff.habitPct}%${mkDelta(hDelta)}</div>
-      </div>
-      <div class="mp-sep"></div>
-      <div class="mp-block">
-        <div class="mp-block-label">PERFECT DAYS</div>
-        <div class="mp-block-val">${curEff.effectivePerfectDays}<span class="mp-frac">/${curEff.effectiveDaysTracked}d</span>${mkDelta(pDelta)}</div>
-      </div>
-      <span class="mp-tap">›</span>`;
-
-    mpEl.onclick = () => {
-      currentTab = 'log';
-      logSubTab = 'history';
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelector('[data-tab="log"]')?.classList.add('active');
-      renderAll();
-      setTimeout(() => {
-        const curve = panelContent.querySelector('.trend-chart-wrap');
-        if (curve) curve.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 200);
-    };
-  }
+  if (mpEl) { mpEl.style.display = 'none'; mpEl.onclick = null; }
 }
 
 
@@ -13867,17 +13751,6 @@ function renderQuestItem(task, opts) {
 
   const gains=document.createElement('div'); gains.className='gains';
   if (opts.listKey==='trabajo') {
-    // Difficulty badge — legendary gets gold label + color instead of the item-rarity purple
-    const _dr = task.difficulty === 'legendary'
-      ? { label:'LEGENDARY', color:'#ffd700', tint:'rgba(255,215,0,0.10)' }
-      : (ITEM_RARITY[task.difficulty] || ITEM_RARITY.normal);
-    const dbadge = document.createElement('span');
-    dbadge.className = 'gain-chip diff-badge';
-    if (task.difficulty === 'legendary') {
-      dbadge.style.cssText = `color:#ffd700;border-color:rgba(255,215,0,0.45);background:rgba(255,215,0,0.09);`;
-    }
-    dbadge.textContent = _dr.label;
-    gains.appendChild(dbadge);
     // Work streak badge — shows consecutive days this specific task was done
     const _wstreak = calcWorkTaskStreak(task);
     if (_wstreak >= 2) {
@@ -13887,11 +13760,16 @@ function renderQuestItem(task, opts) {
       sc.title = `${_wstreak}-day streak on this task${_wstreak >= 3 ? ' · +10% gold bonus active' : ''}`;
       gains.appendChild(sc);
     }
-    // Work tasks: show gold + material drops instead of stat chips
+    // Work tasks: show Worker XP + gold + material drops instead of stat chips
     const drops = done ? (completion && completion.drops) : task.drops;
+    // Worker XP chip (done = actual earned incl. In-Flow/crit; pending = base floor)
+    const _wxpShow = done ? (completion && completion.wxp) : WORK_TASK_REWARD.base.wxp;
+    if (_wxpShow) { const wc=document.createElement('span'); wc.className='gain-chip'; wc.style.cssText='color:#ffc107;border-color:rgba(255,193,7,0.35)'; wc.textContent=`⚒+${_wxpShow}`; gains.appendChild(wc); }
+    if (done && completion && completion.inFlow) { const fc=document.createElement('span'); fc.className='gain-chip'; fc.style.cssText='color:#ffd54f;border-color:rgba(255,213,79,0.5)'; fc.textContent='⚡IN-FLOW'; gains.appendChild(fc); }
     if (drops) {
       if (drops.gold) { const gc=document.createElement('span'); gc.className='gain-chip gain-gold'; gc.innerHTML=`${goldImg(18)}${drops.gold}g`; gains.appendChild(gc); }
       if (drops.matId) { const mc=document.createElement('span'); mc.className='gain-chip gain-mat'; mc.textContent=`${drops.matEmoji||''}×${drops.matQty}`; gains.appendChild(mc); }
+      else { const mc=document.createElement('span'); mc.className='gain-chip gain-mat'; mc.textContent=`🎲×${drops.matQty||1}`; mc.title='Random material on completion'; gains.appendChild(mc); }
     }
     // Commission tags — colored pill per matching active commission
     if (!done && state.commissions && state.commissions.dateKey === todayKey()) {
@@ -14471,12 +14349,8 @@ function renderHabitos() {
     panelContent.classList.remove('habits-paused');
   }
 
-  // Penalty Quest takes priority over the comeback banner — both speak to the same
-  // lost streak, but the penalty quest is the actionable redemption, so we don't stack them.
-  const _penaltyActive = isToday && state.penaltyQuest && !state.penaltyQuest.completed && state.penaltyQuest.dateKey === today;
-
   // Comeback banner: first day back after losing a streak
-  if (!_penaltyActive && isToday && state.streak === 0 && state.streakBrokenAt === today && (state.lastStreakPeak || 0) > 1) {
+  if (isToday && state.streak === 0 && state.streakBrokenAt === today && (state.lastStreakPeak || 0) > 1) {
     const cb = document.createElement('div'); cb.className = 'comeback-banner';
     const _shieldsAvail = state.streakShields || 0;
     const _shieldBtnHtml = _shieldsAvail > 0
@@ -14492,22 +14366,8 @@ function renderHabitos() {
     }
   }
 
-  // ── Penalty Quest banner — appears when streak broke and player can redeem it ──
-  if (_penaltyActive) {
-    const pq = document.createElement('div'); pq.className = 'penalty-quest-banner';
-    pq.innerHTML = `
-      <div class="pq-system-label">⟦ SYSTEM · PENALTY QUEST ⟧</div>
-      <div class="pq-title">FAILURE EVASION PROTOCOL</div>
-      <div class="pq-tasks">
-        ${PENALTY_QUEST_TASKS.map(t => `<div class="pq-task-row">${t}</div>`).join('')}
-      </div>
-      <button class="pq-complete-btn" id="pqCompleteBtn">▶ MARK AS COMPLETE — RESTORE STREAK</button>`;
-    panelContent.appendChild(pq);
-    setTimeout(() => {
-      const btn = document.getElementById('pqCompleteBtn');
-      if (btn) btn.addEventListener('click', e => { e.stopPropagation(); completePenaltyQuest(); });
-    }, 0);
-  }
+  // Penalty Quest banner removed — the streak now simply resets on a miss (no
+  // exercise-based redemption). Shields remain the mercy mechanic.
 
   // Week Mastered banner — persistent once all habits fulfilled across the week
   if (isWeekMastered()) {
@@ -15714,7 +15574,7 @@ function renderTodayEarningsChip() {
 }
 
 function spawnChipFlyouts(task, rect) {
-  const drops = task.drops || getWorkTaskDrops(task.category, task.difficulty);
+  const drops = task.drops || getWorkTaskDrops(task.category);
   if (!drops) return;
   const cx = rect.left + rect.width / 2;
   const cy = rect.top + 10;
@@ -16475,25 +16335,13 @@ function renderTrabajo() {
   });
   form.appendChild(catRow);
 
-  // Difficulty row
-  const diffRow=document.createElement('div'); diffRow.className='task-diff-row';
-  Object.entries(TASK_DIFF_CFG).forEach(([key,cfg])=>{
-    const btn=document.createElement('button');
-    btn.className='task-diff-btn'+(selectedTaskDifficulty===key?' active':'');
-    btn.innerHTML=`${cfg.emoji} <span class="task-diff-label">${cfg.label}</span> <span class="task-diff-xp">+${cfg.xp}xp</span>`;
-    btn.addEventListener('click',()=>{ selectedTaskDifficulty=key; renderAll(); });
-    diffRow.appendChild(btn);
-  });
-  form.appendChild(diffRow);
-
-  // Drops preview
-  const previewDrops = getWorkTaskDrops(selectedTaskCategory, selectedTaskDifficulty);
+  // Reward preview — single base reward (no difficulty); In-Flow gives the bonus.
   const previewDiv=document.createElement('div'); previewDiv.className='task-gains-preview';
-  const goldChip = `<span class="gain-chip gain-gold">🪙 ${previewDrops.gold}g</span>`;
-  const matChip  = previewDrops.matId
-    ? `<span class="gain-chip gain-mat">${previewDrops.matEmoji} ${previewDrops.matLabel} ×${previewDrops.matQty}</span>`
-    : `<span style="opacity:0.35;font-size:9px">Select category for material drop</span>`;
-  previewDiv.innerHTML = `<span style="opacity:0.5;font-size:9px;margin-right:4px">ON COMPLETE:</span>${goldChip}${matChip}`;
+  previewDiv.innerHTML = `<span style="opacity:0.5;font-size:9px;margin-right:4px">ON COMPLETE:</span>`
+    + `<span class="gain-chip" style="color:#ffc107;border-color:rgba(255,193,7,0.35)">⚒ +${WORK_TASK_REWARD.base.wxp} WXP</span>`
+    + `<span class="gain-chip gain-gold">🪙 ${WORK_TASK_REWARD.base.gold}g</span>`
+    + `<span class="gain-chip gain-mat">🎲 ×${WORK_TASK_REWARD.base.mats} random mat</span>`
+    + `<div style="opacity:0.5;font-size:8.5px;margin-top:3px;width:100%">⚡ Finish inside one focus session → IN-FLOW bonus (⚒+${WORK_TASK_REWARD.inflow.wxp} · 🪙${WORK_TASK_REWARD.inflow.gold}g · ×${WORK_TASK_REWARD.inflow.mats})</div>`;
   form.appendChild(previewDiv);
 
   // Input + button
@@ -16602,7 +16450,7 @@ function renderCharStatusHeader() {
   // Grade ladder is base-only (gear wins fights, not grades); the gear delta
   // is surfaced separately as "Gear Power" so equipping kit still feels good.
   const _cp        = calcPowerLevel();                                  // base CP
-  const _gearCP    = calcGearCP(_cp.cp);                                // bounded gear+guild complement (≤30% of base)
+  const _gearCP    = calcGearCP(_cp.cp);                                // true marginal CP from gear (CP-with-gear − base CP)
   const _totalCP   = _cp.cp + _gearCP;
   const gradeInfo  = cpTierFor(_cp.cp);                                 // grade stays base-only
   const hunterGrade = gradeInfo.tier;
@@ -20438,22 +20286,30 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
   const task=state[listKey].find(t=>t.id===id); if(!task) return;
   const wasDone=!!task.done[periodKey];
   if (wasDone) {
-    const c=getCompletion(task,periodKey); if(c){ applyGains(c.gains,-1); state.totalXp=Math.max(0,state.totalXp-(c.xp||0)); state.col=Math.max(0,state.col-(c.xp||0)); if(listKey==='trabajo'&&c.drops) applyWorkDrops(c.drops,-1); if(c.wasCrit && state.lastCritDay===todayKey()) state.dailyCritCount=Math.max(0,(state.dailyCritCount||0)-1); }
+    const c=getCompletion(task,periodKey); if(c){ applyGains(c.gains,-1); if(listKey!=='trabajo'){ state.totalXp=Math.max(0,state.totalXp-(c.xp||0)); state.col=Math.max(0,state.col-(c.xp||0)); } if(listKey==='trabajo'){ if(c.drops) applyWorkDrops(c.drops,-1); if(c.wxp) state.workXp=Math.max(0,(state.workXp||0)-c.wxp); } if(c.wasCrit && state.lastCritDay===todayKey()) state.dailyCritCount=Math.max(0,(state.dailyCritCount||0)-1); }
     delete task.done[periodKey];
   } else {
     const prevLv=calcLevel(state.totalXp).level;
     const _pt={}; STAT_KEYS.forEach(k=>{_pt[k]=tierFor(state.stats[k]).tier;});
-    state.totalXp+=(task.xp||0); state.col+=(task.xp||0);
+    if(listKey!=='trabajo'){ state.totalXp+=(task.xp||0); state.col+=(task.xp||0); } // work tasks give Worker XP, not character XP
     const _doneBefore = listKey==='habitos' ? state.habitos.filter(t=>!!t.done[periodKey]).length : -1;
     const isFirst = _doneBefore === 0;
     const isLast  = listKey==='habitos' && _doneBefore === state.habitos.length - 1;
     if (listKey==='trabajo') {
-      // Work tasks: award gold + materials, no stat gains
-      const _baseDrops = task.drops || getWorkTaskDrops(task.category, task.difficulty);
-      // Trade Post: +12% gold per level · Worker rank gold bonus (B+: +10%, SS+: +25%)
+      // Work tasks: Worker XP + gold + RANDOM materials. No character XP, no shards.
+      // IN-FLOW = completed within a single focus session (dungeon running, this task
+      // linked, before the first session boundary) → the highest reward. Rewards small
+      // tasks and breaking big ones into session-sized steps. 2+ sessions = base only.
+      const _inFlow = !!(state.dungeon && state.dungeon.phase === 'exploring'
+        && state.dungeon.activeWorkTaskId === task.id
+        && (state.dungeon.forgeTaskPomoCount || 0) === 0);
+      const _rw  = _inFlow ? WORK_TASK_REWARD.inflow : WORK_TASK_REWARD.base;
+      const _mat = rollWorkMat();
+      const _mq  = _inFlow ? (2 + Math.floor(Math.random() * 2)) : _rw.mats; // in-flow: 2–3
+      const _baseDrops = { gold:_rw.gold, matId:_mat.id, matTier:1, matQty:_mq, matEmoji:_mat.emoji, matLabel:_mat.label };
+      // Trade Post: +12% gold per level · Worker rank gold bonus
       const _tradeLvl = (state.guildUpgrades||{}).trade || 0;
-      const _workerGoldMul = getWorkerGoldMul();
-      const _goldMul = (1 + _tradeLvl * 0.12) * _workerGoldMul;
+      const _goldMul = (1 + _tradeLvl * 0.12) * getWorkerGoldMul();
       const _tradeDrops = _goldMul > 1
         ? { ..._baseDrops, gold: Math.floor((_baseDrops.gold||0) * _goldMul) }
         : _baseDrops;
@@ -20467,7 +20323,7 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
       const _streakDrops = _taskStreak >= 3
         ? { ..._critDrops, gold: Math.round((_critDrops.gold || 0) * 1.10) }
         : _critDrops;
-      // Session combo multiplier — resets after 10-min gap
+      // Session combo multiplier — resets after an 8-hour gap (one work day)
       if (!state.workComboLastTs || (Date.now() - state.workComboLastTs) > 8 * 60 * 60 * 1000) {
         state.workCombo = 1;
       } else {
@@ -20478,22 +20334,17 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
       let _drops = state.workCombo >= 2
         ? { ..._streakDrops, gold: Math.round((_streakDrops.gold || 0) * _comboMult) }
         : _streakDrops;
-      // Combo jackpot at ×5 and ×10 — bonus rare material drop
+      // Combo jackpot at ×5 and ×10 — bonus random material drop (once/day guardrail)
       const _isJackpot5  = state.workCombo === 5;
       const _isJackpot10 = state.workCombo === 10;
-      // Guardrail: the bonus-material jackpot can only fire ONCE per day, so a long
-      // combo can't be farmed by fragmenting work into many trivial checkboxes.
-      // The combo gold multiplier itself still applies every task (rewards momentum).
       const _jackpotAvailable = state.lastComboJackpotDay !== todayKey();
       if ((_isJackpot5 || _isJackpot10) && _jackpotAvailable) {
         state.lastComboJackpotDay = todayKey();
-        const _jMatKeys = ['timber','scroll','crystal','gear'];
-        const _jMat     = _jMatKeys[Math.floor(Math.random() * _jMatKeys.length)];
-        const _jQty     = _isJackpot10 ? 5 : 3;
+        const _jMat = rollWorkMat();
+        const _jQty = _isJackpot10 ? 5 : 3;
         if (!state.shopMaterials) state.shopMaterials = { timber:0, scroll:0, crystal:0, gear:0 };
-        state.shopMaterials[_jMat] = (state.shopMaterials[_jMat] || 0) + _jQty;
-        const _jMatDef = Object.values(WORK_MATERIALS).find(m => m.id === _jMat);
-        setTimeout(() => showComboJackpot(state.workCombo, _jMatDef?.emoji || '⚙️', _jMat, _jQty), 400);
+        state.shopMaterials[_jMat.id] = (state.shopMaterials[_jMat.id] || 0) + _jQty;
+        setTimeout(() => showComboJackpot(state.workCombo, _jMat.emoji, _jMat.id, _jQty), 400);
       }
       // Specialization passive: +1 bonus material when working your dominant category
       const _specBonus = getWorkSpecialization();
@@ -20505,40 +20356,30 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
         state.dungeon.sessionTasks    = (state.dungeon.sessionTasks||0) + 1;
         state.dungeon.sessionTaskGold = (state.dungeon.sessionTaskGold||0) + (_drops.gold||0);
       }
-      const _wxpByDiff = {easy:15,normal:30,hard:50,legendary:80};
-      grantWorkXp(_wxpByDiff[task.difficulty] || 20);
-      task.done[periodKey] = { gains:{}, xp:task.xp, drops:_drops, wasCrit:_isCritWork };
+      const _wxpAmt = _isCritWork ? _rw.wxp * 2 : _rw.wxp;
+      grantWorkXp(_wxpAmt);
+      task.done[periodKey] = { gains:{}, xp:0, drops:_drops, wxp:_wxpAmt, wasCrit:_isCritWork, inFlow:_inFlow };
       if (periodKey === todayKey() && state.workStreakCountedDay !== periodKey) {
         state.workStreak = (state.workStreakLastDay === yesterdayKey()) ? (state.workStreak||0)+1 : 1;
         state.workStreakLastDay    = periodKey;
         state.workStreakCountedDay = periodKey;
       }
       completedExpanded[listKey]=false;
-      const newLv=calcLevel(state.totalXp).level;
       playWorkComplete(); if(navigator.vibrate) navigator.vibrate([20,20,40]);
       const _matStr = _drops.matId ? ` · ${_drops.matEmoji}×${_drops.matQty}` : '';
       const _critTagWork = _isCritWork ? ' ⚡CRIT' : '';
-      const _tradeBonus = _tradeLvl > 0 ? _tradeDrops.gold - _baseDrops.gold : 0;
-      const _tradeTag = _tradeBonus > 0 ? ` · 🏛 +${_tradeBonus}g` : '';
+      const _flowTag    = _inFlow ? ' · ⚡IN-FLOW' : '';
       const _comboTag   = state.workCombo >= 2 ? ` · 🔥×${state.workCombo} COMBO` : '';
       const _streakTag  = _taskStreak >= 3 ? ` · 🔥${_taskStreak}d streak` : '';
-      const _wxpAmt = _wxpByDiff[task.difficulty] || 20;
-      showNotif(`[SYSTEM] Task logged. +${_wxpAmt} WXP · 🪙${_drops.gold}g${_matStr}${_critTagWork}${_tradeTag}${_comboTag}${_streakTag}`);
+      showNotif(`[SYSTEM] Task logged. +${_wxpAmt} WXP · 🪙${_drops.gold}g${_matStr}${_critTagWork}${_flowTag}${_comboTag}${_streakTag}`);
       if (_isCritWork) setTimeout(() => showCritFloat({}), 160);
       else showWorkerXpFloat(_wxpAmt, anchorY);
-      if      (task.difficulty === 'legendary') setTimeout(() => showLegendaryWorkOverlay(task, _drops, _isCritWork), 250);
-      else if (task.difficulty === 'hard')      setTimeout(() => showHardWorkBanner(task, _drops, _isCritWork), 250);
-      else if (task.difficulty === 'normal')    setTimeout(() => showNormalWorkFlash(task, _drops), 150);
-      if(newLv>prevLv) afterLevelUp(newLv, prevLv, {}, _pt);
-      // Focus bonus — completing your committed focus task rewards the commitment.
+      if (_inFlow) setTimeout(() => showLegendaryWorkOverlay(task, _drops, _isCritWork), 250);
+      else         setTimeout(() => showNormalWorkFlash(task, _drops), 150);
+      // Focus pledge bonus — completing your committed focus task (Worker XP, not character XP)
       if (state.focusTask && state.focusTask.id === task.id) {
-        const _fb = 15; state.totalXp += _fb; state.col += _fb; state.focusTask = null;
-        setTimeout(() => showNotif(`🎯 Focus bonus · +${_fb} XP for finishing what you started!`), 320);
-      }
-      // Honesty nudge — gentle once/day reminder if many high-difficulty tasks logged.
-      if ((task.difficulty === 'hard' || task.difficulty === 'legendary') && state.honestyNudgeDay !== todayKey()) {
-        const _hc = state.trabajo.filter(t => t.done[periodKey] && (t.difficulty==='hard'||t.difficulty==='legendary')).length;
-        if (_hc >= 6) { state.honestyNudgeDay = todayKey(); setTimeout(() => showNotif(`[SYSTEM] ${_hc} hard/legendary tasks today — keep difficulty honest; the economy rewards real effort. 💪`), 760); }
+        const _fb = 25; grantWorkXp(_fb); state.focusTask = null;
+        setTimeout(() => showNotif(`🎯 Focus bonus · +${_fb} WXP for finishing what you started!`), 320);
       }
     } else {
       const _isPhoenix = listKey==='habitos' && periodKey===todayKey() && !task.done[yesterdayKey()] && Object.keys(task.done).length > 0;
@@ -21853,109 +21694,18 @@ function deleteTask(listKey, id) { state[listKey]=state[listKey].filter(t=>t.id!
 function archiveWorkTask(id) { const t=state.trabajo.find(t=>t.id===id); if(!t) return; t.manuallyArchived=true; saveState(); renderAll(); showNotif('[SYSTEM] Task archived.'); }
 function unarchiveWorkTask(id) { const t=state.trabajo.find(t=>t.id===id); if(!t) return; t.manuallyArchived=false; saveState(); renderAll(); showNotif('[SYSTEM] Task restored to active.'); }
 
-function applyMarkAll(simpleTasks, tieredSelections, listKey, periodKey) {
-  simpleTasks.forEach(task=>{
-    if(task.done[periodKey]) return;
-    task.done[periodKey]=true;
-    const prevLv=calcLevel(state.totalXp).level;
-    const _pt={}; STAT_KEYS.forEach(k=>{_pt[k]=tierFor(state.stats[k]).tier;});
-    state.totalXp+=(task.xp||0); applyGains(task.gains,1);
-    gainHpMpFromHabit(task.gains);
-    const _newLvA = calcLevel(state.totalXp).level;
-    if(_newLvA>prevLv) afterLevelUp(_newLvA, prevLv, task.gains, _pt);
-    else checkStatRankUps(task.gains,_pt);
-  });
-  tieredSelections.forEach(({task,tier})=>{
-    if(task.done[periodKey]) return;
-    task.done[periodKey]={tierId:tier.id,label:tier.label,gains:{...tier.gains},xp:tier.xp};
-    const prevLv=calcLevel(state.totalXp).level;
-    const _pt={}; STAT_KEYS.forEach(k=>{_pt[k]=tierFor(state.stats[k]).tier;});
-    state.totalXp+=tier.xp; applyGains(tier.gains,1);
-    gainHpMpFromHabit(tier.gains);
-    const _newLvB = calcLevel(state.totalXp).level;
-    if(_newLvB>prevLv) afterLevelUp(_newLvB, prevLv, tier.gains, _pt);
-    else checkStatRankUps(tier.gains,_pt);
-  });
-  saveState(); closeModal(); renderAll(); showNotif('⚔ All habits marked!');
-  checkAllDone(listKey, periodKey);
-}
-
-function markAllHabits(listKey, periodKey) {
-  const undone=state[listKey].filter(t=>!t.done[periodKey]);
-  if(!undone.length) return;
-  const simple=undone.filter(t=>!t.tiers||!t.tiers.length);
-  const tiered=undone.filter(t=>t.tiers&&t.tiers.length);
-  if(!tiered.length){ applyMarkAll(simple,[],listKey,periodKey); return; }
-
-  // Modal para elegir tier de cada hábito de sesión
-  document.getElementById('modalTitle').textContent='⟦ MARK ALL ⟧';
-  const body=document.getElementById('modalBody'); body.innerHTML='';
-  if(simple.length){
-    const info=document.createElement('div'); info.className='mark-all-info';
-    info.textContent=`✓ ${simple.length} habit${simple.length>1?'s':''} without session will be marked automatically.`;
-    body.appendChild(info);
-  }
-  const selections={};
-  tiered.forEach(task=>{
-    selections[task.id]=task.tiers[0];
-    const field=document.createElement('div'); field.className='m-field';
-    const lbl=document.createElement('label'); lbl.className='m-label'; lbl.textContent=task.text;
-    field.appendChild(lbl);
-    const grid=document.createElement('div'); grid.className='tier-grid';
-    task.tiers.forEach((tier,i)=>{
-      const btn=document.createElement('button'); btn.type='button';
-      btn.className='tier-btn'+(tier.elite?' elite':'')+(i===0?' sel-tier':'');
-      const time=document.createElement('div'); time.className='tier-time'; time.textContent=tier.label; btn.appendChild(time);
-      const sub=document.createElement('div'); sub.className='tier-gains-line'; sub.textContent=tier.sub||''; btn.appendChild(sub);
-      const gl=document.createElement('div'); gl.className='tier-gains-line'; gl.style.color='var(--sao-cyan-bright)'; gl.textContent=Object.entries(tier.gains).map(([k,v])=>`${k}+${v}`).join(' '); btn.appendChild(gl);
-      const xl=document.createElement('div'); xl.className='tier-gains-line'; xl.style.color='var(--sao-gold-soft)'; xl.textContent=`+${tier.xp} EXP`; btn.appendChild(xl);
-      btn.addEventListener('click',()=>{
-        selections[task.id]=tier;
-        grid.querySelectorAll('.tier-btn').forEach(b=>b.classList.remove('sel-tier'));
-        btn.classList.add('sel-tier');
-      });
-      grid.appendChild(btn);
-    });
-    field.appendChild(grid); body.appendChild(field);
-  });
-  _modalSaveHandler=()=>applyMarkAll(simple,tiered.map(t=>({task:t,tier:selections[t.id]})),listKey,periodKey);
-  document.getElementById('habitModal').classList.add('open');
-}
-
-function unmarkAllHabits(listKey, periodKey) {
-  state[listKey].forEach(task=>{
-    if(task.done[periodKey]){
-      const c=getCompletion(task,periodKey);
-      if(c){ applyGains(c.gains,-1); state.totalXp=Math.max(0,state.totalXp-(c.xp||0)); state.col=Math.max(0,state.col-(c.xp||0)); }
-      delete task.done[periodKey];
-    }
-  });
-  saveState(); renderAll(); showNotif('↩ All habits cleared');
-}
-
 function addTask() {
   const input=document.getElementById('taskInput'); if(!input) return;
   const text=input.value.trim(); if(!text) return;
-  const diff  = TASK_DIFF_CFG[selectedTaskDifficulty] || TASK_DIFF_CFG.normal;
-  const drops = getWorkTaskDrops(selectedTaskCategory, selectedTaskDifficulty);
   const taskData = {
     id:'t'+Date.now(), text,
-    xp: diff.xp,
+    xp: 0,                 // work tasks give Worker XP, never character XP
     gains: {},
-    drops,
+    drops: getWorkTaskDrops(selectedTaskCategory),
     category: selectedTaskCategory,
-    difficulty: selectedTaskDifficulty,
     done:{}
   };
   input.value='';
-  if (selectedTaskDifficulty === 'legendary') {
-    // Show contract overlay; defer state push until confirmed
-    showLegendaryContractOverlay(text, () => {
-      state.trabajo.push(taskData);
-      saveState(); renderAll();
-    });
-    return;
-  }
   state.trabajo.push(taskData);
   saveState(); renderAll();
 }
