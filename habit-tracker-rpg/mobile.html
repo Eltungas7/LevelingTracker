@@ -806,6 +806,10 @@ body {
   box-shadow: 0 0 6px var(--sao-gold);
   animation: blink 1.4s infinite;
 }
+/* Close-the-Day nudge — cyan to distinguish "do this" from a gold "claim reward". */
+.tab.has-pending.log-closeday::after {
+  background: var(--sao-cyan); color: #020d14; box-shadow: 0 0 6px var(--sao-cyan);
+}
 .tab .tab-icon { font-size: 16px; line-height: 1; }
 .tab.active {
   color: var(--sao-cyan);
@@ -1741,21 +1745,6 @@ body {
   background: var(--sao-bg2); border: 1px solid var(--sao-border);
   border-radius: 5px; padding: 8px 10px; cursor: pointer;
 }
-.stat-row.stat-stagnant   { animation: stat-stagnant-pulse 3s ease-in-out infinite; }
-.stat-row.stat-stagnant-2 { animation: stat-stagnant-2-pulse 2s ease-in-out infinite; }
-.stat-row.stat-stagnant-3 { animation: stat-stagnant-3-pulse 1.5s ease-in-out infinite; }
-@keyframes stat-stagnant-pulse {
-  0%,100% { border-color: var(--sao-border); box-shadow: none; }
-  50%      { border-color: rgba(255,82,82,0.4); box-shadow: 0 0 8px rgba(255,82,82,0.15); }
-}
-@keyframes stat-stagnant-2-pulse {
-  0%,100% { border-color: var(--sao-border); box-shadow: none; }
-  50%      { border-color: rgba(255,152,0,0.55); box-shadow: 0 0 12px rgba(255,152,0,0.25); }
-}
-@keyframes stat-stagnant-3-pulse {
-  0%,100% { border-color: rgba(229,57,53,0.5); box-shadow: 0 0 8px rgba(229,57,53,0.2); }
-  50%      { border-color: rgba(229,57,53,0.9); box-shadow: 0 0 18px rgba(229,57,53,0.45); }
-}
 .stat-row-top {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 5px;
@@ -1779,25 +1768,6 @@ body {
   animation: stat-delta-pop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
 }
 @keyframes stat-delta-pop { from { transform:scale(0.5); opacity:0; } to { transform:scale(1); opacity:1; } }
-.stagnant-badge {
-  display: inline-flex; align-items: center; font-size: 8px; font-weight: 700;
-  padding: 1px 6px; border-radius: 10px; margin-left: 6px; letter-spacing: 0.5px;
-  vertical-align: middle; font-family: 'Rajdhani', sans-serif;
-}
-.stagnant-atrophy {
-  background: rgba(255,152,0,0.18); border: 1px solid rgba(255,152,0,0.55);
-  color: #ff9800; animation: stagnant-atrophy-pulse 2s ease-in-out infinite;
-}
-.stagnant-critical {
-  background: rgba(229,57,53,0.2); border: 1px solid rgba(229,57,53,0.65);
-  color: #ef5350; animation: stagnant-critical-pulse 1.4s ease-in-out infinite;
-}
-@keyframes stagnant-atrophy-pulse {
-  0%,100% { box-shadow: none; } 50% { box-shadow: 0 0 8px rgba(255,152,0,0.45); }
-}
-@keyframes stagnant-critical-pulse {
-  0%,100% { box-shadow: none; } 50% { box-shadow: 0 0 12px rgba(229,57,53,0.6); }
-}
 .stat-mastery-tease {
   display: inline-flex; align-items: center; gap: 3px;
   font-size: 8px; color: rgba(255,193,7,0.85); letter-spacing: 0.3px;
@@ -3114,63 +3084,50 @@ body {
 .logro-detail-prog { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px; color: var(--sao-text-dim); text-align: center; margin-top: 10px; }
 
 /* ── INVENTORY TAB ── */
-.inv-window { display: flex; flex-direction: column; }
-.inv-window-title { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 3px; color: var(--sao-cyan); text-align: center; padding: 6px 0 10px; }
-.inv-body { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; }
+.inv-window { display: flex; flex-direction: column; gap: 10px; }
 .inv-section-label { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 2px; color: var(--sao-text-dim); margin-bottom: 6px; }
 
-/* ── Left: Paperdoll ── */
-.inv-equip-panel {
+/* ── LOADOUT (full-width, mobile-first) ── */
+.inv-loadout {
   background: linear-gradient(160deg, rgba(4,14,26,0.98) 0%, rgba(6,20,36,0.96) 100%);
-  border: 1px solid var(--sao-border); border-radius: 8px; padding: 10px;
-  position: relative;
+  border: 1px solid var(--sao-border); border-radius: 10px; padding: 10px;
 }
-.inv-equip-panel::before {
-  content: ''; position: absolute; inset: 0; border-radius: 8px;
-  background: radial-gradient(ellipse 80% 55% at 50% 45%, rgba(77,208,225,0.04) 0%, transparent 70%);
-  pointer-events: none;
+.inv-hero-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.inv-hero-sil {
+  width: 46px; height: 46px; flex-shrink: 0; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; font-size: 24px;
+  background: radial-gradient(ellipse at 50% 40%, rgba(77,208,225,0.16) 0%, transparent 70%);
+  border: 1px solid var(--sao-border-bright);
+  filter: drop-shadow(0 0 5px rgba(77,208,225,0.4));
 }
-.inv-equip-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
-  grid-template-areas:
-    "earL helm earR"
-    "wpn  char  shld"
-    "neck armor neck2"
-    "brace belt boot";
-}
-.inv-char-slot {
-  grid-area: char;
-  background: linear-gradient(160deg, rgba(8,24,42,0.9), rgba(4,14,26,0.95));
-  border: 1px solid var(--sao-border-bright); border-radius: 6px; padding: 4px 2px;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  min-height: 54px; position: relative; overflow: hidden;
-}
-.inv-char-slot::before {
-  content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 50% 40%, rgba(77,208,225,0.1) 0%, transparent 70%);
-}
-.inv-char-silhouette { font-size: 20px; position: relative; z-index: 1; filter: drop-shadow(0 0 5px rgba(77,208,225,0.45)); }
-.inv-char-name { font-family: 'Cinzel', serif; font-size: 7px; color: var(--sao-cyan); margin-top: 2px; text-align: center; position: relative; z-index: 1; }
-.inv-char-lv { font-size: 8px; color: var(--sao-gold); font-weight: 700; position: relative; z-index: 1; }
+.inv-hero-info { flex: 1; min-width: 0; }
+.inv-hero-name { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700; color: var(--sao-cyan); }
+.inv-hero-sub { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1.5px; color: var(--sao-text-dim); margin: 1px 0 4px; }
+.inv-hero-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.inv-hero-chip { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 10px; padding: 1px 6px; border-radius: 4px; background: rgba(255,193,7,0.1); border: 1px solid rgba(255,193,7,0.3); color: #ffc107; }
+.inv-hero-chip-muted { background: rgba(255,255,255,0.03); border-color: var(--sao-border); color: var(--sao-text-dim); font-weight: 400; }
+.inv-hero-power { flex-shrink: 0; text-align: center; padding: 4px 8px; border-radius: 8px; background: rgba(255,193,7,0.08); border: 1px solid rgba(255,193,7,0.28); }
+.inv-hero-power-val { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700; color: #ffc107; line-height: 1; text-shadow: 0 0 8px rgba(255,193,7,0.4); }
+.inv-hero-power-lbl { font-family: 'Cinzel', serif; font-size: 6.5px; letter-spacing: 1px; color: rgba(255,193,7,0.65); margin-top: 3px; line-height: 1.2; }
+
+.inv-eq-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
 
 .inv-equip-slot {
   background: rgba(4,12,22,0.7); border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 5px; min-height: 44px;
+  border-radius: 6px; min-height: 56px;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  cursor: pointer; padding: 3px;
+  cursor: pointer; padding: 4px 2px; gap: 2px; position: relative;
   transition: transform 0.12s, border-color 0.15s, box-shadow 0.15s;
 }
-.inv-equip-slot:active { transform: scale(0.91); }
+.inv-equip-slot:active { transform: scale(0.93); }
 .inv-equip-slot.is-selected {
   border-color: var(--sao-cyan) !important;
   box-shadow: 0 0 10px rgba(77,208,225,0.4), inset 0 0 6px rgba(77,208,225,0.08) !important;
   background: rgba(77,208,225,0.06) !important;
   animation: none !important;
 }
-.inv-equip-slot-emoji { font-size: 15px; }
-.inv-equip-slot-label { font-size: 6px; color: var(--sao-text-dim); margin-top: 1px; text-align: center; }
+.inv-equip-slot-emoji { font-size: 20px; line-height: 1; }
+.inv-equip-slot-label { font-size: 7px; letter-spacing: 0.3px; color: var(--sao-text-dim); text-align: center; text-transform: uppercase; }
 
 .inv-equip-slot.r-common   { border-color: rgba(176,176,176,0.4);  background: rgba(176,176,176,0.04); }
 .inv-equip-slot.r-uncommon { border-color: rgba(76,175,80,0.6);    background: rgba(76,175,80,0.06);   box-shadow: 0 0 7px rgba(76,175,80,0.25); }
@@ -3182,20 +3139,24 @@ body {
   50%     { border-color: rgba(255,215,0,0.95);  background: rgba(255,200,0,0.12);  box-shadow: 0 0 22px rgba(255,215,0,0.7), 0 0 40px rgba(255,180,0,0.2); }
 }
 
-.inv-eq-bonuses { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
-.inv-eq-bonus-tag { font-family: 'Cinzel', serif; font-size: 7px; padding: 2px 4px; border-radius: 3px; background: rgba(77,208,225,0.08); border: 1px solid rgba(77,208,225,0.25); color: var(--sao-cyan); }
-
-/* ── Right: Bag grid ── */
-.inv-bag-panel { display: flex; flex-direction: column; }
-.inv-bag-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
-.inv-filter-bar { display: flex; gap: 3px; }
-.inv-filter-btn { font-family: 'Cinzel', serif; font-size: 7px; letter-spacing: 0.5px; padding: 3px 5px; border-radius: 3px; cursor: pointer; background: var(--sao-bg3); border: 1px solid var(--sao-border); color: var(--sao-text-dim); min-height: 22px; transition: all 0.15s; }
-.inv-filter-btn.active { background: rgba(77,208,225,0.12); border-color: var(--sao-cyan); color: var(--sao-cyan); }
-.inv-sort-bar { display: flex; gap: 3px; margin-bottom: 5px; }
-.inv-sort-btn { font-family: 'Cinzel', serif; font-size: 7px; letter-spacing: 0.5px; padding: 2px 4px; border-radius: 3px; cursor: pointer; background: var(--sao-bg3); border: 1px solid var(--sao-border); color: var(--sao-text-dim); min-height: 20px; transition: all 0.15s; white-space: nowrap; }
+/* ── BAG ── */
+.inv-bag-panel {
+  display: flex; flex-direction: column;
+  background: linear-gradient(160deg, rgba(4,14,26,0.98) 0%, rgba(6,20,36,0.96) 100%);
+  border: 1px solid var(--sao-border); border-radius: 10px; padding: 10px;
+}
+/* Segmented filter control */
+.inv-seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; background: rgba(0,0,0,0.3); border: 1px solid var(--sao-border); border-radius: 7px; padding: 3px; margin-bottom: 8px; }
+.inv-seg-btn { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.5px; padding: 6px 2px; border-radius: 5px; cursor: pointer; background: transparent; border: none; color: var(--sao-text-dim); min-height: 28px; transition: all 0.15s; }
+.inv-seg-btn.active { background: rgba(77,208,225,0.14); color: var(--sao-cyan); box-shadow: inset 0 0 0 1px rgba(77,208,225,0.4); }
+.inv-bag-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 7px; flex-wrap: wrap; }
+.inv-cap { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1px; color: var(--sao-text-dim); white-space: nowrap; }
+.inv-sort-bar { display: flex; gap: 3px; }
+.inv-sort-btn { font-family: 'Cinzel', serif; font-size: 7px; letter-spacing: 0.5px; padding: 3px 6px; border-radius: 3px; cursor: pointer; background: var(--sao-bg3); border: 1px solid var(--sao-border); color: var(--sao-text-dim); min-height: 22px; transition: all 0.15s; white-space: nowrap; }
 .inv-sort-btn.active { background: rgba(77,208,225,0.12); border-color: var(--sao-cyan); color: var(--sao-cyan); }
+.inv-bag-empty { text-align: center; padding: 22px 8px; font-size: 9px; color: var(--sao-text-dim); font-family: 'Cinzel', serif; letter-spacing: 2px; opacity: 0.5; }
 
-.inv-bag-grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 3px; margin-bottom: 7px; }
+.inv-bag-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
 .inv-bag-slot {
   aspect-ratio: 1; background: rgba(4,12,22,0.65); border: 1px solid rgba(255,255,255,0.06);
   border-radius: 4px; display: flex; align-items: center; justify-content: center;
@@ -3217,8 +3178,8 @@ body {
   0%,100% { border-color: rgba(255,167,38,0.7);  background: rgba(255,167,38,0.06); box-shadow: 0 0 8px rgba(255,167,38,0.35); }
   50%     { border-color: rgba(255,215,0,0.92);  background: rgba(255,200,0,0.10);  box-shadow: 0 0 18px rgba(255,215,0,0.6), 0 0 30px rgba(255,180,0,0.15); }
 }
-.inv-slot-emoji { font-size: 13px; }
-.inv-slot-qty { position: absolute; bottom: 1px; right: 2px; font-size: 7px; color: var(--sao-gold); font-weight: 700; }
+.inv-slot-emoji { font-size: 20px; line-height: 1; }
+.inv-slot-qty { position: absolute; bottom: 1px; right: 3px; font-size: 8px; color: var(--sao-gold); font-weight: 700; }
 
 .inv-mat-summary { border-top: 1px solid var(--sao-border); margin-top: 6px; padding-top: 6px; }
 .inv-mat-row { display: flex; gap: 5px; flex-wrap: wrap; }
@@ -3315,9 +3276,40 @@ body {
 /* ── Currency bar ── */
 .inv-yang-bar { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 10px; border-top: 1px solid var(--sao-border); font-family: 'Cinzel', serif; font-size: 11px; margin-top: 6px; }
 .inv-yang-val  { font-size: 17px; font-weight: 700; }
-.inv-yang-col  { color: var(--sao-cyan); display:flex; align-items:center; gap:4px; }
-.inv-yang-gold { color: var(--sao-gold); display:flex; align-items:center; gap:4px; }
+.inv-yang-gold  { color: var(--sao-gold); display:flex; align-items:center; gap:4px; }
+.inv-yang-shard { color: var(--sao-shard-bright, #d1b3ff); display:flex; align-items:center; gap:4px; }
 .inv-yang-sep  { color: var(--sao-text-dim); opacity:0.4; }
+
+/* ── Item Inspect — bottom sheet ── */
+.inv-sheet-backdrop {
+  position: fixed; inset: 0; z-index: 1200;
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(2px);
+  display: flex; align-items: flex-end; justify-content: center;
+  animation: invSheetFade 0.18s ease both;
+}
+@keyframes invSheetFade { from { opacity: 0; } to { opacity: 1; } }
+.inv-sheet {
+  position: relative; width: 100%; max-width: 620px;
+  max-height: 80dvh; overflow-y: auto;
+  background: linear-gradient(160deg, rgba(6,18,32,0.99) 0%, rgba(8,24,42,0.98) 100%);
+  border: 1px solid var(--sao-border-bright); border-bottom: none;
+  border-radius: 16px 16px 0 0; padding: 8px 12px 16px;
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.5);
+  animation: invSheetUp 0.24s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes invSheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.inv-sheet.r-uncommon { border-top: 2px solid #66bb6a; }
+.inv-sheet.r-rare     { border-top: 2px solid #42a5f5; }
+.inv-sheet.r-epic     { border-top: 2px solid #ab47bc; }
+.inv-sheet.r-legendary{ border-top: 2px solid #ffa726; }
+.inv-sheet-handle { width: 38px; height: 4px; border-radius: 3px; background: rgba(255,255,255,0.22); margin: 2px auto 8px; }
+.inv-sheet-close { position: absolute; top: 8px; right: 10px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.06); border: 1px solid var(--sao-border); color: var(--sao-text-dim); font-size: 13px; cursor: pointer; line-height: 1; z-index: 2; }
+.inv-sheet-close:active { transform: scale(0.9); }
+/* Inside the sheet the inspect card is borderless (the sheet provides the frame) */
+.inv-sheet .inv-inspect-card { margin-top: 2px; border: none; background: transparent; box-shadow: none; }
+.inv-sheet .inv-inspect-card::before { display: none; }
+.inv-sheet .inv-inspect-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.inv-sheet .inv-act-btn { min-height: 38px; font-size: 9px; }
 
 /* ── DUNGEON ── */
 .dungeon-section {}
@@ -4277,6 +4269,36 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 
 /* ── FORGE VIEW ── */
 .forge-view { padding: 4px 12px 12px; display: flex; flex-direction: column; gap: 10px; }
+
+/* ── FORGE: mode toggle + slot picker + filter ── */
+.forge-mode-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: rgba(0,0,0,0.3); border: 1px solid var(--sao-border); border-radius: 8px; padding: 3px; }
+.forge-mode-btn { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1px; padding: 8px 0; border-radius: 6px; cursor: pointer; background: transparent; border: none; color: var(--sao-text-dim); transition: all 0.15s; }
+.forge-mode-btn.active { background: rgba(255,193,7,0.14); color: #ffc107; box-shadow: inset 0 0 0 1px rgba(255,193,7,0.4); }
+.forge-slot-picker { display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px; }
+.forge-slot-btn {
+  position: relative; aspect-ratio: 1; min-height: 40px; border-radius: 7px; cursor: pointer;
+  background: rgba(4,12,22,0.7); border: 1px solid rgba(255,255,255,0.08);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  padding: 2px 0; transition: transform 0.1s, border-color 0.15s, background 0.15s;
+}
+.forge-slot-btn:active { transform: scale(0.92); }
+.forge-slot-btn.active { border-color: var(--tc); background: color-mix(in srgb, var(--tc) 12%, transparent); box-shadow: 0 0 8px color-mix(in srgb, var(--tc) 40%, transparent); }
+.fsb-emoji { font-size: 16px; line-height: 1; }
+.fsb-prog { font-family: 'Cinzel', serif; font-size: 7px; letter-spacing: 0.3px; color: var(--sao-text-dim); }
+.forge-slot-btn.active .fsb-prog { color: var(--tc); }
+.fsb-dot { position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; border-radius: 50%; background: #69f0ae; box-shadow: 0 0 5px #69f0ae; }
+.fsb-eq { position: absolute; bottom: 2px; right: 3px; font-size: 8px; color: rgba(255,193,7,0.85); }
+.forge-filter-bar { display: flex; gap: 6px; justify-content: center; }
+.forge-filter-pill { flex: 1; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px; padding: 5px 0; border-radius: 5px; cursor: pointer; background: var(--sao-bg3); border: 1px solid var(--sao-border); color: var(--sao-text-dim); transition: all 0.15s; }
+.forge-filter-pill.active { background: rgba(77,208,225,0.12); border-color: var(--sao-cyan); color: var(--sao-cyan); }
+.forge-panels { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; padding-top: 10px; border-top: 1px solid var(--sao-border); }
+.forge-crafted-strip { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; padding: 6px 9px; border-radius: 7px; cursor: pointer; background: color-mix(in srgb, var(--tc) 7%, rgba(0,0,0,0.25)); border: 1px solid color-mix(in srgb, var(--tc) 25%, transparent); }
+.forge-crafted-strip:active { transform: scale(0.99); }
+.fcs-label { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1px; color: #69f0ae; white-space: nowrap; }
+.fcs-item { display: inline-flex; align-items: center; gap: 1px; opacity: 0.85; }
+.fcs-tier { font-family: 'Cinzel', serif; font-size: 7px; color: var(--sao-text-dim); }
+.fcs-toggle { margin-left: auto; font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.5px; color: var(--tc); white-space: nowrap; }
+
 .forge-mat-bar {
   background: rgba(255,193,7,0.06); border: 1px solid rgba(255,193,7,0.22);
   border-radius: 9px; padding: 10px 13px;
@@ -4372,6 +4394,56 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .mr-btn.buy  { background:rgba(130,177,255,0.15); border:1px solid rgba(130,177,255,0.5); color:#aacbff; }
 .mr-btn.disabled { opacity:0.4; pointer-events:none; filter:grayscale(0.5); }
 /* ── QUESTS worker bar ── */
+/* ── DAILY RATION — Workday command center ── */
+.workday-status { background:linear-gradient(160deg,rgba(6,20,36,0.98),rgba(8,24,42,0.96)); border:1px solid rgba(77,208,225,0.3); border-radius:11px; padding:11px 13px; margin-bottom:10px; box-shadow:0 0 16px rgba(77,208,225,0.08); }
+.wds-top { display:flex; align-items:center; gap:7px; margin-bottom:9px; flex-wrap:wrap; }
+.wds-label { font-family:'Cinzel',serif; font-size:9px; letter-spacing:1.5px; color:var(--sao-cyan); }
+.wds-chip { font-family:'Cinzel',serif; font-size:8px; letter-spacing:0.5px; padding:2px 7px; border-radius:10px; }
+.wds-go { color:#69f0ae; background:rgba(105,240,174,0.1); border:1px solid rgba(105,240,174,0.35); }
+.wds-idle { color:var(--sao-text-dim); background:rgba(255,255,255,0.03); border:1px solid var(--sao-border); }
+.wds-streak { margin-left:auto; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:11px; color:#ffc107; }
+.wds-streak-0 { color:var(--sao-text-dim); font-weight:400; font-size:9px; font-family:'Cinzel',serif; letter-spacing:0.5px; }
+.wds-floor-row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px; }
+.wds-floor-label { font-family:'Cinzel',serif; font-size:9px; letter-spacing:1px; color:rgba(255,255,255,0.5); }
+.wds-floor-val { font-family:'Rajdhani',sans-serif; font-weight:700; font-size:13px; color:var(--sao-cyan); }
+.wds-floor-track { height:7px; background:rgba(255,255,255,0.06); border-radius:4px; overflow:hidden; margin-bottom:10px; }
+.wds-floor-fill { height:100%; background:linear-gradient(90deg,rgba(77,208,225,0.6),var(--sao-cyan)); border-radius:4px; transition:width 0.5s; }
+.wds-floor-fill.full { background:linear-gradient(90deg,#69f0ae,#00e676); }
+.wds-md-row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px; }
+.wds-md-label { font-family:'Cinzel',serif; font-size:9px; letter-spacing:1px; color:rgba(255,255,255,0.5); }
+.wds-md-count { font-family:'Rajdhani',sans-serif; font-weight:700; font-size:13px; color:#ffd54f; }
+.wds-md-count.all { color:#69f0ae; }
+.wds-md-empty { font-size:10px; color:var(--sao-text-dim); line-height:1.4; padding:4px 0 2px; }
+.wds-md-list { display:flex; flex-direction:column; gap:3px; }
+.wds-md-item { display:flex; align-items:center; gap:7px; font-size:11px; color:var(--sao-text); }
+.wds-md-item.done { color:var(--sao-text-dim); text-decoration:line-through; opacity:0.6; }
+.wds-md-box { color:#ffd54f; font-size:11px; width:12px; text-align:center; }
+.wds-md-item.done .wds-md-box { color:#69f0ae; }
+.wds-md-text { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+.workday-done { position:relative; overflow:hidden; text-align:center; padding:16px 14px 14px; margin-bottom:10px; border-radius:12px; background:linear-gradient(160deg,rgba(0,40,20,0.5),rgba(8,30,20,0.6)); border:1px solid rgba(0,230,118,0.5); box-shadow:0 0 26px rgba(0,230,118,0.18); }
+.wdd-glow { position:absolute; inset:0; background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(0,230,118,0.15),transparent 70%); pointer-events:none; }
+.wdd-check { font-size:34px; color:#00e676; line-height:1; filter:drop-shadow(0 0 10px rgba(0,230,118,0.7)); position:relative; }
+.wdd-title { font-family:'Cinzel',serif; font-size:15px; font-weight:700; color:#69f0ae; letter-spacing:2px; margin-top:5px; position:relative; }
+.wdd-sub { font-size:10px; color:rgba(255,255,255,0.6); margin-top:5px; position:relative; }
+.wdd-rest { font-family:'Cinzel',serif; font-size:11px; color:#b9f6ca; margin-top:7px; position:relative; }
+.wdd-streak { font-family:'Rajdhani',sans-serif; font-weight:700; font-size:12px; color:#ffc107; margin-top:8px; position:relative; }
+
+.workday-done-ov { position:fixed; inset:0; z-index:1300; display:flex; align-items:center; justify-content:center; background:rgba(0,12,6,0.82); backdrop-filter:blur(3px); animation:wdoFade 0.2s both; }
+@keyframes wdoFade { from{opacity:0} to{opacity:1} }
+.workday-done-ov.wdo-out { animation:wdoFade 0.35s reverse both; }
+.wdo-inner { position:relative; overflow:hidden; max-width:330px; width:84%; text-align:center; padding:26px 22px; border-radius:16px; background:linear-gradient(160deg,rgba(6,30,18,0.98),rgba(8,24,18,0.98)); border:1px solid rgba(0,230,118,0.55); box-shadow:0 0 40px rgba(0,230,118,0.3); animation:wdoPop 0.4s cubic-bezier(0.22,1,0.36,1) both; }
+@keyframes wdoPop { from{transform:scale(0.85);opacity:0} to{transform:scale(1);opacity:1} }
+.wdo-scan { position:absolute; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,rgba(0,230,118,0.7),transparent); animation:wdoScan 2.2s linear infinite; }
+@keyframes wdoScan { 0%{top:0} 100%{top:100%} }
+.wdo-check { font-size:46px; color:#00e676; line-height:1; filter:drop-shadow(0 0 14px rgba(0,230,118,0.8)); }
+.wdo-eyebrow { font-family:'Cinzel',serif; font-size:9px; letter-spacing:2.5px; color:rgba(105,240,174,0.7); margin-top:8px; }
+.wdo-title { font-family:'Cinzel',serif; font-size:24px; font-weight:700; color:#69f0ae; letter-spacing:3px; margin-top:3px; text-shadow:0 0 16px rgba(0,230,118,0.5); }
+.wdo-body { font-size:11px; color:rgba(255,255,255,0.72); line-height:1.6; margin-top:10px; }
+.wdo-body strong { color:#b9f6ca; }
+.wdo-streak { font-family:'Rajdhani',sans-serif; font-weight:700; font-size:13px; color:#ffc107; margin-top:12px; letter-spacing:1px; }
+.wdo-tap { font-size:8px; letter-spacing:1.5px; color:var(--sao-text-dim); margin-top:12px; text-transform:uppercase; }
+
 .quests-worker-bar { margin:0 0 8px; padding:7px 10px; border-radius:8px; background:rgba(255,193,7,0.04); border:1px solid rgba(255,193,7,0.18); transition:border-color 0.15s; }
 .quests-worker-bar:hover { border-color:rgba(255,193,7,0.4); }
 .qwb-top { display:flex; justify-content:space-between; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:5px; }
@@ -4379,6 +4451,13 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .qwb-spec { font-family:'Rajdhani',sans-serif; font-size:9px; font-weight:700; letter-spacing:0.5px; color:var(--spec-color,#ffd54f); border:1px solid var(--spec-color,#ffd54f)55; background:rgba(255,255,255,0.03); border-radius:4px; padding:1px 6px; white-space:nowrap; }
 .qwb-next { font-family:'Rajdhani',sans-serif; font-size:10px; color:var(--sao-text-dim); text-align:right; margin-left:auto; white-space:nowrap; }
 .job-board-section { margin-top:10px; }
+.job-board-toggle .jb-summary { font-size:9px; color:var(--sao-text-dim); font-family:'Rajdhani',sans-serif; letter-spacing:0.5px; }
+.backlog-burndown { display:flex; align-items:center; gap:6px; padding:6px 10px; margin:2px 0 8px; border-radius:7px; background:rgba(77,208,225,0.05); border:1px solid rgba(77,208,225,0.18); font-family:'Rajdhani',sans-serif; font-size:11px; }
+.bb-icon { font-size:12px; }
+.bb-count { font-weight:700; color:var(--sao-cyan); }
+.bb-sep { color:var(--sao-text-dim); opacity:0.5; }
+.bb-eta { color:var(--sao-text-dim); }
+.bb-eta.bb-clear { color:#69f0ae; font-weight:700; }
 .qwb-track { height:4px; background:rgba(255,255,255,0.06); border-radius:2px; overflow:hidden; }
 .qwb-fill { height:100%; border-radius:2px; transition:width 0.5s; }
 /* ── Focus pledge button ── */
@@ -4389,6 +4468,12 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 }
 .quest-focus-btn:hover { color:#ffd54f; border-color:rgba(255,193,7,0.4); }
 .quest-focus-btn.focused { background:rgba(255,193,7,0.12); border-style:solid; border-color:rgba(255,193,7,0.55); color:#ffd54f; }
+.quest-focus-row { display:flex; gap:6px; margin-top:6px; }
+.quest-focus-row .quest-focus-btn { margin-top:0; flex:1; }
+.quest-go-btn { border-style:solid; border-color:rgba(77,208,225,0.4); color:var(--sao-cyan); background:rgba(77,208,225,0.08); }
+.quest-go-btn:hover { color:var(--sao-cyan-bright); border-color:var(--sao-cyan); }
+.quest-go-btn.focusing { background:rgba(77,208,225,0.18); border-color:var(--sao-cyan); color:var(--sao-cyan-bright); animation:goPulse 1.8s ease-in-out infinite; }
+@keyframes goPulse { 0%,100%{box-shadow:0 0 0 rgba(77,208,225,0)} 50%{box-shadow:0 0 9px rgba(77,208,225,0.4)} }
 /* ── Batch craft + forge-it link ── */
 .forge-craft-btn-row { display:flex; gap:6px; }
 .forge-craft-btn-row .forge-craft-btn { flex:1; }
@@ -4516,6 +4601,9 @@ details[open] .devt-hist-summary::after { content:'▲'; }
   cursor: pointer; user-select: none;
 }
 .work-cat-header:hover { opacity: 0.85; }
+.work-mustdo-header { cursor: default; border-bottom-color: rgba(255,213,79,0.5); margin-top: 2px; }
+.work-mustdo-header .wch-label { color: #ffd54f; font-weight: 700; }
+.work-mustdo-header .wch-emoji { filter: drop-shadow(0 0 5px rgba(255,213,79,0.6)); }
 .wch-toggle { font-size: 8px; color: rgba(255,255,255,0.3); width: 10px; flex-shrink: 0; }
 .wch-emoji  { font-size: 13px; }
 .wch-label  {
@@ -4627,10 +4715,11 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 
 /* ── INVENTORY: GRADE BADGES ── */
 .inv-slot-grade {
-  position:absolute; bottom:1px; right:2px;
+  position:absolute; top:2px; right:3px;
   font-family:'Cinzel',serif; font-size:7px; font-weight:700; letter-spacing:0.3px;
   line-height:1; pointer-events:none;
 }
+.inv-slot-eqdot { position:absolute; top:2px; left:3px; font-size:8px; line-height:1; color:var(--sao-cyan); pointer-events:none; text-shadow:0 0 4px rgba(77,208,225,0.8); }
 .inv-bag-slot { position:relative; }
 .inv-inspect-grade {
   display:inline-block; font-family:'Cinzel',serif; font-size:8px; font-weight:700;
@@ -4645,6 +4734,53 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 
 /* ── GUILD VIEW ── */
 .guild-view { padding: 4px 12px 12px; display:flex; flex-direction:column; gap:10px; }
+
+/* ── GUILD CREST (consolidated identity: rank + power + gold) ── */
+.guild-crest {
+  background: linear-gradient(160deg, rgba(6,20,36,0.98), rgba(8,24,42,0.96));
+  border: 1px solid color-mix(in srgb, var(--gc) 35%, var(--sao-border));
+  border-radius: 11px; padding: 12px 14px;
+  box-shadow: 0 0 18px color-mix(in srgb, var(--gc) 12%, transparent);
+}
+.gc-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 9px; }
+.gc-rank { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.gc-rank-icon { font-size: 26px; line-height: 1; filter: drop-shadow(0 0 8px color-mix(in srgb, var(--gc) 60%, transparent)); }
+.gc-rank-name { font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700; color: var(--gc); letter-spacing: 0.5px; line-height: 1.1; }
+.gc-rank-sub { font-size: 9px; color: var(--sao-text-dim); margin-top: 2px; line-height: 1.3; }
+.gc-gold { text-align: right; flex-shrink: 0; }
+.gc-gold-amt { font-family: 'Cinzel', serif; font-size: 15px; font-weight: 700; color: #ffc107; white-space: nowrap; }
+.gc-gold-life { font-size: 8px; color: var(--sao-text-dim); margin-top: 1px; white-space: nowrap; }
+.gc-power-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+.gc-power-lbl { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); }
+.gc-power-val { font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700; color: var(--gc); }
+.gc-power-track { height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+.gc-power-fill { height: 100%; background: linear-gradient(90deg, color-mix(in srgb,var(--gc) 55%,transparent), var(--gc)); border-radius: 3px; transition: width 0.6s; }
+.gc-next { font-size: 9px; color: var(--sao-text-dim); margin-top: 6px; text-align: center; }
+.gc-next strong { color: var(--gc); }
+.gc-next-need { color: var(--gc); font-weight: 700; font-family: 'Rajdhani', sans-serif; }
+
+/* ── Worker chip (compact; full panel on QUESTS) ── */
+.guild-worker-chip {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  background: color-mix(in srgb, var(--wc) 6%, rgba(0,0,0,0.2));
+  border: 1px solid color-mix(in srgb, var(--wc) 30%, transparent);
+  border-radius: 8px; padding: 7px 11px; cursor: pointer;
+}
+.guild-worker-chip:active { transform: scale(0.99); }
+.gwc-rank { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; color: var(--wc); white-space: nowrap; }
+.gwc-lv { font-family: 'Rajdhani', sans-serif; font-size: 10px; color: var(--sao-text-dim); }
+.gwc-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+.gwc-fill { display: block; height: 100%; background: var(--wc); border-radius: 2px; }
+.gwc-more { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.5px; color: color-mix(in srgb, var(--wc) 70%, white 10%); white-space: nowrap; }
+
+/* ── Maxed upgrade slim row + affordable highlight + payback hint ── */
+.guild-maxed-row { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 7px; background: color-mix(in srgb, var(--tc) 6%, rgba(0,0,0,0.2)); border: 1px solid color-mix(in srgb, var(--tc) 22%, transparent); }
+.gmr-emoji { font-size: 15px; }
+.gmr-name { font-family: 'Cinzel', serif; font-size: 11px; color: var(--sao-text); flex: 1; }
+.gmr-max { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1px; color: var(--tc); white-space: nowrap; }
+.guild-upgrade-card.affordable { border-color: color-mix(in srgb, var(--tc) 55%, transparent) !important; box-shadow: 0 0 12px color-mix(in srgb, var(--tc) 22%, transparent); }
+.gt-payback { font-family: 'Rajdhani', sans-serif; font-size: 9px; color: rgba(255,255,255,0.4); text-align: center; margin-top: 5px; }
+
 .guild-gold-panel {
   background:rgba(255,193,7,0.06); border:1px solid rgba(255,193,7,0.22);
   border-radius:9px; padding:10px 14px; display:flex; align-items:center; justify-content:space-between;
@@ -8471,11 +8607,33 @@ const ITEM_RARITY = {
   legendary: { label:'EPIC',     color:'#ea80fc', glow:'rgba(234,128,252,0.45)', tint:'rgba(234,128,252,0.09)' },
 };
 
-// ── Difficulty rank — "at least X" commission matching ────────
+// ── Difficulty rank — kept for legacy/migration only (difficulty retired) ────
 const DIFF_RANK = { easy: 0, normal: 1, hard: 2, legendary: 3 };
 
-// ── Commission board pool (tiered: bronze / silver / gold) ────
+// ── Commission board pool — CADENCE DIRECTIVES ────────────────
+// Bonus-only daily missions that track the behaviours the Daily Ration is built on
+// (clear tasks, run focus sessions, clear must-dos, hit the floor). They auto-complete
+// just by working your normal day — pure extra reward, never a competing demand.
+//   metric: 'tasks' | 'sessions' | 'mustdos' | 'floor' | 'inflow'
 const COMMISSION_POOL = [
+  // ── BRONZE — quick, always reachable ──────────────────────
+  { tier:'bronze', metric:'tasks',    count:1, title:'Morning Dispatch',  flavor:'Clear one task to open the day’s ledger.',                       bonusGold:25,  bonusXp:12, bonusMat:null },
+  { tier:'bronze', metric:'tasks',    count:2, title:"Courier’s Errand",  flavor:'Two tasks cleared before the gates close.',                      bonusGold:40,  bonusXp:20, bonusMat:{id:'gear',   qty:2} },
+  { tier:'bronze', metric:'sessions', count:2, title:'Field Survey',      flavor:'Run 2 focus sessions — explore the work, don’t just plan it.',   bonusGold:45,  bonusXp:22, bonusMat:{id:'scroll', qty:2} },
+  { tier:'bronze', metric:'mustdos',  count:1, title:'Honor the Pledge',  flavor:'Clear one of today’s must-dos.',                                 bonusGold:40,  bonusXp:20, bonusMat:null },
+  // ── SILVER — a solid working day ──────────────────────────
+  { tier:'silver', metric:'tasks',    count:3, title:'Steady Hands',      flavor:'Three tasks off the backlog. Momentum builds.',                  bonusGold:70,  bonusXp:38, bonusMat:{id:'timber', qty:3} },
+  { tier:'silver', metric:'sessions', count:3, title:'Deep Expedition',   flavor:'Three focus sessions today — find your flow.',                   bonusGold:80,  bonusXp:42, bonusMat:{id:'crystal',qty:3} },
+  { tier:'silver', metric:'inflow',   count:1, title:'In the Zone',       flavor:'Finish a task during a focus session — the in-flow bonus.',      bonusGold:75,  bonusXp:40, bonusMat:{id:'scroll', qty:2} },
+  { tier:'silver', metric:'mustdos',  count:2, title:'Priorities First',  flavor:'Clear two of today’s must-dos.',                                 bonusGold:85,  bonusXp:45, bonusMat:null },
+  // ── GOLD — a strong, full day ─────────────────────────────
+  { tier:'gold',   metric:'tasks',    count:5, title:'Productive Day',    flavor:'Five tasks cleared. Real progress on the backlog.',              bonusGold:130, bonusXp:70, bonusMat:{id:'gear',   qty:4} },
+  { tier:'gold',   metric:'sessions', count:4, title:'Marathon Focus',    flavor:'Four focus sessions — a true deep-work day.',                    bonusGold:140, bonusXp:75, bonusMat:{id:'crystal',qty:4} },
+  { tier:'gold',   metric:'floor',    count:1, title:'Full Day Logged',   flavor:'Hit your daily focus floor. You showed up in full.',             bonusGold:120, bonusXp:65, bonusMat:{id:'gear',   qty:3} },
+];
+
+// Legacy pool kept for any old in-flight references (no longer generated).
+const COMMISSION_POOL_LEGACY = [
   // ── BRONZE — short tasks, always reachable ────────────────
   { tier:'bronze', title:"Courier's Errand",          flavor:'Two deliveries outstanding. Clear them before the gates close.',                              category:null,          difficulty:null,       count:2, bonusGold:40,  bonusXp:20,  bonusMat:null },
   { tier:'bronze', title:"Builder's Apprentice",      flavor:"The Iron Guild needs able hands — log 2 physical assignments by shift's end.",               category:'physical',    difficulty:null,       count:2, bonusGold:45,  bonusXp:20,  bonusMat:{id:'timber', qty:2} },
@@ -8516,16 +8674,11 @@ const COMMISSION_POOL = [
 // One contract per ISO week, selected deterministically by weekKey hash.
 // Progress counts all matching task completions across the full week (Mon–Sun).
 const WEEKLY_COMMISSION_POOL = [
-  { title:'The Grand Campaign',      flavor:'The Guild demands significant output this week. Complete 8 contracts of any discipline before Sunday midnight.',             category:null,          difficulty:null,        count:8,  bonusGold:350, bonusXp:180, bonusMat:{id:'gear',    qty:8 } },
-  { title:'Council of Minds',        flavor:'The Arcane Council convenes Sunday. Ten mental submissions must be on record before the bell tolls.',                        category:'mental',      difficulty:null,        count:10, bonusGold:420, bonusXp:220, bonusMat:{id:'scroll',  qty:10} },
-  { title:'Iron Tide',               flavor:'The physical guilds demand a show of strength. Complete 10 physical assignments to earn the Iron Tide seal.',               category:'physical',    difficulty:null,        count:10, bonusGold:400, bonusXp:200, bonusMat:{id:'timber',  qty:10} },
-  { title:"Artisan's Manifesto",     flavor:'The full exhibition demands 10 creative submissions. The Artisan Order accepts no partial portfolios.',                      category:'creative',    difficulty:null,        count:10, bonusGold:430, bonusXp:210, bonusMat:{id:'crystal', qty:10} },
-  { title:'Operations Directive',    flavor:'The strategy council needs sustained output. Log 10 operational contracts to fulfill the standing directive.',               category:'operational', difficulty:null,        count:10, bonusGold:390, bonusXp:195, bonusMat:{id:'gear',    qty:10} },
-  { title:"Veteran's War Council",   flavor:'Only battle-tested operatives qualify. Five hard or legendary contracts — the council will accept nothing less.',           category:null,          difficulty:'hard',      count:5,  bonusGold:480, bonusXp:250, bonusMat:{id:'crystal', qty:8 } },
-  { title:'The Legendary Trifecta',  flavor:'Three legendary feats in a single week. The history books await. One name will be written in. Let it be yours.',            category:null,          difficulty:'legendary', count:3,  bonusGold:600, bonusXp:320, bonusMat:{id:'crystal', qty:12} },
-  { title:'High-Volume Contractor',  flavor:'The merchants need volume, not perfection. Deliver 15 contracts of any discipline before the week closes.',                 category:null,          difficulty:null,        count:15, bonusGold:520, bonusXp:280, bonusMat:{id:'gear',    qty:12} },
-  { title:"Sage's Dissertation",     flavor:'The Academy requires 8 mental submissions this week. The dissertation committee will not grant extensions.',                 category:'mental',      difficulty:null,        count:8,  bonusGold:360, bonusXp:185, bonusMat:{id:'scroll',  qty:8 } },
-  { title:'The Elite Qualifier',     flavor:'The elite circuit demands 4 hard-proven contracts. Standard fare will not be considered for the qualifier.',                 category:null,          difficulty:'hard',      count:4,  bonusGold:440, bonusXp:235, bonusMat:{id:'crystal', qty:8 } },
+  { title:'The Grand Campaign',     flavor:'A full week of steady output. Clear 20 tasks before Sunday midnight.',                  metric:'tasks',    count:20, bonusGold:420, bonusXp:220, bonusMat:{id:'gear',    qty:10} },
+  { title:'Marathon of Focus',      flavor:'Thirty focus sessions across the week — deep work, sustained.',                        metric:'sessions', count:30, bonusGold:450, bonusXp:230, bonusMat:{id:'crystal', qty:10} },
+  { title:'The Backlog Offensive',  flavor:'Push hard on the backlog: 30 tasks cleared this week.',                                metric:'tasks',    count:30, bonusGold:540, bonusXp:280, bonusMat:{id:'timber',  qty:12} },
+  { title:'Iron Cadence',           flavor:'Hit your daily ration on 5 separate days this week — consistency over cramming.',      metric:'rationdays', count:5, bonusGold:520, bonusXp:300, bonusMat:{id:'crystal', qty:12} },
+  { title:'Deep Work Pact',         flavor:'Forty focus sessions this week. The flow compounds.',                                  metric:'sessions', count:40, bonusGold:560, bonusXp:300, bonusMat:{id:'scroll',  qty:12} },
 ];
 
 // ── CLIENT REQUESTS (manual-fulfill commissions) ──────────────────────
@@ -8875,6 +9028,18 @@ function loadState() {
       if (!s.statsSnapshot)   s.statsSnapshot   = null;
       if (!s.radarSnapshot)   s.radarSnapshot   = null;
       if (!s.statGainsToday)  s.statGainsToday  = { date: '', gains: {} };
+      // ── Daily Ration system (work cadence) ─────────────────────
+      if (typeof s.workCapacityHours !== 'number') s.workCapacityHours = 4;   // daily focus floor (hours)
+      if (!s.workDay || typeof s.workDay !== 'object') s.workDay = { dateKey:'', focusMs:0, sessions:0 };
+      if (!s.workMustDos || typeof s.workMustDos !== 'object') s.workMustDos = { dateKey:'', ids:[] };
+      if (!s.workDayDone || typeof s.workDayDone !== 'object') s.workDayDone = { dateKey:'', done:false };
+      if (typeof s.steadyDays !== 'number') s.steadyDays = 0;
+      if (!s.hasOwnProperty('lastSteadyDay')) s.lastSteadyDay = null;
+      if (!Array.isArray(s.rationDays)) s.rationDays = [];   // dateKeys the daily ration was met (for weekly cadence)
+      // Migrate the old single focus-pledge → seed today's must-dos
+      if (s.focusTask && s.focusTask.id && !s.workMustDos.ids.length) {
+        s.workMustDos = { dateKey: todayKey(), ids: [s.focusTask.id] };
+      }
       // Migrate old dungeon difficulty keys (easy/medium/hard/xhard → null)
       if (s.dungeon && ['easy','medium','hard','xhard'].includes(s.dungeon.difficulty)) s.dungeon = null;
       // Add missing idle fields to in-progress dungeons
@@ -9076,6 +9241,35 @@ function loadState() {
           if (n.id === 'neg1') { n.gains = {INT:1,VOL:2}; n.xp = 30; }
         });
       }
+      // ── One-time habit layout (2026-06): exactly 10 daily habits, 4 morning + 6 night ──
+      // Drops Sun exposure / Wash clothes / NO PHONE USAGE (now an avoid habit), moves
+      // Read → morning and Training → night. Existing progress/done-history is preserved.
+      if (!s._habitLayout202606 && Array.isArray(s.habitos)) {
+        s._habitLayout202606 = true;
+        const _nr2 = t => (t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+        const _m2 = (text, key) => key === 'read' ? /\bread\b/.test(_nr2(text)) : _nr2(text).includes(key);
+        // key matcher + target timeOfDay; array order = display order (4 morning, then 6 night)
+        const LAYOUT2606 = [
+          { key:'wake up',     tod:'morning' },
+          { key:'your bed',    tod:'morning' },
+          { key:'stretching',  tod:'morning' },
+          { key:'read',        tod:'morning' },
+          { key:'grateful',    tod:'night'   },
+          { key:'training',    tod:'night'   },
+          { key:'water',       tod:'night'   },
+          { key:'dishes',      tod:'night'   },
+          { key:'meditation',  tod:'night'   },
+          { key:'brush teeth', tod:'night'   },
+        ];
+        const _kept2606 = [];
+        LAYOUT2606.forEach(p => {
+          const ex = s.habitos.find(h => _m2(h.text, p.key) && !_kept2606.includes(h));
+          if (ex) { ex.timeOfDay = p.tod; if (!ex.done) ex.done = {}; _kept2606.push(ex); }
+        });
+        // Only collapse to the 10-habit set if we matched a healthy majority (guards a
+        // wildly-custom save from being gutted). Anything unmatched (sun/wash/phone) is dropped.
+        if (_kept2606.length >= 8) s.habitos = _kept2606;
+      }
       return s;
     }
     // Migrate from v3
@@ -9111,6 +9305,9 @@ let logSubTab    = 'achievements';
 let charSubTab   = 'stats';
 let workShopView = 'workbench'; // 'workbench' | 'forge' | 'guild'
 let forgeFilterMode = 'all'; // 'all' | 'craftable'
+let forgeTree = 'swrd';       // selected equipment tree (slot picker)
+let forgeMode = 'forge';      // 'forge' | 'refine'
+let forgeShowCrafted = {};    // per-tree: expand the collapsed "already forged" tiers
 let activeDate = todayKey();
 let completedExpanded = {};
 let combatStatsExpanded = false;
@@ -9826,8 +10023,12 @@ const INV_SIZE = 45;
 // legacy aliases (quality/qualityMult/label) so existing call sites keep working.
 function rollCraftQuality() {
   const r = Math.random(); let acc = 0;
-  let tier = RARITY_TIERS[0];
-  for (const t of RARITY_TIERS) { acc += t.chance; if (r < acc) { tier = t; break; } }
+  let idx = 0;
+  for (let i = 0; i < RARITY_TIERS.length; i++) { acc += RARITY_TIERS[i].chance; if (r < acc) { idx = i; break; } }
+  // Quality Forge (guild upgrade): chance to promote the roll one rarity tier higher.
+  const qfLvl = (state.guildUpgrades || {}).quality_forge || 0;
+  if (qfLvl > 0 && idx < RARITY_TIERS.length - 1 && Math.random() < qfLvl * 0.04) idx++;
+  const tier = RARITY_TIERS[idx];
   return { quality: tier.id, qualityMult: tier.statMult, label: tier.label };
 }
 // Roll the % affixes for a crafted item: slot count from tier+rarity, magnitude
@@ -10679,6 +10880,16 @@ function getSystemSuggestion() {
 
 function itemImgHtml(item, size) {
   if (!item) return '';
+  // Sprite-sheet icon (e.g. the forge sword tree → "Swords PNG.png", a 6×5 grid of 32px cells).
+  if (item.sprite) {
+    const c = item.sprite.col, r = item.sprite.row;
+    const sheet = item.sprite.sheet || 'Swords PNG.png';
+    const cols = item.sprite.cols || 6, rows = item.sprite.rows || 5;
+    return `<span style="display:inline-block;vertical-align:middle;width:${size}px;height:${size}px;`
+      + `background-image:url('${sheet}');background-repeat:no-repeat;`
+      + `background-size:${cols*size}px ${rows*size}px;background-position:-${c*size}px -${r*size}px;`
+      + `image-rendering:pixelated"></span>`;
+  }
   if (item.img) return `<img src="${item.img}" width="${size}" height="${size}" style="image-rendering:pixelated;display:inline-block;vertical-align:middle">`;
   return item.emoji || '';
 }
@@ -11352,9 +11563,22 @@ function purchaseGuildUpgrade(id) {
   state.guildUpgrades[id] = nextLvl;
   // Guild milestones
   if (!state.guildMilestones) state.guildMilestones = {};
-  const _totalLvls = Object.values(state.guildUpgrades).reduce((a, b) => a + (b || 0), 0);
+  if (!state.shopMaterials) state.shopMaterials = { timber:0, scroll:0, crystal:0, gear:0 };
+  const _totalLvls = GUILD_UPGRADES.reduce((a, u) => a + (state.guildUpgrades[u.id] || 0), 0);
   const _hallUpg = GUILD_UPGRADES.find(u => u.id === 'hall');
-  if (!state.guildMilestones.firstPurchase) {
+  // Guild RANK-UP (crossing a rank threshold) takes priority — celebration + a horizontal
+  // supply-cache reward (materials: useful, on-theme, never permanent power).
+  const _rankUp = getGuildRankIdx(_totalLvls) > getGuildRankIdx(_totalLvls - 1);
+  if (_rankUp) {
+    const _rk = GUILD_RANK_DEFS[getGuildRankIdx(_totalLvls)];
+    const _matQty = 10 + getGuildRankIdx(_totalLvls) * 10;
+    ['timber','scroll','crystal','gear'].forEach(m => { state.shopMaterials[m] = (state.shopMaterials[m]||0) + _matQty; });
+    // Keep overlapping fixed-milestone flags consistent so they don't fire spuriously later.
+    state.guildMilestones.firstPurchase = true;
+    if (_totalLvls >= 5) state.guildMilestones.fiveUpgrades = true;
+    if (id === 'hall' && _hallUpg && nextLvl >= _hallUpg.maxLevel) state.guildMilestones.hallMaxed = true;
+    setTimeout(() => showGuildRankUpOverlay(_rk, _matQty), 480);
+  } else if (!state.guildMilestones.firstPurchase) {
     state.guildMilestones.firstPurchase = true;
     setTimeout(() => showGuildMilestoneOverlay('first'), 450);
   } else if (!state.guildMilestones.fiveUpgrades && _totalLvls >= 5) {
@@ -11478,110 +11702,113 @@ function buyFromMerchant(sellIdx) {
 }
 
 function renderInventory() {
-  panelTitle.textContent = 'INVENTORY'; panelSubtitle.textContent = 'Equipment & items';
+  panelTitle.textContent = 'GEAR'; panelSubtitle.textContent = 'Loadout & inventory';
   panelContent.innerHTML = '';
   const lv = calcLevel(state.totalXp);
   const equip = state.equipment || {};
   const inv = state.inventory || [];
   const inCombat = !!state.dungeon?.combat;
 
-  // Deselect if filtered out
-  if (invSelected?.source === 'bag' && invFilter !== 'all') {
-    const e = inv[invSelected.index];
-    if (e) {
-      const _fi = ITEMS_DB[e.itemId];
-      const vis = (invFilter==='equip' && _fi?.slot) ||
-                  (invFilter==='consumable' && (_fi?.healHP||_fi?.healMP)) ||
-                  (invFilter==='material' && _fi && !_fi.slot && !_fi.healHP && !_fi.healMP);
-      if (!vis) invSelected = null;
-    }
-  }
-
   const win = document.createElement('div');
   win.className = 'inv-window';
-  win.innerHTML = `<div class="inv-window-title">INVENTORY</div>`;
 
-  const body = document.createElement('div');
-  body.className = 'inv-body';
+  // ════════════════ LOADOUT ════════════════
+  const loadout = document.createElement('div');
+  loadout.className = 'inv-loadout';
 
-  // ══ LEFT: Paperdoll ══
-  const eqPanel = document.createElement('div');
-  eqPanel.className = 'inv-equip-panel';
-  eqPanel.innerHTML = `<div class="inv-section-label">EQUIPMENT</div>`;
+  // Hero summary — surfaces gear's CONTRIBUTION to power so equipping feels meaningful
+  const _cp = calcPowerLevel();
+  const _gearCP = calcGearCP(_cp.cp);
+  const eq = getEquippedStats();
+  const _clsId = state.classData && state.classData.equipped;
+  const _clsName = _clsId && CLASSES[_clsId] ? CLASSES[_clsId].name : 'Adventurer';
+  const _equippedCount = EQUIP_SLOTS.filter(d => equip[d.id]).length;
+  const _combatChips = [['ATK','⚔'],['DEF','🛡'],['HP','❤'],['MP','💧']]
+    .filter(([k]) => (eq[k]||0) > 0)
+    .map(([k,ic]) => `<span class="inv-hero-chip">${ic} +${eq[k]}</span>`).join('');
+  const hero = document.createElement('div');
+  hero.className = 'inv-hero-row';
+  hero.innerHTML = `
+    <div class="inv-hero-sil">🗡️</div>
+    <div class="inv-hero-info">
+      <div class="inv-hero-name">${state.playerName||'HERO'}</div>
+      <div class="inv-hero-sub">LV.${lv.level} · ${_clsName.toUpperCase()}</div>
+      <div class="inv-hero-chips">${_combatChips || '<span class="inv-hero-chip inv-hero-chip-muted">No gear bonuses</span>'}</div>
+    </div>
+    <div class="inv-hero-power">
+      <div class="inv-hero-power-val">+${_gearCP.toLocaleString()}</div>
+      <div class="inv-hero-power-lbl">GEAR<br>POWER</div>
+    </div>`;
+  loadout.appendChild(hero);
 
-  const grid = document.createElement('div');
-  grid.className = 'inv-equip-grid';
-
-  const charEl = document.createElement('div');
-  charEl.className = 'inv-char-slot';
-  charEl.style.gridArea = 'char';
-  charEl.innerHTML = `<div class="inv-char-silhouette">🗡️</div><div class="inv-char-name">${state.playerName||'HERO'}</div><div class="inv-char-lv">LV.${lv.level}</div>`;
-  grid.appendChild(charEl);
-
+  // Equipped slots — full-width grid of readable tiles (tap filled = inspect, tap empty = jump to gear bag)
+  const eqGrid = document.createElement('div');
+  eqGrid.className = 'inv-eq-grid';
   EQUIP_SLOTS.forEach(def => {
     const eqId = equip[def.id];
     const eqItem = eqId ? ITEMS_DB[eqId] : null;
     const isSel = invSelected?.source==='equip' && invSelected?.index===def.id;
     const el = document.createElement('div');
-    el.style.gridArea = def.area;
     el.className = `inv-equip-slot${isSel?' is-selected':''}${eqItem?' r-'+eqItem.rarity:''}`;
-    el.innerHTML = eqItem
-      ? `<div class="inv-equip-slot-emoji">${itemImgHtml(eqItem, 16)}</div>`
-      : `<div class="inv-equip-slot-emoji" style="opacity:0.18">${def.emoji}</div><div class="inv-equip-slot-label">${def.name}</div>`;
+    if (eqItem) {
+      const g = (state.equipmentGrades||{})[def.id] || 1;
+      const gBadge = eqItem.crafted && g > 1 ? `<div class="inv-slot-grade" style="color:${GRADE_COLORS[g-1]}">G${GRADE_LABELS[g-1]}</div>` : '';
+      el.innerHTML = `<div class="inv-equip-slot-emoji">${itemImgHtml(eqItem, 22)}</div><div class="inv-equip-slot-label">${def.name}</div>${gBadge}`;
+    } else {
+      el.innerHTML = `<div class="inv-equip-slot-emoji" style="opacity:0.16">${def.emoji}</div><div class="inv-equip-slot-label" style="opacity:0.5">${def.name}</div>`;
+    }
     el.addEventListener('click', () => {
-      if (!eqItem) return;
-      if (isSel) unequipItem(def.id);
-      else { invSelected = {source:'equip', index:def.id}; renderInventory(); }
+      if (eqItem) { invSelected = isSel ? null : {source:'equip', index:def.id}; renderInventory(); }
+      else { invFilter = 'equip'; invSelected = null; renderInventory(); }
     });
-    grid.appendChild(el);
+    eqGrid.appendChild(el);
   });
-  eqPanel.appendChild(grid);
+  loadout.appendChild(eqGrid);
+  win.appendChild(loadout);
 
-  const eq = getEquippedStats();
-  const bonusTags = Object.entries(eq)
-    .filter(([k,v]) => v>0 && ['STR','DEX','CON','INT','VOL','CHA','ATK','DEF','HP','MP'].includes(k))
-    .map(([k,v]) => `<span class="inv-eq-bonus-tag">+${v} ${k}</span>`).join('');
-  if (bonusTags) {
-    const bd = document.createElement('div');
-    bd.className = 'inv-eq-bonuses';
-    bd.innerHTML = bonusTags;
-    eqPanel.appendChild(bd);
-  }
-  body.appendChild(eqPanel);
+  // ════════════════ BAG ════════════════
+  const bag = document.createElement('div');
+  bag.className = 'inv-bag-panel';
 
-  // ══ RIGHT: Bag + Inspect Card ══
-  const bagPanel = document.createElement('div');
-  bagPanel.className = 'inv-bag-panel';
-
-  // Header: count + filter chips
-  const bagHeader = document.createElement('div');
-  bagHeader.className = 'inv-bag-header';
-  bagHeader.innerHTML = `<div class="inv-section-label" style="margin-bottom:0">BAG (${inv.length}/${INV_SIZE})</div>`;
-  const filterBar = document.createElement('div');
-  filterBar.className = 'inv-filter-bar';
-  [['all','ALL'],['equip','⚔'],['consumable','🧪'],['material','💠']].forEach(([f,label]) => {
+  // Segmented filter control (replaces the cramped icon-chip + sort double row)
+  const seg = document.createElement('div');
+  seg.className = 'inv-seg';
+  [['all','ALL'],['equip','⚔ GEAR'],['consumable','🧪 USE'],['material','💠 MATS']].forEach(([f,label]) => {
     const btn = document.createElement('button');
-    btn.className = `inv-filter-btn${invFilter===f?' active':''}`;
+    btn.className = `inv-seg-btn${invFilter===f?' active':''}`;
     btn.textContent = label;
-    btn.addEventListener('click', () => { invFilter = f; renderInventory(); });
-    filterBar.appendChild(btn);
+    btn.addEventListener('click', () => { invFilter = f; if (invSelected?.source==='bag') invSelected = null; renderInventory(); });
+    seg.appendChild(btn);
   });
-  bagHeader.appendChild(filterBar);
-  bagPanel.appendChild(bagHeader);
+  bag.appendChild(seg);
 
-  // Sort chips
+  // Capacity + sort row
+  const bagHead = document.createElement('div');
+  bagHead.className = 'inv-bag-head';
+  bagHead.innerHTML = `<span class="inv-cap">${inv.length} / ${INV_SIZE} slots</span>`;
   const sortBar = document.createElement('div');
   sortBar.className = 'inv-sort-bar';
-  [['default','DEF'],['rarity','★'],['slot','TYPE'],['equipped','EQ']].forEach(([s,label]) => {
+  [['default','RECENT'],['rarity','★'],['slot','TYPE'],['equipped','EQUIPPED']].forEach(([s,label]) => {
     const btn = document.createElement('button');
     btn.className = `inv-sort-btn${invSort===s?' active':''}`;
     btn.textContent = label;
     btn.addEventListener('click', () => { invSort = s; renderInventory(); });
     sortBar.appendChild(btn);
   });
-  bagPanel.appendChild(sortBar);
+  bagHead.appendChild(sortBar);
+  bag.appendChild(bagHead);
 
-  // Build filtered + sorted list
+  // Crafting materials — shown in the MATS view (no longer an always-on strip)
+  if (invFilter === 'material') {
+    const sm = state.shopMaterials || {};
+    const WM = [{id:'timber',emoji:'🪵'},{id:'scroll',emoji:'📜'},{id:'crystal',emoji:'💎'},{id:'gear',emoji:'⚙️'}];
+    const matStrip = document.createElement('div');
+    matStrip.className = 'inv-mat-summary';
+    matStrip.innerHTML = `<div class="inv-section-label" style="margin-bottom:4px">CRAFTING MATERIALS</div><div class="inv-mat-row">${WM.map(m=>`<span class="inv-mat-chip">${m.emoji}<span class="inv-mat-count">${sm[m.id]||0}</span></span>`).join('')}</div>`;
+    bag.appendChild(matStrip);
+  }
+
+  // Filtered + sorted item list (no empty-slot padding — declutters mobile)
   const RARITY_ORDER = { common:0, uncommon:1, rare:2, epic:3, legendary:4 };
   const filteredInv = inv.filter(e => {
     const it = ITEMS_DB[e.itemId]; if (!it) return false;
@@ -11603,187 +11830,166 @@ function renderInventory() {
     return 0;
   });
 
-  let displaySlots;
-  if (invFilter === 'all' && invSort === 'default') {
-    displaySlots = Array(INV_SIZE).fill(null);
-    inv.forEach((e,i) => { if (i < INV_SIZE) displaySlots[i] = e; });
-  } else {
-    displaySlots = sortedInv;
-  }
-
-  // 9-column bag grid
   const bagGrid = document.createElement('div');
   bagGrid.className = 'inv-bag-grid';
-  displaySlots.forEach(entry => {
+  sortedInv.forEach(entry => {
     const bagIdx = inv.indexOf(entry);
-    const item = entry ? ITEMS_DB[entry.itemId] : null;
+    const item = ITEMS_DB[entry.itemId]; if (!item) return;
     const isSel = invSelected?.source==='bag' && invSelected?.index===bagIdx;
     const el = document.createElement('div');
     el.className = `inv-bag-slot${item?' r-'+item.rarity:''}${isSel?' is-selected':''}`;
-    if (item) {
-      const _itemGrade = entry ? (entry.grade||1) : 1;
-      const _gradeBadge = item.crafted && _itemGrade > 1 ? `<div class="inv-slot-grade" style="color:${GRADE_COLORS[_itemGrade-1]}">G${GRADE_LABELS[_itemGrade-1]}</div>` : '';
-      el.innerHTML = `<div class="inv-slot-emoji">${itemImgHtml(item, 16)}</div>${(entry.quantity||1)>1?`<div class="inv-slot-qty">${entry.quantity}</div>`:''}${_gradeBadge}`;
-    }
+    const _itemGrade = entry.grade||1;
+    const _gradeBadge = item.crafted && _itemGrade > 1 ? `<div class="inv-slot-grade" style="color:${GRADE_COLORS[_itemGrade-1]}">G${GRADE_LABELS[_itemGrade-1]}</div>` : '';
+    const _equippedDot = Object.values(equip).includes(entry.itemId) ? `<div class="inv-slot-eqdot" title="Equipped">●</div>` : '';
+    el.innerHTML = `<div class="inv-slot-emoji">${itemImgHtml(item, 22)}</div>${(entry.quantity||1)>1?`<div class="inv-slot-qty">${entry.quantity}</div>`:''}${_gradeBadge}${_equippedDot}`;
     el.addEventListener('click', () => {
-      if (!entry) return;
       invSelected = isSel ? null : {source:'bag', index:bagIdx};
       renderInventory();
     });
     bagGrid.appendChild(el);
   });
-  if (displaySlots.length === 0) {
+  if (sortedInv.length === 0) {
     bagGrid.style.display = 'block';
-    bagGrid.innerHTML = `<div style="text-align:center;padding:12px;font-size:9px;color:var(--sao-text-dim);font-family:'Cinzel',serif;letter-spacing:1px">— NONE —</div>`;
+    bagGrid.innerHTML = `<div class="inv-bag-empty">— EMPTY —</div>`;
   }
-  bagPanel.appendChild(bagGrid);
+  bag.appendChild(bagGrid);
+  win.appendChild(bag);
 
-  // Work materials strip
-  const sm = state.shopMaterials || {};
-  const WM = [{id:'timber',emoji:'🪵'},{id:'scroll',emoji:'📜'},{id:'crystal',emoji:'💎'},{id:'gear',emoji:'⚙️'}];
-  const matSummary = document.createElement('div');
-  matSummary.className = 'inv-mat-summary';
-  matSummary.innerHTML = `<div class="inv-section-label" style="margin-bottom:4px">MATERIALS</div><div class="inv-mat-row">${WM.map(m=>`<span class="inv-mat-chip">${m.emoji}<span class="inv-mat-count">${sm[m.id]||0}</span></span>`).join('')}</div>`;
-  bagPanel.appendChild(matSummary);
-
-  // ── Item Inspect Card ──
-  const inspectCard = document.createElement('div');
-
-  if (invSelected) {
-    let selItem = null, selSlot = null, selBagIdx = null;
-    if (invSelected.source==='bag') {
-      const e = inv[invSelected.index];
-      if (e) { selItem = ITEMS_DB[e.itemId]; selBagIdx = invSelected.index; }
-    } else {
-      const id = equip[invSelected.index];
-      if (id) { selItem = ITEMS_DB[id]; selSlot = invSelected.index; }
-    }
-
-    if (selItem) {
-      const r = selItem.rarity || 'common';
-      inspectCard.className = `inv-inspect-card r-${r}`;
-
-      // Grade-aware stats (+ crafted-instance rarity multiplier)
-      const _selEntry = invSelected.source==='bag' ? inv[invSelected.index] : null;
-      const _selGrade = _selEntry ? (_selEntry.grade||1) : ((state.equipmentGrades||{})[invSelected.index]||1);
-      const _selMods = invSelected.source==='bag' ? _selEntry : ((state.equipmentMods||{})[invSelected.index] || null);
-      const _instRarity  = invSelected.source==='bag' ? (_selEntry?.quality || 'common') : (_selMods?.rarity || 'common');
-      const _instMult    = invSelected.source==='bag' ? (_selEntry?.qualityMult || 1)   : (_selMods?.rarityMult || 1);
-      const _instAffixes = (invSelected.source==='bag' ? _selEntry?.affixes : _selMods?.affixes) || [];
-      const _baseStats = selItem.crafted && _selGrade > 1 ? getGradedStats(selItem.id, _selGrade) : (selItem.stats||{});
-      const _selStats = {}; Object.entries(_baseStats).forEach(([k,v]) => { _selStats[k] = Math.round(v * _instMult); });
-      const statTags = Object.entries(_selStats).filter(([,v])=>v>0)
-        .map(([k,v])=>`<span class="inv-inspect-stat">+${v} ${k}</span>`).join('');
-      const affixTags = _instAffixes.length
-        ? `<div class="inv-inspect-affixes">${_instAffixes.map(a=>`<span class="inv-affix" style="color:${AFFIX_BY_STAT[a.stat]?.color||'#fff'};border-color:${AFFIX_BY_STAT[a.stat]?.color||'#fff'}44">${affixLabel(a)}</span>`).join('')}</div>`
-        : '';
-      const healTags = [
-        selItem.healHP && `<span class="inv-inspect-heal">+${selItem.healHP} HP</span>`,
-        selItem.healMP && `<span class="inv-inspect-heal">+${selItem.healMP} MP</span>`
-      ].filter(Boolean).join('');
-
-      // Comparison vs currently equipped
-      let compareHtml = '';
-      if (invSelected.source==='bag' && selItem.slot) {
-        const eqKey = selItem.slot === 'earring'
-          ? (equip.earring_l ? 'earring_l' : 'earring_r') : selItem.slot;
-        const curItem = equip[eqKey] ? ITEMS_DB[equip[eqKey]] : null;
-        if (curItem) {
-          const _curGrade = (state.equipmentGrades||{})[eqKey] || 1;
-          const _curStats = curItem.crafted && _curGrade > 1 ? getGradedStats(curItem.id, _curGrade) : (curItem.stats || {});
-          const allK = new Set([...Object.keys(_selStats), ...Object.keys(_curStats)]);
-          const diffs = [];
-          allK.forEach(k => {
-            const d = (_selStats[k]||0) - (_curStats[k]||0);
-            if (d !== 0) diffs.push(`<span style="color:${d>0?'#69f0ae':'#ff5252'};font-size:8px;font-family:'Cinzel',serif">${d>0?'+':''}${d} ${k}</span>`);
-          });
-          const _curGradeLabel = curItem.crafted && _curGrade > 1 ? ` [G${GRADE_LABELS[_curGrade-1]}]` : '';
-          compareHtml = `<div class="inv-inspect-compare"><span class="inv-compare-label">vs equipped · </span><span class="inv-compare-name r-${curItem.rarity}">${curItem.name}${_curGradeLabel}</span>${diffs.length?`<div class="inv-compare-diffs">${diffs.join('')}</div>`:`<span style="font-size:8px;color:var(--sao-text-dim)"> — same stats</span>`}</div>`;
-        } else {
-          compareHtml = `<div class="inv-inspect-compare"><span class="inv-compare-label">slot empty — ready to equip</span></div>`;
-        }
-      }
-
-      // Action buttons
-      const sellPrice = SELL_PRICES[selItem.rarity] || 2;
-      const sellQty = selBagIdx !== null ? (inv[selBagIdx]?.quantity||1) : 1;
-      const sellTotal = sellPrice * sellQty;
-      let acts = '';
-      if (invSelected.source==='bag') {
-        if (selItem.slot) acts += `<button class="inv-act-btn equip" onclick="equipItem(${selBagIdx})">EQUIP</button>`;
-        if (selItem.healHP||selItem.healMP) {
-          acts += inCombat
-            ? `<button class="inv-act-btn use-item" onclick="useItem(${selBagIdx})">USE</button>`
-            : `<button class="inv-act-btn use-item disabled" title="Only usable in combat">USE</button>`;
-        }
-        // Refine button for craftable items below Grade V
-        if (selItem.crafted && _selGrade < 5) {
-          const _rfRecipe = CRAFT_RECIPES.find(rc => rc.itemId === selItem.id);
-          const _rfCan = _rfRecipe && canRefine(_rfRecipe, _selGrade);
-          acts += `<button class="inv-act-btn refine-item${_rfCan?'':' disabled'}" onclick="refineItem(${selBagIdx})" title="${_rfCan?'Refine to Grade '+GRADE_LABELS[_selGrade]:'Insufficient materials'}">✦ G${GRADE_LABELS[_selGrade-1]}→G${GRADE_LABELS[_selGrade]}</button>`;
-        }
-        // Shard reroll — re-roll the % affixes (chase a better set)
-        if (_instAffixes.length) {
-          const _rrCost = getRerollCost(_instAffixes.length);
-          const _rrCan = (state.shards || 0) >= _rrCost && (_selEntry?.quantity||1) <= 1;
-          acts += `<button class="inv-act-btn reroll-affix${_rrCan?'':' disabled'}" onclick="rerollAffixes(${selBagIdx})" title="${(_selEntry?.quantity||1)>1?'Unstack first':'Re-roll affixes for '+_rrCost+' shards'}">🎲 REROLL ✦${_rrCost}</button>`;
-        }
-        acts += `<button class="inv-act-btn sell-item" onclick="sellItem(${selBagIdx})">SELL 🪙${sellTotal}g</button>`;
-        if (selItem.slot) {
-          const _sMatId = SALVAGE_MAT[selItem.slot]||'timber';
-          const _sQty = SALVAGE_QTY[selItem.rarity]||3;
-          acts += `<button class="inv-act-btn salvage" onclick="salvageItem(${selBagIdx})">SALVAGE ${SALVAGE_MAT_EMOJI[_sMatId]}×${_sQty}</button>`;
-        }
-        acts += `<button class="inv-act-btn drop-item" onclick="dropItem(${selBagIdx})">DROP</button>`;
-      } else if (selSlot) {
-        acts += `<button class="inv-act-btn sell-item" onclick="sellEquipped('${selSlot}')">SELL 🪙${sellPrice}g</button>`;
-        acts += `<button class="inv-act-btn unequip" onclick="unequipItem('${selSlot}')">UNEQUIP</button>`;
-      }
-
-      const slotLabel = selItem.slot ? selItem.slot.toUpperCase() : (selItem.stackable ? 'CONSUMABLE' : 'MATERIAL');
-      const _gradeDisplay = selItem.crafted && _selGrade > 1
-        ? `<span class="inv-inspect-grade" style="color:${GRADE_COLORS[_selGrade-1]};border-color:${GRADE_COLORS[_selGrade-1]}55">GRADE ${GRADE_LABELS[_selGrade-1]}</span>`
-        : '';
-      const _rm = rarityMeta(_instRarity);
-      const _instBadge = _instRarity && _instRarity !== 'common'
-        ? `<span class="inv-inspect-grade" style="color:${_rm.color};border-color:${_rm.color}55">${_rm.icon ? _rm.icon+' ' : ''}${_rm.label}</span>`
-        : '';
-
-      inspectCard.innerHTML = `
-        <div class="inv-inspect-header">
-          <div class="inv-inspect-icon-wrap">${itemImgHtml(selItem, 32)}</div>
-          <div class="inv-inspect-title">
-            <div class="inv-inspect-name r-${r}">${selItem.name}</div>
-            <div class="inv-inspect-rarity r-${r}">${r.replace('_',' ')} ${_instBadge}${_gradeDisplay}</div>
-            <div class="inv-inspect-slot-label">${slotLabel}</div>
-          </div>
-        </div>
-        ${statTags||healTags ? `<div class="inv-inspect-stats">${statTags}${healTags}</div>` : ''}
-        ${affixTags}
-        ${compareHtml}
-        <div class="inv-inspect-divider"></div>
-        <div class="inv-inspect-lore r-${r}">${selItem.desc}</div>
-        <div class="inv-inspect-actions">${acts}</div>`;
-    } else {
-      inspectCard.className = 'inv-inspect-card';
-      inspectCard.innerHTML = `<div class="inv-inspect-empty"><div class="inv-inspect-empty-icon">🗡️</div><div class="inv-inspect-empty-text">SELECT AN ITEM</div></div>`;
-    }
-  } else {
-    inspectCard.className = 'inv-inspect-card';
-    inspectCard.innerHTML = `<div class="inv-inspect-empty"><div class="inv-inspect-empty-icon">🗡️</div><div class="inv-inspect-empty-text">SELECT AN ITEM</div></div>`;
-  }
-  bagPanel.appendChild(inspectCard);
-
-  body.appendChild(bagPanel);
-  win.appendChild(body);
-
-  // Currency bar
-  const yang = document.createElement('div');
-  yang.className = 'inv-yang-bar';
-  yang.innerHTML = `<span class="inv-yang-col">COL <span class="inv-yang-val">${(state.col||0).toLocaleString()}</span></span><span class="inv-yang-sep">|</span><span class="inv-yang-gold">🪙 <span class="inv-yang-val">${(state.gold||0).toLocaleString()}</span><span style="font-size:10px;opacity:0.7"> g</span></span>`;
-  win.appendChild(yang);
+  // Currency bar — the two real currencies (matches the HUD).
+  const curBar = document.createElement('div');
+  curBar.className = 'inv-yang-bar';
+  curBar.innerHTML = `<span class="inv-yang-gold">🪙 <span class="inv-yang-val">${(state.gold||0).toLocaleString()}</span><span style="font-size:10px;opacity:0.7"> g</span></span><span class="inv-yang-sep">|</span><span class="inv-yang-shard">✦ <span class="inv-yang-val">${(state.shards||0).toLocaleString()}</span></span>`;
+  win.appendChild(curBar);
 
   panelContent.appendChild(win);
+
+  // ════════════════ INSPECT — bottom sheet ════════════════
+  let selItem = null, selSlot = null, selBagIdx = null;
+  if (invSelected?.source === 'bag') {
+    const e = inv[invSelected.index];
+    if (e) { selItem = ITEMS_DB[e.itemId]; selBagIdx = invSelected.index; }
+  } else if (invSelected?.source === 'equip') {
+    const id = equip[invSelected.index];
+    if (id) { selItem = ITEMS_DB[id]; selSlot = invSelected.index; }
+  }
+  if (!selItem) { invSelected = null; return; }
+
+  const r = selItem.rarity || 'common';
+
+  // Grade-aware stats (+ crafted-instance rarity multiplier)
+  const _selEntry = invSelected.source==='bag' ? inv[invSelected.index] : null;
+  const _selGrade = _selEntry ? (_selEntry.grade||1) : ((state.equipmentGrades||{})[invSelected.index]||1);
+  const _selMods = invSelected.source==='bag' ? _selEntry : ((state.equipmentMods||{})[invSelected.index] || null);
+  const _instRarity  = invSelected.source==='bag' ? (_selEntry?.quality || 'common') : (_selMods?.rarity || 'common');
+  const _instMult    = invSelected.source==='bag' ? (_selEntry?.qualityMult || 1)   : (_selMods?.rarityMult || 1);
+  const _instAffixes = (invSelected.source==='bag' ? _selEntry?.affixes : _selMods?.affixes) || [];
+  const _baseStats = selItem.crafted && _selGrade > 1 ? getGradedStats(selItem.id, _selGrade) : (selItem.stats||{});
+  const _selStats = {}; Object.entries(_baseStats).forEach(([k,v]) => { _selStats[k] = Math.round(v * _instMult); });
+  const statTags = Object.entries(_selStats).filter(([,v])=>v>0)
+    .map(([k,v])=>`<span class="inv-inspect-stat">+${v} ${k}</span>`).join('');
+  const affixTags = _instAffixes.length
+    ? `<div class="inv-inspect-affixes">${_instAffixes.map(a=>`<span class="inv-affix" style="color:${AFFIX_BY_STAT[a.stat]?.color||'#fff'};border-color:${AFFIX_BY_STAT[a.stat]?.color||'#fff'}44">${affixLabel(a)}</span>`).join('')}</div>`
+    : '';
+  const healTags = [
+    selItem.healHP && `<span class="inv-inspect-heal">+${selItem.healHP} HP</span>`,
+    selItem.healMP && `<span class="inv-inspect-heal">+${selItem.healMP} MP</span>`
+  ].filter(Boolean).join('');
+
+  // Comparison vs currently equipped
+  let compareHtml = '';
+  if (invSelected.source==='bag' && selItem.slot) {
+    const eqKey = selItem.slot === 'earring'
+      ? (equip.earring_l ? 'earring_l' : 'earring_r') : selItem.slot;
+    const curItem = equip[eqKey] ? ITEMS_DB[equip[eqKey]] : null;
+    if (curItem) {
+      const _curGrade = (state.equipmentGrades||{})[eqKey] || 1;
+      const _curStats = curItem.crafted && _curGrade > 1 ? getGradedStats(curItem.id, _curGrade) : (curItem.stats || {});
+      const allK = new Set([...Object.keys(_selStats), ...Object.keys(_curStats)]);
+      const diffs = [];
+      allK.forEach(k => {
+        const d = (_selStats[k]||0) - (_curStats[k]||0);
+        if (d !== 0) diffs.push(`<span style="color:${d>0?'#69f0ae':'#ff5252'};font-size:8px;font-family:'Cinzel',serif">${d>0?'+':''}${d} ${k}</span>`);
+      });
+      const _curGradeLabel = curItem.crafted && _curGrade > 1 ? ` [G${GRADE_LABELS[_curGrade-1]}]` : '';
+      compareHtml = `<div class="inv-inspect-compare"><span class="inv-compare-label">vs equipped · </span><span class="inv-compare-name r-${curItem.rarity}">${curItem.name}${_curGradeLabel}</span>${diffs.length?`<div class="inv-compare-diffs">${diffs.join('')}</div>`:`<span style="font-size:8px;color:var(--sao-text-dim)"> — same stats</span>`}</div>`;
+    } else {
+      compareHtml = `<div class="inv-inspect-compare"><span class="inv-compare-label">slot empty — ready to equip</span></div>`;
+    }
+  }
+
+  // Action buttons
+  const sellPrice = SELL_PRICES[selItem.rarity] || 2;
+  const sellQty = selBagIdx !== null ? (inv[selBagIdx]?.quantity||1) : 1;
+  const sellTotal = sellPrice * sellQty;
+  let acts = '';
+  if (invSelected.source==='bag') {
+    if (selItem.slot) acts += `<button class="inv-act-btn equip" onclick="equipItem(${selBagIdx})">EQUIP</button>`;
+    if (selItem.healHP||selItem.healMP) {
+      acts += inCombat
+        ? `<button class="inv-act-btn use-item" onclick="useItem(${selBagIdx})">USE</button>`
+        : `<button class="inv-act-btn use-item disabled" title="Only usable in combat">USE</button>`;
+    }
+    // Refine button for craftable items below Grade V
+    if (selItem.crafted && _selGrade < 5) {
+      const _rfRecipe = CRAFT_RECIPES.find(rc => rc.itemId === selItem.id);
+      const _rfCan = _rfRecipe && canRefine(_rfRecipe, _selGrade);
+      acts += `<button class="inv-act-btn refine-item${_rfCan?'':' disabled'}" onclick="refineItem(${selBagIdx})" title="${_rfCan?'Refine to Grade '+GRADE_LABELS[_selGrade]:'Insufficient materials'}">✦ G${GRADE_LABELS[_selGrade-1]}→G${GRADE_LABELS[_selGrade]}</button>`;
+    }
+    // Shard reroll — re-roll the % affixes (chase a better set)
+    if (_instAffixes.length) {
+      const _rrCost = getRerollCost(_instAffixes.length);
+      const _rrCan = (state.shards || 0) >= _rrCost && (_selEntry?.quantity||1) <= 1;
+      acts += `<button class="inv-act-btn reroll-affix${_rrCan?'':' disabled'}" onclick="rerollAffixes(${selBagIdx})" title="${(_selEntry?.quantity||1)>1?'Unstack first':'Re-roll affixes for '+_rrCost+' shards'}">🎲 REROLL ✦${_rrCost}</button>`;
+    }
+    acts += `<button class="inv-act-btn sell-item" onclick="sellItem(${selBagIdx})">SELL 🪙${sellTotal}g</button>`;
+    if (selItem.slot) {
+      const _sMatId = SALVAGE_MAT[selItem.slot]||'timber';
+      const _sQty = SALVAGE_QTY[selItem.rarity]||3;
+      acts += `<button class="inv-act-btn salvage" onclick="salvageItem(${selBagIdx})">SALVAGE ${SALVAGE_MAT_EMOJI[_sMatId]}×${_sQty}</button>`;
+    }
+    acts += `<button class="inv-act-btn drop-item" onclick="dropItem(${selBagIdx})">DROP</button>`;
+  } else if (selSlot) {
+    acts += `<button class="inv-act-btn unequip" onclick="unequipItem('${selSlot}')">UNEQUIP</button>`;
+    acts += `<button class="inv-act-btn sell-item" onclick="sellEquipped('${selSlot}')">SELL 🪙${sellPrice}g</button>`;
+  }
+
+  const slotLabel = selItem.slot ? selItem.slot.toUpperCase() : (selItem.stackable ? 'CONSUMABLE' : 'MATERIAL');
+  const _gradeDisplay = selItem.crafted && _selGrade > 1
+    ? `<span class="inv-inspect-grade" style="color:${GRADE_COLORS[_selGrade-1]};border-color:${GRADE_COLORS[_selGrade-1]}55">GRADE ${GRADE_LABELS[_selGrade-1]}</span>`
+    : '';
+  const _rm = rarityMeta(_instRarity);
+  const _instBadge = _instRarity && _instRarity !== 'common'
+    ? `<span class="inv-inspect-grade" style="color:${_rm.color};border-color:${_rm.color}55">${_rm.icon ? _rm.icon+' ' : ''}${_rm.label}</span>`
+    : '';
+
+  const closeSheet = () => { invSelected = null; renderInventory(); };
+  const backdrop = document.createElement('div');
+  backdrop.className = 'inv-sheet-backdrop';
+  backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeSheet(); });
+  const sheet = document.createElement('div');
+  sheet.className = `inv-sheet r-${r}`;
+  const inspectCard = document.createElement('div');
+  inspectCard.className = `inv-inspect-card r-${r}`;
+  inspectCard.innerHTML = `
+    <div class="inv-inspect-header">
+      <div class="inv-inspect-icon-wrap">${itemImgHtml(selItem, 32)}</div>
+      <div class="inv-inspect-title">
+        <div class="inv-inspect-name r-${r}">${selItem.name}</div>
+        <div class="inv-inspect-rarity r-${r}">${r.replace('_',' ')} ${_instBadge}${_gradeDisplay}</div>
+        <div class="inv-inspect-slot-label">${slotLabel}${selSlot ? ' · EQUIPPED' : ''}</div>
+      </div>
+    </div>
+    ${statTags||healTags ? `<div class="inv-inspect-stats">${statTags}${healTags}</div>` : ''}
+    ${affixTags}
+    ${compareHtml}
+    <div class="inv-inspect-divider"></div>
+    <div class="inv-inspect-lore r-${r}">${selItem.desc}</div>
+    <div class="inv-inspect-actions">${acts}</div>`;
+  sheet.innerHTML = `<div class="inv-sheet-handle"></div><button class="inv-sheet-close" id="invSheetClose">✕</button>`;
+  sheet.appendChild(inspectCard);
+  backdrop.appendChild(sheet);
+  panelContent.appendChild(backdrop);
+  document.getElementById('invSheetClose')?.addEventListener('click', closeSheet);
 }
 
 // ─ Render LOGROS tab ────────────────────────────────────────
@@ -12221,15 +12427,34 @@ function _getAchEntry(id) {
   return { awarded: raw.awarded ?? -1, claimable: raw.claimable ?? null, claimedAt: raw.claimedAt ?? null };
 }
 
+// True when we should nudge the player to Close the Day: from ~10pm onward, on a
+// day with habits, that hasn't been closed yet. (After midnight it's a fresh day,
+// so the nudge naturally stops until the next evening.)
+function _shouldPromptCloseDay() {
+  if (new Date().getHours() < 22) return false;
+  if (!(state.habitos && state.habitos.length)) return false;
+  return !((state.dayReflections || {})[todayKey()]);
+}
+
 function _updateAchBadge() {
   const count = ACHIEVEMENTS.filter(a => {
     const e = _getAchEntry(a.id);
     return e.claimable !== null && e.claimable > e.awarded;
   }).length;
   const tabEl = document.querySelector('[data-tab="log"]');
-  if (tabEl) {
-    tabEl.classList.toggle('has-pending', count > 0);
-    tabEl.dataset.claimCount = count > 0 ? count : '';
+  if (!tabEl) return;
+  if (count > 0) {
+    // Achievement claims take priority — the gold badge with the claim count.
+    tabEl.classList.add('has-pending');
+    tabEl.classList.remove('log-closeday');
+    tabEl.dataset.claimCount = count;
+  } else if (_shouldPromptCloseDay()) {
+    // Nothing to claim — nudge to Close the Day with a distinct cyan "1".
+    tabEl.classList.add('has-pending', 'log-closeday');
+    tabEl.dataset.claimCount = '1';
+  } else {
+    tabEl.classList.remove('has-pending', 'log-closeday');
+    tabEl.dataset.claimCount = '';
   }
 }
 
@@ -12554,6 +12779,17 @@ const GUILD_REP_TIERS = [
 function getGuildRepTier(rep) {
   return [...GUILD_REP_TIERS].reverse().find(t => rep >= t.min) || GUILD_REP_TIERS[0];
 }
+
+// Guild ranks — derived from total upgrade levels (min = level threshold). Shared by the
+// Guild crest header and the rank-up celebration detection in purchaseGuildUpgrade.
+const GUILD_RANK_DEFS = [
+  { min:0,  name:'FRONTIER OUTPOST',     sub:'A small band with big ambitions.',                cls:'rank-outpost',    icon:'⚑' },
+  { min:10, name:"ADVENTURER'S GUILD",   sub:'Word of your guild spreads through the region.',  cls:'rank-adventurer', icon:'⚔' },
+  { min:20, name:'MERCENARY STRONGHOLD', sub:'Hardened veterans answer your call.',             cls:'rank-stronghold', icon:'🛡' },
+  { min:36, name:'REGIONAL CITADEL',     sub:'Your guild commands respect across the kingdom.', cls:'rank-citadel',    icon:'🏰' },
+  { min:52, name:'GRAND ORDER',          sub:'Legends are written about guilds like yours.',    cls:'rank-order',      icon:'👑' },
+];
+function getGuildRankIdx(levels) { let i = 0; GUILD_RANK_DEFS.forEach((r, idx) => { if (levels >= r.min) i = idx; }); return i; }
 function commissionCountdown() {
   const now = new Date();
   const midnight = new Date(now); midnight.setHours(24,0,0,0);
@@ -12589,21 +12825,11 @@ function _shuffleArr(arr) {
 }
 
 function generateCommissions(dateKey) {
-  const activeTasks = (state.trabajo || []).filter(t => !isArchivedTask(t));
-
-  // Bucket pool by tier, filter to viable commissions, then shuffle
+  // Cadence missions are always viable (they track behaviour, not specific tasks),
+  // so just bucket by tier and shuffle.
   const byTier = { bronze: [], silver: [], gold: [] };
-  COMMISSION_POOL.forEach(t => {
-    if (t.difficulty) return; // difficulty-gated commissions retired (no self-rated difficulty)
-    if (byTier[t.tier] && _commissionIsViable(t, activeTasks)) byTier[t.tier].push({ ...t });
-  });
-  // Fallback: if a tier is empty after viability filter, use any same-tier commission with no category restriction
-  ['bronze','silver','gold'].forEach(tier => {
-    if (!byTier[tier].length) {
-      COMMISSION_POOL.filter(t => t.tier === tier && !t.category && !t.difficulty).forEach(t => byTier[tier].push({ ...t }));
-    }
-    _shuffleArr(byTier[tier]);
-  });
+  COMMISSION_POOL.forEach(t => { if (byTier[t.tier]) byTier[t.tier].push({ ...t }); });
+  ['bronze','silver','gold'].forEach(tier => _shuffleArr(byTier[tier]));
 
   const slots = getWorkerCommissionSlots();
   // Core 3 slots: 1 bronze + 1 silver + 1 gold (80%) or silver (20%)
@@ -12634,11 +12860,8 @@ function generateCommissions(dateKey) {
   const _suffix  = REP_FLAVOR_SUFFIX[_repName];
   if (_suffix) picked.forEach(comm => { comm.flavor = comm.flavor + ' ' + _suffix; });
 
-  // One manual-fulfill client request per day (gear or material) — costs real
-  // resources and counts toward the Daily Sweep (+Shard).
-  const client = generateClientRequest(dateKey);
-  if (client) picked.push(client);
-
+  // Client requests removed — the board is now pure auto-tracked cadence missions
+  // (no resource sacrifice, no pressure).
   state.commissions = { dateKey, list: picked, sweepClaimed: false, rerollsLeft: 1 };
 }
 
@@ -12753,19 +12976,23 @@ function _checkCommissionSweep() {
   showNotif(`[SYSTEM] Daily Sweep! All ${_n} commissions complete. +${sweepGold}g · +${sweepXp} XP · ✦+${_shards}`);
 }
 
+// Cadence metrics for the current day, read live from state.
+function _commissionMetricValue(metric, periodKey) {
+  const isToday = periodKey === todayKey();
+  switch (metric) {
+    case 'sessions': return (state.workDay && state.workDay.dateKey === periodKey) ? (state.workDay.sessions || 0) : 0;
+    case 'inflow':   return (state.workDay && state.workDay.dateKey === periodKey) ? (state.workDay.inflow   || 0) : 0;
+    case 'mustdos':  return isToday ? mustDosClearedCount() : 0;
+    case 'floor':    return (isToday && getWorkFocusMinToday() >= getWorkCapacityMin()) ? 1 : 0;
+    case 'tasks':
+    default:         return state.trabajo.filter(t => !!t.done[periodKey]).length;
+  }
+}
 function updateCommissionProgress(periodKey) {
   if (!state.commissions || state.commissions.dateKey !== periodKey) return;
-  const done = state.trabajo.filter(t => !!t.done[periodKey]);
   state.commissions.list.forEach(comm => {
     if (comm.completed) return;
-    // Client requests (gear/material) are fulfilled manually — never auto-progress.
-    if (comm.kind === 'gear' || comm.kind === 'material') return;
-    comm.progress = done.filter(t => {
-      const catOk  = !comm.category   || t.category === comm.category;
-      // "at least" logic: legendary satisfies hard, hard satisfies normal, etc.
-      const diffOk = !comm.difficulty || (DIFF_RANK[t.difficulty] || 0) >= (DIFF_RANK[comm.difficulty] || 0);
-      return catOk && diffOk;
-    }).length;
+    comm.progress = _commissionMetricValue(comm.metric || 'tasks', periodKey);
     if (comm.progress >= comm.count) _awardCommissionRewards(comm);
   });
   _checkCommissionSweep();
@@ -12862,14 +13089,18 @@ function updateWeeklyCommissionProgress() {
   const comm = state.weeklyCommission.commission;
   const weekDates = getWeekDates(weekKey);
   let progress = 0;
-  (state.trabajo || []).forEach(task => {
-    weekDates.forEach(dk => {
-      if (!task.done[dk]) return;
-      const catOk  = !comm.category   || task.category === comm.category;
-      const diffOk = !comm.difficulty || (DIFF_RANK[task.difficulty] || 0) >= (DIFF_RANK[comm.difficulty] || 0);
-      if (catOk && diffOk) progress++;
-    });
-  });
+  const metric = comm.metric || 'tasks';
+  if (metric === 'tasks') {
+    (state.trabajo || []).forEach(task => { weekDates.forEach(dk => { if (task.done && task.done[dk]) progress++; }); });
+  } else if (metric === 'sessions') {
+    // Today's live session count + any logged-day totals isn't stored historically,
+    // so approximate with today's sessions + completed ration days × floor sessions.
+    progress = (state.workDay && weekDates.includes(state.workDay.dateKey)) ? (state.workDay.sessions || 0) : 0;
+    const floorSessions = Math.round(getWorkCapacityMin() / 25);
+    (state.rationDays || []).forEach(dk => { if (weekDates.includes(dk) && dk !== (state.workDay && state.workDay.dateKey)) progress += floorSessions; });
+  } else if (metric === 'rationdays') {
+    progress = (state.rationDays || []).filter(dk => weekDates.includes(dk)).length;
+  }
   state.weeklyCommission.progress = progress;
   if (progress >= comm.count) {
     state.weeklyCommission.completed    = true;
@@ -13775,10 +14006,10 @@ function renderQuestItem(task, opts) {
     if (!done && state.commissions && state.commissions.dateKey === todayKey()) {
       const _TIER_COLORS = { bronze:'#cd7f32', silver:'#90a4ae', gold:'#ffc107' };
       const _TIER_SYM    = { bronze:'B', silver:'S', gold:'G' };
-      const matches = (state.commissions.list||[]).filter(c => !c.completed &&
-        c.kind !== 'gear' && c.kind !== 'material' &&   // client requests aren't task-driven
-        (!c.category   || c.category   === task.category) &&
-        (!c.difficulty || (DIFF_RANK[task.difficulty]||0) >= (DIFF_RANK[c.difficulty]||0))
+      // Cadence missions track behaviour, not specific tasks — only category-targeted
+      // commissions (legacy) get per-task tags, so this is naturally empty now.
+      const matches = (state.commissions.list||[]).filter(c => !c.completed && c.category &&
+        c.category === task.category
       );
       matches.forEach(c => {
         const clr = _TIER_COLORS[c.tier] || '#ffc107';
@@ -13793,9 +14024,8 @@ function renderQuestItem(task, opts) {
     // Weekly commission tag
     if (!done && state.weeklyCommission && state.weeklyCommission.weekKey === isoWeekKey() && !state.weeklyCommission.completed) {
       const _wcom = state.weeklyCommission.commission;
-      const _wcatOk  = !_wcom.category   || _wcom.category   === task.category;
-      const _wdiffOk = !_wcom.difficulty || (DIFF_RANK[task.difficulty || 'easy'] || 0) >= (DIFF_RANK[_wcom.difficulty] || 0);
-      if (_wcatOk && _wdiffOk) {
+      // Cadence weeklies aren't task-category-driven → no per-task tag (legacy only).
+      if (_wcom.category && _wcom.category === task.category) {
         const wtag = document.createElement('span');
         wtag.className = 'comm-task-tag';
         wtag.textContent = '📅W';
@@ -13987,14 +14217,25 @@ function renderQuestItem(task, opts) {
       <div class="forge-mini-bar"><div class="forge-mini-fill${isBreak?' break':''}" style="width:${pct}%"></div></div>`;
     el.appendChild(forgeBar);
   }
-  // Focus pledge — commit to a task for a completion XP bonus (independent of dungeons)
+  // One-tap focus + must-do row — undone work tasks
   if (opts.listKey==='trabajo' && !done && opts.periodKey===todayKey()) {
-    const _isFocused = state.focusTask && state.focusTask.id===task.id;
-    const fBtn=document.createElement('button'); fBtn.className='quest-focus-btn'+(_isFocused?' focused':'');
-    fBtn.innerHTML = _isFocused ? '🎯 FOCUSED · +15 XP on finish' : '🎯 Focus';
-    fBtn.title = _isFocused ? 'Cancel focus pledge' : 'Pledge focus — finishing this task grants bonus XP';
+    const row = document.createElement('div'); row.className = 'quest-focus-row';
+    // ▶ FOCUS — start (or bind) a focus session on this task in one tap
+    const _isFocusing = state.dungeon && (state.dungeon.phase==='exploring'||state.dungeon.phase==='paused') && state.dungeon.activeWorkTaskId===task.id;
+    const focusBtn = document.createElement('button');
+    focusBtn.className = 'quest-focus-btn quest-go-btn' + (_isFocusing ? ' focusing' : '');
+    focusBtn.innerHTML = _isFocusing ? '⚒ FOCUSING…' : '▶ FOCUS';
+    focusBtn.title = _isFocusing ? 'This task is your active focus session' : 'Start a focus session on this task';
+    focusBtn.addEventListener('click',(e)=>{ e.stopPropagation(); focusOnTask(task.id); });
+    row.appendChild(focusBtn);
+    // 🎯 must-do toggle
+    const _isMD = isMustDo(task.id);
+    const fBtn=document.createElement('button'); fBtn.className='quest-focus-btn'+(_isMD?' focused':'');
+    fBtn.innerHTML = _isMD ? '🎯 MUST-DO · +15 XP' : '🎯 Make must-do';
+    fBtn.title = _isMD ? 'Remove from today\'s must-dos' : 'Commit to clearing this today (max 3)';
     fBtn.addEventListener('click',(e)=>{ e.stopPropagation(); focusTaskToggle(task.id); });
-    el.appendChild(fBtn);
+    row.appendChild(fBtn);
+    el.appendChild(row);
   }
 
   el.addEventListener('click',(e)=>{
@@ -14222,8 +14463,22 @@ function renderWorkTasksByCat(activeTasks, opts) {
   };
 
   // Group tasks by category
+  // ── Pinned "TODAY'S MUST-DOS" group — the day's ration on top ──
+  const mustIds = (opts.listKey === 'trabajo' && today === todayKey()) ? (state.workMustDos?.ids || []) : [];
+  if (mustIds.length) {
+    const mustTasks = mustIds.map(id => activeTasks.find(t => t.id === id)).filter(Boolean);
+    if (mustTasks.length) {
+      const mdDone = mustTasks.filter(t => !!t.done[today]).length;
+      const mh = document.createElement('div'); mh.className = 'work-cat-header work-mustdo-header';
+      mh.innerHTML = `<span class="wch-emoji">🎯</span><span class="wch-label">TODAY'S MUST-DOS</span><span class="wch-count">${mdDone}/${mustTasks.length}</span>${mdDone===mustTasks.length?'<span class="wch-check">✓</span>':''}`;
+      wrap.appendChild(mh);
+      mustTasks.filter(t => !t.done[today]).forEach(t => wrap.appendChild(renderQuestItem(t, opts)));
+      mustTasks.filter(t =>  !!t.done[today]).forEach(t => wrap.appendChild(renderQuestItem(t, opts)));
+    }
+  }
+
   const groups = {}; CAT_ORDER.forEach(c => { groups[c] = []; });
-  activeTasks.forEach(t => { groups[CAT_ORDER.includes(t.category) ? t.category : null].push(t); });
+  activeTasks.forEach(t => { if (mustIds.includes(t.id)) return; groups[CAT_ORDER.includes(t.category) ? t.category : null].push(t); });
 
   CAT_ORDER.forEach(catId => {
     const tasks = groups[catId]; if (!tasks.length) return;
@@ -14584,18 +14839,19 @@ function renderForge() {
   const wrap = document.createElement('div'); wrap.className = 'forge-view';
   const sm = state.shopMaterials || {};
 
-  // ── Filter toggle ───────────────────────────────────────────
-  const filterBar = document.createElement('div');
-  filterBar.style.cssText = 'display:flex;gap:6px;justify-content:center;padding:4px 0 2px;';
-  [['all','ALL RECIPES'],['craftable','⚒ READY TO FORGE']].forEach(([mode, label]) => {
-    const btn = document.createElement('button');
-    btn.className = 'work-view-btn' + (forgeFilterMode === mode ? ' active' : '');
-    btn.style.cssText = 'flex:1;font-size:9px;padding:5px 0;';
-    btn.textContent = label;
-    btn.addEventListener('click', () => { forgeFilterMode = mode; renderAll(); });
-    filterBar.appendChild(btn);
-  });
-  wrap.appendChild(filterBar);
+  // Equipment trees (one per gear slot) — shared by the slot picker and the tree render.
+  const FORGE_TREES = [
+    { id:'swrd', label:'SWORD',    emoji:'⚔️', color:'#ff8a80' },
+    { id:'armr', label:'ARMOR',    emoji:'🥋', color:'#80deea' },
+    { id:'helm', label:'HELMET',   emoji:'⛑️',  color:'#82b1ff' },
+    { id:'shld', label:'SHIELD',   emoji:'🛡️', color:'#80deea' },
+    { id:'neck', label:'NECKLACE', emoji:'📿', color:'#ea80fc' },
+    { id:'earr', label:'EARRING',  emoji:'💎', color:'#f48fb1' },
+    { id:'brac', label:'BRACELET', emoji:'💍', color:'#ce93d8' },
+    { id:'belt', label:'BELT',     emoji:'⚙️', color:'#b9f6ca' },
+    { id:'boot', label:'BOOTS',    emoji:'👢', color:'#b9f6ca' },
+  ];
+  if (!FORGE_TREES.some(t => t.id === forgeTree)) forgeTree = 'swrd';
 
   const matDefs = [
     { id:'timber',  ...WORK_MATERIALS.physical },
@@ -14646,6 +14902,58 @@ function renderForge() {
 
   wrap.appendChild(matBar);
 
+  // ── FORGE / REFINE mode toggle ───────────────────────────────
+  const modeBar = document.createElement('div'); modeBar.className = 'forge-mode-bar';
+  [['forge','⚒ FORGE'],['refine','✦ REFINE']].forEach(([m,label]) => {
+    const b = document.createElement('button');
+    b.className = 'forge-mode-btn' + (forgeMode === m ? ' active' : '');
+    b.textContent = label;
+    b.addEventListener('click', () => { forgeMode = m; renderAll(); });
+    modeBar.appendChild(b);
+  });
+  wrap.appendChild(modeBar);
+
+  const craftCountsTop = state.forgeCraftCounts || {};
+  // ── Slot picker — pick one equipment tree to work on (forge mode only) ──
+  if (forgeMode === 'forge') {
+    const picker = document.createElement('div'); picker.className = 'forge-slot-picker';
+    FORGE_TREES.forEach(tree => {
+      const recs = CRAFT_RECIPES.filter(r => !r.legacy && ITEMS_DB[r.itemId]?.tree === tree.id).sort((a,b)=>(a.tier||0)-(b.tier||0));
+      if (!recs.length) return;
+      const craftedCount = recs.filter(r => (craftCountsTop[r.itemId]||0) > 0).length;
+      const topTier = craftedCount; // highest contiguous-ish crafted = number crafted (tiers are sequential)
+      const anyReady = recs.some(r => canCraft(r));
+      const equippedHere = recs.some(r => Object.values(state.equipment||{}).includes(r.itemId));
+      const sel = tree.id === forgeTree;
+      const btn = document.createElement('button');
+      btn.className = 'forge-slot-btn' + (sel ? ' active' : '') + (anyReady ? ' ready' : '');
+      btn.style.setProperty('--tc', tree.color);
+      btn.title = tree.label;
+      btn.innerHTML = `<span class="fsb-emoji">${tree.emoji}</span>`
+        + `<span class="fsb-prog">T${topTier}/9</span>`
+        + (anyReady ? `<span class="fsb-dot" title="Ready to forge"></span>` : '')
+        + (equippedHere ? `<span class="fsb-eq" title="Equipped from this tree">⚒</span>` : '');
+      btn.addEventListener('click', () => { forgeTree = tree.id; renderAll(); });
+      picker.appendChild(btn);
+    });
+    wrap.appendChild(picker);
+
+    // Per-tree filter (ALL / READY) — only meaningful inside a tree
+    const filterBar = document.createElement('div'); filterBar.className = 'forge-filter-bar';
+    [['all','ALL TIERS'],['craftable','⚒ READY']].forEach(([mode, label]) => {
+      const btn = document.createElement('button');
+      btn.className = 'forge-filter-pill' + (forgeFilterMode === mode ? ' active' : '');
+      btn.textContent = label;
+      btn.addEventListener('click', () => { forgeFilterMode = mode; renderAll(); });
+      filterBar.appendChild(btn);
+    });
+    wrap.appendChild(filterBar);
+  }
+
+  // Reference panels (Transmuter, Gear Sets, Forge Record, Rarity Odds, anvil) render
+  // BELOW the working area — collected here, appended near the end (action before management).
+  const panelsBox = document.createElement('div'); panelsBox.className = 'forge-panels';
+
   // ── Refinery — material conversion (Guild 'refinery' building) ──
   {
     const rfLvl = getRefineryLevel();
@@ -14665,7 +14973,7 @@ function renderForge() {
           <button class="rf-btn" onclick="doRefineMat()">CONVERT</button>
         </div>`;
     }
-    wrap.appendChild(rfPanel);
+    panelsBox.appendChild(rfPanel);
     if (rfLvl >= 1) { const _t = rfPanel.querySelector('#rfTo'); if (_t) _t.selectedIndex = 1; }
   }
 
@@ -14685,7 +14993,7 @@ function renderForge() {
           <span class="fs-bonus">${s.active ? '✓ ' : (nextTier ? `${nextTier.pieces}-pc → ` : '')}${bonusStr}</span>
         </div>`;
       }).join('');
-    wrap.appendChild(setsPanel);
+    panelsBox.appendChild(setsPanel);
   }
 
   // ── Trophy wall: recently forged (moved to top) ──────────
@@ -14717,7 +15025,7 @@ function renderForge() {
       _logItems.appendChild(_el);
     });
     _logSec.appendChild(_logItems);
-    wrap.appendChild(_logSec);
+    panelsBox.appendChild(_logSec);
   }
 
   // ── Rarity roll odds ─────────────────────────────────────
@@ -14735,7 +15043,7 @@ function renderForge() {
   qualBar.querySelector('.forge-quality-hdr-toggle').addEventListener('click', () => {
     completedExpanded['forgeOdds'] = !completedExpanded['forgeOdds']; renderAll();
   });
-  wrap.appendChild(qualBar);
+  panelsBox.appendChild(qualBar);
 
   // ── Craft Queue ──────────────────────────────────────────
   const _queue = (state.craftQueue || []);
@@ -14767,7 +15075,7 @@ function renderForge() {
              </div>`}`;
       qWrap.appendChild(row);
     });
-    wrap.appendChild(qWrap);
+    panelsBox.appendChild(qWrap);
     setTimeout(() => {
       qWrap.querySelectorAll('.craft-queue-collect-btn').forEach(btn => {
         btn.addEventListener('click', e => { e.stopPropagation(); collectCraft(btn.dataset.cqid); });
@@ -14784,7 +15092,7 @@ function renderForge() {
     const banner = document.createElement('div');
     banner.className = 'forge-mastery-banner';
     banner.textContent = `⚒️ Forge Mastery Lv.${_anvilLvl} — craft costs -${_anvilLvl*8}%`;
-    wrap.appendChild(banner);
+    panelsBox.appendChild(banner);
   }
 
   const etaRates = getDailyMatRate();
@@ -14792,30 +15100,15 @@ function renderForge() {
   const STAT_CHIP_COLORS = { STR:'#ff8a80', DEX:'#b9f6ca', CON:'#80deea', INT:'#82b1ff', VOL:'#ce93d8', CHA:'#f48fb1', ATK:'#ffab40', DEF:'#ffd180', HP:'#69f0ae', MP:'#40c4ff', dodgeBonus:'#b9f6ca', critBonus:'#ffab40', blockBonus:'#80deea' };
   const _matEmoji = { timber:'🪵', scroll:'📜', crystal:'💎', gear:'⚙️' };
 
-  // ── FORGE TREE PATHS ──────────────────────────────────────
-  const FORGE_TREES = [
-    { id:'swrd', label:'SWORD',    emoji:'⚔️', color:'#ff8a80' },
-    { id:'armr', label:'ARMOR',    emoji:'🥋', color:'#80deea' },
-    { id:'helm', label:'HELMET',   emoji:'⛑️',  color:'#82b1ff' },
-    { id:'shld', label:'SHIELD',   emoji:'🛡️', color:'#80deea' },
-    { id:'neck', label:'NECKLACE', emoji:'📿', color:'#ea80fc' },
-    { id:'earr', label:'EARRING',  emoji:'💎', color:'#f48fb1' },
-    { id:'brac', label:'BRACELET', emoji:'💍', color:'#ce93d8' },
-    { id:'belt', label:'BELT',     emoji:'⚙️', color:'#b9f6ca' },
-    { id:'boot', label:'BOOTS',    emoji:'👢', color:'#b9f6ca' },
-  ];
-
   const craftCounts = state.forgeCraftCounts || {};
   const equip = state.equipment || {};
 
-  FORGE_TREES.forEach(tree => {
+  // Render ONLY the selected tree (slot picker), and only in FORGE mode.
+  if (forgeMode === 'forge') FORGE_TREES.filter(t => t.id === forgeTree).forEach(tree => {
     const treeRecipes = CRAFT_RECIPES
       .filter(r => !r.legacy && ITEMS_DB[r.itemId]?.tree === tree.id)
       .sort((a, b) => (a.tier||0) - (b.tier||0));
     if (treeRecipes.length === 0) return;
-
-    // In "craftable" mode, skip trees with nothing ready
-    if (forgeFilterMode === 'craftable' && !treeRecipes.some(r => canCraft(r))) return;
 
     // Highest crafted tier for progress dots
     const equippedInTree = treeRecipes.some(r => Object.values(equip).includes(r.itemId));
@@ -14839,7 +15132,26 @@ function renderForge() {
       </div>`;
     section.appendChild(hdr);
 
-    treeRecipes.forEach(recipe => {
+    // ── Collapse already-forged tiers into a compact strip (ALL-tiers view only) ──
+    // Keeps the focus on the next craftable tier; tap the strip to re-forge old tiers.
+    const craftedRecs = treeRecipes.filter(r => (craftCounts[r.itemId]||0) > 0);
+    const showCrafted = !!forgeShowCrafted[tree.id];
+    if (craftedRecs.length && forgeFilterMode !== 'craftable') {
+      const strip = document.createElement('div'); strip.className = 'forge-crafted-strip';
+      strip.style.setProperty('--tc', tree.color);
+      strip.innerHTML = `<span class="fcs-label">✓ ${craftedRecs.length} FORGED</span>`
+        + craftedRecs.map(r => { const it = ITEMS_DB[r.itemId]; return `<span class="fcs-item" title="${it.name}">${itemImgHtml(it,16)}<span class="fcs-tier">T${r.tier}</span></span>`; }).join('')
+        + `<span class="fcs-toggle">${showCrafted ? '▲ hide' : '▼ re-forge'}</span>`;
+      strip.addEventListener('click', () => { forgeShowCrafted[tree.id] = !showCrafted; renderAll(); });
+      section.appendChild(strip);
+    }
+    // What to render as full/lock cards: in READY mode show everything craftable;
+    // in ALL mode hide forged tiers (unless expanded) so only the frontier + locked show.
+    const renderList = (forgeFilterMode === 'craftable')
+      ? treeRecipes
+      : (showCrafted ? treeRecipes : treeRecipes.filter(r => (craftCounts[r.itemId]||0) === 0));
+
+    renderList.forEach(recipe => {
       const item = ITEMS_DB[recipe.itemId]; if (!item) return;
       const locked    = isRecipeLocked(recipe);
       const craftable = canCraft(recipe);
@@ -15004,13 +15316,19 @@ function renderForge() {
     wrap.appendChild(section);
   }); // end FORGE_TREES
 
-  // ── Refine section — owned craftable items in inventory ──
-  const refineable = (state.inventory||[])
+  // ── Refine section — owned craftable items in inventory (REFINE mode) ──
+  const refineable = forgeMode === 'refine' ? (state.inventory||[])
     .map((entry, idx) => ({ entry, idx }))
     .filter(({ entry }) => {
       const it = ITEMS_DB[entry.itemId];
       return it && it.crafted && (entry.grade||1) < 5;
-    });
+    }) : [];
+  if (forgeMode === 'refine' && refineable.length === 0) {
+    const re = document.createElement('div');
+    re.style.cssText = 'text-align:center;padding:24px 0;opacity:0.45;font-size:11px;';
+    re.innerHTML = `<div style="font-size:28px;margin-bottom:8px">✦</div>No gear to refine yet.<br>Forge a weapon or armor first, then upgrade it Grade I → V here.`;
+    wrap.appendChild(re);
+  }
   if (refineable.length > 0) {
     const refSec = document.createElement('div'); refSec.className = 'forge-section forge-refine-sec';
     const refHdr = document.createElement('div'); refHdr.className = 'forge-section-hdr';
@@ -15084,18 +15402,20 @@ function renderForge() {
     wrap.appendChild(refSec);
   }
 
-  // Empty state
-  const _anyVisible = CRAFT_RECIPES.some(r => forgeFilterMode === 'all' ? true : canCraft(r));
-  if ((!_anyVisible || _log.length === 0 && CRAFT_RECIPES.length > 0) && !_anyVisible) {
-    const empty = document.createElement('div');
-    empty.style.cssText = 'text-align:center;padding:24px 0;opacity:0.4;font-size:11px;';
-    if (forgeFilterMode === 'craftable') {
-      empty.innerHTML = `<div style="font-size:28px;margin-bottom:8px">🔒</div>No recipes ready yet.<br>Complete work tasks to gather materials.`;
-    } else {
-      empty.innerHTML = `<div style="font-size:28px;margin-bottom:8px">⚒️</div>Complete work tasks to gather materials,<br>then forge your gear here.`;
+  // Empty state — forge mode, selected tree has nothing ready under the READY filter
+  if (forgeMode === 'forge' && forgeFilterMode === 'craftable') {
+    const treeRecs = CRAFT_RECIPES.filter(r => !r.legacy && ITEMS_DB[r.itemId]?.tree === forgeTree);
+    if (!treeRecs.some(r => canCraft(r))) {
+      const empty = document.createElement('div');
+      empty.style.cssText = 'text-align:center;padding:20px 0;opacity:0.45;font-size:11px;';
+      empty.innerHTML = `<div style="font-size:28px;margin-bottom:8px">🔒</div>Nothing ready in this path yet.<br>Gather materials from work tasks, or switch to ALL TIERS.`;
+      wrap.appendChild(empty);
     }
-    wrap.appendChild(empty);
   }
+
+  // Reference panels (Transmuter · Gear Sets · Forge Record · Rarity Odds) render
+  // BELOW the working area — action before management.
+  wrap.appendChild(panelsBox);
 
   return wrap;
 }
@@ -15105,93 +15425,58 @@ function renderGuild() {
   const gu = state.guildUpgrades || {};
 
   // ── Completion stats ─────────────────────────────────────────
-  const MAX_GUILD_LEVELS = GUILD_UPGRADES.reduce((a, u) => a + u.maxLevel, 0); // 65
-  const _curLevels = Object.values(gu).reduce((a, b) => a + (b||0), 0);
+  const MAX_GUILD_LEVELS = GUILD_UPGRADES.reduce((a, u) => a + u.maxLevel, 0);
+  // Count only LIVE upgrades (ignores retired ones lingering in old saves) so the
+  // completion meter / rank can actually reach 100%.
+  const _curLevels = GUILD_UPGRADES.reduce((a, u) => a + (gu[u.id] || 0), 0);
   const _completionPct = Math.round((_curLevels / MAX_GUILD_LEVELS) * 100);
 
-  // ── Gold panel ───────────────────────────────────────────────
-  const _gpBorder = _completionPct >= 80 ? 'rgba(255,215,0,0.65)' : _completionPct >= 55 ? 'rgba(255,193,7,0.55)'
-    : _completionPct >= 31 ? 'rgba(255,193,7,0.38)' : _completionPct >= 15 ? 'rgba(77,208,225,0.35)' : 'rgba(77,208,225,0.15)';
-  const _gpGlow = _completionPct >= 80 ? '0 0 22px rgba(255,215,0,0.15)' : _completionPct >= 55 ? '0 0 16px rgba(255,193,7,0.12)' : 'none';
-  const goldPanel = document.createElement('div'); goldPanel.className = 'guild-gold-panel';
-  goldPanel.style.cssText = `border-color:${_gpBorder};box-shadow:${_gpGlow}`;
-  goldPanel.innerHTML = `
-    <div>
-      <div class="guild-gold-label">GUILD TREASURY</div>
-      <div class="guild-gold-amount">${goldImg(28)} ${(state.gold||0).toLocaleString()}g</div>
-    </div>
-    <div style="text-align:right">
-      <div class="guild-gold-label">LIFETIME EARNED</div>
-      <div style="font-family:'Cinzel',serif;font-size:13px;color:var(--sao-text-dim)">${goldImg(20)} ${(state.totalGoldEarned||0).toLocaleString()}g</div>
-    </div>`;
-  wrap.appendChild(goldPanel);
-
-  // ── Guild power / completion bar ─────────────────────────────
+  // ── GUILD CREST — one identity band: rank + power + treasury gold ──
+  const _GUILD_RANKS = GUILD_RANK_DEFS;
+  let _rankIdx = 0; _GUILD_RANKS.forEach((r, i) => { if (_curLevels >= r.min) _rankIdx = i; });
+  const _rank = _GUILD_RANKS[_rankIdx];
+  const _nextRank = _GUILD_RANKS[_rankIdx + 1] || null;
   const _compColor = _completionPct >= 80 ? '#ffd700' : _completionPct >= 55 ? '#ffc107' : _completionPct >= 31 ? '#ffa726' : '#4dd0e1';
-  const compBar = document.createElement('div');
-  compBar.style.cssText = 'padding:0 0 8px';
-  compBar.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
-      <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;color:rgba(255,255,255,0.45)">⟦ GUILD POWER ⟧</span>
-      <span style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:${_compColor}">${_curLevels} / ${MAX_GUILD_LEVELS} &nbsp;·&nbsp; ${_completionPct}%</span>
+  const crest = document.createElement('div'); crest.className = `guild-crest ${_rank.cls}`;
+  crest.style.setProperty('--gc', _compColor);
+  crest.innerHTML = `
+    <div class="gc-top">
+      <div class="gc-rank">
+        <span class="gc-rank-icon">${_rank.icon}</span>
+        <div class="gc-rank-text">
+          <div class="gc-rank-name">${_rank.name}</div>
+          <div class="gc-rank-sub">${_rank.sub}</div>
+        </div>
+      </div>
+      <div class="gc-gold">
+        <div class="gc-gold-amt">${goldImg(18)} ${(state.gold||0).toLocaleString()}g</div>
+        <div class="gc-gold-life">lifetime ${(state.totalGoldEarned||0).toLocaleString()}g</div>
+      </div>
     </div>
-    <div style="height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">
-      <div style="height:100%;width:${_completionPct}%;background:linear-gradient(90deg,${_compColor}88,${_compColor});border-radius:3px;transition:width 0.6s"></div>
-    </div>`;
-  wrap.appendChild(compBar);
+    <div class="gc-power-row">
+      <span class="gc-power-lbl">⟦ GUILD POWER ⟧</span>
+      <span class="gc-power-val">${_curLevels} / ${MAX_GUILD_LEVELS} · ${_completionPct}%</span>
+    </div>
+    <div class="gc-power-track"><div class="gc-power-fill" style="width:${_completionPct}%"></div></div>
+    <div class="gc-next">${_nextRank ? `<span class="gc-next-need">${_nextRank.min - _curLevels}</span> upgrade levels → <strong>${_nextRank.name}</strong>` : '👑 APEX GUILD RANK REACHED'}</div>`;
+  wrap.appendChild(crest);
 
-  // ── Guild rank name ──────────────────────────────────────────
-  const _GUILD_RANKS = [
-    { min:1,  name:'FRONTIER OUTPOST',    sub:'A small band with big ambitions.',                    cls:'rank-outpost',    icon:'⚑' },
-    { min:10, name:"ADVENTURER'S GUILD",  sub:'Word of your guild spreads through the region.',      cls:'rank-adventurer', icon:'⚔' },
-    { min:20, name:'MERCENARY STRONGHOLD',sub:'Hardened veterans answer your call.',                 cls:'rank-stronghold', icon:'🛡' },
-    { min:36, name:'REGIONAL CITADEL',    sub:'Your guild commands respect across the kingdom.',     cls:'rank-citadel',    icon:'🏰' },
-    { min:52, name:'GRAND ORDER',         sub:'Legends are written about guilds like yours.',        cls:'rank-order',      icon:'👑' },
-  ];
-  if (_curLevels > 0) {
-    const _rank = [..._GUILD_RANKS].reverse().find(r => _curLevels >= r.min) || _GUILD_RANKS[0];
-    const _rankEl = document.createElement('div'); _rankEl.className = `guild-rank-header ${_rank.cls}`;
-    _rankEl.innerHTML = `<div class="guild-rank-name">${_rank.icon} ${_rank.name}</div><div class="guild-rank-sub">${_rank.sub}</div>`;
-    wrap.appendChild(_rankEl);
-  }
-
-  // ── Worker Rank Panel ────────────────────────────────────────
+  // ── Worker Rank — compact chip (full panel lives on the QUESTS workbench) ──
   {
     const wlv = calcWorkerLevel(state.workXp || 0);
     const RANK_COLORS_W = { F:'#9e9e9e', E:'#80deea', D:'#82b1ff', C:'#69f0ae', B:'#ffc107', A:'#ffa726', S:'#ffd700', SS:'#ea80fc', SSS:'#ffffff' };
-    const RANK_IDX_W    = ['F','E','D','C','B','A','S','SS','SSS'];
     const wCol = RANK_COLORS_W[wlv.rank] || '#ffc107';
     const xpPct = wlv.level < 99 ? Math.round((wlv.xpProgress / wlv.xpPerLevel) * 100) : 100;
-    const nextRank = RANK_IDX_W[RANK_IDX_W.indexOf(wlv.rank) + 1];
-    const nextMs   = nextRank && WORKER_RANK_MILESTONES[nextRank];
-
-    const wxpMul       = getWorkerWxpMul();
-    const goldMul      = getWorkerGoldMul();
-    const commSlots    = getWorkerCommissionSlots();
-    // Note: forge-time / forge-slot worker perks are retired — crafting is instant.
-    const passiveChips = [
-      commSlots > 3 ? `📋 ${commSlots} commissions/day` : '',
-      wxpMul > 1 ? `⚡ ×${wxpMul.toFixed(2)} WXP` : '',
-      goldMul > 1 ? `🪙 ×${goldMul.toFixed(2)} Gold` : '',
-    ].filter(Boolean);
-
-    const wPanel = document.createElement('div');
-    wPanel.style.cssText = `background:rgba(255,193,7,0.04);border:1px solid ${wCol}33;border-radius:10px;padding:10px 12px;margin-bottom:6px`;
-    wPanel.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
-        <div>
-          <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;color:rgba(255,193,7,0.5);margin-bottom:3px">⟦ WORKER RANK ⟧</div>
-          <div style="font-family:'Cinzel',serif;font-size:15px;color:${wCol};font-weight:700">⚒ RANK ${wlv.rank} · LV.${wlv.level}</div>
-          <div style="font-family:'Rajdhani',sans-serif;font-size:10px;color:rgba(255,255,255,0.35);margin-top:1px">${(state.workXp||0).toLocaleString()} WXP · ${wlv.xpProgress}/${wlv.xpPerLevel} this level</div>
-        </div>
-        <button onclick="showWorkerMilestoneOverlay()" style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;color:rgba(255,193,7,0.6);background:rgba(255,193,7,0.08);border:1px solid rgba(255,193,7,0.2);border-radius:5px;padding:4px 8px;cursor:pointer">MILESTONES ▶</button>
-      </div>
-      <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;margin-bottom:8px">
-        <div style="height:100%;width:${xpPct}%;background:${wCol};border-radius:2px;transition:width 0.6s"></div>
-      </div>
-      ${passiveChips.length > 0 ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">${passiveChips.map(p=>`<span style="font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:600;background:rgba(255,193,7,0.1);border:1px solid rgba(255,193,7,0.25);border-radius:4px;padding:2px 6px;color:#ffc107">${p}</span>`).join('')}</div>` : ''}
-      ${nextMs ? `<div style="font-family:'Rajdhani',sans-serif;font-size:10px;color:rgba(255,255,255,0.35);border-top:1px solid rgba(255,255,255,0.06);padding-top:6px"><span style="color:rgba(255,193,7,0.5)">RANK ${nextRank}:</span> ${nextMs.effect}</div>` : `<div style="font-family:'Cinzel',serif;font-size:9px;color:#ffd700;letter-spacing:1px;border-top:1px solid rgba(255,215,0,0.1);padding-top:6px">⭐ MAXIMUM WORKER RANK ACHIEVED</div>`}`;
-    wrap.appendChild(wPanel);
+    const wChip = document.createElement('button');
+    wChip.className = 'guild-worker-chip';
+    wChip.style.setProperty('--wc', wCol);
+    wChip.onclick = () => showWorkerMilestoneOverlay();
+    wChip.innerHTML = `
+      <span class="gwc-rank">⚒ WORKER ${wlv.rank}</span>
+      <span class="gwc-lv">Lv.${wlv.level}</span>
+      <span class="gwc-bar"><span class="gwc-fill" style="width:${xpPct}%"></span></span>
+      <span class="gwc-more">MILESTONES ▶</span>`;
+    wrap.appendChild(wChip);
   }
 
   // ── Guild Reputation bar ─────────────────────────────────────
@@ -15222,6 +15507,9 @@ function renderGuild() {
     const tNextDiv = getTreasuryDividend(tLvl + 1);
     const canInvest = (state.gold || 0) >= tCost;
     const canClaim  = canClaimTreasury();
+    // Payback hint — marginal daily gold gained vs. the invest cost (honest ROI for a gold sink).
+    const _incr = Math.max(1, tNextDiv.gold - tDiv.gold);
+    const _payback = Math.ceil(tCost / _incr);
     const tEl = document.createElement('div'); tEl.className = 'guild-treasury';
     tEl.innerHTML = `
       <div class="gt-top">
@@ -15233,27 +15521,9 @@ function renderGuild() {
       </div>
       <button class="gt-invest${canInvest?'':' disabled'}" onclick="investTreasury()">
         INVEST 🪙${tCost.toLocaleString()}g → Lv.${tLvl+1} (🪙${tNextDiv.gold}g/day${tNextDiv.mat?` + mats`:''})
-      </button>`;
+      </button>
+      <div class="gt-payback">+🪙${_incr}g/day · pays back in ~${_payback}d</div>`;
     wrap.appendChild(tEl);
-  }
-
-  // ── Active bonuses summary ───────────────────────────────────
-  const active = GUILD_UPGRADES.filter(u => (gu[u.id]||0) > 0);
-  if (active.length > 0) {
-    const bonusSec = document.createElement('div');
-    bonusSec.style.cssText = 'background:rgba(77,208,225,0.04);border:1px solid rgba(77,208,225,0.15);border-radius:8px;padding:9px 12px;margin-bottom:4px';
-    const TIER_COLOR_MAP = {
-      hall:'#69f0ae',trade:'#69f0ae',scriptorium:'#69f0ae',patron_vault:'#69f0ae',
-      anvil:'#ffd54f',warehouse:'#ffd54f',chronoforge:'#ffd54f',forge_hall:'#ffd54f',
-      barracks:'#ff8a80',sanctum:'#ff8a80',alchemy:'#ff8a80',
-    };
-    bonusSec.innerHTML = `<div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;color:var(--sao-cyan);margin-bottom:6px">⟦ ACTIVE GUILD BONUSES ⟧</div>
-      ${active.map(u => {
-        const lvl = gu[u.id]||0;
-        const tc = TIER_COLOR_MAP[u.id] || '#ffc107';
-        return `<div style="font-size:10px;color:var(--sao-text-dim);margin-bottom:3px">${u.emoji} <strong style="color:var(--sao-text)">${u.name}</strong> <span style="color:${tc}">Lv.${lvl}/${u.maxLevel}</span> — ${u.perLevel}</div>`;
-      }).join('')}`;
-    wrap.appendChild(bonusSec);
   }
 
   // ── Tier-grouped upgrade cards ───────────────────────────────
@@ -15263,7 +15533,7 @@ function renderGuild() {
 
   const TIERS = [
     { label:'GROWTH', icon:'🌱', color:'#69f0ae', ids:['hall','trade','scriptorium','patron_vault'] },
-    { label:'FORGE',  icon:'⚒',  color:'#ffd54f', ids:['anvil','warehouse','refinery'] }, // chronoforge/forge_hall retired — crafting is instant now
+    { label:'FORGE',  icon:'⚒',  color:'#ffd54f', ids:['anvil','warehouse','refinery','quality_forge'] }, // chronoforge/forge_hall retired — crafting is instant now
     { label:'POWER',  icon:'⚔',  color:'#ff8a80', ids:['barracks','sanctum','alchemy'] },
   ];
 
@@ -15284,6 +15554,16 @@ function renderGuild() {
       const _wlvCur = calcWorkerLevel(state.workXp || 0).level;
       const isWorkerLocked = !isMaxed && lvl === 0 && _wlvCur < _wlvReq;
 
+      // Maxed upgrades collapse to a slim "done" row — keeps buyable upgrades in focus.
+      if (isMaxed) {
+        const mrow = document.createElement('div');
+        mrow.className = 'guild-maxed-row';
+        mrow.style.setProperty('--tc', tier.color);
+        mrow.innerHTML = `<span class="gmr-emoji">${upg.emoji}</span><span class="gmr-name">${upg.name}</span><span class="gmr-max">✓ MAX Lv.${upg.maxLevel}</span>`;
+        wrap.appendChild(mrow);
+        return;
+      }
+
       const pips = Array.from({length: Math.min(upg.maxLevel, 10)}, (_,i) =>
         `<span class="guild-lvl-pip${i<lvl?' filled':''}"${i<lvl?` style="--pc:${tier.color}"`:''}/>`
       ).join('') + (upg.maxLevel > 10 ? `<span style="font-size:9px;color:rgba(255,255,255,0.3);margin-left:2px">+${upg.maxLevel-10}</span>` : '');
@@ -15294,6 +15574,7 @@ function renderGuild() {
         : upg.effect === 'wxpBonus'        ? `MAX: +${upg.maxLevel*10}% Work XP`
         : upg.effect === 'craftDiscount'   ? `MAX: −${Math.min(56, upg.maxLevel*8)}% mat cost`
         : upg.effect === 'bonusMat'        ? `MAX: +${upg.maxLevel} mats/stage`
+        : upg.effect === 'qualityRoll'     ? `MAX: +${upg.maxLevel*4}% rarity upgrade chance`
         : upg.effect === 'matRefine'       ? `MAX: 3→2 conversion ratio`
         : upg.effect === 'forgeTime'       ? `MAX: −${upg.maxLevel*10}% forge time`
         : upg.effect === 'forgeSlot'       ? `+${upg.maxLevel} queue slot${upg.maxLevel>1?'s':''} total`
@@ -15315,9 +15596,9 @@ function renderGuild() {
             : 'brightness(1.05)';
 
       const card = document.createElement('div');
-      card.className = 'guild-upgrade-card' + (isMaxed ? ' owned' : '') + (isWorkerLocked ? ' wlocked' : '');
-      if (lvl > 0 && !isMaxed) card.style.borderColor = `${tier.color}2a`;
-      if (isMaxed) card.style.cssText = `border-color:${tier.color}44;background:${tier.color}07`;
+      card.className = 'guild-upgrade-card' + (isWorkerLocked ? ' wlocked' : '') + (canAfford ? ' affordable' : '');
+      if (canAfford) card.style.setProperty('--tc', tier.color);
+      if (lvl > 0) card.style.borderColor = `${tier.color}2a`;
 
       card.innerHTML = `
         <div class="guild-upgrade-top">
@@ -15344,6 +15625,25 @@ function renderGuild() {
       wrap.appendChild(card);
     });
   });
+
+  // ── Active bonuses summary (reference — below the upgrades) ──
+  const active = GUILD_UPGRADES.filter(u => (gu[u.id]||0) > 0);
+  if (active.length > 0) {
+    const TIER_COLOR_MAP = {
+      hall:'#69f0ae',trade:'#69f0ae',scriptorium:'#69f0ae',patron_vault:'#69f0ae',
+      anvil:'#ffd54f',warehouse:'#ffd54f',refinery:'#ffd54f',chronoforge:'#ffd54f',forge_hall:'#ffd54f',
+      barracks:'#ff8a80',sanctum:'#ff8a80',alchemy:'#ff8a80',
+    };
+    const bonusSec = document.createElement('div');
+    bonusSec.style.cssText = 'background:rgba(77,208,225,0.04);border:1px solid rgba(77,208,225,0.15);border-radius:8px;padding:9px 12px;margin-top:8px';
+    bonusSec.innerHTML = `<div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;color:var(--sao-cyan);margin-bottom:6px">⟦ ACTIVE GUILD BONUSES ⟧</div>
+      ${active.map(u => {
+        const lvl = gu[u.id]||0;
+        const tc = TIER_COLOR_MAP[u.id] || '#ffc107';
+        return `<div style="font-size:10px;color:var(--sao-text-dim);margin-bottom:3px">${u.emoji} <strong style="color:var(--sao-text)">${u.name}</strong> <span style="color:${tc}">Lv.${lvl}/${u.maxLevel}</span> — ${u.perLevel}</div>`;
+      }).join('')}`;
+    wrap.appendChild(bonusSec);
+  }
 
   return wrap;
 }
@@ -15493,15 +15793,10 @@ function renderCommissionBoard() {
       return;
     }
 
-    // Qualifying tasks count — how many tasks could fulfill this commission
-    const activeTasks = (state.trabajo||[]).filter(t=>!isArchivedTask(t));
-    const qualifyCount = activeTasks.filter(t=>{
-      const catOk  = !comm.category   || t.category  === comm.category;
-      const diffOk = !comm.difficulty || (DIFF_RANK[t.difficulty]||0) >= (DIFF_RANK[comm.difficulty]||0);
-      return catOk && diffOk;
-    }).length;
-    const qualifyHint = (!isDone && qualifyCount > 0)
-      ? `<span class="cc-qualify-hint">${qualifyCount} task${qualifyCount!==1?'s':''} qualify</span>` : '';
+    // Metric label — what this cadence mission tracks
+    const _METRIC_LABEL = { tasks:'tasks cleared', sessions:'focus sessions', mustdos:'must-dos', floor:'focus floor', inflow:'in-flow finish' };
+    const qualifyHint = !isDone
+      ? `<span class="cc-qualify-hint">${_METRIC_LABEL[comm.metric] || 'tasks cleared'}</span>` : '';
 
     card.innerHTML = `
       <div class="cc-top">
@@ -16209,6 +16504,9 @@ function renderTrabajo() {
   }
 
   // ── WORKBENCH view ───────────────────────────────────────
+  // Daily Ration command center — focus floor + must-dos + cadence (or REST EARNED).
+  panelContent.appendChild(renderWorkdayStatus());
+
   // Consolidated status strip — the single home for worker rank + next unlock +
   // specialization (replaces the old slim bar AND the duplicate post-divider badge).
   {
@@ -16299,14 +16597,32 @@ function renderTrabajo() {
   // Today's earnings chip — only visible once something has been completed
   const _teb = renderTodayEarningsChip();
   if (_teb) panelContent.appendChild(_teb);
-  const _activeTasks   = state.trabajo.filter(t => !isArchivedTask(t));
-  const _archivedTasks = state.trabajo.filter(t =>  isArchivedTask(t));
-  if (_activeTasks.length===0) {
+  // One-off backlog: OPEN = not finished; DONE TODAY = finished today (kept for undo/satisfaction);
+  // tasks finished on earlier days simply leave the backlog (and 30d-archive as before).
+  const _openTasks      = state.trabajo.filter(t => !isArchivedTask(t) && !t.completed);
+  const _completedTasks = state.trabajo.filter(t => t.completed && t.completedDate === today && !isArchivedTask(t));
+  const _archivedTasks  = state.trabajo.filter(t =>  isArchivedTask(t));
+
+  // ── Backlog burndown — "X open · ~Y days to caught up" ──
+  panelContent.appendChild(renderBacklogBurndown(_openTasks.length));
+
+  if (_openTasks.length===0) {
     const empty=document.createElement('div'); empty.className='empty-state';
-    empty.innerHTML=`<div class="empty-icon">⚔</div><div class="empty-text">⟦ NO ACTIVE QUESTS ⟧</div><div class="empty-sub">Add work tasks to start your day.</div>`;
+    empty.innerHTML = _completedTasks.length
+      ? `<div class="empty-icon">✓</div><div class="empty-text">⟦ BACKLOG CLEAR ⟧</div><div class="empty-sub">Nothing open. You're caught up — add what's next, or rest.</div>`
+      : `<div class="empty-icon">⚔</div><div class="empty-text">⟦ NO OPEN QUESTS ⟧</div><div class="empty-sub">Brain-dump everything you're behind on below — then chip at it.</div>`;
     panelContent.appendChild(empty);
   } else {
-    panelContent.appendChild(renderWorkTasksByCat(_activeTasks,{listKey:'trabajo',periodKey:today,isWeekly:false,allowDelete:true,recommendedTaskId:getRecommendedTaskId()}));
+    panelContent.appendChild(renderWorkTasksByCat(_openTasks,{listKey:'trabajo',periodKey:today,isWeekly:false,allowDelete:true,recommendedTaskId:getRecommendedTaskId()}));
+  }
+  // Completed (this period) — collapsed; uncheck to reopen
+  if (_completedTasks.length > 0) {
+    const isCompOpen = !!completedExpanded['trabajo-completed'];
+    const compSep = document.createElement('div'); compSep.className = 'work-archived-sep'; compSep.style.cursor='pointer';
+    compSep.innerHTML = `<div class="work-archived-line"></div><span>${isCompOpen?'▲':'▼'} ✓ ${_completedTasks.length} DONE</span><div class="work-archived-line"></div>`;
+    compSep.addEventListener('click', () => { completedExpanded['trabajo-completed'] = !completedExpanded['trabajo-completed']; renderAll(); });
+    panelContent.appendChild(compSep);
+    if (isCompOpen) panelContent.appendChild(renderQuestList(_completedTasks,{listKey:'trabajo',periodKey:today,isWeekly:false,allowDelete:true,expandKey:'trabajo-completed-inner'}));
   }
   if (_archivedTasks.length > 0) {
     const isArchOpen = !!completedExpanded['trabajo-archived'];
@@ -16353,15 +16669,22 @@ function renderTrabajo() {
   document.getElementById('addBtn').addEventListener('click',addTask);
   document.getElementById('taskInput').addEventListener('keydown',e=>{ if(e.key==='Enter') addTask(); });
 
-  // ── JOB BOARD — economy demands grouped below the tasks (DO before MANAGE) ──
+  // ── JOB BOARD — collapsible (calm default; the economy is opt-in depth) ──
   const jobBoard = document.createElement('div'); jobBoard.className = 'job-board-section';
-  const jbHdr = document.createElement('div'); jbHdr.className = 'dungeon-divider';
-  jbHdr.innerHTML = '<span>⟦ JOB BOARD ⟧</span>';
+  const jbOpen = !!completedExpanded['jobboard'];
+  // Compact summary for the collapsed state
+  const _commCount = (state.commissions && state.commissions.dateKey === todayKey())
+    ? (state.commissions.list || []).filter(c => !c.completed).length : 0;
+  const jbHdr = document.createElement('div'); jbHdr.className = 'dungeon-divider job-board-toggle'; jbHdr.style.cursor = 'pointer';
+  jbHdr.innerHTML = `<span>${jbOpen ? '▾' : '▸'} ⟦ JOB BOARD ⟧${jbOpen ? '' : `<span class="jb-summary"> · ${_commCount} mission${_commCount===1?'':'s'}</span>`}</span>`;
+  jbHdr.addEventListener('click', () => { completedExpanded['jobboard'] = !completedExpanded['jobboard']; renderAll(); });
   jobBoard.appendChild(jbHdr);
-  jobBoard.appendChild(renderCommissionBoard());
-  jobBoard.appendChild(renderMerchantPanel());
-  const _ncw = renderNextCraftWidget();
-  if (_ncw) jobBoard.appendChild(_ncw);
+  if (jbOpen) {
+    jobBoard.appendChild(renderCommissionBoard());
+    // Traveling Merchant removed — focus the Job Board on cadence missions only.
+    const _ncw = renderNextCraftWidget();
+    if (_ncw) jobBoard.appendChild(_ncw);
+  }
   panelContent.appendChild(jobBoard);
 
   panelContent.appendChild(renderFooter('trabajo'));
@@ -16392,7 +16715,7 @@ function renderFooter(tabKey) {
     showConfirmDialog(
       "Reset today's progress?<br><span style='font-size:11px;opacity:0.7'>All checks cleared and stats reversed.</span>",
       () => {
-        [...state.habitos,...state.trabajo].forEach(t=>{ if(t.done[today]){const c=getCompletion(t,today);if(c){applyGains(c.gains,-1);state.totalXp=Math.max(0,state.totalXp-(c.xp||0));if(c.drops) applyWorkDrops(c.drops,-1);}delete t.done[today];}});
+        [...state.habitos,...state.trabajo].forEach(t=>{ if(t.done[today]){const c=getCompletion(t,today);if(c){applyGains(c.gains,-1);state.totalXp=Math.max(0,state.totalXp-(c.xp||0));if(c.drops) applyWorkDrops(c.drops,-1);}delete t.done[today]; if(t.completed&&t.completedDate===today){t.completed=false;delete t.completedDate;}}});
         saveState(); renderAll();
       },
       { title: 'RESET DAY', okLabel: 'RESET' }
@@ -16584,12 +16907,6 @@ function renderPersonaje() {
     const nextTier = TIERS[TIERS.findIndex(x => x.t === t.tier)+1];
     const isOpen = openStatKey === k;
 
-    // Stagnant detection: escalates at 7 / 14 / 30 days of neglect
-    const last30 = Array.from({length:30},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-i); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; });
-    const sourceHabits = [...state.habitos, ...state.negativos].filter(h => { const g=(h.gains||{})[k]||0; return g>0; });
-    const hasRecent = (n) => sourceHabits.some(h => last30.slice(0,n).some(d => h.done && h.done[d]));
-    const stagnantLevel = sourceHabits.length === 0 ? 0 : !hasRecent(30) ? 3 : !hasRecent(14) ? 2 : !hasRecent(7) ? 1 : 0;
-    const isStagnant = stagnantLevel > 0;
     // Mastery proximity tease
     const mastAch = ACHIEVEMENTS.find(a => a.id === `stat_${k}`);
     let masteryTeaseHtml = '';
@@ -16607,12 +16924,10 @@ function renderPersonaje() {
     const wrap = document.createElement('div'); wrap.className = 'stat-row-wrap';
 
     const row = document.createElement('div');
-    const stagnantClass = stagnantLevel===3 ? ' stat-stagnant stat-stagnant-3' : stagnantLevel===2 ? ' stat-stagnant stat-stagnant-2' : stagnantLevel===1 ? ' stat-stagnant' : '';
-    const stagnantBadge = stagnantLevel===3 ? `<span class="stagnant-badge stagnant-critical">🩸 CRITICAL</span>` : stagnantLevel===2 ? `<span class="stagnant-badge stagnant-atrophy">⚠ ATROPHYING</span>` : '';
-    row.className = `stat-row ${k}${isOpen ? ' stat-row-open' : ''}${stagnantClass}`;
+    row.className = `stat-row ${k}${isOpen ? ' stat-row-open' : ''}`;
     row.innerHTML = `
       <div class="stat-row-top">
-        <div class="stat-name-block"><span class="stat-code">${k}</span><span class="stat-full-name">${STAT_NAMES[k]}</span>${stagnantBadge}</div>
+        <div class="stat-name-block"><span class="stat-code">${k}</span><span class="stat-full-name">${STAT_NAMES[k]}</span></div>
         <div style="display:flex;align-items:center;gap:8px">
           <div class="stat-tier" style="color:${TIER_COLORS[t.tier]||'#9e9e9e'};border-color:${TIER_COLORS[t.tier]||'#9e9e9e'}44;text-shadow:0 0 8px ${TIER_COLORS[t.tier]||'#9e9e9e'}60">RANK ${t.tier}</div>
           <span style="font-family:'Cinzel',serif;font-size:9px;color:var(--sao-text-dim)">${isOpen?'▲':'▼'}</span>
@@ -18193,6 +18508,119 @@ function renderDailyCloseOutList(container) {
   sec.appendChild(listEl); container.appendChild(sec);
 }
 
+// History "extras" — analytics + reflection widgets rendered BELOW the weekly chart
+// so the chart stays near the top of the tab (less scrolling to "how I did this week").
+// Close-the-Day only appears in the evening (9pm–11:59pm) so it doesn't bury the chart.
+function _renderHistoryExtras(container) {
+  // ── LIFETIME RECORD ──
+  {
+    const _lvl = calcLevel(state.totalXp || 0).level;
+    const _xp = state.totalXp || 0;
+    const _best = Math.max(state.lastStreakPeak || 0, state.streak || 0);
+    const _gold = state.totalGoldEarned || 0;
+    const _runs = (state.dungeonLog || []).length;
+    const _topKey = STAT_KEYS.reduce((a, b) => (state.stats[a] || 0) >= (state.stats[b] || 0) ? a : b, STAT_KEYS[0]);
+    const _topVal = state.stats[_topKey] || 0;
+    const card = document.createElement('div');
+    card.className = 'lifetime-stats-card';
+    card.innerHTML = `
+      <div class="lst-header">⟦ LIFETIME RECORD ⟧</div>
+      <div class="lst-grid">
+        <div class="lst-cell"><div class="lst-val">${_lvl}</div><div class="lst-label">LEVEL</div></div>
+        <div class="lst-cell"><div class="lst-val">${_xp.toLocaleString()}</div><div class="lst-label">TOTAL XP</div></div>
+        <div class="lst-cell"><div class="lst-val" style="color:#ffd700">${_best}d</div><div class="lst-label">BEST STREAK</div></div>
+        <div class="lst-cell"><div class="lst-val" style="color:${STAT_COLORS[_topKey]}">${_topKey} ${_topVal}</div><div class="lst-label">TOP STAT</div></div>
+        <div class="lst-cell"><div class="lst-val" style="color:#ffc107">${_gold.toLocaleString()}g</div><div class="lst-label">GOLD EARNED</div></div>
+        <div class="lst-cell"><div class="lst-val">${_runs}</div><div class="lst-label">DUNGEONS</div></div>
+      </div>`;
+    container.appendChild(card);
+  }
+  // ── YEAR HEATMAP ──
+  renderYearHeatmap(container);
+  // ── TRENDS ──
+  renderTrendChart(container);
+  renderChronicles(container);
+  // ── CLOSE THE DAY — evening only (9pm onward) ──
+  if (new Date().getHours() >= 21) renderDailyCloseOut(container);
+  renderDailyCloseOutList(container);
+}
+
+// ALL-TIME RECORDS — motivational anchor, now rendered below the chart. `days` is the
+// active history range (used for the "this period / this week" comparison hints).
+function _renderAllTimeRecords(container, days) {
+  if (!(state.habitos.length > 0) || !days) return;
+  const allDates = Object.keys(
+    state.habitos.reduce((acc,h) => { Object.keys(h.done||{}).forEach(k=>acc[k]=1); return acc; }, {})
+  ).sort();
+
+  let longestStreak=0, curStreak=0, prevD=null;
+  let totalPerfectEver=0;
+  allDates.forEach(dk=>{
+    const i=getHabitPct(dk); if(!i||!i.total) return;
+    if(i.pct===100) totalPerfectEver++;
+    if(prevD){
+      const prev=new Date(prevD+'T12:00:00'), cur=new Date(dk+'T12:00:00');
+      const diff=Math.round((cur-prev)/86400000);
+      if(diff===1 && i.done>0) curStreak++; else curStreak = i.done>0?1:0;
+    } else { curStreak = i.done>0?1:0; }
+    if(curStreak>longestStreak) longestStreak=curStreak;
+    prevD=dk;
+  });
+
+  const weekMap={};
+  allDates.forEach(dk=>{ const wk=isoWeekKey(new Date(dk+'T12:00:00')); const i=getHabitPct(dk); if(i&&i.total) { if(!weekMap[wk]) weekMap[wk]=[]; weekMap[wk].push(i.pct); } });
+  const bestWeekAvg = Object.values(weekMap).reduce((best,arr)=>{ const avg=Math.round(arr.reduce((s,v)=>s+v,0)/arr.length); return avg>best?avg:best; }, 0);
+
+  // Current-period stats for hint computation
+  const perfDaysPeriod = days.filter(dk => { const i=getHabitPct(dk); return i&&i.pct===100&&!isVacationDay(dk); }).length;
+  const activeDaysPeriod = days.filter(dk => { const i=getHabitPct(dk); return i&&i.total>0&&!isVacationDay(dk); }).length;
+  const periodAvg = activeDaysPeriod > 0
+    ? Math.round(days.filter(dk=>{ const i=getHabitPct(dk); return i&&i.total>0&&!isVacationDay(dk); })
+        .reduce((s,dk)=>s+getHabitPct(dk).pct, 0) / activeDaysPeriod)
+    : 0;
+  const curStrk = state.streak || 0;
+
+  const recSec=document.createElement('div'); recSec.className='records-section';
+  const recTitle=document.createElement('div'); recTitle.className='records-title'; recTitle.textContent='⟦ ALL-TIME RECORDS ⟧';
+  recSec.appendChild(recTitle);
+  const recGrid=document.createElement('div'); recGrid.className='records-grid';
+
+  const mkRec=(val,label,hint)=>{
+    const card=document.createElement('div'); card.className='record-card';
+    const v=document.createElement('div'); v.className='record-val'; v.textContent=val;
+    const l=document.createElement('div'); l.className='record-label'; l.textContent=label;
+    card.appendChild(v); card.appendChild(l);
+    if(hint) { const h=document.createElement('div'); h.className='record-hint'; h.innerHTML=hint; card.appendChild(h); }
+    return card;
+  };
+
+  const streakHint = curStrk > 0 && curStrk >= longestStreak && longestStreak > 0
+    ? `<span class="record-hint-new">✦ ACTIVE RECORD</span>`
+    : curStrk > 0 && longestStreak > 0
+      ? `Current: ${curStrk}d · <span class="record-hint-chase">${longestStreak - curStrk}d to break</span>`
+      : longestStreak > 0 ? `Start again to chase ${longestStreak}d` : '';
+
+  const perfHint = perfDaysPeriod > 0 && perfDaysPeriod >= totalPerfectEver && totalPerfectEver > 0
+    ? `<span class="record-hint-new">✦ NEW RECORD THIS PERIOD</span>`
+    : perfDaysPeriod > 0 && totalPerfectEver > 0
+      ? `This period: ${perfDaysPeriod} · <span class="record-hint-chase">${totalPerfectEver - perfDaysPeriod} more to break</span>`
+      : totalPerfectEver > 0 ? `${totalPerfectEver} to beat · earn one today` : '';
+
+  const isWeekView = ['thisweek','lastweek'].includes(historyPeriod);
+  const weekAvgHint = isWeekView && bestWeekAvg > 0
+    ? periodAvg >= bestWeekAvg
+      ? `<span class="record-hint-new">✦ BEST WEEK EVER</span>`
+      : `This week: ${periodAvg}% · <span class="record-hint-chase">${bestWeekAvg - periodAvg}% to break</span>`
+    : '';
+
+  recGrid.appendChild(mkRec(longestStreak+'d',  'LONGEST STREAK',    streakHint));
+  recGrid.appendChild(mkRec(totalPerfectEver,   'PERFECT DAYS EVER', perfHint));
+  recGrid.appendChild(mkRec(bestWeekAvg>0 ? bestWeekAvg+'%' : '—', 'BEST WEEK AVG', weekAvgHint));
+  recGrid.appendChild(mkRec(allDates.length+'d','DAYS TRACKED',      ''));
+  recSec.appendChild(recGrid);
+  container.appendChild(recSec);
+}
+
 function renderHistory() {
   panelTitle.textContent='HISTORY'; panelSubtitle.textContent='Past performance';
   panelContent.innerHTML='';
@@ -18283,52 +18711,10 @@ function renderHistory() {
     return;
   }
 
-  // ── LIFETIME STATS CARD ───────────────────────────────────
-  {
-    const _lvl = calcLevel(state.totalXp || 0).level;
-    const _xp = state.totalXp || 0;
-    const _best = Math.max(state.lastStreakPeak || 0, state.streak || 0);
-    const _gold = state.totalGoldEarned || 0;
-    const _runs = (state.dungeonLog || []).length;
-    const _topKey = STAT_KEYS.reduce((a, b) => (state.stats[a] || 0) >= (state.stats[b] || 0) ? a : b, STAT_KEYS[0]);
-    const _topVal = state.stats[_topKey] || 0;
-    const card = document.createElement('div');
-    card.className = 'lifetime-stats-card';
-    card.innerHTML = `
-      <div class="lst-header">⟦ LIFETIME RECORD ⟧</div>
-      <div class="lst-grid">
-        <div class="lst-cell"><div class="lst-val">${_lvl}</div><div class="lst-label">LEVEL</div></div>
-        <div class="lst-cell"><div class="lst-val">${_xp.toLocaleString()}</div><div class="lst-label">TOTAL XP</div></div>
-        <div class="lst-cell"><div class="lst-val" style="color:#ffd700">${_best}d</div><div class="lst-label">BEST STREAK</div></div>
-        <div class="lst-cell"><div class="lst-val" style="color:${STAT_COLORS[_topKey]}">${_topKey} ${_topVal}</div><div class="lst-label">TOP STAT</div></div>
-        <div class="lst-cell"><div class="lst-val" style="color:#ffc107">${_gold.toLocaleString()}g</div><div class="lst-label">GOLD EARNED</div></div>
-        <div class="lst-cell"><div class="lst-val">${_runs}</div><div class="lst-label">DUNGEONS</div></div>
-      </div>`;
-    panelContent.appendChild(card);
-  }
-
-  // ── YEAR HEATMAP ──────────────────────────────────────────
-  renderYearHeatmap(panelContent);
-
-  // ── QUICK REPORTS ROW ─────────────────────────────────────
-  {
-    const repRow = document.createElement('div'); repRow.className = 'hist-report-row';
-    const wrBtn = document.createElement('button'); wrBtn.className = 'hist-rpt-btn';
-    wrBtn.textContent = '📊 WEEKLY REPORT';
-    wrBtn.addEventListener('click', () => showWeeklyReport());
-    const mrBtn = document.createElement('button'); mrBtn.className = 'hist-rpt-btn';
-    mrBtn.textContent = '📅 MONTHLY REPORT';
-    const _capM = historyMonth;
-    mrBtn.addEventListener('click', () => showMonthReport(_capM));
-    repRow.appendChild(wrBtn); repRow.appendChild(mrBtn);
-    panelContent.appendChild(repRow);
-  }
-  renderDailyCloseOut(panelContent);
-  renderInlineReflection(panelContent);
-  renderWeeklyReflections(panelContent);
-  renderDailyCloseOutList(panelContent);
-  renderTrendChart(panelContent);
-  renderChronicles(panelContent);
+  // The weekly chart + period view render first (right under the streak pill) so
+  // "how I did this week" is near the top. Lifetime record, heatmap, trends,
+  // Close-the-Day, etc. are rendered BELOW the chart via _renderHistoryExtras().
+  // (Weekly reflection was removed per design.)
 
   // Period selector
   const PERIODS=[{k:'today',l:'TODAY'},{k:'thisweek',l:'THIS WEEK'},{k:'lastweek',l:'LAST WEEK'},{k:'month',l:'MONTH'},{k:'custom',l:'CUSTOM'}];
@@ -18492,7 +18878,8 @@ function renderHistory() {
     }
 
     panelContent.appendChild(wrap);
-    if(!historyCustomFrom || !historyCustomTo) return;
+    // Still picking a custom range — show the analytics/reflection extras so the tab isn't bare.
+    if(!historyCustomFrom || !historyCustomTo) { _renderHistoryExtras(panelContent); return; }
   }
 
   const [fromDate,toDate]=getHistRange();
@@ -18500,82 +18887,7 @@ function renderHistory() {
   const todayStr=todayKey();
   if(days.length===1&&!historySelectedDay) historySelectedDay=days[0];
 
-  // ── PERSONAL RECORDS (all-time, above chart as motivational anchor) ──
-  if(state.habitos.length > 0) {
-    const allDates = Object.keys(
-      state.habitos.reduce((acc,h) => { Object.keys(h.done||{}).forEach(k=>acc[k]=1); return acc; }, {})
-    ).sort();
-
-    let longestStreak=0, curStreak=0, prevD=null;
-    let totalPerfectEver=0;
-    allDates.forEach(dk=>{
-      const i=getHabitPct(dk); if(!i||!i.total) return;
-      if(i.pct===100) totalPerfectEver++;
-      if(prevD){
-        const prev=new Date(prevD+'T12:00:00'), cur=new Date(dk+'T12:00:00');
-        const diff=Math.round((cur-prev)/86400000);
-        if(diff===1 && i.done>0) curStreak++; else curStreak = i.done>0?1:0;
-      } else { curStreak = i.done>0?1:0; }
-      if(curStreak>longestStreak) longestStreak=curStreak;
-      prevD=dk;
-    });
-
-    const weekMap={};
-    allDates.forEach(dk=>{ const wk=isoWeekKey(new Date(dk+'T12:00:00')); const i=getHabitPct(dk); if(i&&i.total) { if(!weekMap[wk]) weekMap[wk]=[]; weekMap[wk].push(i.pct); } });
-    const bestWeekAvg = Object.values(weekMap).reduce((best,arr)=>{ const avg=Math.round(arr.reduce((s,v)=>s+v,0)/arr.length); return avg>best?avg:best; }, 0);
-
-    // Current-period stats for hint computation
-    const perfDaysPeriod = days.filter(dk => { const i=getHabitPct(dk); return i&&i.pct===100&&!isVacationDay(dk); }).length;
-    const activeDaysPeriod = days.filter(dk => { const i=getHabitPct(dk); return i&&i.total>0&&!isVacationDay(dk); }).length;
-    const periodAvg = activeDaysPeriod > 0
-      ? Math.round(days.filter(dk=>{ const i=getHabitPct(dk); return i&&i.total>0&&!isVacationDay(dk); })
-          .reduce((s,dk)=>s+getHabitPct(dk).pct, 0) / activeDaysPeriod)
-      : 0;
-    const curStrk = state.streak || 0;
-
-    const recSec=document.createElement('div'); recSec.className='records-section';
-    const recTitle=document.createElement('div'); recTitle.className='records-title'; recTitle.textContent='⟦ ALL-TIME RECORDS ⟧';
-    recSec.appendChild(recTitle);
-    const recGrid=document.createElement('div'); recGrid.className='records-grid';
-
-    const mkRec=(val,label,hint)=>{
-      const card=document.createElement('div'); card.className='record-card';
-      const v=document.createElement('div'); v.className='record-val'; v.textContent=val;
-      const l=document.createElement('div'); l.className='record-label'; l.textContent=label;
-      card.appendChild(v); card.appendChild(l);
-      if(hint) { const h=document.createElement('div'); h.className='record-hint'; h.innerHTML=hint; card.appendChild(h); }
-      return card;
-    };
-
-    // Streak hint
-    const streakHint = curStrk > 0 && curStrk >= longestStreak && longestStreak > 0
-      ? `<span class="record-hint-new">✦ ACTIVE RECORD</span>`
-      : curStrk > 0 && longestStreak > 0
-        ? `Current: ${curStrk}d · <span class="record-hint-chase">${longestStreak - curStrk}d to break</span>`
-        : longestStreak > 0 ? `Start again to chase ${longestStreak}d` : '';
-
-    // Perfect days hint
-    const perfHint = perfDaysPeriod > 0 && perfDaysPeriod >= totalPerfectEver && totalPerfectEver > 0
-      ? `<span class="record-hint-new">✦ NEW RECORD THIS PERIOD</span>`
-      : perfDaysPeriod > 0 && totalPerfectEver > 0
-        ? `This period: ${perfDaysPeriod} · <span class="record-hint-chase">${totalPerfectEver - perfDaysPeriod} more to break</span>`
-        : totalPerfectEver > 0 ? `${totalPerfectEver} to beat · earn one today` : '';
-
-    // Best week avg hint (show only for week-length periods)
-    const isWeekView = ['thisweek','lastweek'].includes(historyPeriod);
-    const weekAvgHint = isWeekView && bestWeekAvg > 0
-      ? periodAvg >= bestWeekAvg
-        ? `<span class="record-hint-new">✦ BEST WEEK EVER</span>`
-        : `This week: ${periodAvg}% · <span class="record-hint-chase">${bestWeekAvg - periodAvg}% to break</span>`
-      : '';
-
-    recGrid.appendChild(mkRec(longestStreak+'d',  'LONGEST STREAK',    streakHint));
-    recGrid.appendChild(mkRec(totalPerfectEver,   'PERFECT DAYS EVER', perfHint));
-    recGrid.appendChild(mkRec(bestWeekAvg>0 ? bestWeekAvg+'%' : '—', 'BEST WEEK AVG', weekAvgHint));
-    recGrid.appendChild(mkRec(allDates.length+'d','DAYS TRACKED',      ''));
-    recSec.appendChild(recGrid);
-    panelContent.appendChild(recSec);
-  }
+  // ALL-TIME RECORDS moved below the chart (see _renderAllTimeRecords call near the footer).
 
   // ── Shared small ring builder (used by single-day companions & week summary) ──
   const hRingCol = p => p===100?'#00e676':p>=70?'#69f0ae':p>=30?'#fdd835':p>0?'#ff5252':'rgba(224,247,250,0.15)';
@@ -19396,6 +19708,10 @@ function renderHistory() {
 
     panelContent.appendChild(detail);
   }
+
+  // ── BELOW THE CHART: all-time records + analytics + reflection ──
+  _renderAllTimeRecords(panelContent, days);
+  _renderHistoryExtras(panelContent);
 
   // Report buttons — always show both
   const histFoot = document.createElement('div'); histFoot.className = 'hist-footer';
@@ -20276,10 +20592,210 @@ function showXpFloat(xp, gains, anchorY) {
   setTimeout(()=>el.remove(),1400);
 }
 
+// ════════════════════════════════════════════════════════════
+// DAILY RATION — work cadence: a 4h(default) focus floor + up to 3 must-dos.
+// "DONE" (rest earned) fires only when BOTH are met. A steady-days streak
+// rewards showing up daily instead of cramming into weekly binges.
+// ════════════════════════════════════════════════════════════
+const MUST_DO_MAX = 3;
+const MUST_DO_BONUS_XP = 15;
+
+function _rollWorkDay() { // ensure today's containers exist & reset on a new day
+  const tk = todayKey();
+  if (!state.workDay || state.workDay.dateKey !== tk) state.workDay = { dateKey: tk, focusMs: 0, sessions: 0 };
+  if (!state.workMustDos || state.workMustDos.dateKey !== tk) state.workMustDos = { dateKey: tk, ids: [] };
+  if (!state.workDayDone || state.workDayDone.dateKey !== tk) state.workDayDone = { dateKey: tk, done: false };
+}
+function getWorkCapacityMin() { return Math.max(30, (state.workCapacityHours || 4) * 60); }
+function getWorkFocusMinToday() { _rollWorkDay(); return Math.round((state.workDay.focusMs || 0) / 60000); }
+function getMustDoTasks() {
+  _rollWorkDay();
+  return state.workMustDos.ids
+    .map(id => state.trabajo.find(t => t.id === id))
+    .filter(Boolean);
+}
+function isMustDo(taskId) { _rollWorkDay(); return state.workMustDos.ids.includes(taskId); }
+function mustDosClearedCount() {
+  const tk = todayKey();
+  return getMustDoTasks().filter(t => !!t.done[tk]).length;
+}
+function isWorkDayComplete() {
+  const md = getMustDoTasks();
+  const floorMet = getWorkFocusMinToday() >= getWorkCapacityMin();
+  const mustDosMet = md.length >= 1 && md.every(t => !!t.done[todayKey()]);
+  return floorMet && mustDosMet;
+}
+// Accrue focus time toward today's floor (called when a work session completes).
+function accrueWorkFocus(ms) {
+  _rollWorkDay();
+  state.workDay.focusMs = (state.workDay.focusMs || 0) + ms;
+  state.workDay.sessions = (state.workDay.sessions || 0) + 1;
+  // Cadence missions that track focus sessions / the floor.
+  updateCommissionProgress(todayKey());
+  updateWeeklyCommissionProgress();
+  checkWorkDayComplete();
+}
+// Fire the "DONE — rest earned" moment + bump the steady-days streak (once/day).
+function checkWorkDayComplete() {
+  _rollWorkDay();
+  if (state.workDayDone.done) return;
+  if (!isWorkDayComplete()) return;
+  state.workDayDone.done = true;
+  const tk = todayKey();
+  // Steady-days streak: consecutive days the ration was met.
+  if (state.lastSteadyDay !== tk) {
+    state.steadyDays = (state.lastSteadyDay === yesterdayKey()) ? (state.steadyDays || 0) + 1 : 1;
+    state.lastSteadyDay = tk;
+  }
+  // Log the ration-met day (for the weekly "Iron Cadence" contract); keep last 60.
+  if (!Array.isArray(state.rationDays)) state.rationDays = [];
+  if (!state.rationDays.includes(tk)) { state.rationDays.push(tk); if (state.rationDays.length > 60) state.rationDays = state.rationDays.slice(-60); }
+  updateWeeklyCommissionProgress();
+  saveState();
+  setTimeout(() => showWorkDayDoneOverlay(), 400);
+}
+// Toggle a task as one of today's must-dos (max 3).
 function focusTaskToggle(taskId) {
-  if (state.focusTask && state.focusTask.id === taskId) { state.focusTask = null; showNotif('🎯 Focus cleared.'); }
-  else { state.focusTask = { id: taskId, startedAt: Date.now() }; showNotif('🎯 Focus set — finish this task for +15 XP.'); }
+  _rollWorkDay();
+  const ids = state.workMustDos.ids;
+  const i = ids.indexOf(taskId);
+  if (i >= 0) { ids.splice(i, 1); showNotif('🎯 Removed from today\'s must-dos.'); }
+  else if (ids.length >= MUST_DO_MAX) { showNotif(`🎯 Max ${MUST_DO_MAX} must-dos today — clear one first.`); return; }
+  else { ids.push(taskId); showNotif(`🎯 Must-do set — clear it today (+${MUST_DO_BONUS_XP} XP).`); }
   saveState(); renderAll();
+}
+
+// One-tap focus: start (or re-point) a focus session bound to this task, skipping the
+// dungeon-select screen for the common case. "I want to focus on X" → one tap → focusing.
+function focusOnTask(taskId) {
+  const task = state.trabajo.find(t => t.id === taskId); if (!task) return;
+  // A session is already running → just point it at this task (resume if paused).
+  if (state.dungeon && (state.dungeon.phase === 'exploring' || state.dungeon.phase === 'paused')) {
+    if (state.dungeon.pausedAt) resumeDungeon();
+    setForgeTask(taskId);
+    showNotif(`⚒ Focus session now on: ${task.text}`);
+    setTimeout(() => document.querySelector('.dungeon-explore, .dungeon-section')?.scrollIntoView({ behavior:'smooth', block:'start' }), 60);
+    return;
+  }
+  // Mid-boss / reward phase → just link it for the next session.
+  if (state.dungeon) { setForgeTask(taskId); return; }
+  // No session → start one using the last dungeon, else a sensible default E-rank.
+  let did = (state.lastDungeonId && DUNGEON_CONFIG[state.lastDungeonId]) ? state.lastDungeonId : null;
+  if (!did) {
+    const prefer = ['e_warrior','e_rogue','e_mage','e_guardian','e_bard','e_monk','e_engineer'];
+    did = prefer.find(id => DUNGEON_CONFIG[id]) || Object.keys(DUNGEON_CONFIG).find(id => DUNGEON_CONFIG[id] && DUNGEON_CONFIG[id].rank === 'E');
+  }
+  if (!did) { showNotif('⚠ Open the Dungeon Explorer below to start a focus session.'); return; }
+  startDungeon(did);
+  if (state.dungeon) {              // startDungeon may abort on retreat cooldown
+    setForgeTask(taskId);
+    showNotif(`⚒ Focus session started · ${task.text}`);
+    setTimeout(() => document.querySelector('.dungeon-explore')?.scrollIntoView({ behavior:'smooth', block:'start' }), 60);
+  }
+}
+
+// The Workday command center — focus floor + must-dos + cadence. Becomes the
+// "REST EARNED" panel once both are met (the closure signal).
+function renderWorkdayStatus() {
+  _rollWorkDay();
+  const focusMin = getWorkFocusMinToday();
+  const capMin   = getWorkCapacityMin();
+  const focusPct = Math.min(100, Math.round((focusMin / capMin) * 100));
+  const hrsStr   = (m) => (m % 60 === 0 ? (m/60) + 'h' : (m/60).toFixed(1).replace(/\.0$/,'') + 'h');
+  const md       = getMustDoTasks();
+  const mdCleared = mustDosClearedCount();
+  const streak   = state.steadyDays || 0;
+  const complete = isWorkDayComplete();
+  const tk = todayKey();
+
+  const el = document.createElement('div');
+
+  if (complete && state.workDayDone.done) {
+    // ── DONE — REST EARNED ────────────────────────────────────
+    el.className = 'workday-done';
+    el.innerHTML = `
+      <div class="wdd-glow"></div>
+      <div class="wdd-check">✓</div>
+      <div class="wdd-title">⟦ DAY COMPLETE ⟧</div>
+      <div class="wdd-sub">You hit your ${hrsStr(capMin)} focus floor and cleared every must-do.</div>
+      <div class="wdd-rest">This is your free time now. Rest — you've earned it.</div>
+      <div class="wdd-streak">🔥 ${streak} steady day${streak===1?'':'s'} in a row</div>`;
+    return el;
+  }
+
+  // ── STATUS (in-progress) ──────────────────────────────────
+  el.className = 'workday-status';
+  const started = focusMin > 0 || mdCleared > 0;
+  const stateChip = started
+    ? `<span class="wds-chip wds-go">● IN PROGRESS</span>`
+    : `<span class="wds-chip wds-idle">○ NOT STARTED</span>`;
+  const streakChip = streak > 0 ? `<span class="wds-streak">🔥 ${streak}d</span>` : `<span class="wds-streak wds-streak-0">build your streak today</span>`;
+
+  // Must-dos block
+  let mdHtml;
+  if (md.length === 0) {
+    mdHtml = `<div class="wds-md-empty">🎯 Pick today's 1–${MUST_DO_MAX} must-dos — tap “Make must-do” on a task below.</div>`;
+  } else {
+    mdHtml = `<div class="wds-md-list">` + md.map(t => {
+      const cdone = !!t.done[tk];
+      return `<div class="wds-md-item${cdone?' done':''}"><span class="wds-md-box">${cdone?'✓':'○'}</span><span class="wds-md-text">${t.text}</span></div>`;
+    }).join('') + `</div>`;
+  }
+
+  el.innerHTML = `
+    <div class="wds-top">
+      <span class="wds-label">⟦ TODAY'S WORK ⟧</span>
+      ${stateChip}${streakChip}
+    </div>
+    <div class="wds-floor-row">
+      <span class="wds-floor-label">⏱ FOCUS</span>
+      <span class="wds-floor-val">${hrsStr(focusMin)} / ${hrsStr(capMin)}</span>
+    </div>
+    <div class="wds-floor-track"><div class="wds-floor-fill${focusPct>=100?' full':''}" style="width:${focusPct}%"></div></div>
+    <div class="wds-md-row">
+      <span class="wds-md-label">🎯 MUST-DOS</span>
+      <span class="wds-md-count${md.length&&mdCleared>=md.length?' all':''}">${mdCleared} / ${md.length||0}</span>
+    </div>
+    ${mdHtml}`;
+  return el;
+}
+
+function showWorkDayDoneOverlay() {
+  if (document.querySelector('.workday-done-ov')) return;
+  if (navigator.vibrate) navigator.vibrate([40, 60, 120, 60, 200]);
+  if (soundEnabled) { try { playAllComplete(); } catch(e){} }
+  const streak = state.steadyDays || 0;
+  const ov = document.createElement('div'); ov.className = 'workday-done-ov';
+  ov.innerHTML = `
+    <div class="wdo-inner">
+      <div class="wdo-scan"></div>
+      <div class="wdo-check">✓</div>
+      <div class="wdo-eyebrow">⟦ DAY'S WORK COMPLETE ⟧</div>
+      <div class="wdo-title">REST EARNED</div>
+      <div class="wdo-body">You showed up, hit your focus floor, and cleared your must-dos.<br>Whatever's left can wait. <strong>Close the laptop guilt-free.</strong></div>
+      <div class="wdo-streak">🔥 ${streak} STEADY DAY${streak===1?'':'S'} IN A ROW</div>
+      <div class="wdo-tap">tap to continue</div>
+    </div>`;
+  document.body.appendChild(ov);
+  const dismiss = () => { if (ov._d) return; ov._d = true; ov.classList.add('wdo-out'); setTimeout(() => ov.remove(), 380); };
+  ov.addEventListener('click', dismiss);
+  setTimeout(dismiss, 7000);
+}
+
+// Backlog burndown — open count + ETA to caught-up at your recent pace. The light
+// at the end of the tunnel for "I'm behind → chip down → even."
+function renderBacklogBurndown(openCount) {
+  const el = document.createElement('div'); el.className = 'backlog-burndown';
+  const d = new Date(); d.setDate(d.getDate() - 6);
+  const since = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const finished7 = state.trabajo.filter(t => t.completedDate && t.completedDate >= since).length;
+  const pace = finished7 / 7;
+  let etaStr, cls = '';
+  if (openCount === 0) { etaStr = '✓ caught up — backlog clear'; cls = 'bb-clear'; }
+  else if (pace > 0)   { const days = Math.ceil(openCount / pace); etaStr = `~${days} day${days===1?'':'s'} to caught up · ${finished7} done this week`; }
+  else                 { etaStr = 'finish a few to chart your pace'; }
+  el.innerHTML = `<span class="bb-icon">📋</span><span class="bb-count">${openCount} open</span><span class="bb-sep">·</span><span class="bb-eta ${cls}">${etaStr}</span>`;
+  return el;
 }
 
 function toggleQuest(listKey, periodKey, id, anchorY) {
@@ -20288,6 +20804,8 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
   if (wasDone) {
     const c=getCompletion(task,periodKey); if(c){ applyGains(c.gains,-1); if(listKey!=='trabajo'){ state.totalXp=Math.max(0,state.totalXp-(c.xp||0)); state.col=Math.max(0,state.col-(c.xp||0)); } if(listKey==='trabajo'){ if(c.drops) applyWorkDrops(c.drops,-1); if(c.wxp) state.workXp=Math.max(0,(state.workXp||0)-c.wxp); } if(c.wasCrit && state.lastCritDay===todayKey()) state.dailyCritCount=Math.max(0,(state.dailyCritCount||0)-1); }
     delete task.done[periodKey];
+    // One-off backlog: un-finishing a work task returns it to the open backlog.
+    if (listKey==='trabajo') { task.completed=false; delete task.completedDate; }
   } else {
     const prevLv=calcLevel(state.totalXp).level;
     const _pt={}; STAT_KEYS.forEach(k=>{_pt[k]=tierFor(state.stats[k]).tier;});
@@ -20296,6 +20814,8 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
     const isFirst = _doneBefore === 0;
     const isLast  = listKey==='habitos' && _doneBefore === state.habitos.length - 1;
     if (listKey==='trabajo') {
+      // One-off backlog: finishing a work task removes it from the open backlog for good.
+      task.completed = true; task.completedDate = periodKey;
       // Work tasks: Worker XP + gold + RANDOM materials. No character XP, no shards.
       // IN-FLOW = completed within a single focus session (dungeon running, this task
       // linked, before the first session boundary) → the highest reward. Rewards small
@@ -20303,6 +20823,7 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
       const _inFlow = !!(state.dungeon && state.dungeon.phase === 'exploring'
         && state.dungeon.activeWorkTaskId === task.id
         && (state.dungeon.forgeTaskPomoCount || 0) === 0);
+      if (_inFlow) { _rollWorkDay(); state.workDay.inflow = (state.workDay.inflow || 0) + 1; }
       const _rw  = _inFlow ? WORK_TASK_REWARD.inflow : WORK_TASK_REWARD.base;
       const _mat = rollWorkMat();
       const _mq  = _inFlow ? (2 + Math.floor(Math.random() * 2)) : _rw.mats; // in-flow: 2–3
@@ -20376,11 +20897,13 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
       else showWorkerXpFloat(_wxpAmt, anchorY);
       if (_inFlow) setTimeout(() => showLegendaryWorkOverlay(task, _drops, _isCritWork), 250);
       else         setTimeout(() => showNormalWorkFlash(task, _drops), 150);
-      // Focus pledge bonus — completing your committed focus task (Worker XP, not character XP)
-      if (state.focusTask && state.focusTask.id === task.id) {
-        const _fb = 25; grantWorkXp(_fb); state.focusTask = null;
-        setTimeout(() => showNotif(`🎯 Focus bonus · +${_fb} WXP for finishing what you started!`), 320);
+      // Must-do bonus — clearing one of today's committed must-dos (Worker XP, not character XP)
+      if (isMustDo(task.id)) {
+        const _fb = 25; grantWorkXp(_fb);
+        setTimeout(() => showNotif(`🎯 Must-do cleared · +${_fb} WXP — that's a priority off the list!`), 320);
       }
+      // A cleared must-do may complete the daily ration → fire the "rest earned" moment.
+      checkWorkDayComplete();
     } else {
       const _isPhoenix = listKey==='habitos' && periodKey===todayKey() && !task.done[yesterdayKey()] && Object.keys(task.done).length > 0;
       const _phoenixMult = _isPhoenix ? 1.5 : 1.0;
@@ -20530,6 +21053,27 @@ function showGuildMilestoneOverlay(type) {
     if (ov._dismissed) return; ov._dismissed = true;
     ov.classList.add('gm-out'); setTimeout(() => ov.remove(), 370);
   };
+  ov.addEventListener('click', dismiss);
+  setTimeout(dismiss, 5500);
+}
+
+// Guild RANK-UP celebration — gives the named guild ranks real weight (Step 5).
+function showGuildRankUpOverlay(rank, matQty) {
+  if (navigator.vibrate) navigator.vibrate([40, 50, 100, 50, 180]);
+  if (soundEnabled) { try { playGuildHallUpgrade(); } catch(e){} }
+  const ov = document.createElement('div'); ov.className = 'guild-milestone-ov guild-rankup-ov';
+  ov.innerHTML = `
+    <div class="gm-inner">
+      <div class="gm-scan"></div>
+      <div class="gm-icon">${rank.icon}</div>
+      <div class="gm-eyebrow">⟦ GUILD RANK UP ⟧</div>
+      <div class="gm-title">${rank.name}</div>
+      <div class="gm-body">${rank.sub}</div>
+      <div class="gm-effect">📦 SUPPLY CACHE · +${matQty} of every material</div>
+      <div class="gm-tap">TAP TO CONTINUE</div>
+    </div>`;
+  document.body.appendChild(ov);
+  const dismiss = () => { if (ov._dismissed) return; ov._dismissed = true; ov.classList.add('gm-out'); setTimeout(() => ov.remove(), 370); };
   ov.addEventListener('click', dismiss);
   setTimeout(dismiss, 5500);
 }
@@ -22260,6 +22804,8 @@ function tickDungeon() {
       d.pomodoroCount++;
       d.sessionCount=(d.sessionCount||0)+1;
       d.focusCheckPending=false;
+      // Daily Ration: a completed work session counts toward today's focus floor.
+      accrueWorkFocus(getPomoWorkMs());
       // Mid-boss trigger: every 2nd completed pomo that isn't the final stage
       const _mb=cfg && d.pomodoroCount%2===0 && d.pomodoroCount<cfg.stages;
       // Award stage drop (+ Material Cache bonus mats) + XP
@@ -25502,7 +26048,7 @@ renderAll();
 scheduleNotifications();
 if (_pendingAnims.length) setTimeout(() => { const fn = _pendingAnims.shift(); if (fn) fn(); }, 600);
 initAvatar();
-setInterval(()=>{ tickHpMp(); renderHeader(); saveState(); }, 60000);
+setInterval(()=>{ tickHpMp(); renderHeader(); _updateAchBadge(); saveState(); }, 60000);
 // Restore dungeon timers if app was refreshed mid-session
 if (state.dungeon?.phase==='exploring' && !state.dungeon.pausedAt) startDungeonTimer();
 if ((state.dungeon?.phase==='boss_fight'||state.dungeon?.phase==='mid_boss') && state.dungeon.combat && !state.dungeon.combat.outcome) startCombatTimer();

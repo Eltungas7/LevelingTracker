@@ -196,13 +196,11 @@ const GUILD_UPGRADES = [
   { id:'refinery',     name:'Transmuter',         emoji:'♻️', maxLevel:3,  baseCost:300, minWorkerLevel:12,
     effect:'matRefine',       perLevel:'better material conversion ratio',
     desc:'Unlocks the Transmuter — convert surplus materials into the type you need. Higher levels improve the ratio (Lv1 3→1 · Lv2 2→1 · Lv3 3→2).' },
-  { id:'chronoforge',  name:'Chronoforge',        emoji:'⏱️', maxLevel:5,  baseCost:750, minWorkerLevel:25,
-    effect:'forgeTime',       perLevel:'-10% forge craft time',
-    desc:'Reduces the time required to complete all forge crafts. Stacks with Worker rank bonuses.' },
-  { id:'forge_hall',   name:'Grand Forge Hall',   emoji:'🔥', maxLevel:2,  baseCost:4500, minWorkerLevel:35,
-    effect:'forgeSlot',       perLevel:'+1 forge queue slot',
-    customLevelCosts:[4500, 13500],
-    desc:'Expands the forge queue — run more crafts simultaneously. +1 slot at Lv.1, +2 total at Lv.2.' },
+  { id:'quality_forge', name:'Quality Forge',      emoji:'💠', maxLevel:5,  baseCost:600, minWorkerLevel:18,
+    effect:'qualityRoll',     perLevel:'+4% chance to forge one rarity tier higher',
+    desc:'Tunes the forge to roll above its station — each level adds a chance for a craft to come out one rarity tier higher (the forge chase).' },
+  // (Retired: Chronoforge / Grand Forge Hall — crafting is instant now, so forge-time and
+  //  queue-slot upgrades had no effect. Quality Forge replaces them in the FORGE tier.)
   // ── POWER tier (gear stats, combat) ───────────────────────────────────────
   { id:'barracks',     name:'Barracks',           emoji:'⚔️', maxLevel:7,  baseCost:225, minWorkerLevel:20,
     effect:'strengthAura',    perLevel:'+5% STR & CON from gear',
