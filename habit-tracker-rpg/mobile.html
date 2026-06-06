@@ -287,6 +287,85 @@ body {
   font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.5px;
   color: rgba(77,208,225,0.45); margin-top: 8px;
 }
+/* ── LATE CHECK-IN OVERLAY ─────────────────────────────────── */
+.lco-overlay {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(3,12,25,0.97);
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  animation: masteryFadeIn 0.5s ease forwards;
+  padding: 40px 20px 28px; overflow-y: auto;
+}
+.lco-eyebrow {
+  font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 4px;
+  color: #b388ff; margin-bottom: 8px; opacity: 0.85;
+}
+.lco-title {
+  font-family: 'Cinzel', serif; font-size: 22px; font-weight: 700; letter-spacing: 3px;
+  color: #fff; margin-bottom: 4px; text-shadow: 0 0 20px rgba(179,136,255,0.4);
+}
+.lco-date {
+  font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px;
+  color: #80deea; margin-bottom: 8px;
+}
+.lco-desc {
+  font-family: 'Rajdhani', sans-serif; font-size: 13px; color: rgba(224,247,250,0.5);
+  margin-bottom: 18px; line-height: 1.5; text-align: center; max-width: 300px;
+}
+.lco-context {
+  font-family: 'Rajdhani', sans-serif; font-size: 12px; color: rgba(128,222,234,0.5);
+  margin-bottom: 10px; letter-spacing: 0.3px;
+}
+.lco-progress {
+  width: 100%; max-width: 320px; height: 3px; background: rgba(255,255,255,0.08);
+  border-radius: 2px; margin-bottom: 20px; overflow: hidden;
+}
+.lco-progress-fill {
+  height: 100%; width: 0%; background: #4dd0e1;
+  border-radius: 2px; transition: width 0.35s ease;
+}
+.lco-habit-list {
+  width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 8px;
+  margin-bottom: 24px;
+}
+.lco-habit-row {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(77,208,225,0.06); border: 1px solid rgba(77,208,225,0.18);
+  border-radius: 8px; padding: 10px 14px; cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.lco-habit-row.lco-done {
+  background: rgba(77,208,225,0.11); border-color: rgba(77,208,225,0.4); cursor: default;
+}
+.lco-habit-row:not(.lco-done):active { background: rgba(77,208,225,0.14); }
+.lco-habit-check {
+  font-size: 15px; width: 18px; flex-shrink: 0; text-align: center;
+  color: rgba(77,208,225,0.3); transition: color 0.2s;
+}
+.lco-habit-row.lco-done .lco-habit-check { color: #4dd0e1; }
+.lco-habit-text {
+  flex: 1; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 600;
+  color: #e0f7fa; letter-spacing: 0.3px;
+}
+.lco-habit-row.lco-done .lco-habit-text { color: rgba(224,247,250,0.45); text-decoration: line-through; }
+.lco-habit-xp {
+  font-family: 'Rajdhani', sans-serif; font-size: 11px;
+  color: rgba(77,208,225,0.55); letter-spacing: 0.5px; flex-shrink: 0;
+}
+.lco-submit-btn {
+  background: none; border: 1px solid rgba(77,208,225,0.4); cursor: pointer;
+  font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2px;
+  color: #4dd0e1; padding: 11px 28px; border-radius: 4px;
+  transition: background 0.15s, border-color 0.15s;
+}
+.lco-submit-btn:active { background: rgba(77,208,225,0.12); }
+.lco-submit-btn.lco-all-done {
+  border-color: rgba(255,215,0,0.5); color: #ffd700;
+}
+.lco-restored-hint {
+  font-family: 'Rajdhani', sans-serif; font-size: 11px; color: rgba(255,215,0,0.6);
+  margin-top: 10px; letter-spacing: 0.3px; text-align: center;
+}
+/* ── ─────────────────────────────────────────────────────────── */
 .dquote-overlay {
   position: fixed; inset: 0; z-index: 9997;
   background: rgba(3,12,25,0.92);
@@ -3233,6 +3312,17 @@ body {
 .inv-inspect-affixes { display:flex; flex-wrap:wrap; gap:4px; margin:0 0 7px; }
 .inv-affix { font-family:'Rajdhani',sans-serif; font-weight:600; font-size:9px; letter-spacing:0.4px; padding:2px 6px; border-radius:3px; border:1px solid; background:rgba(255,255,255,0.03); }
 .inv-act-btn.reroll-affix { color:#b388ff; border-color:rgba(179,136,255,0.5); }
+.inv-act-btn.rarity-upgrade { color:#b388ff; border-color:rgba(179,136,255,0.5); }
+.inv-affix-row { display:inline-flex; align-items:center; gap:3px; }
+.inv-affix-reroll { font-family:'Rajdhani',sans-serif; font-size:8px; font-weight:600; padding:1px 5px; border-radius:3px; border:1px solid rgba(255,193,7,0.4); background:rgba(255,193,7,0.06); color:#ffc107; cursor:pointer; white-space:nowrap; }
+.inv-affix-reroll.disabled { opacity:0.4; cursor:not-allowed; }
+.affix-cap-bars { margin:0 0 7px; padding:6px 8px; background:rgba(77,208,225,0.04); border:1px solid rgba(77,208,225,0.15); border-radius:5px; }
+.acb-hdr { font-family:'Cinzel',serif; font-size:7px; letter-spacing:1.5px; color:var(--sao-cyan); opacity:0.6; margin-bottom:5px; }
+.affix-cap-row { display:flex; align-items:center; gap:5px; margin-bottom:3px; }
+.acr-label { font-family:'Rajdhani',sans-serif; font-size:8px; font-weight:700; width:34px; flex-shrink:0; }
+.acr-track { flex:1; height:4px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden; }
+.acr-fill { height:100%; border-radius:2px; transition:width 0.3s; }
+.acr-val { font-family:'Rajdhani',sans-serif; font-size:8px; white-space:nowrap; opacity:0.85; }
 .inv-inspect-stat { font-family: 'Cinzel', serif; font-size: 8px; padding: 2px 5px; border-radius: 3px; background: rgba(77,208,225,0.08); border: 1px solid rgba(77,208,225,0.28); color: var(--sao-cyan); }
 .inv-inspect-heal { font-family: 'Cinzel', serif; font-size: 8px; padding: 2px 5px; border-radius: 3px; background: rgba(105,240,174,0.08); border: 1px solid rgba(105,240,174,0.28); color: var(--sao-green); }
 .inv-inspect-divider { height: 1px; background: var(--sao-border); margin: 6px 0; opacity: 0.45; }
@@ -3404,6 +3494,7 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .dcc-info-row { display: flex; justify-content: space-between; align-items: center; padding: 0 7px 7px; }
 .dcc-xp  { font-size: 8px; color: var(--sao-cyan); }
 .dcc-time { font-size: 8px; color: var(--sao-text-dim); opacity: 0.6; }
+.dcc-cp-req { font-family:'Cinzel',serif; font-size:8px; color:var(--sao-cyan); text-align:center; padding:2px 5px 1px; opacity:0.8; letter-spacing:0.5px; }
 .dcc-gimmick { font-size: 7.5px; color: rgba(255,255,255,0.45); text-align: center; padding: 1px 5px 3px; letter-spacing: 0.5px; }
 .dcc-affinity-badge { font-family:'Cinzel',serif; font-size:7px; letter-spacing:0.8px; padding:1px 5px; border-radius:3px; border:1px solid rgba(255,193,7,0.6); color:#ffc107; background:rgba(255,193,7,0.1); white-space:nowrap; }
 .dexp-affinity-badge { font-family:'Cinzel',serif; font-size:8px; padding:2px 7px; border:1px solid rgba(255,193,7,0.55); color:#ffc107; background:rgba(255,193,7,0.1); border-radius:3px; letter-spacing:1px; }
@@ -3572,6 +3663,7 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .dboss-sprite.boss-sprite { font-size: 32px; }
 .dboss-sprite.d-dead { filter: grayscale(1); opacity: 0.4; }
 .dboss-name { font-family: 'Cinzel', serif; font-size: 9px; color: var(--sao-text-dim); text-align: center; margin-bottom: 4px; }
+.dboss-build { font-family:'Cinzel',serif; font-size:8px; letter-spacing:1px; color:var(--bb); border:1px solid color-mix(in srgb, var(--bb) 45%, transparent); background:color-mix(in srgb, var(--bb) 10%, transparent); border-radius:3px; padding:1px 6px; text-align:center; margin:0 auto 5px; width:fit-content; }
 .dboss-bar-wrap { margin-bottom: 4px; }
 .dboss-bar-label { display: flex; justify-content: space-between; font-size: 8px; color: var(--sao-text-dim); margin-bottom: 2px; }
 .dboss-track { height: 6px; background: rgba(255,255,255,0.07); border-radius: 3px; overflow: hidden; }
@@ -3739,6 +3831,29 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .met-countdown-fill { height:100%; background:var(--sao-cyan); width:100%; animation:metCountdown 8s linear forwards; }
 @keyframes metCountdown { from{width:100%} to{width:0%} }
 
+/* ── BOSS INCOMING OVERLAY ── */
+.boss-incoming-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.92); display:flex; align-items:center; justify-content:center; z-index:2000; animation:bioFadeIn 0.4s ease-out forwards; pointer-events:none; }
+@keyframes bioFadeIn { from{opacity:0;transform:scale(0.94)} to{opacity:1;transform:scale(1)} }
+.boss-incoming-overlay.bio-out { animation:bioFadeOut 0.5s ease-in forwards; }
+@keyframes bioFadeOut { from{opacity:1} to{opacity:0} }
+.bio-inner { text-align:center; padding:32px 24px; }
+.bio-rank { font-family:'Cinzel',serif; font-size:11px; letter-spacing:3px; color:var(--dcolor,var(--sao-cyan)); opacity:0.8; margin-bottom:12px; }
+.bio-emoji { font-size:72px; line-height:1; margin-bottom:16px; animation:bioPulse 0.9s ease-in-out infinite alternate; filter:drop-shadow(0 0 18px var(--dglow,rgba(77,208,225,0.6))); }
+@keyframes bioPulse { from{transform:scale(1)} to{transform:scale(1.12)} }
+.bio-label { font-family:'Cinzel',serif; font-size:22px; letter-spacing:5px; color:var(--dcolor,#ff1744); text-shadow:0 0 24px var(--dglow,rgba(255,23,68,0.7)); margin-bottom:8px; animation:bioFlicker 1.4s ease-in-out infinite; }
+@keyframes bioFlicker { 0%,100%{opacity:1} 50%{opacity:0.82} }
+.bio-name { font-family:'Cinzel',serif; font-size:16px; letter-spacing:2px; color:rgba(255,255,255,0.9); margin-bottom:8px; }
+.bio-sub { font-size:11px; letter-spacing:1px; color:rgba(255,255,255,0.4); }
+
+/* ── BOSS PROGRESS TRACKER ── */
+.dexp-boss-tracker { text-align:center; font-family:'Cinzel',serif; font-size:9px; letter-spacing:2px; color:rgba(255,255,255,0.4); padding:4px 0 2px; }
+.dexp-boss-tracker.final { color:rgba(255,80,80,0.85); }
+.dexp-boss-tracker.complete { color:var(--dcolor,var(--sao-cyan)); letter-spacing:3px; animation:trackerPulse 1.6s ease-in-out infinite; }
+@keyframes trackerPulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+/* ── BREAK EVENT CARD ── */
+.break-event-section { margin:10px 0 4px; }
+
 /* ── END-SESSION EVENT OVERLAY ── */
 .end-event-overlay { position:absolute; inset:0; background:rgba(2,13,20,0.94); backdrop-filter:blur(4px); border-radius:inherit; display:flex; align-items:center; justify-content:center; z-index:800; animation:eevFadeIn 0.32s ease-out forwards; }
 @keyframes eevFadeIn { from{opacity:0} to{opacity:1} }
@@ -3812,8 +3927,16 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .d-intent-name  { font-family:'Cinzel',serif; font-size:11px; color:var(--icolor); letter-spacing:1px; line-height:1.2; }
 .d-intent-hint  { font-size:9px; color:rgba(255,255,255,0.42); margin-top:2px; line-height:1.3; }
 .d-intent-tell  { font-size:10px; color:rgba(255,255,255,0.72); line-height:1.6; flex:1; font-style:italic; padding-right:8px; }
-.d-intent-tellcard { border-color:rgba(255,255,255,0.22) !important; }
-.d-intent-tell-text { font-size:11px; color:rgba(255,255,255,0.78); font-style:italic; line-height:1.5; letter-spacing:0.3px; }
+.d-intent-tellcard { border-color:var(--icolor) !important; box-shadow:0 0 14px -4px var(--icolor); }
+.d-intent-tell-text { font-size:10px; color:rgba(255,255,255,0.6); font-style:italic; line-height:1.45; letter-spacing:0.3px; margin-top:3px; }
+.d-intent-headline { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.d-intent-move { font-family:'Cinzel',serif; font-size:13px; font-weight:700; color:#fff; letter-spacing:0.8px; line-height:1.1; }
+.d-intent-danger { font-family:'Cinzel',serif; font-size:9px; font-weight:700; letter-spacing:1px; padding:2px 7px; border-radius:4px; border:1px solid; white-space:nowrap; flex-shrink:0; }
+.d-intent-meta { display:flex; align-items:center; gap:6px; margin-top:4px; }
+.d-intent-type { font-family:'Rajdhani',sans-serif; font-size:9px; font-weight:600; letter-spacing:1.5px; color:rgba(255,255,255,0.5); }
+.d-intent-arrow { font-size:11px; color:rgba(255,255,255,0.35); }
+.d-intent-resp { font-family:'Cinzel',serif; font-size:10px; font-weight:700; letter-spacing:0.5px; color:var(--icolor); }
+.d-sk-tag { font-family:'Cinzel',serif; font-size:7px; letter-spacing:1px; color:rgba(255,255,255,0.4); }
 .d-intent-mul   { font-family:'Rajdhani',sans-serif; font-weight:700; font-size:16px; color:var(--icolor); flex-shrink:0; }
 .d-intent-mul.heal-mul { font-size:11px; color:#69f0ae; }
 
@@ -8977,6 +9100,24 @@ function loadState() {
       (s.inventory || []).forEach(_migRarity);
       (s.craftQueue || []).forEach(_migRarity);
       (s.forgeLog || []).forEach(e => { if (e && e.quality && !RARITY_BY_ID[e.quality]) { const n = _RARITY_FROM_QUALITY[e.quality] || 'common'; e.quality = n; e.qualityLabel = RARITY_BY_ID[n].label; } });
+      // ── Affix magnitude rescale (old base max 15 → new base max 3; ×0.20 factor) ──
+      // Individual affixes were too large — a single slot could exceed the old cap alone.
+      // Now affixes accumulate across ~5-7 slots to reach the new 35% per-dimension cap.
+      if (!s.affixRescaledV2) {
+        const _rescaleAffixes = (affixes) => {
+          if (!Array.isArray(affixes)) return;
+          affixes.forEach(a => {
+            if (!a || a.val == null) return;
+            if (['atkPct','hpPct','defPct','mpPct'].includes(a.stat)) a.val = parseFloat((a.val * 0.2).toFixed(2));
+            else if (a.stat === 'critPts')  a.val = parseFloat((a.val * 0.1).toFixed(2));
+            else if (a.stat === 'dodgePts') a.val = parseFloat((a.val * 0.125).toFixed(2));
+          });
+        };
+        (s.inventory  || []).forEach(e => _rescaleAffixes(e?.affixes));
+        (s.craftQueue || []).forEach(e => _rescaleAffixes(e?.affixes));
+        Object.values(s.equipmentMods || {}).forEach(m => _rescaleAffixes(m?.affixes));
+        s.affixRescaledV2 = true;
+      }
       if (!s.guildUpgrades) {
         s.guildUpgrades = { warehouse:0, alchemy:0, trade:0, scriptorium:0, anvil:0, refinery:0, barracks:0, sanctum:0, hall:0, patron_vault:0, chronoforge:0, forge_hall:0 };
       } else {
@@ -9073,6 +9214,15 @@ function loadState() {
       if (s.dungeon && !s.dungeon.hasOwnProperty('pendingMidEvent'))  s.dungeon.pendingMidEvent = null;
       if (s.dungeon && !s.dungeon.hasOwnProperty('midEventFired'))    s.dungeon.midEventFired   = false;
       if (s.dungeon && !s.dungeon.hasOwnProperty('nextMidEventAt'))   s.dungeon.nextMidEventAt  = 0;
+      if (s.dungeon && !s.dungeon.hasOwnProperty('breakEvents')) {
+        s.dungeon.breakEvents = [];
+        // Migrate in-flight pendingEndEvent → breakEvents
+        if (s.dungeon.pendingEndEvent) {
+          s.dungeon.breakEvents.push(s.dungeon.pendingEndEvent);
+          s.dungeon.pendingEndEvent = null;
+          if (s.dungeon.pomodoroPhase === 'event') s.dungeon.pomodoroPhase = 'break';
+        }
+      }
       if (s.dungeon && !s.dungeon.hasOwnProperty('sessionCount'))     s.dungeon.sessionCount    = 0;
       if (s.dungeon && !s.dungeon.hasOwnProperty('pendingXpBonus'))   s.dungeon.pendingXpBonus  = 0;
       if (s.dungeon && !s.dungeon.hasOwnProperty('reliquaryBreached'))s.dungeon.reliquaryBreached = false;
@@ -9990,6 +10140,36 @@ function drawBossTell(intentType) {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
+// ── Readable telegraph: classify an intent into danger + response so the player
+//    can READ the threat (explicit category + danger) instead of hunting a green
+//    button. All info already lives on the intent (type/damageMultiplier/counterType).
+const INTENT_RESPONSE = {
+  BLOCK:    { verb:'BLOCK',     emoji:'🛡️' },
+  EVADE:    { verb:'EVADE',     emoji:'💨' },
+  INTERRUPT:{ verb:'INTERRUPT', emoji:'⚡' },
+  DISRUPT:  { verb:'DISRUPT',   emoji:'🚫' },
+};
+function getIntentTelegraph(intent) {
+  if (!intent) return null;
+  const mult = intent.damageMultiplier || 0;
+  let danger, dColor, dIcon;
+  if (mult <= 0)        { danger='UTILITY'; dColor='#69f0ae'; dIcon='✦'; }
+  else if (mult < 1.6)  { danger='LIGHT';   dColor='#b0bec5'; dIcon='·'; }
+  else if (mult < 2.2)  { danger='HEAVY';   dColor='#ffc107'; dIcon='⚠'; }
+  else                  { danger='LETHAL';  dColor='#ff5252'; dIcon='⚠⚠'; }
+  const resp = INTENT_RESPONSE[intent.counterType] || null;
+  const isHeal = intent.type === 'RECOVERY';
+  return {
+    label: intent.label || intent.type || 'UNKNOWN',
+    emoji: intent.emoji || '👁',
+    type: intent.type || '',
+    danger, dColor, dIcon, mult,
+    respVerb: resp ? resp.verb : (isHeal ? 'DISRUPT' : ''),
+    respEmoji: resp ? resp.emoji : (isHeal ? '🚫' : ''),
+    isHeal,
+  };
+}
+
 // ── drawBossIntent: weighted random draw, no immediate repeat, RECOVERY throttled ──
 function drawBossIntent(boss, lastIntentId, turnCount, poolOverride) {
   const pool = poolOverride || boss.intentPool;   // phases can swap the intent pool
@@ -10031,20 +10211,39 @@ function rollCraftQuality() {
   const tier = RARITY_TIERS[idx];
   return { quality: tier.id, qualityMult: tier.statMult, label: tier.label };
 }
+// ── Slot-aware affix pools ─────────────────────────────────────────────────────
+// Weapons roll offense, armor/shield/belt roll defense, accessories roll full pool.
+// Prevents "sword with +DEF%" or "armor with +CRIT%" nonsense rolls.
+const SLOT_AFFIX_POOL = {
+  weapon:   ['atkPct', 'critPts'],
+  shield:   ['hpPct', 'defPct'],
+  armor:    ['hpPct', 'defPct'],
+  belt:     ['hpPct', 'defPct'],
+  helmet:   ['atkPct', 'hpPct', 'defPct', 'mpPct', 'critPts', 'dodgePts'],
+  necklace: ['atkPct', 'hpPct', 'mpPct', 'critPts', 'dodgePts'],
+  earring:  ['critPts', 'dodgePts', 'atkPct', 'mpPct'],
+  bracelet: ['atkPct', 'mpPct', 'critPts', 'dodgePts'],
+  boots:    ['dodgePts', 'hpPct', 'critPts'],
+};
+function getSlotAffixPool(slot) {
+  const allowed = SLOT_AFFIX_POOL[slot];
+  if (!allowed) return AFFIX_POOL.slice();
+  return AFFIX_POOL.filter(a => allowed.includes(a.stat));
+}
+
 // Roll the % affixes for a crafted item: slot count from tier+rarity, magnitude
 // scaled by rarity and refine grade. No duplicate stats on one item.
-function rollAffixes(tier, rarityId, grade) {
+function rollAffixes(tier, rarityId, grade, slot) {
   const slots = affixSlots(tier, rarityId);
   if (slots <= 0) return [];
-  const pool = AFFIX_POOL.slice();
+  const pool = getSlotAffixPool(slot).slice();  // slot-aware pool
   const rMult = RARITY_AFFIX_MULT[rarityId] || 1.0;
   const gMult = affixGradeMult(grade);
   const out = [];
   for (let i = 0; i < slots && pool.length; i++) {
     const pick = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
     const base = pick.min + Math.random() * (pick.max - pick.min);
-    const scaled = base * rMult * gMult;
-    const val = pick.kind === 'pts' ? Math.max(1, Math.round(scaled)) : Math.max(1, Math.round(scaled));
+    const val = Math.max(0.1, parseFloat((base * rMult * gMult).toFixed(1)));
     out.push({ stat: pick.stat, val });
   }
   return out;
@@ -10353,37 +10552,21 @@ function calcPrimaryAtk(archetype, S) {
   }
 }
 
-// Affix dimension caps — total % bonus a full loadout can stack in one dimension.
-// Tuned so a full best-in-game set lands near ×2 combat ("doubles you"), honestly —
-// these % scale the STAT POOLS (pre-√), so they're a real but bounded mirror.
-const AFFIX_ATK_CAP = 15, AFFIX_HP_CAP = 15, AFFIX_MP_CAP = 15;
+// Affix dimension caps — total % a full loadout can stack per dimension.
+// Set to 35% so a full T9 G5 legendary 10-slot set naturally exceeds it, making the
+// 70% GEAR_CP_MAX_FRAC display cap binding for serious endgame gear. Individual affix
+// base max is 3% (×2.516 at legendary G5 = 7.55% per slot), so ~5 good rolls hits cap.
+// The % applies POST-√ to live combat output → stays proportional at S vs SSS rank.
+const AFFIX_ATK_CAP = 35, AFFIX_HP_CAP = 35, AFFIX_MP_CAP = 35;
+// Gear-contribution caps for chance/DR stats (stat cap + gear cap = total cap shown on screen)
+const AFFIX_CRIT_GEAR_CAP = 15;   // gear ≤15% crit  → stat 15% + gear 15% = 30% total
+const AFFIX_DODGE_GEAR_CAP = 10;  // gear ≤10% evade → stat 10% + gear 10% = 20% total
+const AFFIX_DR_GEAR_CAP = 15;     // gear ≤15% DR    → stat 15% + gear 15% = 30% total
 // Stat-points granted per point of gear ATK/HP/DEF/MP when folded into the pools.
-// Calibrated (with the affix caps + chance bounds above) so a full best-in-game set
-// lands near ×2 combat — "doubles you" (Gear Power ≈ +130-150% of base CP at endgame).
-const GEAR_FOLD_K = 0.04;
-// Active gear sets: for each SET_BONUSES def, count equipped slots holding a
-// CRAFTED item, return the highest tier threshold met (+ its bonus). Drives both
-// combat (folded into affix dimensions) and the FORGE/CHAR set-progress display.
-function getActiveSets() {
-  const equip = state.equipment || {};
-  return (typeof SET_BONUSES === 'undefined' ? [] : SET_BONUSES).map(def => {
-    const pieces = def.slots.reduce((n, slot) => {
-      const id = equip[slot];
-      return n + (id && ITEMS_DB[id] && ITEMS_DB[id].crafted ? 1 : 0);
-    }, 0);
-    let active = null;
-    def.tiers.forEach(t => { if (pieces >= t.pieces) active = t; });
-    return { def, pieces, active };
-  });
-}
-// Merge active set bonuses into an affix-totals object (same stat keys).
-function _addSetBonuses(totals) {
-  getActiveSets().forEach(s => {
-    if (!s.active) return;
-    Object.entries(s.active.bonus).forEach(([k, v]) => { if (totals[k] !== undefined) totals[k] += v; });
-  });
-  return totals;
-}
+const GEAR_FOLD_K = 0.15; // raised from 0.04 — flat gear ATK/HP/DEF/MP now visible esp. at early/mid game
+// Gear sets removed — build identity comes from weapon-tree choice (bow/scepter coming in future update).
+function getActiveSets() { return []; }
+function _addSetBonuses(totals) { return totals; }
 
 // Sum the % / flat-point affixes across all equipped slots (state.equipmentMods).
 function getEquippedAffixTotals() {
@@ -10395,22 +10578,37 @@ function getEquippedAffixTotals() {
   return t;
 }
 
+// Aggregate EQUIPPED-loadout progress toward each affix dimension cap — lets the
+// player reroll/upgrade with knowledge of how close they are to the gear cap.
+function _buildAffixCapBars() {
+  const totals = getEquippedAffixTotals();
+  const dims = [
+    { key:'atkPct',   label:'ATK%',  cap:AFFIX_ATK_CAP,       color:'#ff8a80' },
+    { key:'hpPct',    label:'HP%',   cap:AFFIX_HP_CAP,        color:'#69f0ae' },
+    { key:'mpPct',    label:'MP%',   cap:AFFIX_MP_CAP,        color:'#b39ddb' },
+    { key:'defPct',   label:'DEF%',  cap:AFFIX_DR_GEAR_CAP,   color:'#90caf9' },
+    { key:'critPts',  label:'CRIT',  cap:AFFIX_CRIT_GEAR_CAP, color:'#ffd54f' },
+    { key:'dodgePts', label:'EVADE', cap:AFFIX_DODGE_GEAR_CAP,color:'#4dd0e1' },
+  ];
+  const bars = dims.filter(d => (totals[d.key]||0) > 0).map(d => {
+    const val = parseFloat((totals[d.key]||0).toFixed(1));
+    const shown = Math.min(val, d.cap);
+    const pct = Math.min(100, Math.round(shown / d.cap * 100));
+    const atCap = val >= d.cap;
+    return `<div class="affix-cap-row"><span class="acr-label" style="color:${d.color}">${d.label}</span><div class="acr-track"><div class="acr-fill" style="width:${pct}%;background:${d.color}"></div></div><span class="acr-val" style="color:${atCap?'#ff5252':d.color}">${val.toFixed(1)}/${d.cap}${atCap?' ⛔':''}</span></div>`;
+  });
+  return bars.length ? `<div class="affix-cap-bars"><div class="acb-hdr">⟦ EQUIPPED LOADOUT vs CAPS ⟧</div>${bars.join('')}</div>` : '';
+}
+
 // ── Combat stat derivation (all √-based for stats in the thousands) ──
 function calcPlayerCombatStats(includeGear) {
-  if (includeGear === undefined) includeGear = true; // combat = with gear; pass false for the Hunter-Grade roll-up
+  if (includeGear === undefined) includeGear = true;
   const lv = calcLevel(state.totalXp), eq = includeGear ? getEquippedStats() : {}, st = state.stats;
   const level = lv.level;
-  const archetype  = getPlayerArchetype();
-  // ── GEAR = bonus stat-points (mirror) + % affixes (the player-scaling lever) ──
-  // 1) FLAT MIRROR: gear's combat stats fold into the relevant pool BEFORE the √
-  //    (ATK→STR, HP/DEF→CON, MP→INT) at GEAR_FOLD_K points each — so a gear stat is
-  //    valued like an earned one, √-compressed, never dwarfing your pools. Gear's own
-  //    STR/DEX/… are already stats, so they stay 1:1.
-  // 2) % AFFIXES: applied to the FINAL combat outputs (post-√, below), so a % affix
-  //    is a real % of your CURRENT power ("varies with the player"). Bounded per
-  //    dimension so a full best-in-game set lands near ×2 combat ("doubles you").
+  const archetype = getPlayerArchetype();
+  // Gear flat folding + affix totals
   let aff = { atkPct:0, hpPct:0, defPct:0, mpPct:0, critPts:0, dodgePts:0 };
-  if (includeGear) aff = _addSetBonuses(getEquippedAffixTotals());
+  if (includeGear) aff = getEquippedAffixTotals();  // sets removed, use direct totals
   const K = GEAR_FOLD_K;
   const STR = (st.STR||0)+(eq.STR||0)+(eq.ATK||0)*K;
   const DEX = (st.DEX||0)+(eq.DEX||0);
@@ -10419,48 +10617,68 @@ function calcPlayerCombatStats(includeGear) {
   const VOL = (st.VOL||0)+(eq.VOL||0);
   const CHA = (st.CHA||0)+(eq.CHA||0);
   const Spool = { STR, DEX, CON, INT, VOL, CHA };
-  let pMaxHP   = 200 + Math.round(Math.sqrt(CON)*12) + Math.round(Math.sqrt(CHA)*4) + level*4;
+
+  // ── BASE POOLS ──
+  // HP: CON primary (CHA contribution removed)
+  let pMaxHP   = 200 + Math.round(Math.sqrt(CON)*12) + level*4;
+  // MP: INT primary, VOL secondary
   let pMaxMP   = 80  + Math.round(Math.sqrt(INT)*8)  + Math.round(Math.sqrt(VOL)*4) + level*2;
   let pAtk     = 10  + Math.round(Math.sqrt(STR)*2.5);
   let magicAtk = Math.round(Math.sqrt(INT)*2.5);
-  // Base √-derived chances (item crit/dodge/block bonuses included; affixes added below).
-  let pCrit    = Math.min(15, parseFloat((Math.sqrt(DEX)*0.20).toFixed(1))) + (eq.critBonus||0);
-  let pDodge   = Math.min(10, parseFloat((Math.sqrt(DEX)*0.13).toFixed(1))) + (eq.dodgeBonus||0);
-  const pDblAtk  = Math.min(12,  parseFloat((Math.sqrt(DEX)*0.15).toFixed(1)));
-  let pDmgRed  = Math.min(50, parseFloat((Math.sqrt(CON)*0.65).toFixed(1))) + (eq.blockBonus||0);
-  const pVolMult = 1 + Math.min(0.35, parseFloat((Math.sqrt(VOL)*0.004).toFixed(3)));
-  const pIntMult = 1 + Math.min(0.30, parseFloat((Math.sqrt(INT)*0.003).toFixed(3)));
+
+  // ── OFFENSIVE CHANCES ──
+  // CRIT: DEX only — stat cap 15% (reaches cap at DEX ≈ 5100 = SSS level)
+  let pCrit    = Math.min(15, parseFloat((Math.sqrt(DEX)*0.21).toFixed(1))) + (eq.critBonus||0);
+  // EVADE (was DODGE): DEX only — stat cap 10%, CHA no longer contributes
+  let pDodge   = Math.min(10, parseFloat((Math.sqrt(DEX)*0.14).toFixed(1))) + (eq.dodgeBonus||0);
+  // DOUBLE STRIKE: CHA (LUCK) only — moved from DEX — cap 15%
+  const pDblAtk = Math.min(15, parseFloat((Math.sqrt(CHA)*0.21).toFixed(1)));
+  // SPELL POWER (was INT MULT): mage identity multiplier — cap ×1.30
+  const pSpellPower = 1 + Math.min(0.30, parseFloat((Math.sqrt(INT)*0.003).toFixed(3)));
+
+  // ── DEFENSIVE ──
+  // DMG REDUCTION: VOL primary + CON secondary — stat cap 15%
+  // At SSS (VOL=CON=5000): 70.7×0.17 + 70.7×0.04 ≈ 12% + 2.8% = 14.8% → near cap
+  let pDmgRed  = Math.min(15, parseFloat((Math.sqrt(VOL)*0.17 + Math.sqrt(CON)*0.04).toFixed(1)))
+               + (eq.blockBonus||0);
+
+  // ── SUPPORT ──
   const pMpRegen = Math.max(3, Math.round(Math.sqrt(INT)*0.4));
-  const pPetAtk  = Math.round(Math.sqrt(CHA)*1.2);
-  const pPetSpd  = CHA >= 2000 ? 2 : 1;
+
+  // ── CHA LUCK (meta rewards) ──
+  // FORTUNE: up to +25% gold on all earnings at SSS CHA
+  const chaGoldBonus = Math.min(0.25, parseFloat((Math.sqrt(CHA)*0.0035).toFixed(4)));
+  // INSIGHT: up to +15% habit XP at SSS CHA
+  const chaXpBonus   = Math.min(0.15, parseFloat((Math.sqrt(CHA)*0.0021).toFixed(4)));
+
   let primaryAtk = calcPrimaryAtk(archetype, Spool);
   if (includeGear) {
-    // Guild POWER tiers — a final-output multiplier (separate from gear stats).
     const gu = state.guildUpgrades || {};
-    const sanctumMul  = 1 + (gu.sanctum  || 0) * 0.04; // +4%/lvl → all combat output
-    const barracksMul = 1 + (gu.barracks || 0) * 0.05; // +5%/lvl → physical might + durability
+    const sanctumMul  = 1 + (gu.sanctum  || 0) * 0.04;
+    const barracksMul = 1 + (gu.barracks || 0) * 0.05;
     primaryAtk = Math.round(primaryAtk * sanctumMul * barracksMul);
     pAtk       = Math.round(pAtk       * sanctumMul * barracksMul);
     magicAtk   = Math.round(magicAtk   * sanctumMul);
     pMaxHP     = Math.round(pMaxHP     * sanctumMul * barracksMul);
     pMaxMP     = Math.round(pMaxMP     * sanctumMul);
-    // ── % AFFIXES — real % of your current combat output, bounded per dimension. ──
-    const atkPct = Math.min(AFFIX_ATK_CAP, aff.atkPct);
-    const hpPct  = Math.min(AFFIX_HP_CAP,  aff.hpPct);
-    const mpPct  = Math.min(AFFIX_MP_CAP,  aff.mpPct);
+    // ── % AFFIXES (post-√, bounded per dimension) ──
+    const atkPct = Math.min(AFFIX_ATK_CAP, aff.atkPct || 0);
+    const hpPct  = Math.min(AFFIX_HP_CAP,  aff.hpPct  || 0);
+    const mpPct  = Math.min(AFFIX_MP_CAP,  aff.mpPct  || 0);
     if (atkPct) { const m = 1 + atkPct/100; primaryAtk = Math.round(primaryAtk*m); pAtk = Math.round(pAtk*m); magicAtk = Math.round(magicAtk*m); }
     if (hpPct)  pMaxHP = Math.round(pMaxHP * (1 + hpPct/100));
     if (mpPct)  pMaxMP = Math.round(pMaxMP * (1 + mpPct/100));
-    // Chance affixes stay tightly bounded (the effHP reciprocal makes these volatile).
-    pDmgRed += Math.min(6, (aff.defPct  ||0) * 0.15);
-    pCrit   += Math.min(7, (aff.critPts ||0));
-    pDodge  += Math.min(6, (aff.dodgePts||0));
+    // Chance/DR affixes: direct % addition with gear caps
+    pDmgRed += Math.min(AFFIX_DR_GEAR_CAP,   aff.defPct   || 0);
+    pCrit   += Math.min(AFFIX_CRIT_GEAR_CAP, aff.critPts  || 0);
+    pDodge  += Math.min(AFFIX_DODGE_GEAR_CAP,aff.dodgePts || 0);
   }
-  pCrit   = Math.min(22, pCrit);
-  pDodge  = Math.min(16, pDodge);
-  pDmgRed = Math.min(56, pDmgRed);
+  // Total caps (stat + gear combined)
+  pCrit   = Math.min(30, pCrit);
+  pDodge  = Math.min(20, pDodge);
+  pDmgRed = Math.min(30, pDmgRed);
   pCrit = parseFloat(pCrit.toFixed(1)); pDodge = parseFloat(pDodge.toFixed(1)); pDmgRed = parseFloat(pDmgRed.toFixed(1));
-  return { pMaxHP, pMaxMP, pAtk, magicAtk, pCrit, pDodge, pDblAtk, pDmgRed, pVolMult, pIntMult, pMpRegen, pPetAtk, pPetSpd, archetype, primaryAtk };
+  return { pMaxHP, pMaxMP, pAtk, magicAtk, pCrit, pDodge, pDblAtk, pDmgRed, pSpellPower, pMpRegen, chaGoldBonus, chaXpBonus, archetype, primaryAtk };
 }
 
 // ── POWER LEVEL (CP) — one roll-up of total combat capability ───────
@@ -10485,17 +10703,28 @@ const CP_TIERS = [
   { t:'C', min:7000 },   { t:'B', min:26000 },  { t:'A', min:80000 },
   { t:'S', min:260000 }, { t:'SS', min:425000 },{ t:'SSS', min:540000 },
 ];
+// Per-tier class power multiplier — applied consistently in both CP and combat damage.
+// T1 Novice ×1.00 · T2 Adept ×1.05 · T3 Expert ×1.10 · T4 Legend ×1.15 · T5 True Hero ×1.20
+// Unlocking higher tiers requires real mastery investment, so the CP bonus is meaningful (+27% at T5).
+const CLASS_TIER_CP_MULT = 0.05;
+function getClassTierMult() {
+  const cls = CLASSES[state.classData?.equipped];
+  return cls ? 1 + (cls.tier - 1) * CLASS_TIER_CP_MULT : 1.0;
+}
+
 function calcPowerLevel(cs) {
-  // Hunter Grade / CP reflect WHO YOU ARE (base stats) — gear is for winning
-  // dungeon fights, not for shortcutting your grade. Combat code passes its own
-  // gear-included cs to the fight engine; this roll-up defaults to base-only.
+  // CP reflects WHO YOU ARE: base stats × class tier mastery.
+  // Gear is for winning dungeon fights; this roll-up defaults to base-only.
   cs = cs || calcPlayerCombatStats(false);
-  const archMult = cs.archetype === 'mage' ? cs.pIntMult : cs.pVolMult;
+  // Mages get Spell Power boost; warriors rely on raw stats + survival (VOL→DR improves effHP).
+  const archMult = cs.archetype === 'mage' ? (cs.pSpellPower || 1) : 1.0;
+  const tierMult = getClassTierMult(); // T1→×1.0 … T5 True Hero→×1.20
   // Attack score — every offensive CHANCE folded in as an average bonus
   const effAtk = cs.primaryAtk
     * (1 + (cs.pCrit  / 100) * 0.5)  // crit: chance × bonus damage
     * (1 +  cs.pDblAtk / 100)        // double strike: extra hits
-    * archMult;                      // VOL/INT aura multiplier
+    * archMult                        // VOL/INT aura multiplier
+    * tierMult;                       // class tier mastery bonus
   // Survival score — HP made "effective" by dodge + mitigation, small regen nudge
   const effHP = (cs.pMaxHP / ((1 - cs.pDmgRed / 100) * (1 - cs.pDodge / 100)))
     * (1 + cs.pMpRegen / 200);
@@ -10513,10 +10742,12 @@ function calcPowerLevel(cs) {
 // into stat-point space (see calcPlayerCombatStats), so no stat sits "post-√" and
 // dwarfs your pools. Endgame power then comes from % affixes (which scale with you).
 // (Grade ladder stays base-only — gear shows as "Gear Power", never shortcuts Grade.)
+const GEAR_CP_MAX_FRAC = 0.70; // gear can add up to 70% of base CP — work compounds with habits, not decorates them
 function calcGearCP(baseCP) {
   if (baseCP == null) baseCP = calcPowerLevel(calcPlayerCombatStats(false)).cp;
   const withGear = calcPowerLevel(calcPlayerCombatStats(true)).cp;
-  return Math.max(0, withGear - baseCP);
+  const raw = Math.max(0, withGear - baseCP);
+  return Math.min(raw, Math.round(baseCP * GEAR_CP_MAX_FRAC));
 }
 
 // CP → grade tier. Returns the same shape as tierFor() so it can power getHunterGrade().
@@ -10546,15 +10777,23 @@ function cpReadiness(cp, rank) {
 // ── Boss scaling — ABSOLUTE / CP-threshold bound ───────────────────
 // Boss HP/ATK are anchored to the RANK's reference player (the one sitting
 // exactly at this rank's CP requirement, CP_RANK_REQ), NOT to the live player.
-// Result: a player AT the threshold gets a balanced ~coin-flip fight; a player
-// ABOVE it out-damages and out-survives the boss (easier); BELOW it gets
-// crushed. CP (your power vs the rank requirement) now drives difficulty, so
-// gear/levels matter and cpReadiness (READY/PERILOUS/DEADLY) is now real.
-// Ref ATK/HP come from the CP grade ladder (per-rank reference values below).
+// Result: a player AT the threshold gets a TENSE fight; a player ABOVE it
+// out-damages and out-survives the boss (easier); BELOW it gets crushed. CP
+// drives difficulty, so cpReadiness (READY/PERILOUS/DEADLY) is now real.
+//
+// REBALANCE (rank-anchor recalibration): RANK_REF_HP was set ~1/2.5–3.3× the
+// effHP a player ACTUALLY has at the READY CP threshold — so the boss did far
+// too little damage and a READY player face-rolled (and high ranks were the
+// EASIEST, since the gap widened with rank). RANK_REF_HP is now the REAL READY
+// effHP × TENSE_FACTOR (0.60), which (a) tenses the fight to ~90% win / finish
+// bloodied ~30-35% HP for skilled play, (b) makes under-CP PERILOUS a real
+// coin-flip, and (c) FLATTENS the curve: the buff scales ×1.5 (E) → ×2.0 (S),
+// biggest where the stomp was worst. Offense anchor (EFF_ATK) was already
+// well-calibrated (~26 vs 28-hit target) → left untouched.
 const RANK_REF_EFF_ATK = { E:45, D:75, C:111, B:182, A:264, S:410 };
-const RANK_REF_HP      = { E:154, D:231, C:350, B:490, A:700, S:945 };
-const BOSS_HITS_TO_KILL  = 28;  // hits a threshold-CP player needs to kill the boss (parity → ~20-turn fight). TUNE.
-const PLAYER_HITS_TO_DIE = 20;  // raw boss hits a threshold-CP player survives (parity). TUNE.
+const RANK_REF_HP      = { E:230, D:340, C:479, B:776, A:1201, S:1897 }; // real READY effHP × 0.60
+const BOSS_HITS_TO_KILL  = 28;  // hits a threshold-CP player needs to kill the boss. TUNE.
+const PLAYER_HITS_TO_DIE = 20;  // raw boss hits a threshold-CP player survives. TUNE.
 
 // Boss HP is ABSOLUTE: anchored to the rank's reference ATK (the CP-threshold
 // player), so your real ATK decides how many hits YOU need. Over-CP = fewer
@@ -10617,7 +10856,7 @@ function getDungeonClassMatch(dungeonClass) {
 function getDungeonClassDebuff(cfg) {
   if (!cfg || cfg.isWeeklyBoss) return null;
   if (getDungeonClassMatch(cfg.dungeonClass)) return null;
-  return { dmgMul: 0.5, recvMul: 1.5 };
+  return { dmgMul: 0.75, recvMul: 1.25 }; // ~1.67× effective difficulty (was 3× — too steep)
 }
 
 const DUNGEON_CLASS_REQ = {
@@ -11279,7 +11518,7 @@ function reforgeQuality(invIdx) {
       state.gold = Math.max(0, (state.gold || 0) - goldCost);
       const qRoll = rollCraftQuality();
       const _rfRecipe = CRAFT_RECIPES.find(rc => rc.itemId === entry.itemId);
-      const _affixes = rollAffixes(_rfRecipe?.tier, qRoll.quality, entry.grade || 1);
+      const _affixes = rollAffixes(_rfRecipe?.tier, qRoll.quality, entry.grade || 1, item.slot);
       if (qRoll.quality === 'common') { delete entry.quality; delete entry.qualityMult; delete entry.qualityLabel; }
       else { entry.quality = qRoll.quality; entry.qualityMult = qRoll.qualityMult; entry.qualityLabel = qRoll.label; }
       if (_affixes.length) entry.affixes = _affixes; else delete entry.affixes;
@@ -11291,29 +11530,100 @@ function reforgeQuality(invIdx) {
   );
 }
 
-// ── Shard reroll: re-roll an item's % affixes (chase a better set) ──
-const SHARD_REROLL_BASE = 3;
-function getRerollCost(slotCount) { return SHARD_REROLL_BASE + Math.max(0, slotCount || 0); }
-function rerollAffixes(invIdx) {
+// ── AFFIX REROLL SYSTEM ───────────────────────────────────────────────────────
+// Two tiers:
+//   GOLD reroll — re-roll the VALUE of ONE affix (keep the stat type, change number)
+//   SHARD upgrade — raise the item's instance RARITY by one tier (one-way, improves)
+const STAT_REROLL_COST = { common:20, uncommon:50, rare:120, epic:300, legendary:750 };
+const RARITY_UPGRADE_SHARD_COST = { common:5, uncommon:12, rare:25, epic:50 };
+function getStatRerollGoldCost(entry) { return STAT_REROLL_COST[entry?.quality || 'common'] || 20; }
+function getRarityUpgradeShardCost(entry) { return RARITY_UPGRADE_SHARD_COST[entry?.quality || 'common'] || 5; }
+
+// Helper: if this inventory item is currently equipped, sync its mods into state.equipmentMods.
+function _syncEquippedMods(invIdx) {
+  const entry = state.inventory[invIdx]; if (!entry) return;
+  const item = ITEMS_DB[entry.itemId]; if (!item || !item.slot) return;
+  const equip = state.equipment || {};
+  if (equip[item.slot] === entry.itemId) {
+    if (!state.equipmentMods) state.equipmentMods = {};
+    state.equipmentMods[item.slot] = {
+      rarity: entry.quality || 'common',
+      rarityMult: entry.qualityMult || 1,
+      affixes: entry.affixes || []
+    };
+  }
+}
+
+// Re-roll the value of ONE affix (keep the stat, randomise value within tier/rarity/grade range).
+function rerollSingleAffix(invIdx, affixIdx) {
   const entry = state.inventory[invIdx]; if (!entry) return;
   const item = ITEMS_DB[entry.itemId]; if (!item || !item.crafted) return;
-  if (!entry.affixes || !entry.affixes.length) { showNotif('[SYSTEM] This item has no affixes to reroll.'); return; }
-  if ((entry.quantity || 1) > 1) { showNotif('[SYSTEM] Only a single item can be rerolled — unstack first.'); return; }
-  const cost = getRerollCost(entry.affixes.length);
-  if ((state.shards || 0) < cost) { showNotif(`[SYSTEM] Need ✦${cost} shards to reroll — you have ${state.shards||0}.`); return; }
+  if (!entry.affixes || !entry.affixes[affixIdx]) { showNotif('[SYSTEM] No affix at that slot.'); return; }
+  if ((entry.quantity || 1) > 1) { showNotif('[SYSTEM] Unstack before rerolling.'); return; }
+  const cost = getStatRerollGoldCost(entry);
+  if ((state.gold||0) < cost) { showNotif(`[SYSTEM] Need 🪙${cost}g — you have ${state.gold||0}g.`); return; }
+  const rarityId = entry.quality || 'common', grade = entry.grade || 1;
+  const stat = entry.affixes[affixIdx].stat, pickDef = AFFIX_BY_STAT[stat];
+  if (!pickDef) return;
+  const rMult = RARITY_AFFIX_MULT[rarityId] || 1.0, gMult = affixGradeMult(grade);
+  const base = pickDef.min + Math.random() * (pickDef.max - pickDef.min);
+  const val = Math.max(0.1, parseFloat((base * rMult * gMult).toFixed(1)));
+  state.gold = Math.max(0, (state.gold||0) - cost);
+  entry.affixes[affixIdx] = { stat, val };
+  _syncEquippedMods(invIdx);
+  saveState();
+  showNotif(`[SYSTEM] Rerolled: ${affixLabel({stat,val})} · 🪙-${cost}g`);
+  renderAll();
+}
+
+// Upgrade instance rarity by one tier — bumps statMult, scales affix values, may add slots.
+function upgradeItemRarity(invIdx) {
+  const entry = state.inventory[invIdx]; if (!entry) return;
+  const item = ITEMS_DB[entry.itemId]; if (!item || !item.crafted) return;
+  if ((entry.quantity || 1) > 1) { showNotif('[SYSTEM] Unstack before upgrading rarity.'); return; }
+  const curIdx = RARITY_TIERS.findIndex(r => r.id === (entry.quality || 'common'));
+  if (curIdx < 0 || curIdx >= RARITY_TIERS.length - 1) { showNotif('[SYSTEM] Already LEGENDARY — max rarity.'); return; }
+  const cost = getRarityUpgradeShardCost(entry);
+  if ((state.shards||0) < cost) { showNotif(`[SYSTEM] Need ✦${cost} shards — you have ${state.shards||0}.`); return; }
+  const newRarity = RARITY_TIERS[curIdx + 1];
+  const oldRMult = RARITY_AFFIX_MULT[RARITY_TIERS[curIdx].id] || 1, newRMult = RARITY_AFFIX_MULT[newRarity.id] || 1;
   const recipe = CRAFT_RECIPES.find(rc => rc.itemId === entry.itemId);
+  const tier = item.tier || recipe?.tier || 1, grade = entry.grade || 1;
   showConfirmDialog(
-    `Reroll affixes on <strong>${item.name}</strong> for <span style="color:#b388ff">✦${cost}</span>?<br><small style="opacity:0.65">Same ${entry.affixes.length} slot(s) · values change — can go up or down.</small>`,
+    `Upgrade <strong>${item.name}</strong> to <span style="color:${newRarity.color}">${newRarity.label}</span> for <span style="color:#b388ff">✦${cost}</span>?<br><small style="opacity:0.65">Boosts flat stats and scales affixes${affixSlots(tier,newRarity.id)>(entry.affixes?.length||0)?' · may add a new affix slot':''}.</small>`,
     () => {
       spendShards(cost);
-      entry.affixes = rollAffixes(recipe?.tier, entry.quality || 'common', entry.grade || 1);
+      entry.quality = newRarity.id; entry.qualityMult = newRarity.statMult; entry.qualityLabel = newRarity.label;
+      if (entry.affixes && entry.affixes.length) {
+        entry.affixes = entry.affixes.map(a => {
+          const def = AFFIX_BY_STAT[a.stat]; if (!def) return a;
+          return { stat: a.stat, val: Math.max(0.1, parseFloat((a.val * (newRMult / oldRMult)).toFixed(1))) };
+        });
+        const newSlots = affixSlots(tier, newRarity.id), oldSlots = entry.affixes.length;
+        if (newSlots > oldSlots) {
+          const pool = getSlotAffixPool(item.slot).filter(p => !entry.affixes.some(a => a.stat === p.stat));
+          for (let i = oldSlots; i < newSlots && pool.length; i++) {
+            const pick = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
+            const base = pick.min + Math.random() * (pick.max - pick.min);
+            const val = Math.max(0.1, parseFloat((base * newRMult * affixGradeMult(grade)).toFixed(1)));
+            entry.affixes.push({ stat: pick.stat, val });
+          }
+        }
+      } else {
+        entry.affixes = rollAffixes(tier, newRarity.id, grade, item.slot);
+      }
+      _syncEquippedMods(invIdx);
       saveState();
-      showForgeRevealOverlay({ itemId: entry.itemId, quality: entry.quality || 'common', qualityLabel: entry.qualityLabel, affixes: entry.affixes }, () => renderAll());
+      showForgeRevealOverlay({ itemId: entry.itemId, quality: newRarity.id, qualityMult: newRarity.statMult, qualityLabel: newRarity.label, affixes: entry.affixes }, () => renderAll());
       renderAll();
     },
-    { title:'🎲 REROLL AFFIXES', okLabel:`REROLL ✦${cost}` }
+    { title:'✦ UPGRADE RARITY', okLabel:`UPGRADE ✦${cost}` }
   );
 }
+
+// Legacy alias — old call sites get redirected to the new buttons.
+function getRerollCost(slotCount) { return 3 + Math.max(0, slotCount || 0); }
+function rerollAffixes(invIdx) { showNotif('[SYSTEM] Use the 🎲 per-stat reroll or ✦ UPGRADE RARITY button.'); }
 
 function craftItem(recipeId, silent) {
   const recipe = CRAFT_RECIPES.find(r => r.id === recipeId); if (!recipe) return null;
@@ -11333,7 +11643,7 @@ function craftItem(recipeId, silent) {
   if (state.consumables && state.consumables.forgeToken > 0) { state.consumables.forgeToken--; if (!silent) setTimeout(()=>showNotif(`🔨 Forge Token used · ${state.consumables.forgeToken} left.`), 450); }
   // Roll rarity + affixes (instant — no queue, no timer). Crafts start at Grade 1.
   const qRoll = rollCraftQuality();
-  const _affixes = rollAffixes(recipe.tier, qRoll.quality, 1);
+  const _affixes = rollAffixes(recipe.tier, qRoll.quality, 1, ITEMS_DB[recipe.itemId]?.slot);
   // Tracking + progression prerequisites
   state.totalItemsCrafted = (state.totalItemsCrafted||0) + 1;
   if (!state.forgeCraftCounts) state.forgeCraftCounts = {};
@@ -11887,8 +12197,17 @@ function renderInventory() {
   const _selStats = {}; Object.entries(_baseStats).forEach(([k,v]) => { _selStats[k] = Math.round(v * _instMult); });
   const statTags = Object.entries(_selStats).filter(([,v])=>v>0)
     .map(([k,v])=>`<span class="inv-inspect-stat">+${v} ${k}</span>`).join('');
+  const _isBagSel = invSelected.source==='bag';
+  const _selBagIdxForAffix = _isBagSel ? invSelected.index : null;
+  const _srGoldCost = getStatRerollGoldCost(_selEntry);
   const affixTags = _instAffixes.length
-    ? `<div class="inv-inspect-affixes">${_instAffixes.map(a=>`<span class="inv-affix" style="color:${AFFIX_BY_STAT[a.stat]?.color||'#fff'};border-color:${AFFIX_BY_STAT[a.stat]?.color||'#fff'}44">${affixLabel(a)}</span>`).join('')}</div>`
+    ? `<div class="inv-inspect-affixes">${_instAffixes.map((a,ai)=>{
+        const col = AFFIX_BY_STAT[a.stat]?.color||'#fff';
+        const chip = `<span class="inv-affix" style="color:${col};border-color:${col}44">${affixLabel(a)}</span>`;
+        if (!_isBagSel) return chip;
+        const canRoll = (state.gold||0) >= _srGoldCost && (_selEntry?.quantity||1) <= 1;
+        return `<span class="inv-affix-row">${chip}<button class="inv-affix-reroll${canRoll?'':' disabled'}" onclick="rerollSingleAffix(${_selBagIdxForAffix},${ai})" title="Reroll this affix value for 🪙${_srGoldCost}g">🎲 🪙${_srGoldCost}</button></span>`;
+      }).join('')}</div>${_buildAffixCapBars()}`
     : '';
   const healTags = [
     selItem.healHP && `<span class="inv-inspect-heal">+${selItem.healHP} HP</span>`,
@@ -11935,11 +12254,14 @@ function renderInventory() {
       const _rfCan = _rfRecipe && canRefine(_rfRecipe, _selGrade);
       acts += `<button class="inv-act-btn refine-item${_rfCan?'':' disabled'}" onclick="refineItem(${selBagIdx})" title="${_rfCan?'Refine to Grade '+GRADE_LABELS[_selGrade]:'Insufficient materials'}">✦ G${GRADE_LABELS[_selGrade-1]}→G${GRADE_LABELS[_selGrade]}</button>`;
     }
-    // Shard reroll — re-roll the % affixes (chase a better set)
-    if (_instAffixes.length) {
-      const _rrCost = getRerollCost(_instAffixes.length);
-      const _rrCan = (state.shards || 0) >= _rrCost && (_selEntry?.quantity||1) <= 1;
-      acts += `<button class="inv-act-btn reroll-affix${_rrCan?'':' disabled'}" onclick="rerollAffixes(${selBagIdx})" title="${(_selEntry?.quantity||1)>1?'Unstack first':'Re-roll affixes for '+_rrCost+' shards'}">🎲 REROLL ✦${_rrCost}</button>`;
+    // Rarity upgrade — raise instance rarity one tier with shards (chase Legendary)
+    if (selItem.crafted) {
+      const _curRarIdx = RARITY_TIERS.findIndex(r => r.id === (_selEntry?.quality || 'common'));
+      if (_curRarIdx < RARITY_TIERS.length - 1) {
+        const _ruCost = getRarityUpgradeShardCost(_selEntry);
+        const _canRu = (state.shards||0) >= _ruCost && (_selEntry?.quantity||1) <= 1;
+        acts += `<button class="inv-act-btn rarity-upgrade${_canRu?'':' disabled'}" onclick="upgradeItemRarity(${selBagIdx})" title="${(_selEntry?.quantity||1)>1?'Unstack first':'Upgrade rarity for '+_ruCost+' shards'}">✦ UPGRADE ✦${_ruCost}</button>`;
+      }
     }
     acts += `<button class="inv-act-btn sell-item" onclick="sellItem(${selBagIdx})">SELL 🪙${sellTotal}g</button>`;
     if (selItem.slot) {
@@ -12751,6 +13073,14 @@ function getWeeklyStreak(task) {
   }
   return streak;
 }
+// CHA = LUCK: FORTUNE (gold) and INSIGHT (XP) meta-rewards scale with CHA stat.
+function getChaGoldBonus() {
+  return Math.min(0.25, Math.sqrt((state.stats && state.stats.CHA) || 0) * 0.0035);
+}
+function getChaXpBonus() {
+  return Math.min(0.15, Math.sqrt((state.stats && state.stats.CHA) || 0) * 0.0021);
+}
+
 function applyWorkDrops(drops, mul) {
   if (!drops) return;
   const goldDelta = (drops.gold||0) * mul;
@@ -13350,9 +13680,14 @@ function updateStreakOnLoad() {
     // Clear any legacy penalty quest left over from before the penalty system was removed
     if (state.penaltyQuest) state.penaltyQuest = null;
     // If streakCountedDay === y, streak carries over as-is (already includes yesterday)
-    // Queue harvest overlay — shown after renderAll()
-    const harvestInfo = _buildHarvestInfo(y);
-    _pendingAnims.push(() => showHarvestOverlay(harvestInfo)); // Daily Briefing (Yesterday + Today)
+    // Late check-in: if any habits were missed yesterday, let the user log them first.
+    // Fires before the harvest briefing so the briefing reflects the final logged state.
+    const _missedYest = state.habitos.filter(h => !h.done || !h.done[y]);
+    if (_missedYest.length > 0 && !state.habitsPaused && state.habitos.length > 0) {
+      _pendingAnims.push(() => showLateCheckInOverlay(y));
+    }
+    // Defer _buildHarvestInfo so it captures any retroactive completions from late check-in
+    _pendingAnims.push(() => showHarvestOverlay(_buildHarvestInfo(y))); // Daily Briefing (Yesterday + Today)
     // Auto weekly report on Mondays (queued after harvest so it shows on dismiss)
     if (new Date().getDay() === 1 && state.lastWeeklyReport !== today) {
       state.lastWeeklyReport = today;
@@ -13483,6 +13818,112 @@ function showShieldInfo() {
 // ============================================================
 // MASTERY SYSTEM  (Pasos 7 + 8 + 9 + 10)
 // ============================================================
+
+// ============================================================
+// LATE CHECK-IN OVERLAY
+// Shown when opening the app on a new day with uncompleted habits
+// from yesterday. Lets the user retroactively log them before
+// the harvest briefing fires, so rewards + streak are correct.
+// ============================================================
+
+function showLateCheckInOverlay(yKey) {
+  const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const [yr,mo,dy] = yKey.split('-');
+  const dateStr = `${months[parseInt(mo,10)-1]} ${parseInt(dy,10)} · ${yr}`;
+  const total = state.habitos.length;
+  if (!total) { const nxt=_pendingAnims.shift(); if(nxt) nxt(); return; }
+
+  const countDone = () => state.habitos.filter(h => h.done && h.done[yKey]).length;
+
+  const ov = document.createElement('div');
+  ov.className = 'lco-overlay';
+  ov.id = 'lcoOverlay';
+
+  const _renderHtml = () => {
+    const done = countDone();
+    const pct  = total > 0 ? done/total : 0;
+    const allDone = done === total;
+    const streakWouldRestore = pct >= 0.7 && state.streakBrokenAt === todayKey();
+    return `
+      <div class="lco-eyebrow">SYSTEM NOTICE</div>
+      <div class="lco-title">LATE LOG</div>
+      <div class="lco-date">${dateStr}</div>
+      <div class="lco-desc">Log yesterday's habits before the day closes.</div>
+      <div class="lco-context" id="lcoCtx">${done} of ${total} logged</div>
+      <div class="lco-progress"><div class="lco-progress-fill" id="lcoFill" style="width:${Math.round(pct*100)}%"></div></div>
+      <div class="lco-habit-list">
+        ${state.habitos.map(h => {
+          const isDone = !!(h.done && h.done[yKey]);
+          return `<div class="lco-habit-row${isDone?' lco-done':''}" id="lco-${h.id}"
+            ${isDone ? '' : `onclick="lcoToggle('${h.id}','${yKey}')"`}>
+            <span class="lco-habit-check">${isDone ? '✓' : '○'}</span>
+            <span class="lco-habit-text">${h.text}</span>
+            <span class="lco-habit-xp">+${h.xp||0} XP</span>
+          </div>`;
+        }).join('')}
+      </div>
+      <button class="lco-submit-btn${allDone?' lco-all-done':''}" id="lcoBtn"
+        onclick="closeLateCheckIn('${yKey}')">
+        ${allDone ? '✓ ALL LOGGED' : done > 0 ? `CLOSE · ${done}/${total} LOGGED` : 'SKIP'}
+      </button>
+      ${streakWouldRestore ? `<div class="lco-restored-hint">🔥 Log 70 %+ to restore your streak</div>` : ''}
+    `;
+  };
+
+  ov.innerHTML = _renderHtml();
+  document.body.appendChild(ov);
+}
+
+function lcoToggle(habitId, yKey) {
+  const task = state.habitos.find(t => t.id === habitId);
+  if (!task || (task.done && task.done[yKey])) return;
+  // Complete retroactively via the normal path (awards XP/stats, skips today-gated overlays)
+  toggleQuest('habitos', yKey, habitId);
+  // Update this row
+  const row = document.getElementById('lco-' + habitId);
+  if (row) {
+    row.classList.add('lco-done');
+    row.querySelector('.lco-habit-check').textContent = '✓';
+    row.onclick = null;
+  }
+  // Refresh progress + button
+  const total = state.habitos.length;
+  const done  = state.habitos.filter(h => h.done && h.done[yKey]).length;
+  const pct   = total > 0 ? done/total : 0;
+  const fill  = document.getElementById('lcoFill');
+  if (fill) fill.style.width = Math.round(pct*100) + '%';
+  const ctx = document.getElementById('lcoCtx');
+  if (ctx) ctx.textContent = `${done} of ${total} logged`;
+  const btn = document.getElementById('lcoBtn');
+  if (btn) {
+    const allDone = done === total;
+    btn.className = 'lco-submit-btn' + (allDone ? ' lco-all-done' : '');
+    btn.textContent = allDone ? '✓ ALL LOGGED' : `CLOSE · ${done}/${total} LOGGED`;
+  }
+}
+
+function closeLateCheckIn(yKey) {
+  const total = state.habitos.length;
+  const done  = state.habitos.filter(h => h.done && h.done[yKey]).length;
+  const pct   = total > 0 ? done/total : 0;
+  // Restore streak if ≥70 % done retroactively and streak was broken this morning
+  if (pct >= 0.7 && state.streakBrokenAt === todayKey()) {
+    const restored = state.lastStreakPeak || 1;
+    state.streak = restored;
+    state.streakCountedDay = yKey;
+    state.streakBrokenAt = null;
+    state.lastStreakPeak = 0;
+    saveState();
+    setTimeout(() => showNotif(`[SYSTEM] Late log accepted. Streak restored: ${restored} days.`), 350);
+  } else if (done > 0) {
+    saveState();
+  }
+  const ov = document.getElementById('lcoOverlay');
+  if (ov) {
+    ov.style.animation = 'masteryFadeOut 0.4s ease forwards';
+    setTimeout(() => { ov.remove(); const nxt=_pendingAnims.shift(); if(nxt) nxt(); }, 420);
+  }
+}
 
 // DAILY_QUOTES → data/content.js
 function showHarvestOverlay(info) {
@@ -14977,24 +15418,7 @@ function renderForge() {
     if (rfLvl >= 1) { const _t = rfPanel.querySelector('#rfTo'); if (_t) _t.selectedIndex = 1; }
   }
 
-  // ── Gear sets — cross-slot bonuses for equipping crafted gear ──
-  {
-    const setsPanel = document.createElement('div'); setsPanel.className = 'forge-sets';
-    setsPanel.innerHTML = `<div class="fs-hdr">⟦ GEAR SETS ⟧ <span class="fs-sub">equip crafted gear across slots</span></div>` +
-      getActiveSets().map(s => {
-        const topPieces = s.def.tiers[s.def.tiers.length - 1].pieces;
-        const cur = Math.min(s.pieces, topPieces);
-        const nextTier = s.def.tiers.find(t => s.pieces < t.pieces);
-        const shown = s.active ? s.active : (nextTier || s.def.tiers[0]);
-        const bonusStr = Object.entries(shown.bonus).map(([k, v]) => affixLabel({ stat: k, val: v })).join(' · ');
-        return `<div class="fs-row${s.active ? ' fs-on' : ''}" style="--fs:${s.def.color}">
-          <span class="fs-name">${s.def.icon} ${s.def.name}</span>
-          <span class="fs-count">${cur}/${topPieces}</span>
-          <span class="fs-bonus">${s.active ? '✓ ' : (nextTier ? `${nextTier.pieces}-pc → ` : '')}${bonusStr}</span>
-        </div>`;
-      }).join('');
-    panelsBox.appendChild(setsPanel);
-  }
+  // ── Gear sets removed — build identity comes from weapon-tree choice ──
 
   // ── Trophy wall: recently forged (moved to top) ──────────
   const _log = state.forgeLog || [];
@@ -17104,7 +17528,7 @@ function renderCombatMini() {
     <div class="combat-mini-stat" style="--cmc:#b9f6ca" onclick="combatStatsExpanded=true;renderCombatStats();document.getElementById('combatStatsEl')?.scrollIntoView({behavior:'smooth'})">
       <div class="combat-mini-icon">👁</div>
       <div class="combat-mini-val">${cs.pDodge.toFixed(1)}%</div>
-      <div class="combat-mini-lbl">DODGE</div>
+      <div class="combat-mini-lbl">EVADE</div>
     </div>
   </div>`;
 }
@@ -17946,54 +18370,47 @@ function renderCombatStats() {
 
   if (!combatStatsExpanded) return;
 
-  // Active gear sets summary
-  const _activeSets = getActiveSets().filter(s => s.active);
-  if (_activeSets.length) {
-    const setEl = document.createElement('div');
-    setEl.className = 'char-active-sets';
-    setEl.innerHTML = `<div class="cas-hdr">⟦ ACTIVE SETS ⟧</div>` + _activeSets.map(s => {
-      const bonusStr = Object.entries(s.active.bonus).map(([k, v]) => affixLabel({ stat: k, val: v })).join(' · ');
-      return `<div class="cas-row" style="--cas:${s.def.color}"><span class="cas-name">${s.def.icon} ${s.def.name} (${s.active.pieces}pc)</span><span class="cas-bonus">${bonusStr}</span></div>`;
-    }).join('');
-    el.appendChild(setEl);
-  }
-
-  const volPct  = Math.round(cs.pVolMult * 100);
-  const intPct  = Math.round(cs.pIntMult * 100);
+  const spellPct = Math.round((cs.pSpellPower || 1) * 100);
+  const fortPct  = Math.round((cs.chaGoldBonus || 0) * 100);
+  const insgPct  = Math.round((cs.chaXpBonus  || 0) * 100);
 
   const content = document.createElement('div');
   content.innerHTML = `<div class="combat-stats-section">
     <div class="cstat-category">
       ${catHdr('BASE COMBAT','#4dd0e1')}
       <div class="cstat-grid">
-        ${card('⚔','ATK DAMAGE',  cs.pAtk,             '', '10 + √STR × 2.5',                  '#ff8a80', cs.pAtk<=10)}
-        ${card('✨','MAGIC ATK',   cs.magicAtk,         '', '√INT × 2.5',                        '#82b1ff', cs.magicAtk===0)}
-        ${card('❤','MAX HP',      cs.pMaxHP,            '', '200 + √CON×12 + √CHA×4 + LVL×4',   '#76ff03', false)}
-        ${card('💧','MAX MP',     cs.pMaxMP,            '', '80 + √INT×8 + √VOL×4 + LVL×2',     '#4dd0e1', false)}
+        ${card('⚔','ATK DAMAGE',  cs.pAtk,             '', '10 + √STR × 2.5',                       '#ff8a80', cs.pAtk<=10)}
+        ${card('✨','MAGIC ATK',   cs.magicAtk,         '', '√INT × 2.5 × Spell Power',              '#82b1ff', cs.magicAtk===0)}
+        ${card('❤','MAX HP',      cs.pMaxHP,            '', '200 + √CON×12 + LVL×4',                '#76ff03', false)}
+        ${card('💧','MAX MP',     cs.pMaxMP,            '', '80 + √INT×8 + √VOL×4 + LVL×2',         '#4dd0e1', false)}
       </div>
     </div>
     <div class="cstat-category">
       ${catHdr('OFFENSIVE','#ff8a80')}
       <div class="cstat-grid">
-        ${card('🎯','CRIT CHANCE',   cs.pCrit.toFixed(1),   '%', '√DEX × 0.20% (cap 15%)',       '#ff7043', cs.pCrit===0)}
-        ${card('⚡','DOUBLE STRIKE', cs.pDblAtk.toFixed(1), '%', '√DEX × 0.15% (cap 12%)',       '#ffab40', cs.pDblAtk===0)}
-        ${card('🧠','VOL MULT',      volPct,                '%', '1 + √VOL×0.004 (cap ×1.35)',    '#ce93d8', cs.pVolMult<=1)}
-        ${card('🔮','INT MULT',      intPct,                '%', '1 + √INT×0.003 (cap ×1.30)',    '#82b1ff', cs.pIntMult<=1)}
+        ${card('🎯','CRIT CHANCE',   cs.pCrit.toFixed(1),   '%', '√DEX × 0.21% · 15% stat + 15% gear = 30% cap', '#ff7043', cs.pCrit===0)}
+        ${card('⚡','DOUBLE STRIKE', cs.pDblAtk.toFixed(1), '%', '√CHA × 0.21% (LUCK) · cap 15%',                '#ffab40', cs.pDblAtk===0)}
+        ${card('🔮','SPELL POWER',   spellPct,              '%', '1 + √INT×0.003 (cap ×1.30) — mage bonus',      '#82b1ff', cs.pSpellPower<=1)}
       </div>
     </div>
     <div class="cstat-category">
       ${catHdr('DEFENSIVE','#ffd180')}
       <div class="cstat-grid">
-        ${card('👁','DODGE RATE',    cs.pDodge.toFixed(1),  '%', '√DEX × 0.13% (cap 10%)',       '#b9f6ca', cs.pDodge===0)}
-        ${card('🪨','DMG REDUCTION', cs.pDmgRed.toFixed(1), '%', '√CON × 0.65% (cap 50%)',       '#ffc107', cs.pDmgRed===0)}
+        ${card('👁','EVADE',         cs.pDodge.toFixed(1),  '%', '√DEX × 0.14% · 10% stat + 10% gear = 20% cap',  '#b9f6ca', cs.pDodge===0)}
+        ${card('🪨','DMG REDUCTION', cs.pDmgRed.toFixed(1), '%', '√VOL×0.17% + √CON×0.04% · 15%+15% = 30% cap',   '#ffc107', cs.pDmgRed===0)}
       </div>
     </div>
     <div class="cstat-category">
       ${catHdr('SUPPORT','#ce93d8')}
       <div class="cstat-grid">
         ${card('🔵','MP REGEN',   cs.pMpRegen,  '/turn',    '√INT × 0.4 (min 3)',                '#4dd0e1', false)}
-        ${card('🐾','PET DAMAGE', cs.pPetAtk,   '',         '√CHA × 1.2',                        '#ffe082', cs.pPetAtk===0)}
-        ${card('🐾','PET SPEED',  cs.pPetSpd,   ' hit/t',   'CHA ≥ 2000 → 2 hits/turn',         '#ffe082', false)}
+      </div>
+    </div>
+    <div class="cstat-category">
+      ${catHdr('✦ LUCK (CHA)','#ffd54f')}
+      <div class="cstat-grid">
+        ${card('🪙','FORTUNE',  fortPct, '%', '√CHA × 0.35% — bonus gold on all earnings (cap +25%)', '#ffd54f', fortPct===0)}
+        ${card('📖','INSIGHT',  insgPct, '%', '√CHA × 0.21% — bonus habit XP (cap +15%)',             '#ffd54f', insgPct===0)}
       </div>
     </div>
   </div>`;
@@ -20872,6 +21289,9 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
       if (_specBonus && task.category === _specBonus.category && _drops.matId) {
         _drops = { ..._drops, matQty: (_drops.matQty || 0) + 1 };
       }
+      // CHA LUCK — FORTUNE: bonus gold on all work earnings
+      const _fortune = getChaGoldBonus();
+      if (_fortune > 0 && _drops.gold) _drops = { ..._drops, gold: Math.round(_drops.gold * (1 + _fortune)) };
       applyWorkDrops(_drops, 1);
       if (state.dungeon && state.dungeon.phase==='exploring') {
         state.dungeon.sessionTasks    = (state.dungeon.sessionTasks||0) + 1;
@@ -20912,7 +21332,7 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
       const _masteryMult = _prevStreak >= 65 ? 1.2 : 1.0;
       const _totalMult = _phoenixMult * (_isCrit ? 2.0 : 1.0) * _masteryMult;
       const _xpBoost = getActiveBoostMult('xp'); // EXP Tonic — boosts EXP only, never stats
-      const _scaledXp = Math.round((task.xp||0) * _totalMult * _xpBoost);
+      const _scaledXp = Math.round((task.xp||0) * _totalMult * _xpBoost * (1 + getChaXpBonus()));
       if (_scaledXp > (task.xp||0)) { state.totalXp += _scaledXp-(task.xp||0); state.col += _scaledXp-(task.xp||0); }
       const _scaledGains = {}; Object.entries(task.gains||{}).forEach(([k,v])=>{ _scaledGains[k]=Math.round(v*_totalMult); });
       const _ag=applyGainsWithClass(_scaledGains);
@@ -20930,10 +21350,10 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
       const newLv=calcLevel(state.totalXp).level;
       if (_isPhoenix) { if(navigator.vibrate) navigator.vibrate([40,30,80,30,120]); setTimeout(()=>showNotif('[SYSTEM] ⚡ RESURRECTION PROTOCOL — ×1.5 COMEBACK OVERRIDE'), 300); }
       if (_isCrit) { if(navigator.vibrate) navigator.vibrate([10,20,80,25,160,25,80]); setTimeout(()=>showCritFloat(_scaledGains), _isPhoenix ? 650 : 180); }
-      if(isFirst) {
+      if(isFirst && periodKey===todayKey()) {
         // Morning System Login Cache — variable reward gated on the FIRST real habit
         // check of the day (never on merely opening the app). Once per day.
-        if (periodKey===todayKey() && (!state.dailyCache || state.dailyCache.dateKey!==todayKey())) {
+        if (!state.dailyCache || state.dailyCache.dateKey!==todayKey()) {
           setTimeout(()=>grantDailyLoginCache(), 320);
         } else {
           setTimeout(()=>showFirstHabitOverlay(), 320);
@@ -22197,6 +22617,7 @@ function checkAllDone(listKey, periodKey) {
       if (!state.logros) state.logros={};
       if (state.logros.lastPerfectDayOverlay !== periodKey) {
         state.logros.lastPerfectDayOverlay = periodKey;
+        if (periodKey !== todayKey()) { saveState(); return; } // retroactive late-log: mark seen, no overlay or shards
         grantShards(SHARD_REWARDS.perfectDay, 'perfect day'); // ✦ core discipline faucet
         // Phoenix check: perfect day after a day below 70%
         const yKey = yesterdayKey();
@@ -22755,6 +23176,28 @@ function showFinalStageBanner(cfg) {
   setTimeout(()=>b.remove(),3700);
 }
 
+function showBossIncomingBanner(cfg) {
+  const prev=document.querySelector('.boss-incoming-overlay');
+  if (prev) prev.remove();
+  const boss=cfg.boss||{};
+  const ov=document.createElement('div');
+  ov.className='boss-incoming-overlay';
+  ov.style.setProperty('--dcolor',cfg.color);
+  ov.style.setProperty('--dglow',cfg.glow);
+  ov.innerHTML=`
+    <div class="bio-inner">
+      <div class="bio-rank">⟦ ${cfg.rank} RANK ⟧</div>
+      <div class="bio-emoji">${boss.emoji||'⚔'}</div>
+      <div class="bio-label">BOSS INCOMING</div>
+      <div class="bio-name">${boss.name||'The Boss'}</div>
+      <div class="bio-sub">All stages cleared — the final battle begins</div>
+    </div>`;
+  document.body.appendChild(ov);
+  if (navigator.vibrate) navigator.vibrate([100,50,100,50,400,80,400]);
+  setTimeout(()=>ov.classList.add('bio-out'),3600);
+  setTimeout(()=>ov.remove(),4300);
+}
+
 function showBossVictoryOverlay(cfg, boss) {
   const ov=document.createElement('div'); ov.className='bvict-overlay';
   ov.style.setProperty('--dcolor',cfg.color); ov.style.setProperty('--dglow',cfg.glow);
@@ -22803,7 +23246,6 @@ function tickDungeon() {
     if (d.pomodoroPhase==='work') {
       d.pomodoroCount++;
       d.sessionCount=(d.sessionCount||0)+1;
-      d.focusCheckPending=false;
       // Daily Ration: a completed work session counts toward today's focus floor.
       accrueWorkFocus(getPomoWorkMs());
       // Mid-boss trigger: every 2nd completed pomo that isn't the final stage
@@ -22850,48 +23292,26 @@ function tickDungeon() {
         grantWorkXp(15);
       }
       if (_mb) { _midBossTriggered=true; break; }
-      // Pick end-session event — blocks break until player resolves
-      const _endEvt=pickDungeonEvent('end', d, cfg);
-      if (_endEvt) {
-        d.pendingEndEvent=prepareDungeonEvent(_endEvt, cfg);
-        d.pomodoroPhase='event';
-      } else {
-        d.pomodoroPhase='break';
-        d.midEventFired=false;
-        d.nextMidEventAt=d.pomodoroPhaseStart+getPomoWorkMs()+12*60*1000;
-        // Consume driven omen: cut break to 1 s
-        if (d.activeOmens?.includes('driven')) { d.activeOmens=d.activeOmens.filter(o=>o!=='driven'); d.pomodoroPhaseStart-=(POMODORO_BREAK_MS-1000); showNotif('⚡ Driven — break cut short'); }
+      // Queue up to 2 events for the break (non-blocking — break timer runs freely)
+      if (!d.breakEvents) d.breakEvents=[];
+      const _evt1=pickDungeonEvent('end', d, cfg);
+      if (_evt1) {
+        d.breakEvents.push(prepareDungeonEvent(_evt1, cfg));
+        const _evt2=pickDungeonEvent('end', d, cfg);
+        if (_evt2 && _evt2.id!==_evt1.id) d.breakEvents.push(prepareDungeonEvent(_evt2, cfg));
       }
+      d.pomodoroPhase='break';
+      // Boss incoming banner when all stages done
+      if (cfg && d.pomodoroCount>=cfg.stages) showBossIncomingBanner(cfg);
+      // Consume driven omen: cut break to 1 s
+      if (d.activeOmens?.includes('driven')) { d.activeOmens=d.activeOmens.filter(o=>o!=='driven'); d.pomodoroPhaseStart-=(POMODORO_BREAK_MS-1000); showNotif('⚡ Driven — break cut short'); }
     } else if (d.pomodoroPhase==='break') {
+      // Discard any unresolved break events — break is over
+      d.breakEvents=[];
       d.pomodoroPhase='work';
-      d.nextFocusCheckAt=d.pomodoroPhaseStart+10*60*1000;
-      d.focusCheckPending=false;
-      d.midEventFired=false;
-      d.nextMidEventAt=d.pomodoroPhaseStart+12*60*1000;
       // Final stage warning: last work pomo before the boss
       if (cfg && d.pomodoroCount===cfg.stages-1) showFinalStageBanner(cfg);
     }
-  }
-
-  // Focus interrupt: auto-dismiss after 30 s without response
-  if (d.focusCheckPending && d.focusCheckShownAt && Date.now()-d.focusCheckShownAt>30000) {
-    d.focusCheckPending=false; advanced=true;
-  }
-  // Focus interrupt: trigger every 10 min during work phase
-  if (d.pomodoroPhase==='work' && !d.focusCheckPending && d.nextFocusCheckAt && Date.now()>=d.nextFocusCheckAt) {
-    d.focusCheckPending=true; d.focusCheckShownAt=Date.now(); d.nextFocusCheckAt=Date.now()+10*60*1000; advanced=true;
-  }
-  // Mid-session event: trigger at ~12 min into work session
-  if (d.pomodoroPhase==='work' && !d.midEventFired && d.nextMidEventAt && Date.now()>=d.nextMidEventAt) {
-    d.midEventFired=true;
-    const _midEvt=pickDungeonEvent('mid', d, cfg);
-    if (_midEvt) {
-      const _prepared=prepareDungeonEvent(_midEvt, cfg);
-      d.pendingMidEvent=_prepared;
-      showMidEventToast(_prepared, d, cfg);
-    }
-    advanced=true;
-  }
   if (_midBossTriggered) { initMidBoss(); return; }
   saveState();
   if (currentTab==='work') { if(advanced) renderTrabajo(); else updateExploreDisplay(); }
@@ -23199,10 +23619,58 @@ function resolveEndEventChoice(choiceIdx) {
   d.pomodoroPhase = 'break';
   d.pomodoroPhaseStart = Date.now();
   d.midEventFired = false;
-  d.nextMidEventAt = Date.now()+POMODORO_BREAK_MS+12*60*1000;
-  // Consume driven omen: cut break to 1 s
+  d.nextMidEventAt = 0;
   if (d.activeOmens?.includes('driven')) { d.activeOmens=d.activeOmens.filter(o=>o!=='driven'); d.pomodoroPhaseStart-=(POMODORO_BREAK_MS-1000); showNotif('⚡ Driven — break cut short'); }
   saveState(); renderAll();
+}
+
+function resolveBreakEventChoice(choiceIdx) {
+  const d = state.dungeon;
+  if (!d || !d.breakEvents || d.breakEvents.length === 0) return;
+  const event = d.breakEvents[0];
+  const cfg = DUNGEON_CONFIG[d.difficulty];
+  const rankIdx = _RANK_IDX[cfg?.rank]??0;
+  applyDungeonEventOutcome(choiceIdx, event, d, cfg, rankIdx);
+  const hint = event.choices?.[choiceIdx]?.label;
+  if (hint) showNotif(`⟦ ${_EVT_CAT_LABEL[event.category]||'EVENT'} ⟧ ${hint}`);
+  if (!d.eventHistory) d.eventHistory=[];
+  d.eventHistory.push({eventId:event.id, stage:d.pomodoroCount, slot:'break', choiceIdx, ts:Date.now()});
+  d.breakEvents.shift();
+  saveState(); renderAll();
+}
+
+function buildBreakEventCard(event, cfg, totalPending) {
+  const rankIdx = _RANK_IDX[cfg?.rank]??0;
+  const catColor = _EVT_CAT_COLOR[event.category]||'rgba(77,208,225,0.6)';
+  const catLabel = _EVT_CAT_LABEL[event.category]||event.category;
+  const choiceHtml = event.choices.map((c,i)=>{
+    const hint = _choiceOutcomeHint(c, rankIdx, cfg);
+    const isRisk = !!(c.roll||c.worthyGate);
+    const goldCost = _rval((c.outcome||{}).gold||0, rankIdx);
+    const cantAfford = goldCost < 0 && Math.abs(goldCost) > (state.gold||0);
+    const disabledAttr = cantAfford ? 'disabled' : '';
+    const disabledStyle = cantAfford ? 'opacity:0.38;cursor:not-allowed;' : '';
+    return `<button class="eev-choice${isRisk?' risk':''}" onclick="resolveBreakEventChoice(${i})" ${disabledAttr} style="${disabledStyle}">
+      <span class="eev-choice-label">${c.label}</span>
+      ${(cantAfford?'🪙 Not enough gold':hint)?`<span class="eev-choice-hint">${cantAfford?'🪙 Not enough gold':hint}</span>`:''}
+    </button>`;
+  }).join('');
+  const el = document.createElement('div');
+  el.className = 'break-event-section';
+  el.innerHTML = `<div class="eev-card" style="--eev-color:${catColor}">
+    <div class="eev-glow-line"></div>
+    <div class="eev-inner">
+      <div class="eev-header">
+        <span class="eev-cat">${catLabel}</span>
+        <span class="eev-rank">${totalPending > 1 ? `1 of ${totalPending}` : cfg?.rank||''} · BREAK EVENT</span>
+      </div>
+      <div class="eev-title">${event.title}</div>
+      <div class="eev-body">${event.body}</div>
+      <div class="eev-choices">${choiceHtml}</div>
+      <div class="eev-footer">Resolve during your break · ${totalPending > 1 ? `${totalPending - 1} more event${totalPending-1!==1?'s':''} after this` : 'last event this stage'}</div>
+    </div>
+  </div>`;
+  return el;
 }
 
 function buildEndEventOverlay(event, cfg) {
@@ -23298,10 +23766,11 @@ function startDungeon(diffId) {
     stageRewardsLog:[], combat:null,
     activeWorkTaskId:null, forgeTaskPomoCount:0,
     midBossesDefeated:0,
-    nextFocusCheckAt:now+10*60*1000, focusCheckPending:false, focusCheckShownAt:0, focusBonusTotal:0,
+    nextFocusCheckAt:0, focusCheckPending:false, focusCheckShownAt:0, focusBonusTotal:0,
     sessionTasks:0, sessionTaskGold:0, sessionCommissions:0, sessionRep:0,
     eventHistory:[], activeOmens:[], pendingEndEvent:null, pendingMidEvent:null,
-    midEventFired:false, nextMidEventAt:now+12*60*1000,
+    midEventFired:false, nextMidEventAt:0,
+    breakEvents:[],
     sessionCount:0, pendingXpBonus:0, reliquaryBreached:false, sessionEventGold:0,
   };
   // Transfer cross-session flags into this run
@@ -23480,7 +23949,7 @@ function startWeeklyBoss() {
   const _wbArch     = cs.archetype;
   const _wbResLabel = {warrior:'RAGE 0→100',rogue:'COMBO 0→5',mage:'CHARGES 1→3',monk:'DISCIPLINE 0→7'}[_wbArch]||'RAGE 0→100';
   const statLine    = `HP:${buffedHP} · ${_wbResLabel} · ATK:${buffedAtk}`;
-  const derivedLine = `CRIT:${cs.pCrit.toFixed(1)}% · DODGE:${cs.pDodge.toFixed(1)}% · DR:${buffedDR.toFixed(1)}%`;
+  const derivedLine = `CRIT:${cs.pCrit.toFixed(1)}% · EVADE:${cs.pDodge.toFixed(1)}% · DR:${buffedDR.toFixed(1)}%`;
   const buffLine    = buff.steps===0 ? null
     : buff.isPerfect
       ? `⚡ PERFECT WEEK! ATK+${Math.round((buff.atkMult-1)*100)}% · HP+${Math.round((buff.hpMult-1)*100)}% · DR+${buff.drBonus}%`
@@ -23504,10 +23973,12 @@ function startWeeklyBoss() {
         playerAtk:buffedAtk, magicAtk:buffedMagic,
         critChance:cs.pCrit, dodgeChance:cs.pDodge, dblAtkChance:cs.pDblAtk,
         dmgReduction:buffedDR, mpRegen:cs.pMpRegen,
-        volMult:cs.pVolMult, intMult:cs.pIntMult,
-        petAtk:cs.pPetAtk, petSpd:cs.pPetSpd,
+        spellPower:cs.pSpellPower,
         atkBonus:0, atkBonusTurns:0, blocking:false,
-        enemyHP:getScaledBossHP(null,cs.primaryAtk), enemyMaxHP:getScaledBossHP(null,cs.primaryAtk), enemyAtk:getScaledBossATK(null,buffedHP),
+        enemyHP:bossBase.hp, enemyMaxHP:bossBase.hp, enemyAtk:getScaledBossATK(null,buffedHP),
+        // Boss HP is fixed to tier table (not live player ATK) so good-habit players fight
+        // a FASTER fight (more ATK), not a HARDER one. Boss ATK still scales to buffedHP
+        // so survival time stays consistent regardless of habit completion level.
         turnCount:0,
         log:[`⟦ WEEKLY CHAMPION RAID ⟧`,`${variant.emoji} ${variant.name} descends!`,statLine,derivedLine,buffLine,
              _firstTellW?`👁 ${_firstTellW}`:null].filter(Boolean),
@@ -23554,8 +24025,8 @@ function challengeBoss() {
   stopDungeonTimer();
   const cfg=DUNGEON_CONFIG[state.dungeon.difficulty];
   const cs=calcPlayerCombatStats();
-  const derivedLine=`CRIT:${cs.pCrit.toFixed(1)}% · DODGE:${cs.pDodge.toFixed(1)}% · DR:${cs.pDmgRed.toFixed(1)}%`;
-  const petLine=cs.pPetAtk>0?`🐾 Pet: ${cs.pPetAtk} dmg × ${cs.pPetSpd}/turn`:null;
+  const derivedLine=`CRIT:${cs.pCrit.toFixed(1)}% · EVADE:${cs.pDodge.toFixed(1)}% · DR:${cs.pDmgRed.toFixed(1)}%`;
+  const petLine=null;
   state.dungeon.phase='boss_fight';
   const _arch=cs.archetype;
   const _resLabel={warrior:'RAGE 0→100',rogue:'COMBO 0→5',mage:'CHARGES 1→3',monk:'DISCIPLINE 0→7',guardian:'FORTITUDE 0→10',bard:'HARMONY 0→5'}[_arch]||'RAGE 0→100';
@@ -23568,15 +24039,14 @@ function challengeBoss() {
   const _debuffedAtk =_dbf?Math.round(cs.pAtk    *_dbf.dmgMul):cs.pAtk;
   const _debuffedMagic=_dbf?Math.round((cs.magicAtk||0)*_dbf.dmgMul):(cs.magicAtk||0);
   const _debuffedPrimAtk=_dbf?Math.round(_auraAtk*_dbf.dmgMul):_auraAtk;
-  const _debuffLine=_dbf?`⚠ CLASS MISMATCH — DMG ×0.5 · RECV ×1.5`:null;
+  const _debuffLine=_dbf?`⚠ CLASS MISMATCH — DMG ×0.75 · RECV ×1.25`:null;
   state.dungeon.combat={
     playerHP:cs.pMaxHP, playerMaxHP:cs.pMaxHP,
     playerMP:cs.pMaxMP, playerMaxMP:cs.pMaxMP,
     playerAtk:_debuffedAtk, magicAtk:_debuffedMagic,
     critChance:cs.pCrit, dodgeChance:cs.pDodge, dblAtkChance:cs.pDblAtk,
     dmgReduction:cs.pDmgRed, mpRegen:cs.pMpRegen,
-    volMult:cs.pVolMult, intMult:cs.pIntMult,
-    petAtk:cs.pPetAtk, petSpd:cs.pPetSpd,
+    spellPower:cs.pSpellPower,
     atkBonus:0, atkBonusTurns:0, blocking:false,
     enemyHP:getScaledBossHP(cfg,_auraAtk), enemyMaxHP:getScaledBossHP(cfg,_auraAtk), enemyAtk:getScaledBossATK(cfg,cs.pMaxHP),
     dungeonClassDebuff:!!_dbf, dungeonRecvMul:_dbf?_dbf.recvMul:1.0,
@@ -23633,8 +24103,7 @@ function startPracticeBoss(diffId) {
       playerAtk: cs.pAtk, magicAtk: cs.magicAtk || 0,
       critChance: cs.pCrit, dodgeChance: cs.pDodge, dblAtkChance: cs.pDblAtk,
       dmgReduction: cs.pDmgRed, mpRegen: cs.pMpRegen,
-      volMult: cs.pVolMult, intMult: cs.pIntMult,
-      petAtk: cs.pPetAtk, petSpd: cs.pPetSpd,
+      spellPower: cs.pSpellPower,
       atkBonus: 0, atkBonusTurns: 0, blocking: false,
       enemyHP: getScaledBossHP(cfg,_auraAtk), enemyMaxHP: getScaledBossHP(cfg,_auraAtk), enemyAtk: getScaledBossATK(cfg,cs.pMaxHP),
       dungeonClassDebuff: false, dungeonRecvMul: 1.0,
@@ -23677,11 +24146,11 @@ function initMidBoss() {
   const d=state.dungeon, cfg=DUNGEON_CONFIG[d.difficulty];
   if (!cfg) return;
   const cs=calcPlayerCombatStats();
-  const scaledHP =Math.round(getScaledBossHP(cfg,_auraAtk)*0.4);
-  const scaledATK=Math.round(getScaledBossATK(cfg,cs.pMaxHP)*0.6);
   const _arch=cs.archetype;
   const _aura=getHabitCompoundMultiplier();
   const _auraAtk=Math.round(cs.primaryAtk*_aura);
+  const scaledHP =Math.round(getScaledBossHP(cfg,_auraAtk)*0.4);
+  const scaledATK=Math.round(getScaledBossATK(cfg,cs.pMaxHP)*0.6);
   const _firstIntent=drawBossIntent(cfg.boss,null,0);
   const _firstTell=drawBossTell(_firstIntent?.type);
   const statLine=`HP:${cs.pMaxHP} · ATK:${_auraAtk}${_aura>1?` (⚡×${_aura})`:''}`;
@@ -23696,8 +24165,7 @@ function initMidBoss() {
     playerAtk:_mbAtkD, magicAtk:_mbMagD,
     critChance:cs.pCrit, dodgeChance:cs.pDodge, dblAtkChance:cs.pDblAtk,
     dmgReduction:cs.pDmgRed, mpRegen:cs.pMpRegen,
-    volMult:cs.pVolMult, intMult:cs.pIntMult,
-    petAtk:cs.pPetAtk, petSpd:cs.pPetSpd,
+    spellPower:cs.pSpellPower,
     atkBonus:0, atkBonusTurns:0, blocking:false,
     enemyHP:scaledHP, enemyMaxHP:scaledHP, enemyAtk:scaledATK,
     dungeonClassDebuff:!!_mbDbf, dungeonRecvMul:_mbDbf?_mbDbf.recvMul:1.0,
@@ -23708,7 +24176,7 @@ function initMidBoss() {
       `HP:${scaledHP} · ATK:${scaledATK}`,
       statLine,
       _aura>1?`⚡ Aura ×${_aura} active — ATK boosted!`:null,
-      _mbDbf?`⚠ CLASS MISMATCH — DMG ×0.5 · RECV ×1.5`:null,
+      _mbDbf?`⚠ CLASS MISMATCH — DMG ×0.75 · RECV ×1.25`:null,
       _firstTell?`👁 ${_firstTell}`:null,
     ].filter(Boolean),
     outcome:null,
@@ -23786,6 +24254,19 @@ function claimRewards() {
   const _compWxp = Math.round(((_COMP_WXP[cfg.rank] || 80)) * _dgBoost);
   grantWorkXp(_compWxp);
   grantShards(SHARD_REWARDS.dungeonClear, 'dungeon clear'); // ✦ small expedition faucet
+  // Boss kill bonus: gold + materials + shard chance
+  if (bossKill) {
+    const _BKB = { E:{gold:40,mats:5,shardChance:0.30,shards:1}, D:{gold:100,mats:8,shardChance:0.35,shards:2}, C:{gold:220,mats:12,shardChance:0.40,shards:2}, B:{gold:450,mats:18,shardChance:0.50,shards:3}, A:{gold:900,mats:25,shardChance:0.60,shards:3}, S:{gold:1800,mats:35,shardChance:0.70,shards:4} };
+    const _bkb = _BKB[cfg.rank] || _BKB.E;
+    state.gold = (state.gold||0) + _bkb.gold;
+    state.totalGoldEarned = (state.totalGoldEarned||0) + _bkb.gold;
+    const _bkMatId = {warrior:'timber',guardian:'timber',rogue:'crystal',bard:'crystal',mage:'scroll',monk:'scroll',engineer:'gear'}[cfg.dungeonClass]||'gear';
+    const _bkMatEmoji = {timber:'🪵',scroll:'📜',crystal:'💎',gear:'⚙️'}[_bkMatId]||'📦';
+    if (!state.shopMaterials) state.shopMaterials={timber:0,scroll:0,crystal:0,gear:0};
+    state.shopMaterials[_bkMatId] = (state.shopMaterials[_bkMatId]||0) + _bkb.mats;
+    if (Math.random() < _bkb.shardChance) grantShards(_bkb.shards, 'boss kill');
+    showNotif(`⟦ BOSS SLAIN ⟧ · 🪙+${_bkb.gold}g · ${_bkMatEmoji}×${_bkb.mats} · ⚒+${_compWxp}WXP`);
+  }
   const _pendingDrop = state.dungeon.pendingItemDrop;
   if (bossKill && _pendingDrop?.id) {
     const _dropItem = ITEMS_DB[_pendingDrop.id];
@@ -23899,17 +24380,70 @@ function tickPlayerDots(c){
     c.log.push(`🔥 BURN — ${dmg} dmg`);
   });
 }
-// Multi-phase bosses: when HP crosses a threshold, fire the phase's banner, buffs, and intent-pool swap.
+// Universal default escalation — applied to EVERY boss that doesn't script its own
+// phases. Pressure (66%) then Frenzy (33%): more crits + a moderate enrage. NON-LETHAL
+// by design — the frenzy adds survivable double-jabs + a stacking bleed (see resolveBossAction),
+// never a one-shot gate. Scripted-phase bosses (e.g. the forge) keep their own pools.
+const DEFAULT_BOSS_PHASES=[
+  {at:0.66, banner:'⚡ PRESSURE RISES — sharper, deadlier blows!', critChance:0.10},
+  {at:0.33, banner:'🔥 FRENZY — a relentless final assault!',     critChance:0.18, enrage:0.20},
+];
+
+// ── BOSS BUILDS — each dungeon archetype punishes a CLEAN (undefended) frenzy hit
+//    in its own NON-LETHAL way. Derived from cfg.dungeonClass (no per-boss data). ──
+const BOSS_BUILD = {
+  warrior:  { id:'str',  label:'BRUTE',     emoji:'💪', color:'#ff8a80', punish:'exposed',   threat:'Clean hits leave you EXPOSED — +dmg taken until you heal/cleanse' },
+  rogue:    { id:'dex',  label:'STALKER',   emoji:'🗡️', color:'#69f0ae', punish:'bleed',     threat:'Clean hits cause a stacking BLEED — heal/cleanse to clear' },
+  mage:     { id:'int',  label:'MYSTIC',    emoji:'🔮', color:'#82b1ff', punish:'drain',     threat:'Clean hits SIPHON your resource & MP — guard your momentum' },
+  engineer: { id:'gear', label:'WARFORGED', emoji:'⚙️', color:'#ffc107', punish:'overclock', threat:'Clean hits OVERCLOCK it — Wrath surges & crits sharpen' },
+  champion: { id:'gear', label:'CHAMPION',  emoji:'👑', color:'#ea80fc', punish:'overclock', threat:'Clean hits OVERCLOCK it — Wrath surges & crits sharpen' },
+};
+function getBossBuild(cfg){ return BOSS_BUILD[cfg?.dungeonClass] || BOSS_BUILD.warrior; }
+// Apply a build's non-lethal punish for eating a clean hit during the frenzy.
+function applyBuildPunish(c,bb){
+  switch(bb.punish){
+    case 'bleed':{
+      const cur=getEffect(c.playerActiveEffects,'burn');
+      if(cur){ cur.value=Math.min(0.09,(cur.value||0)+0.02); cur.duration=Math.max(cur.duration||0,3); }
+      else addEffect(c.playerActiveEffects,{name:'burn',duration:3,value:0.03,debuff:true});
+      c.log.push(`🩸 ${bb.label} tears you open — bleeding!`); break;
+    }
+    case 'exposed':{
+      const cur=getEffect(c.playerActiveEffects,'exposed');
+      if(cur){ cur.value=Math.min(0.30,(cur.value||0)+0.10); cur.duration=Math.max(cur.duration||0,2); }
+      else addEffect(c.playerActiveEffects,{name:'exposed',duration:2,value:0.12,debuff:true});
+      c.log.push(`💔 ${bb.label} staggers you — EXPOSED (+dmg taken)!`); break;
+    }
+    case 'drain':{
+      const res=c.playerResource;
+      if(res&&res.max){ const d=Math.ceil(res.max*0.30); res.value=Math.max(0,(res.value||0)-d); }
+      c.playerMP=Math.max(0,(c.playerMP||0)-Math.ceil((c.playerMaxMP||0)*0.20));
+      c.log.push(`🔮 ${bb.label} siphons your focus — resource & MP drained!`); break;
+    }
+    case 'overclock':{
+      c.bossWrath=Math.min(100,(c.bossWrath||0)+15);
+      c.bossCritChance=Math.min(0.40,(c.bossCritChance||0)+0.05);
+      c.log.push(`⚙️ ${bb.label} OVERCLOCKS — Wrath surges, crits sharpen!`); break;
+    }
+  }
+}
 function checkBossPhase(c,boss){
-  const phases=boss.phases;
-  if(!phases||!phases.length||c.enemyMaxHP<=0)return;
+  if(c.enemyMaxHP<=0)return;
   const frac=c.enemyHP/c.enemyMaxHP;
+  // Universal low-HP FRENZY flag — drives the (non-lethal) double-jab + bleed for ALL bosses.
+  c.bossDesperation = frac<=0.33;
+  const phases=(boss.phases&&boss.phases.length)?boss.phases:DEFAULT_BOSS_PHASES;
   let idx=c.bossPhase||0;
   while(idx<phases.length && frac<=phases[idx].at){
     const ph=phases[idx];
     c.log.push(`⟦ ${ph.banner} ⟧`);
     if(ph.intentPool)c.bossIntentPool=ph.intentPool;
     if(typeof ph.critChance==='number')c.bossCritChance=ph.critChance;
+    if(typeof ph.enrage==='number'){
+      const en=getEffect(c.bossActiveEffects,'enrage');
+      if(en) en.value=Math.max(en.value||0,ph.enrage);
+      else addEffect(c.bossActiveEffects,{name:'enrage',duration:9999,permanent:true,value:ph.enrage});
+    }
     (ph.onEnter||[]).forEach(e=>applyEffectEntry(c,e,null));
     idx++;
   }
@@ -24047,13 +24581,14 @@ function resolveNewSkillAction(c,sk,boss){
   const counter =resolveCounter(intent,sk);
   const ctrMul  =counter==='perfect'?1.6:counter==='partial'?1.25:1.0;
   const cls     =CLASSES[state.classData?.equipped];
-  const tierBonus=cls?1+(cls.tier-1)*0.03:1.0;
+  const tierBonus=cls?1+(cls.tier-1)*CLASS_TIER_CP_MULT:1.0; // mirrors calcPowerLevel — same coefficient, consistent CP↔combat
   const rallyEff=getEffect(c.playerActiveEffects,'rally');
   const rallyMul=rallyEff?1+(rallyEff.value||0.4):1.0;
   let vulnMul=1.0;
   if(hasEffect(c.bossActiveEffects,'sundered'))  vulnMul*=1+(getEffect(c.bossActiveEffects,'sundered')?.value||0.20);
   if(hasEffect(c.bossActiveEffects,'vulnerable'))vulnMul*=1+(getEffect(c.bossActiveEffects,'vulnerable')?.value||0.30);
   if(hasEffect(c.bossActiveEffects,'marked'))    vulnMul*=1+(getEffect(c.bossActiveEffects,'marked')?.value||0.35);
+  vulnMul=Math.min(2.0,vulnMul); // cap at 2.0: landing all 3 debuffs is decisive without one-shotting (natural max 2.27)
   const res     =c.playerResource;
   // Lethality (rogue, Apex Predator) raises both crit chance and finisher damage
   const lethalityCrit=res?.type==='combo'?(c.lethalityStacks||0)*4:0;
@@ -24088,7 +24623,7 @@ function resolveNewSkillAction(c,sk,boss){
   const crSuffix=critRoll?' ⭐CRIT':'';
   const crescendoMul=res.type==='rage'?1+(c.crescendoStacks||0)*0.08:1.0;
   // Mage: VOL multiplier (previously computed but never applied) + Arcane Attunement stacks
-  const mageMul=res.type==='charges'?(c.volMult||1)*(1+(c.attunementStacks||0)*0.04):1.0;
+  const mageMul=res.type==='charges'?(c.spellPower||1)*(1+(c.attunementStacks||0)*0.04):1.0;
   // Bard: amplifyNext (consumed by next damaging skill) + FULL CHORUS damage bonus
   const ampMul=((c.amplifyNext||0)>0&&BARD_DMG_ACTIONS.has(sk.action))?1+(c.amplifyNext/100):1.0;
   const chorus=(c.fullChorus&&sk.fullChorusBonus)?sk.fullChorusBonus:null;
@@ -24165,7 +24700,7 @@ function resolveNewSkillAction(c,sk,boss){
     case 'heal_cleanse':{
       const hPct=(isTrans&&sk.transcendentHealPct)?sk.transcendentHealPct:(sk.healPct||0.20);
       // Mage heals scale with the VOL multiplier (makes VOL a real lever)
-      const healVolMul=res.type==='charges'?(c.volMult||1):1.0;
+      const healVolMul=res.type==='charges'?(c.spellPower||1):1.0;
       const ha=Math.floor(c.playerMaxHP*hPct*healVolMul);
       c.playerHP=Math.min(c.playerMaxHP,c.playerHP+ha);
       const clrN=isTrans?Infinity:(sk.debuffClearCount||1);
@@ -24235,6 +24770,8 @@ function resolveNewSkillAction(c,sk,boss){
   // Late TRANSCENDENT check (for DP grants via onPerfectCounter on iron_ward etc.)
   if(res.type==='discipline'&&res.value>=7&&!c.transcendent){res.value=7;c.transcendent=true;c.log.push('⚖️ TRANSCENDENT!');}
 }
+// Skill actions that deal damage to the boss (a "trade" turn vs. a defensive "stall").
+const _ATTACK_ACTIONS = new Set(['attack','attack_buff','attack_debuff','attack_stun','ultimate','hybrid_attack','finisher']);
 function resolveBossAction(c,boss){
   const intent   =c.bossCurrentIntent;
   const isBerserk=hasEffect(c.bossActiveEffects,'berserk');
@@ -24262,6 +24799,9 @@ function resolveBossAction(c,boss){
   const _dmgMulDeb=getEffect(c.bossActiveEffects,'dmgmuldown');
   if(_dmgMulDeb&&_dmgMulDeb.value)baseMul*=(1-Math.min(0.7,_dmgMulDeb.value));
   let ed=Math.max(1,Math.floor(c.enemyAtk*baseMul+Math.random()*6-3));
+  // EXPOSED (BRUTE build) — you take amplified damage until you heal/cleanse it off.
+  const _exposed=getEffect(c.playerActiveEffects,'exposed');
+  if(_exposed&&_exposed.value) ed=Math.floor(ed*(1+_exposed.value));
   // Guardian signature: bossAtkDebuff erodes the boss's outgoing damage (capped at 60%)
   const _atkDeb=getEffect(c.bossActiveEffects,'atkdebuff');
   if(_atkDeb&&_atkDeb.value)ed=Math.max(1,Math.floor(ed*(1-Math.min(0.6,_atkDeb.value))));
@@ -24282,7 +24822,13 @@ function resolveBossAction(c,boss){
   }
   if(Math.random()*100<(c.dodgeChance||0)){c.log.push(`💨 DODGED! — ${boss.name} misses!`);return;}
   if((c.activeMitigationPct||0)>0){
-    const rp=c.activeMitigationPct;c.activeMitigationPct=0;defended=true;
+    let rp=c.activeMitigationPct;c.activeMitigationPct=0;defended=true;
+    // Danger-scaled cap: HEAVY/LETHAL blows can never be FULLY negated — chip always
+    // pierces, so you cannot turtle a hard-hitting boss indefinitely (must race it down).
+    const _mult=intent?.damageMultiplier||1.0;
+    const _mitCap=_mult>=2.2?0.75:_mult>=1.6?0.90:1.0;
+    const _pierced=rp>_mitCap;
+    rp=Math.min(rp,_mitCap);
     if(rp>=1.0){
       // Guardian: a full block still hardens you — grant Fortitude even though no
       // damage lands (the on-damage Fortitude code below is skipped by this return).
@@ -24293,13 +24839,25 @@ function resolveBossAction(c,boss){
       c.log.push(`🛡️ ${label} — BLOCKED!`);return;
     }
     ed=Math.max(1,Math.floor(ed*(1-rp)));
-    c.log.push(`🛡️ ${Math.round(rp*100)}% block → ${ed} dmg`);
+    c.log.push(`🛡️ ${Math.round(rp*100)}% block${_pierced?' ⚠ PIERCED':''} → ${ed} dmg`);
   }
   if(c.blocking){ed=Math.max(1,Math.floor(ed*0.4));c.log.push(`🛡️ Blocked! → ${ed} dmg`);c.blocking=false;defended=true;}
   if((c.dmgReduction||0)>0){const red=Math.floor(ed*(c.dmgReduction/100));ed=Math.max(1,ed-red);}
   c.playerHP=Math.max(0,c.playerHP-ed);
   c.log.push(`${label}${_bossCrit?' 💥CRIT':''} (${ed} dmg)`);
   if(!defended&&ed>0)c._tookFullHit=true;   // a clean, uncountered hit (Bard loses Harmony)
+  // ── FRENZY punish (≤33% boss HP) — only follows a CLEAN hit, so DEFENDING negates it.
+  //    Survivable pressure: a half-power jab + the boss BUILD's signature debuff. Never a one-shot. ──
+  if(c.bossDesperation && !defended && ed>0 && c.playerHP>0){
+    if(Math.random()<0.35){
+      const jab=Math.max(1,Math.floor(ed*0.5));
+      c.playerHP=Math.max(0,c.playerHP-jab);
+      c.log.push(`⚡ FRENZY follow-up — ${jab} dmg!`);
+    }
+    if(c.playerHP>0){
+      applyBuildPunish(c, getBossBuild(DUNGEON_CONFIG[state.dungeon?.difficulty]));
+    }
+  }
   // Guardian: taking damage builds Fortitude and triggers on-damage passives (retaliation, hardening).
   if(c.playerResource?.type==='fortitude'&&ed>0){
     const r=c.playerResource;
@@ -24335,15 +24893,28 @@ function resolveBossAction(c,boss){
     }
   }
 }
+// Wrath = stall timer. TRADING blows (dealing damage) builds it slowly; STALLING
+// (defend/heal, no damage) builds it fast → a pure turtle berserks itself. A perfect
+// read HALVES the gain (no longer freezes it — turtling can't hold Wrath at 0 forever).
 function tickBossWrath(c,boss,counterResult){
-  if(counterResult==='perfect')return; // perfect counter keeps wrath flat
-  c.bossWrath=Math.min(100,(c.bossWrath||0)+12);
-  if(c.bossWrath>=100&&!hasEffect(c.bossActiveEffects,'berserk')){
+  const prev=c.bossWrath||0;
+  let gain = c._playerAttacked ? 5 : 10;          // stall = ×2 wrath (berserk onsets ~turn 20 of pure attacking → backstop, not midfight)
+  if(counterResult==='perfect') gain = Math.ceil(gain*0.5);
+  c.bossWrath=Math.min(100,prev+gain);
+  const w=c.bossWrath;
+  if(w>=100&&!hasEffect(c.bossActiveEffects,'berserk')){
     addEffect(c.bossActiveEffects,{name:'berserk',duration:9999,permanent:true});
-    c.log.push(`💀 ${boss.name} BERSERKS! Permanent ×1.5 ATK!`);
-  }else if(c.bossWrath===75)c.log.push(`⚠️ ${boss.name} WRATH 75 — growing dangerous!`);
-  else if(c.bossWrath===50)c.log.push(`⚠️ ${boss.name} WRATH 50 — enraged!`);
-  else if(c.bossWrath===25)c.log.push(`⚠️ ${boss.name} WRATH 25 — angered!`);
+    addEffect(c.bossActiveEffects,{name:'enrage',duration:9999,permanent:true,value:0});
+    c.log.push(`💀 ${boss.name} BERSERKS! ×1.5 ATK — and growing each turn. END THIS.`);
+  }else if(prev<75&&w>=75)c.log.push(`⚠️ ${boss.name} WRATH 75 — growing dangerous!`);
+  else if(prev<50&&w>=50)c.log.push(`⚠️ ${boss.name} WRATH 50 — enraged!`);
+  else if(prev<25&&w>=25)c.log.push(`⚠️ ${boss.name} WRATH 25 — angered!`);
+  // Hard-enrage ramp: once berserk, damage climbs every turn (+12%/turn) so STALLING
+  // is fatal — you cannot out-heal an infinite fight. Forces the kill within a window.
+  if(hasEffect(c.bossActiveEffects,'berserk')){
+    const en=getEffect(c.bossActiveEffects,'enrage');
+    if(en){ en.value=(en.value||0)+0.06; const _p=Math.round(en.value*100); if(_p>0&&_p%30<6) c.log.push(`🔥 ${boss.name} ENRAGE +${_p}% — burst it down NOW!`); }
+  }
 }
 function processPlayerAction(skillId){
   const d=state.dungeon,c=d?.combat;
@@ -24353,6 +24924,9 @@ function processPlayerAction(skillId){
   const sk=getActiveArchetypeSkills(c.playerArchetype).find(s=>s.id===skillId);
   if(!sk||!canAffordNewSkill(c,sk))return;
   c.actedThisRound=true;c.turnCount++;
+  // Opportunity cost: did this turn TRADE (deal damage) or STALL (defend/heal)?
+  // Stalling builds boss Wrath faster (anti-turtle) — see tickBossWrath.
+  c._playerAttacked = _ATTACK_ACTIONS.has(sk.action);
   const _counter=resolveCounter(c.bossCurrentIntent,sk);
   resolveNewSkillAction(c,sk,boss);
   // Bard: Harmony now builds inside resolveNewSkillAction (debuffs/buffs applied),
@@ -24362,14 +24936,6 @@ function processPlayerAction(skillId){
   if(_counter==='perfect')firePassive(c,'on_perfect_counter');
   // Crimson Crescendo — bank a stack if the action filled Rage to max
   updateRageLatch(c);firePassive(c,'on_resource_max');
-  // Pet companion (CHA)
-  if((c.petAtk||0)>0&&c.enemyHP>0){
-    for(let i=0;i<(c.petSpd||1);i++){
-      if(c.enemyHP<=0)break;
-      c.enemyHP=Math.max(0,c.enemyHP-c.petAtk);
-      c.log.push(`🐾 Pet strikes: ${c.petAtk} dmg`);
-    }
-  }
   // Win check
   if(c.enemyHP<=0){
     c.outcome='win';
@@ -24453,23 +25019,11 @@ function renderDungeonSelect() {
     w.appendChild(rb);
   }
 
-  // Weekly Boss banner
-  const _wbStatus=getWeeklyBossStatus();
-  if (_wbStatus.unlocked||_wbStatus.claimed) {
-    const _wbv=getWeeklyBossVariant();
-    const wbBanner=document.createElement('div');
-    wbBanner.className='weekly-boss-banner'+(_wbStatus.claimed?' claimed':'');
-    wbBanner.style.cssText=`border-color:${_wbStatus.claimed?'rgba(255,215,0,0.15)':_wbv.color+'88'}`;
-    const _wbBuff=getWeeklyBossCompletionBuff(_wbStatus.avgPct);
-    const _buffLabels=['','Slight Edge','Notable Boost','Major Boost','⚡ PERFECT WEEK'];
-    const _buffSub=_wbStatus.claimed
-      ?`${_wbv.name} already defeated this week`
-      :_wbBuff.steps>0
-        ?`${_wbv.name} · ${_wbStatus.avgPct}% — ${_buffLabels[_wbBuff.steps]} (+${Math.round((_wbBuff.atkMult-1)*100)}% ATK · +${Math.round((_wbBuff.hpMult-1)*100)}% HP · +${_wbBuff.drBonus}% DR)`
-        :`${_wbv.name} · ${_wbStatus.avgPct}% avg — boss unlocked`;
-    wbBanner.innerHTML=`<div class="wb-glow-bar" style="background:linear-gradient(90deg,transparent,${_wbv.color},transparent)"></div><div class="wb-content"><span class="wb-icon">${_wbv.emoji}</span><div class="wb-text"><div class="wb-title" style="color:${_wbv.color}">${_wbStatus.claimed?'CHAMPION DEFEATED':'WEEKLY CHAMPION'}</div><div class="wb-sub">${_buffSub}</div></div>${!_wbStatus.claimed?`<button class="wb-fight-btn" style="border-color:${_wbv.color};color:${_wbv.color};background:${_wbv.color}22" onclick="startWeeklyBoss()">FIGHT →</button>`:`<span class="wb-claimed-badge" style="color:${_wbv.color}88">✓</span>`}</div>`;
-    w.appendChild(wbBanner);
-  }
+  // ── ARENA placeholder (weekly boss removed — arena system coming) ──
+  const _arenaBanner = document.createElement('div');
+  _arenaBanner.style.cssText=`background:linear-gradient(135deg,rgba(179,136,255,0.06),rgba(10,8,20,0.9));border:1px solid rgba(179,136,255,0.25);border-radius:10px;overflow:hidden;margin-bottom:10px;display:flex;align-items:center;gap:12px;padding:12px 16px;opacity:0.7`;
+  _arenaBanner.innerHTML=`<span style="font-size:22px">⚔️</span><div style="flex:1"><div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:#b388ff">ARENA</div><div style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:2px">Challenge fights · coming soon</div></div><span style="font-family:'Cinzel',serif;font-size:8px;color:rgba(179,136,255,0.5);letter-spacing:1px">IN DEVELOPMENT</span>`;
+  w.appendChild(_arenaBanner);
 
   // Rank tabs
   const tabs=document.createElement('div'); tabs.className='dungeon-rank-tabs';
@@ -24503,7 +25057,10 @@ function renderDungeonSelect() {
 
   // 3-column class grid
   const grid=document.createElement('div'); grid.className='dungeon-class-grid';
-  const _cpNow = calcPowerLevel().cp;
+  // Readiness = true combat power: gear-inclusive CP × habit-aura boost (aura multiplies
+  // primaryAtk → effAtk → raw, then goes through CP_SNOWBALL, so CP scales as aura^CP_SNOWBALL).
+  const _cpGear = calcPowerLevel(calcPlayerCombatStats(true)).cp;
+  const _cpNow  = Math.round(_cpGear * Math.pow(getHabitCompoundMultiplier(), CP_SNOWBALL));
   DUNGEON_CLASS_DEFS.forEach(cls=>{
     const col=document.createElement('div'); col.className='dungeon-class-col';
     const hdr=document.createElement('div'); hdr.className='dungeon-class-header';
@@ -24532,6 +25089,16 @@ function renderDungeonSelect() {
     const _engToday  = cfg.dungeonClass==='engineer'
       ? ({1:'⚔ WARRIOR TODAY',4:'⚔ WARRIOR TODAY',2:'🗡 ROGUE TODAY',5:'🗡 ROGUE TODAY',3:'✨ MAGE TODAY',6:'✨ MAGE TODAY',0:'⚠ NO AFFINITY'})[new Date().getDay()]||''
       : '';
+    // CP requirement line — show raw req when matched, adjusted upward when mismatched
+    // Mismatch factor: deal ×0.75, recv ×1.25 → need ~1.67× more effective power
+    const _cpReqLine = (()=>{
+      if (!_rdy.req) return '';
+      if (!cfg.isWeeklyBoss && !_isMatched) {
+        const adjReq = Math.round(_rdy.req * (1/0.75) * 1.25);
+        return `<div class="dcc-cp-req" style="color:#ffab40">⚡ ~${adjReq.toLocaleString()} CP <span style="opacity:0.7;font-size:8px">(class penalty)</span></div>`;
+      }
+      return `<div class="dcc-cp-req">⚡ ${_rdy.req.toLocaleString()} CP needed</div>`;
+    })();
     card.innerHTML=`
       <div class="dcc-top-bar"></div>
       <div class="dcc-portal">${cfg.img?`<img class="dcc-img" src="${cfg.img}" alt="${cfg.emoji}" onerror="this.outerHTML='<div class=\\'dcc-emoji\\'>'+this.alt+'</div>'">`:`<div class="dcc-emoji">${cfg.emoji}</div>`}</div>
@@ -24543,6 +25110,7 @@ function renderDungeonSelect() {
           :`<span class="dcc-affinity-badge" style="border-color:rgba(255,82,82,0.7);color:#ff5252;background:rgba(255,82,82,0.1)">⚠ DEBUFF</span>`}
         ${_rdy.label?`<span class="dcc-affinity-badge" style="border-color:${_rdy.color};color:${_rdy.color};background:${_rdy.color}1a">${_rdy.label}</span>`:''}
       </div>
+      ${_cpReqLine}
       ${_classReq?`<div class="dcc-gimmick">${cfg.dungeonClass==='engineer'?_engToday:_classReq}</div>`:''}
       <div class="dcc-info-row">
         <span class="dcc-xp">🪙 ${(()=>{ const _b=getStageDrop(cfg,true); return `${Math.round(_b.gold*0.8)*cfg.stages}–${Math.round(_b.gold*1.2)*cfg.stages}`; })()}g</span>
@@ -24606,8 +25174,13 @@ function renderDungeonExplore() {
   // Total gold earned so far this expedition
   const earnedGold=(d.stageRewardsLog||[]).reduce((s,r)=>s+(r.gold||0),0);
 
-  // Focus interrupt overlay (shown every 10 min during work phase)
-  const focusInterruptHtml=(d.focusCheckPending&&!isPaused&&!isBreak)?`<div class="focus-interrupt"><div class="focus-int-header"><span class="focus-int-icon">🎯</span><span class="focus-int-title">STAYING ON TASK?</span></div><div class="focus-int-sub">Confirm to earn a focus bonus</div><button class="focus-confirm-btn" onclick="answerFocusCheck('tap')">Still here → <span style="color:#ffc107">+10g</span></button><div class="focus-input-row"><input type="text" id="focus-check-input" class="focus-check-input" placeholder="What are you working on?" maxlength="80" /><button class="focus-text-btn" onclick="answerFocusCheck('text')">→ +15g</button></div><div class="focus-timeout-wrap"><div class="focus-timeout-bar"></div></div></div>`:'';
+  // Boss progress tracker
+  const _remaining=totalStages-stagesComplete;
+  const bossTrackerHtml=isComplete
+    ?`<div class="dexp-boss-tracker complete">⚔ ${cfg.boss?.name||'THE BOSS'} AWAITS</div>`
+    :_remaining===1
+      ?`<div class="dexp-boss-tracker final">⟦ FINAL SESSION — BOSS INCOMING ⟧</div>`
+      :`<div class="dexp-boss-tracker">${_remaining} more session${_remaining!==1?'s':''} → <span style="color:${cfg.color}">BOSS FIGHT</span></div>`;
 
   // Aura chip
   const _auraMult = getHabitCompoundMultiplier();
@@ -24657,6 +25230,7 @@ function renderDungeonExplore() {
       <div class="dexp-overall-track"><div class="dexp-overall-fill" style="width:${Math.min(100,stagePct)}%"></div></div>
     </div>
     <div class="dexp-stage-dots">${stageDots}</div>
+    ${bossTrackerHtml}
     ${auraChipHtml}
     <div class="dexp-scene">
       <div class="dexp-bg ${isPaused?'paused':''}">
@@ -24684,7 +25258,7 @@ function renderDungeonExplore() {
       <div class="dexp-pomo-track"><div class="dexp-pomo-fill ${isBreak?'break-fill':''}" style="width:${pomoPct*100}%"></div></div>
     </div>
     ${prebossStrip}
-    ${focusInterruptHtml}${forgeSection}
+    ${forgeSection}
     <div class="dexp-actions">
       ${isPaused
         ?`<button class="dexp-btn dexp-btn-primary" onclick="resumeDungeon()">▶  RESUME</button>`
@@ -24697,7 +25271,11 @@ function renderDungeonExplore() {
     </div>
     ${isComplete?`<div class="dexp-complete-badge">⟦ ALL STAGES CLEARED — THE BOSS AWAITS ⟧</div>`:''}`;
 
-  // End-session event overlay — blocks break start until player resolves
+  // Break events — shown inline during break, non-blocking
+  if (isBreak && d.breakEvents && d.breakEvents.length > 0) {
+    w.appendChild(buildBreakEventCard(d.breakEvents[0], cfg, d.breakEvents.length));
+  }
+  // Legacy: migrate old event-phase session
   if (d.pomodoroPhase==='event' && d.pendingEndEvent) {
     w.style.position='relative';
     w.appendChild(buildEndEventOverlay(d.pendingEndEvent, cfg));
@@ -24717,9 +25295,11 @@ function renderDungeonBoss() {
   const archetype=c.playerArchetype||'warrior';
   const wrath=c.bossWrath||0;
   const isBerserk=hasEffect(c.bossActiveEffects,'berserk');
+  const _bbuild=getBossBuild(cfg);
 
-  // ── Intent tell colour — neutral so the move type stays hidden ──
-  const intentColor='rgba(255,255,255,0.45)';
+  // ── Readable telegraph — explicit category + danger (player reads the threat) ──
+  const tg=getIntentTelegraph(intent);
+  const intentColor=tg?tg.dColor:'rgba(255,255,255,0.45)';
   const tell=c.bossCurrentTell||(intent?drawBossTell(intent.type):null);
 
   // ── Wrath bar ────────────────────────────────────────────────
@@ -24731,13 +25311,21 @@ function renderDungeonBoss() {
       <span class="d-wrath-num">${isBerserk?'💀 BERSERK':`${wrath}/100`}</span>
     </div>`;
 
-  // ── Intent card — vague behavioral tell only (no type/counter leak) ──
-  const intentHtml=intent&&!c.outcome?`
+  // ── Intent card — explicit telegraph: move + danger + the response it demands ──
+  const intentHtml=intent&&!c.outcome&&tg?`
     <div class="d-intent-card d-intent-tellcard" style="--icolor:${intentColor}">
       <div class="d-intent-body">
-        <span class="d-intent-emoji">👁</span>
+        <span class="d-intent-emoji">${tg.emoji}</span>
         <div class="d-intent-text">
-          <div class="d-intent-tell-text">${tell||'The boss watches you carefully...'}</div>
+          <div class="d-intent-headline">
+            <span class="d-intent-move">${tg.label}</span>
+            <span class="d-intent-danger" style="color:${tg.dColor};border-color:${tg.dColor}66">${tg.dIcon} ${tg.danger}</span>
+          </div>
+          <div class="d-intent-meta">
+            <span class="d-intent-type">${tg.type}</span>
+            ${tg.respVerb?`<span class="d-intent-arrow">→</span><span class="d-intent-resp">${tg.respEmoji} ${tg.respVerb}</span>`:''}
+          </div>
+          ${tell?`<div class="d-intent-tell-text">${tell}</div>`:''}
         </div>
       </div>
     </div>`:'';
@@ -24834,15 +25422,15 @@ function renderDungeonBoss() {
         <div class="d-sk-desc">${sk.desc}</div>
         <div class="d-sk-foot">
           <span class="d-sk-cost">${skCost(sk)}</span>
-          ${counter?`<span class="d-sk-ctrbadge">${counter==='perfect'?'✅ PERFECT':'🔷 PARTIAL'}</span>`:''}
+          <span class="d-sk-tag">${sk.counterTag||''}</span>
         </div>
       </button>`;
     }).join('');
   }
 
   // ── Active effects ───────────────────────────────────────────
-  const EFF_EMOJI={rally:'📯',sundered:'🩸',vulnerable:'💔',marked:'🎯',stunned:'⚡',berserk:'💀',atkdebuff:'🪓',dmgmuldown:'📉',enrage:'🔥',burn:'🔥'};
-  const EFF_LABEL={atkdebuff:'ATK↓',dmgmuldown:'DMG↓'};
+  const EFF_EMOJI={rally:'📯',sundered:'🩸',vulnerable:'💔',marked:'🎯',stunned:'⚡',berserk:'💀',atkdebuff:'🪓',dmgmuldown:'📉',enrage:'🔥',burn:'🔥',exposed:'💔'};
+  const EFF_LABEL={atkdebuff:'ATK↓',dmgmuldown:'DMG↓',exposed:'EXPOSED',burn:'BLEED'};
   const effName=e=>EFF_LABEL[e.name]||e.name.toUpperCase();
   const playerEffHtml=(c.playerActiveEffects||[]).map(e=>`<span class="d-eff d-eff-player">${EFF_EMOJI[e.name]||'✨'} ${effName(e)}${e.permanent?'':` ${e.duration}t`}</span>`).join('');
   const bossEffHtml=(c.bossActiveEffects||[]).filter(e=>!e.permanent||e.name!=='berserk').map(e=>`<span class="d-eff d-eff-boss">${EFF_EMOJI[e.name]||'☠️'} ${effName(e)}${e.permanent?'':` ${e.duration}t`}</span>`).join('');
@@ -24864,7 +25452,7 @@ function renderDungeonBoss() {
     </div>
     ${d.isPractice?`<div class="dboss-practice-bar">⚔ PRACTICE ARENA — No XP · No rewards · Pure combat</div>`:''}
     ${c.isMidBoss?`<div class="dboss-practice-bar" style="border-color:rgba(255,193,7,0.4);color:#ffc107">⚔ MID-BOSS — Weakened form · HP×0.4 · ATK×0.6</div>`:''}
-    ${c.dungeonClassDebuff?`<div class="dboss-practice-bar" style="border-color:rgba(255,82,82,0.6);color:#ff5252;font-weight:700">⚠ CLASS MISMATCH — YOUR DMG ×0.5 · INCOMING ×1.5</div>`:''}
+    ${c.dungeonClassDebuff?`<div class="dboss-practice-bar" style="border-color:rgba(255,82,82,0.6);color:#ff5252;font-weight:700">⚠ CLASS MISMATCH — YOUR DMG ×0.75 · INCOMING ×1.25</div>`:''}
 
     ${wrathHtml}
 
@@ -24884,7 +25472,6 @@ function renderDungeonBoss() {
           ${(c.critChance||0)>0?`<span>⭐${c.critChance.toFixed(1)}%</span>`:''}
           ${(c.dodgeChance||0)>0?`<span>💨${c.dodgeChance.toFixed(1)}%</span>`:''}
           ${(c.dmgReduction||0)>0?`<span>🪨${c.dmgReduction.toFixed(1)}%DR</span>`:''}
-          ${(c.petAtk||0)>0?`<span>🐾${c.petAtk}×${c.petSpd}</span>`:''}
         </div>
         ${playerEffHtml?`<div class="d-effects-row">${playerEffHtml}</div>`:''}
       </div>
@@ -24892,6 +25479,7 @@ function renderDungeonBoss() {
       <div class="dboss-fighter">
         <div class="dboss-sprite boss-sprite ${c.outcome==='win'?'d-dead':''}" id="d-enemy-sprite">${boss.emoji}</div>
         <div class="dboss-name">${boss.name}${isBerserk?' 💀':''}</div>
+        <div class="dboss-build" style="--bb:${_bbuild.color}" title="${_bbuild.threat}">${_bbuild.emoji} ${_bbuild.label}</div>
         <div class="dboss-bar-wrap">
           <div class="dboss-bar-label"><span>HP</span><span id="d-ehp-txt">${c.enemyHP}/${c.enemyMaxHP}</span></div>
           <div class="dboss-track"><div class="dboss-fill enemy-hp-fill" id="d-ehp-fill" style="width:${eHP}%"></div></div>

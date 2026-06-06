@@ -1,6 +1,6 @@
 ﻿const DUNGEON_CONFIG = {
   // â•â• E RANK Â· 2 stages Â· comfortable threshold STR/CONâ‰ˆ100 â•â•
-  e_warrior:{id:'e_warrior',rank:'E',dungeonClass:'warrior',unlockLevel:1,workerUnlockLevel:1,stages:2,
+  e_warrior:{id:'e_warrior',rank:'E',dungeonClass:'warrior',unlockLevel:1,workerUnlockLevel:1,stages:4,
     name:"Dark Knight's Forge",img:'img/dungeon/yellow_barracks.png',emoji:'âš”ï¸',color:'#ef5350',glow:'rgba(239,83,80,0.4)',bgColor:'rgba(20,3,3,0.97)',
     minHours:1,
     enemies:[{name:'Armed Zombie',emoji:'ðŸ§Ÿ'},{name:'Iron Golem',emoji:'ðŸ¤–'},{name:'Dark Guard',emoji:'ðŸ›¡ï¸'},{name:'Broken Knight',emoji:'âš”ï¸'}],
@@ -32,7 +32,7 @@
         {id:'forged_strike',  label:'FORGED STRIKE',  emoji:'âš”ï¸',type:'CHARGE',  damageMultiplier:2.0,counterType:'INTERRUPT',hint:'Interrupt before the charge connects',weight:2},
         {id:'forge_mend',     label:'FORGE MEND',     emoji:'âš™ï¸',type:'RECOVERY', damageMultiplier:0,  counterType:'DISRUPT',  hint:'Disrupt the self-repair ritual',weight:1},
       ]}},
-  e_rogue:{id:'e_rogue',rank:'E',dungeonClass:'rogue',unlockLevel:1,workerUnlockLevel:1,stages:2,
+  e_rogue:{id:'e_rogue',rank:'E',dungeonClass:'rogue',unlockLevel:1,workerUnlockLevel:1,stages:4,
     name:'Shadowy Forest',img:'img/dungeon/yellow_archery.png',emoji:'ðŸŒ²',color:'#66bb6a',glow:'rgba(102,187,106,0.4)',bgColor:'rgba(3,12,3,0.97)',
     minHours:1,
     enemies:[{name:'Shadow Spider',emoji:'ðŸ•·ï¸'},{name:'Dark Wolf',emoji:'ðŸº'},{name:'Outcast Elf',emoji:'ðŸ§'},{name:'Cursed Archer',emoji:'ðŸ¹'}],
@@ -43,7 +43,7 @@
         {id:'predator_lunge', label:'PREDATOR LUNGE', emoji:'ðŸŒ‘',type:'CHARGE',  damageMultiplier:1.8,counterType:'INTERRUPT',hint:'Interrupt the lunging ambush',weight:2},
         {id:'shadow_mend',    label:'SHADOW MEND',    emoji:'ðŸŒ«ï¸',type:'RECOVERY', damageMultiplier:0,  counterType:'DISRUPT',  hint:'Disrupt the shadow regeneration',weight:1},
       ]}},
-  e_mage:{id:'e_mage',rank:'E',dungeonClass:'mage',unlockLevel:1,workerUnlockLevel:1,stages:2,
+  e_mage:{id:'e_mage',rank:'E',dungeonClass:'mage',unlockLevel:1,workerUnlockLevel:1,stages:4,
     name:'Cursed Library',img:'img/dungeon/yellow_monastery.png',emoji:'ðŸ“š',color:'#7e57c2',glow:'rgba(126,87,194,0.4)',bgColor:'rgba(8,3,18,0.97)',
     minHours:1,
     enemies:[{name:'Cursed Scholar',emoji:'ðŸ“–'},{name:'Ink Specter',emoji:'âœ’ï¸'},{name:'Paper Golem',emoji:'ðŸ“œ'},{name:'Arcane Imp',emoji:'ðŸ‘»'}],
@@ -249,7 +249,7 @@
       ]}},
 
   // â•â• ENGINEER RANK Â· Gear materials Â· Operational dungeons â•â•
-  e_engineer:{id:'e_engineer',rank:'E',dungeonClass:'engineer',unlockLevel:1,workerUnlockLevel:1,stages:2,
+  e_engineer:{id:'e_engineer',rank:'E',dungeonClass:'engineer',unlockLevel:1,workerUnlockLevel:1,stages:4,
     name:'Abandoned Workshop',img:'img/dungeon/yellow_tower.png',emoji:'ðŸ”§',color:'#80deea',glow:'rgba(128,222,234,0.4)',bgColor:'rgba(0,12,15,0.97)',
     minHours:1,
     enemies:[{name:'Junk Golem',emoji:'ðŸ”©'},{name:'Faulty Automaton',emoji:'ðŸ¤–'},{name:'Rust Specter',emoji:'â›“ï¸'},{name:'Gear Wraith',emoji:'âš™ï¸'}],

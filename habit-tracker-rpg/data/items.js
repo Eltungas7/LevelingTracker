@@ -29,13 +29,17 @@ const RARITY_BY_ID = Object.fromEntries(RARITY_TIERS.map(r => [r.id, r]));
 const RARITY_AFFIX_MULT = { common:1.00, uncommon:1.15, rare:1.30, epic:1.50, legendary:1.70 };
 
 // Affix pool — rolled on T4+ gear. kind 'pct' = % combat multiplier, 'pts' = flat points.
+// Affix base min/max are BEFORE rarity×grade scaling (legendary G5 multiplies by ×2.516).
+// Calibrated so a full T9 G5 legendary 10-slot loadout (40 affix slots, ~6-7 rolling atkPct)
+// accumulates ≥35% total atkPct → raw gear CP > 70% of base CP → display cap binds.
+// Individual max per legendary G5 slot: atkPct/hpPct 3×2.516=7.55%, crit 0.6×2.516=1.51%.
 const AFFIX_POOL = [
-  { stat:'atkPct',   label:'ATK',   suffix:'%', kind:'pct', min:5, max:15, color:'#ff8a80' },
-  { stat:'hpPct',    label:'HP',    suffix:'%', kind:'pct', min:5, max:15, color:'#69f0ae' },
-  { stat:'defPct',   label:'DEF',   suffix:'%', kind:'pct', min:5, max:15, color:'#90caf9' },
-  { stat:'mpPct',    label:'MP',    suffix:'%', kind:'pct', min:5, max:15, color:'#b39ddb' },
-  { stat:'critPts',  label:'CRIT',  suffix:'%', kind:'pts', min:2, max:6,  color:'#ffd54f' },
-  { stat:'dodgePts', label:'DODGE', suffix:'%', kind:'pts', min:1, max:4,  color:'#4dd0e1' },
+  { stat:'atkPct',   label:'ATK',   suffix:'%', kind:'pct', min:1,   max:3,   color:'#ff8a80' },
+  { stat:'hpPct',    label:'HP',    suffix:'%', kind:'pct', min:1,   max:3,   color:'#69f0ae' },
+  { stat:'defPct',   label:'DEF',   suffix:'%', kind:'pct', min:1,   max:3,   color:'#90caf9' },
+  { stat:'mpPct',    label:'MP',    suffix:'%', kind:'pct', min:1,   max:3,   color:'#b39ddb' },
+  { stat:'critPts',  label:'CRIT',  suffix:'%', kind:'pts', min:0.2, max:0.6, color:'#ffd54f' },
+  { stat:'dodgePts', label:'DODGE', suffix:'%', kind:'pts', min:0.1, max:0.5, color:'#4dd0e1' },
 ];
 const AFFIX_BY_STAT = Object.fromEntries(AFFIX_POOL.map(a => [a.stat, a]));
 
@@ -48,23 +52,6 @@ function affixGradeMult(grade) { return 1 + 0.12 * ((grade || 1) - 1); }
 function rarityMeta(id) { return RARITY_BY_ID[id] || RARITY_BY_ID.common; }
 function affixLabel(a) { const m = AFFIX_BY_STAT[a.stat]; return m ? `+${a.val}${m.suffix} ${m.label}` : `+${a.val} ${a.stat}`; }
 
-// ── GEAR SETS — cross-slot bonuses that reward COMPLETING a loadout ──────
-// A slot "counts" toward a set when it holds a CRAFTED (forge) item. Sets span
-// multiple slots (one item per slot, so per-tree sets are impossible). Bonuses
-// use the affix stat vocabulary and fold into the SAME capped combat dimensions
-// (AFFIX_*_CAP), so they stay a bounded complement — they reward breadth of
-// forging, not a power blowup.
-const SET_BONUSES = [
-  { id:'warmonger', name:"Warmonger's Arsenal", icon:'⚔️', color:'#ff8a80',
-    slots:['weapon','shield','armor','belt'],
-    tiers:[ {pieces:2, bonus:{atkPct:6}}, {pieces:3, bonus:{atkPct:12, hpPct:8}}, {pieces:4, bonus:{atkPct:20, hpPct:14, critPts:4}} ] },
-  { id:'arcanist', name:"Arcanist's Regalia", icon:'✨', color:'#b39ddb',
-    slots:['helmet','necklace','bracelet','earring_l','earring_r'],
-    tiers:[ {pieces:2, bonus:{mpPct:10}}, {pieces:3, bonus:{mpPct:20, atkPct:8}}, {pieces:4, bonus:{mpPct:30, atkPct:14, critPts:4}} ] },
-  { id:'juggernaut', name:"Juggernaut's Bulwark", icon:'🛡️', color:'#90caf9',
-    slots:['armor','shield','helmet','belt','boots'],
-    tiers:[ {pieces:2, bonus:{hpPct:8}}, {pieces:3, bonus:{hpPct:16, defPct:10}}, {pieces:4, bonus:{hpPct:26, defPct:18, dodgePts:3}} ] },
-];
 
 const ITEMS_DB = {
   // ── DUNGEON DROP WEAPONS ─────────────────────────────────────
