@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "habit-tracker-rpg",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": ["-NoProfile", "-Command", "$root='C:\\Users\\Eltun\\OneDrive\\Documentos\\Claude\\Artifacts\\habit-tracker-rpg';$mime=@{'.html'='text/html';'.js'='application/javascript';'.css'='text/css';'.png'='image/png';'.jpg'='image/jpeg';'.json'='application/json';'.svg'='image/svg+xml'};$l=New-Object Net.HttpListener;$l.Prefixes.Add('http://localhost:3333/');$l.Start();while($l.IsListening){$c=$l.GetContext();$p=$c.Request.Url.LocalPath;if($p -eq '/' -or $p -eq ''){$p='/mobile.html'};$f=Join-Path $root $p.TrimStart('/');if(Test-Path $f -PathType Leaf){$ext=[IO.Path]::GetExtension($f);$ct=if($mime[$ext]){$mime[$ext]}else{'application/octet-stream'};$b=[IO.File]::ReadAllBytes($f);$c.Response.ContentType=$ct;$c.Response.ContentLength64=$b.Length;$c.Response.OutputStream.Write($b,0,$b.Length)}else{$c.Response.StatusCode=404};$c.Response.Close()}"],
+      "port": 3333
+    }
+  ]
+}

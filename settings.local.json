@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "PowerShell($ts = [System.DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds\\(\\); Copy-Item \"C:\\\\Users\\\\Eltun\\\\OneDrive\\\\Documentos\\\\Claude\\\\Artifacts\\\\habit-tracker-rpg\\\\index.html\" \"C:\\\\Users\\\\Eltun\\\\OneDrive\\\\Documentos\\\\Claude\\\\Artifacts\\\\habit-tracker-rpg\\\\versions\\\\$ts.html\"; Write-Output \"OK: $ts.html\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Eltun\\\\OneDrive\\\\Documentos\\\\Claude\\\\Artifacts\\\\habit-tracker-rpg\" -Recurse -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object FullName)",
+      "Bash(ConvertTo-Json)",
+      "Bash(node --input-type=module)",
+      "PowerShell(\\(Get-Content \"C:\\\\Users\\\\Eltun\\\\OneDrive\\\\Documentos\\\\Claude\\\\Artifacts\\\\habit-tracker-rpg\\\\index.html\" | Measure-Object -Line\\).Lines)",
+      "PowerShell($content = Get-Content \"C:\\\\Users\\\\Eltun\\\\OneDrive\\\\Documentos\\\\Claude\\\\Artifacts\\\\habit-tracker-rpg\\\\mobile.html\" -Raw; $content.Contains\\(\"game.js\"\\))",
+      "mcp__Claude_Preview__preview_start"
+    ]
+  }
+}
