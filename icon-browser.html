@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Raven Fantasy Icons — Browser</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d1117; color: #e0f7fa; font-family: monospace; padding: 12px; }
+  h1 { font-size: 14px; letter-spacing: 2px; color: #4dd0e1; margin-bottom: 10px; }
+
+  .controls {
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    margin-bottom: 12px; background: #161b22; padding: 10px; border-radius: 6px;
+  }
+  .controls label { font-size: 11px; color: #aaa; }
+  .controls input[type=range] { width: 120px; }
+  .controls input[type=number] { background: #0d1117; border: 1px solid #30363d; color: #e0f7fa; padding: 4px 8px; border-radius: 4px; width: 80px; font-size: 12px; }
+  .controls button { background: #1c6070; border: none; color: #4dd0e1; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; letter-spacing: 1px; }
+  .controls button:hover { background: #2a8a9e; }
+
+  #selected-info {
+    background: #161b22; border: 1px solid #4dd0e1; border-radius: 6px;
+    padding: 10px 14px; margin-bottom: 12px; font-size: 12px; display: none;
+  }
+  #selected-info .sel-num { font-size: 18px; font-weight: bold; color: #4dd0e1; }
+  #selected-info .sel-path { color: #aaa; margin-top: 3px; word-break: break-all; }
+  #selected-info .sel-copy { margin-top: 6px; background: #4dd0e1; color: #0d1117; border: none; padding: 4px 12px; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold; }
+
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 20), 1fr);
+    gap: 3px;
+  }
+  .icon-cell {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 3px 2px; background: #161b22; border-radius: 3px;
+    cursor: pointer; border: 1px solid transparent;
+    transition: border-color 0.1s, background 0.1s;
+  }
+  .icon-cell:hover { border-color: #4dd0e1; background: #1c3a40; }
+  .icon-cell.selected { border-color: #ffc107; background: #2a2600; }
+  .icon-cell img {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    display: block;
+  }
+  .icon-cell .num {
+    font-size: 7px; color: #556; margin-top: 2px; text-align: center; line-height: 1;
+  }
+  .icon-cell:hover .num { color: #4dd0e1; }
+
+  #jump { display: flex; gap: 6px; align-items: center; }
+</style>
+</head>
+<body>
+
+<h1>⟦ RAVEN FANTASY ICONS — 2192 ICONS ⟧</h1>
+
+<div class="controls">
+  <label>Size: <input type="range" id="sizeSlider" min="16" max="64" value="32" oninput="updateSize(this.value)"> <span id="sizeLabel">32px</span></label>
+  <label>Cols: <input type="range" id="colSlider" min="10" max="40" value="20" oninput="updateCols(this.value)"> <span id="colLabel">20</span></label>
+  <div id="jump">
+    <label>Jump to #<input type="number" id="jumpInput" min="1" max="2192" placeholder="e.g. 400" onkeydown="if(event.key==='Enter')jumpTo()"></label>
+    <button onclick="jumpTo()">GO</button>
+  </div>
+</div>
+
+<div id="selected-info">
+  <div>Selected: <span class="sel-num" id="sel-num">—</span></div>
+  <div class="sel-path" id="sel-path">—</div>
+  <button class="sel-copy" onclick="copyPath()">COPY PATH</button>
+</div>
+
+<div id="grid"></div>
+
+<script>
+  const TOTAL = 2192;
+  const BASE = 'Assets/Free - Raven Fantasy Icons/Free - Raven Fantasy Icons/Separated Files/16x16/';
+  let selectedId = null;
+
+  function iconPath(n) {
+    return BASE + 'fa' + n + '.png';
+  }
+
+  function buildGrid() {
+    const grid = document.getElementById('grid');
+    const frag = document.createDocumentFragment();
+    for (let i = 1; i <= TOTAL; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'icon-cell';
+      cell.id = 'cell-' + i;
+      cell.dataset.n = i;
+      cell.innerHTML = `<img src="${iconPath(i)}" width="32" height="32" loading="lazy"><div class="num">${i}</div>`;
+      cell.addEventListener('click', () => selectIcon(i));
+      frag.appendChild(cell);
+    }
+    grid.appendChild(frag);
+  }
+
+  function selectIcon(n) {
+    if (selectedId) {
+      const prev = document.getElementById('cell-' + selectedId);
+      if (prev) prev.classList.remove('selected');
+    }
+    selectedId = n;
+    const cell = document.getElementById('cell-' + n);
+    if (cell) cell.classList.add('selected');
+    const path = iconPath(n);
+    document.getElementById('sel-num').textContent = 'fa' + n;
+    document.getElementById('sel-path').textContent = path;
+    document.getElementById('selected-info').style.display = 'block';
+  }
+
+  function copyPath() {
+    if (!selectedId) return;
+    navigator.clipboard.writeText(iconPath(selectedId)).then(() => {
+      document.querySelector('.sel-copy').textContent = 'COPIED!';
+      setTimeout(() => document.querySelector('.sel-copy').textContent = 'COPY PATH', 1200);
+    });
+  }
+
+  function updateSize(v) {
+    document.getElementById('sizeLabel').textContent = v + 'px';
+    document.querySelectorAll('#grid img').forEach(img => { img.width = +v; img.height = +v; });
+  }
+
+  function updateCols(v) {
+    document.getElementById('colLabel').textContent = v;
+    document.getElementById('grid').style.setProperty('--cols', v);
+  }
+
+  function jumpTo() {
+    const n = parseInt(document.getElementById('jumpInput').value);
+    if (!n || n < 1 || n > TOTAL) return;
+    const cell = document.getElementById('cell-' + n);
+    if (cell) { cell.scrollIntoView({ behavior: 'smooth', block: 'center' }); selectIcon(n); }
+  }
+
+  buildGrid();
+</script>
+</body>
+</html>
