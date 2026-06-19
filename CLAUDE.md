@@ -1,22 +1,30 @@
 # SAO // Daily Quests — Habit Tracker RPG
 
 ## Project basics
-- Primary logic: **always edit `mobile.html` — never `index.html`**
+- **Primary file: `index.html`** — all logic, UI, and CSS live here. Edit this file.
 - Data tables live in `data/*.js` (loaded before the main script) — edit those files for data-only changes
 - All UI text in English
 - Respond to the user in English
 - Stack: vanilla JS + HTML/CSS, localStorage persistence, Chart.js for radar
 - Fonts: Cinzel (serif headers), Rajdhani (body)
-- Color palette: `--sao-cyan` (#4dd0e1) for habits/stats, amber (#ffc107) for work/shop
+- Color palette: `--sao-cyan` (#4dd0e1) for habits/stats, amber (#ffc107) for work/shop, `--sao-shard` (#b388ff) for premium currency
 
 ---
 
 ## Architecture overview
 
 ### Navigation
-Bottom nav: QUESTS | CHAR | WORK | **SHOP** | LOG (DUNGEON lives inside WORK)
-CHAR tab has sub-tabs: STATS | WORK | CLASS
-Within WORK there is a 3-way toggle: **⚒ QUESTS** | **🔥 FORGE** | **🏛 GUILD** (`workShopView` global: `'workbench'|'forge'|'guild'`)
+Bottom nav: **QUESTS | CHAR | WORK | LOG** (4 tabs, no SHOP — it was deleted).
+- **CHAR** sub-tabs: **👤 STATS** | **🎒 GEAR**
+- **WORK** has a 4-way toggle: **⚒ QUESTS** | **🔥 FORGE** | **🛠 WORKSHOP** | **🏛 CITY** (`workShopView` global: `'workbench'|'forge'|'workshop'|'guild'`). Note the global key `'guild'` is for the CITY view — legacy naming, do not rename without searching all uses.
+- **LOG** sub-tabs: **🏆 Achievements** | **📊 History** | **⚔ Dungeons**
+
+### NPC ownership
+| NPC | Tabs |  Voice |
+|---|---|---|
+| **Yami** | QUESTS | Yami Sukehiro from Black Clover. Profanity, tough love, treats Tuni like a lazy fuck. Anchor catchphrase: "Surpass your limits." ~32% absentee gags (he's offscreen — at HQ, eating, hiding from Charlotte, etc). |
+| **Leah** | WORK + CITY | Rise from Persona 4 baseline, but adult/+18 honest. Funny, motivational, openly flirty. Brand-specific work references (orders queue, DMs, content calendar, ads dashboard). Addresses Tuni as "Tuni" — pet names "Muns"/"Tungas" reserved for high-emotion peaks only (3-5 lines total). Less commanding, more partner-energy. |
+| **Manin** | FORGE + WORKSHOP | Deadpool, but a blacksmith. Fourth-wall-breaking, chaotic, fun-as-hell. Aware he's an NPC in a habit tracker. Profanity allowed. |
 
 ### State shape (key fields)
 ```js
@@ -30,20 +38,27 @@ state = {
   gold: 0,              // spendable gold (guild purchases)
   totalGoldEarned: 0,   // lifetime gold — drives shop level
   shards: 0,            // PREMIUM currency — earned only from discipline milestones
-  totalShardsEarned: 0, // lifetime shards (prestige hook)
-  shopMaterials: { timber:0, scroll:0, crystal:0, gear:0 },
-  shopChests: { daily, weekly, monthly },  // last-claim period keys for free chests
-  shopBuys: { dateKey, gold_chest, shard_chest, rot_shard_pack }, // daily purchase caps
-  consumables: { forgeToken:0 },           // held tokens (Forge Token, etc.)
-  activeBoosts: [ { type, mult, expires } ], // timed multipliers (xp / dungeon)
-  cosmetics: { owned:[], equipped },       // CSS nameplate flair
-  shopRotation: { dateKey, ids:[...] } | null, // today's rotating deals
-  shardLog: [ { t, n, reason } ],          // last 30 shard transactions
-  guildUpgrades: { anvil:false, library:false, barracks:false, sanctum:false, hall:false },
-  forgeLog: [ { itemId, date } ],   // last 12 crafted items
+  totalShardsEarned: 0,
+  shopMaterials: { timber:0, scroll:0, crystal:0, gear:0 },  // T1 — forge mat storage (name is legacy, still used by FORGE/WORKSHOP)
+  shopMatsT2: { timber:0, scroll:0, crystal:0, gear:0 },     // T2 refined
+  shopMatsT3: { timber:0, scroll:0, crystal:0, gear:0 },     // T3 refined
+  consumables: { forgeToken:0 },                              // earned from achievements / boss drops
+  activeBoosts: [ { type, mult, expires } ],                  // xp/dungeon boosts (from chests, events, etc.)
+  shardLog: [ { t, n, reason } ],
+  guildUpgrades: { anvil:0, warehouse:0, refinery:0, hall:0, trade:0, scriptorium:0,
+                   patron_vault:0, quality_forge:0, barracks:0, sanctum:0, alchemy:0 },
+  forgeLog: [ { itemId, date } ],
   commissions: { dateKey, list: [...] } | null,
   dungeon: { ...dungeonFields, activeWorkTaskId, forgeTaskPomoCount } | null,
-  // ... achievements, classData, inventory, equipment, etc.
+  treasury: { level:0, invested:0 },
+  treasuryClaim: { dateKey, claimed:false },
+  focusTask: null,
+  honestyNudgeDay: null,
+  merchant: null,
+  dailyCache: { dateKey, claimed:false },
+  lastComboJackpotDay: null,
+  dayReflections: {},   // keyed by dateKey
+  // ... achievements, classData, inventory, equipment, equipmentMods, equipmentGrades, etc.
 }
 ```
 
@@ -51,7 +66,7 @@ state = {
 ```js
 {
   id, text, xp,
-  gains: {},            // always empty for trabajo — no stat gains
+  gains: {},
   drops: { gold, matId, matEmoji, matLabel, matQty },
   category: 'mental'|'creative'|'operational'|'physical'|null,
   difficulty: 'easy'|'normal'|'hard'|'legendary',
@@ -61,233 +76,135 @@ state = {
 
 ---
 
-## Shop Heroes redesign — COMPLETED steps
-
-### Step 1 — Decoupled economy
-Work tasks no longer give stats. They give **gold + materials** via `applyWorkDrops(drops, mul)`.
-- `WORK_MATERIALS`: timber(physical), scroll(mental), crystal(creative), gear(operational)
-- `TASK_DIFF_CFG`: easy→5g/1mat, normal→12g/2mat, hard→25g/3mat, legendary→50g/5mat
-- `getWorkTaskDrops(categoryId, difficultyId)` → `{ gold, matId, matQty, matEmoji, matLabel }`
-- Reversal on uncheck and Reset Day both call `applyWorkDrops(c.drops, -1)`
-
-### Step 2 — Material drops on completion
-- `toggleQuest` branches on `listKey==='trabajo'`: calls `applyWorkDrops` instead of `applyGainsWithClass`
-- Completion stored as `task.done[periodKey] = { gains:{}, xp, drops }`
-- Notification: `+20 EXP · 🪙12g · 📜×2`
-
-### Step 3 — Commission board
-Daily 3-commission board generated by `generateCommissions(dateKey)`, stored in `state.commissions`.
-- `COMMISSION_POOL`: 14 templates (category×2, category×3, difficulty-gated, bulk)
-- `updateCommissionProgress(periodKey)`: called in `toggleQuest` for trabajo tasks; awards bonus gold+mat when threshold reached; completed commissions lock permanently
-- Renders in `renderCommissionBoard()` between the divider and task list
-- Commissions regenerate at midnight (checked on render)
-
-#### Client requests (manual-fulfill commissions) — COMPLETED
-Beyond the auto-completing task commissions, the board appends **one client request per day** (`generateClientRequest`, pushed in `generateCommissions`). These cost real resources and must be fulfilled by choice (`fulfillCommission(idx)`):
-- **Gear request** (`kind:'gear'`): a client wants a specific item from an **unlocked** recipe (`isRecipeLocked` filtered, so always craftable). Fulfilling consumes your **weakest** matching inventory copy (sorted by grade×100 + rarity rank — your rare/legendary copies are safe).
-- **Material request** (`kind:'material'`): wants a batch (6–12) of one material; fulfilling spends from `state.shopMaterials`.
-- `kind` is `'task'` by default; `updateCommissionProgress` **skips** client kinds (they never auto-progress). Reward grant + sweep are shared helpers: `_awardCommissionRewards(comm)` and `_checkCommissionSweep()` (called by both the auto path and `fulfillCommission`).
-- **Daily Sweep** now grants **+1 Shard** (`SHARD_REWARDS.commissionSweep`) on top of gold/XP when ALL commissions — task **and** client — are complete. Client requests are required for the sweep, making the shard a deliberate gear/material sacrifice (owner-approved discipline-adjacent faucet).
-- Render: `.cc-client` cards (violet accent) show the requirement + a `⚒ DELIVER` button (disabled until affordable); reroll is hidden on client requests. Two task-matching spots (`getSystemSuggestion`-style activeComms + per-task commission tags) explicitly exclude client kinds (they'd otherwise match every task, since they have no category/difficulty).
-- Templates: `CLIENT_GEAR_FLAVORS`/`CLIENT_MAT_FLAVORS`/`CLIENT_TITLES` in mobile.html near `COMMISSION_POOL`.
-
-### Step 4 — FORGE view (replaces MY SHOP)
-`workShopView` global is now `'workbench' | 'forge' | 'guild'` (3-way toggle).
-- `CRAFT_RECIPES`: 20 recipes across 4 tiers (common/uncommon/rare/epic), each consuming `shopMaterials`
-- `ITEMS_DB` extended with 21 craftable `work_*` items (physical→STR/CON, mental→INT/VOL, creative→CHA/DEX, operational→CON/DEF)
-- `getEffectiveCraftCost(recipe)`: applies 20% discount if guild anvil owned
-- `canCraft(recipe)`: checks `shopMaterials` against effective cost
-- `craftItem(recipeId)`: deducts mats, pushes item to `state.inventory`, logs to `state.forgeLog`
-- `renderForge()`: material bar + 5 recipe sections (physical/mental/creative/operations/epic) + forge log
-
-### Step 5 — Pomodoro = Forge session
-Dungeon state extended with `activeWorkTaskId` and `forgeTaskPomoCount`.
-- `setForgeTask(taskId)`: links/unlinks a task to the active dungeon
-- `tickDungeon`: on each completed 25-min work session → if task linked: `+5g` partial drop, increment `forgeTaskPomoCount`, show notif
-- Task cards: `⚒` forge button appears on undone trabajo tasks when dungeon is running; active task gets amber border glow + live mini-progress bar + session tally
-- Dungeon explore view: active task name shown in the pomodoro section
-- Task card chips: trabajo cards show `🪙Xg + emoji×qty` instead of empty stat chips (both pending and done states)
-
-### Step 6 — GUILD view (gold sinks)
-- `GUILD_UPGRADES`: 5 one-time upgrades stored in `state.guildUpgrades`
-- `purchaseGuildUpgrade(id)`: deducts gold, sets flag, shows notif
-- Effects wired in: anvil→`getEffectiveCraftCost`, library→`toggleQuest` mental bonus scroll, barracks/sanctum→`getEquippedStats`, hall→`applyGainsWithClass`
-- `renderGuild()`: gold panel, active bonuses summary, upgrade cards
-
-### Step 7 — Gear stat visibility on CHAR screen
-- `getEquippedStats()` now applies guild barracks (+15% STR/CON) and sanctum (+20% all stats) bonuses
-- CHAR > STATS renders `+N⚔` gear bonus chip next to each stat that has equipped gear bonuses
-- `.stat-gear-bonus` CSS class (amber #ffc107)
-
----
-
-## PENDING steps
-
-### Step 8 — COMPLETED — History & analytics
-Daily, weekly, monthly habit comparison views implemented in both the HABITS tab and the History tab. Long-term trend visualization fully in place.
-
-### Step 9 (future) — Forge prestige / Guild prestige
-At 10,000g `totalGoldEarned`, offer a prestige reset with a cosmetic badge.
-
----
-
-## Dopamine / retention pass — COMPLETED
-
-Behavioral-design changes layered onto the daily loop (all in `mobile.html`):
-
-- **Morning System Login Cache** (`grantDailyLoginCache` / `showCacheOverlay`) — variable-ratio reward (common/uncommon/rare → gold + materials) granted on the **first daily habit check** of the day, gated by `state.dailyCache = {dateKey, claimed}`. Replaces the plain `showFirstHabitOverlay` when unclaimed today. Never pays out for merely opening the app.
-- **System Fortune** — `toggleQuest` habit branch: ~12% chance of a small bounded EXP windfall (8–30) on a non-crit check; `showFortuneFloat`. Adds variable-ratio texture to the core action.
-- **Nearest-achievement forward pull** (`getNearestAchievements`) — returns achievements ≥50% to their next tier. **Notification-only** (feeds `_pickMorningNotifBody`); the on-screen HABITS-tab widget was removed to keep the QUESTS tab focused on the habits themselves.
-- **Stateful notifications** — `_pickMorningNotifBody` / `_pickEveningNotifBody` feed `scheduleNotifications`; bodies pull streak, nearest achievement, perfect-day remaining, commission countdown.
-- **Work-combo guardrail** — ×5/×10 material jackpot now capped once/day via `state.lastComboJackpotDay` (combo gold multiplier still applies every task). Stops task-fragmentation farming.
-- **Softened miss-day punishment** — overnight HP drain cap 60%→30%, floor 10%→25% (`updateStreakOnLoad`). Streak shields + Phoenix remain the mercy mechanics.
-- **Perfect-day crescendo** — `showPerfectDayOverlay` now shows `.pd-iron` consecutive-perfect-day count when `logros.ironDiscStreak ≥ 2`.
-
-New `state` fields (migrated in `loadState`): `dailyCache`, `lastComboJackpotDay`.
-Deferred from the audit: full prestige (Step 9, risky reset logic) and non-`statAll` trophy rewards (data-heavy, lower impact).
-
-## Daily-ritual pass — COMPLETED
-
-- **Daily Briefing** — `showHarvestOverlay` reworked into a two-section morning overlay: ⟦ YESTERDAY ⟧ (improved harvest — habit gains + work tasks/gold + avoid status + PERFECT tag, via expanded `_buildHarvestInfo` in `data/content.js`) and ⟦ TODAY ⟧ (streak status, today's #1 focus pulled from yesterday's Close-the-Day `tomorrow`, login-cache hint). Queued unconditionally on a new day in `updateStreakOnLoad` (replaces the old done>0 gate + `showDailyQuoteOverlay` fallback; quote now lives inside the briefing).
-- **Close the Day** (`renderDailyCloseOut`/`saveDayReflection`/`renderDailyCloseOutList`) — daily evening reflection in the **History tab**, mirroring the weekly reflection pattern. Rating (1–5) + Win + Tomorrow's #1 + note, stored in `state.dayReflections[dateKey]`. +30 XP/+10g on first close per day. ⟦ RECENT DAYS ⟧ list shows past closeouts for comparison. The `tomorrow` field feeds the next morning's Briefing #1 focus.
-- **Character next-milestones tracker** (`getCharNextMilestones`, `.char-next-milestones`) — under the CP block in `renderCharStatusHeader`: equipped-class mastery progress + the two stats closest to their next grade. Dopaminergic near-goals between the long CP-grade climbs (CP/grade ladder itself is intentionally a multi-year effort, unchanged).
-
-New `state` field: `dayReflections` (object keyed by dateKey).
-Crit reference: habit/work crit = `rollCrit()` — flat **7%/check, NO daily cap** (shared across habits + work; `dailyCritCount` still tracked only to balance uncheck-reversal); gear `critBonus` is dungeon-combat only.
-Per user: class quests stay in the HABITS tab (not Character); Habits cadence model (N×/week) intentionally NOT implemented.
-
-## Forge = gold sink (instant) — COMPLETED
-
-The forge is deliberately shallow (depth lives in the boss fights). `craftItem` now resolves **instantly** — no queue, no timer: deducts materials **+ a gold cost** (`getCraftGoldCost` / `CRAFT_GOLD_COST` by rarity: common15/uncommon35/rare90/epic220/legendary500), rolls quality, adds the item to inventory immediately, then shows `showForgeRevealOverlay` for the quality reveal. Recipe cards show a 🪙 gold chip; the FORGE button disables if you can't afford mats **or** gold.
-- Legacy queue path (`craftQueue`, `collectCraft`, `rushCraft`, `getEffectiveCraftDuration`, `getMaxForgeSlots`) is **kept** so any in-flight crafts from before still finish, but new crafts never enqueue.
-- Retired guild upgrades **Chronoforge** (`forgeTime`) and **Grand Forge Hall** (`forgeSlot`) — removed from the Guild shop tier list in `renderGuild` (still owned if previously bought). `anvil` (mat discount) + `warehouse` (bonus mats) remain.
-
-### Forge gold-sink + progression deepening — COMPLETED
-- **Tier-scaled craft gold** — `getCraftGoldCost(item)` uses `CRAFT_GOLD_BY_TIER` (T1:10 → T9:4000) for forge-tree items; rarity table (`CRAFT_GOLD_COST`) is the fallback for non-tree craftables.
-- **Refinement gold sink** — `getRefineGoldCost(grade)` adds escalating gold per refine step (G1→2:50, →3:150, →4:400, →5:1000) on top of materials. `canRefine`/`refineItem` are now gold-gated; refine card shows the 🪙 chip and `✦ REFINE · 🪙N` label.
-- **Reforge quality** — `reforgeQuality(invIdx)`: spend `getCraftGoldCost(item)` to re-roll a single crafted item's quality (chase Masterwork). `🎲 REFORGE` button in the refine section (single items only; needs grade<5 to appear since that's the refine list filter).
-- **Visible tier-path + unlock pop** — tree header dots are now numbered tier nodes (`.ftn` done/open/lock). `craftItem` detects when a craft satisfies the next recipe's `reqCraft` and fires `showTierUnlockOverlay` (the prereq chain itself — 2× per tier T2–T4, then 1× + worker/level gates — already lived in `recipes.js`).
-
-### Gear-matters combat rework — COMPLETED
-Root problem: attributes scale by √, so flat gear stats vanished against stat pools in the thousands, and gear's headline `ATK`/`HP`/`DEF` were never read by the combat engine (display-only). Fixes in `calcPlayerCombatStats(includeGear=true)`:
-- **Gear consumed post-√** — `eq.ATK`→`pAtk` (melee), `eq.MP×0.30`→`magicAtk` (casters), `eq.HP`→`pMaxHP`, `eq.MP`→`pMaxMP`. A G5 T9 sword now ~triples attack (187→574 at STR 5000) instead of +1%.
-- **Guild POWER tier repointed** — Sanctum (+4%/lvl) and Barracks (+5%/lvl) now multiply the **final** combat output (pAtk/magicAtk/pMaxHP), not inert gear attributes. Maxed = ~+73% combat. (`getEquippedStats` still scales gear attributes for the CHAR bonus chips; the √ effect there is negligible — real effect is the new multipliers.)
-- **Cap extensions** — `pCrit` 15→40, `pDodge` 10→25, `pDmgRed` 50→75, extended by `eq.critBonus`/`dodgeBonus`/`blockBonus` + `eq.DEF×0.04` mitigation, so secondary combat stats matter at endgame.
-- **Grade decoupled from gear (Step 2)** — `calcPowerLevel(cs)` now defaults to `calcPlayerCombatStats(false)` (base stats only). Hunter Grade / displayed CP / readiness reflect real progress; gear only wins dungeon **fights** (which call `calcPlayerCombatStats()` gear-included). Verified: equipping a G5 legendary set leaves grade CP identical.
-- Tuning levers (Step 5) if fights become too easy: the gear coefficients above, `RANK_REF_EFF_ATK`/`RANK_REF_HP`, `BOSS_HITS_TO_KILL`/`PLAYER_HITS_TO_DIE`.
-
-### Gear Power (CP) — bounded complement — COMPLETED
-The CHAR header shows **Base CP + Gear Power = Total** (gear line in amber), in `renderCharStatusHeader`. Gear/guild are a COMPLEMENT, never a multiplier: `calcGearCP(baseCP)` caps the gear contribution at **30% of base CP** (`GEAR_CP_MAX_FRAC`), split `0.80·loadoutFrac + 0.20·guildPowerFrac`. We deliberately do NOT run gear through the effAtk×effHP snowball (that produced a 10×+ blowup). `getGearLoadoutFrac` scores equipped items vs a legendary-G5-affixed reference (`GEAR_REF_MULT`), including rarity mult + `_affixPoints`. Grade ladder stays base-only (`calcPowerLevel()` defaults to base). 70/30 design: habits dominate, work-life advantages add but never cheese.
-
-### 5-tier rarity + gear AFFIXES (forge chase) — COMPLETED
-Crafted gear rolls a **5-tier instance rarity** (`RARITY_TIERS` in `data/items.js`: Common 50 / Uncommon 27 / Rare 15 / Epic 6 / Legendary 2 %) that gates a flat-stat multiplier (`statMult` 1.00→1.75, now actually applied in `getEquippedStats`) AND random **% affixes**.
-- **Rolled fields** (legacy names kept for migration): `entry.quality` = rarity id, `entry.qualityMult` = statMult, `entry.qualityLabel`, **`entry.affixes`** = `[{stat,val}]`. `rollCraftQuality()` rolls rarity; `rollAffixes(tier,rarity,grade)` rolls the affixes.
-- **Affix slots** = `affixSlots(tier,rarity)` = base-by-tier (T1–3:0 · T4–7:1 · T8–9:2) + rarity slotBonus (Epic +1, Legendary +2). Legendary T9 = 4.
-- **Affix pool** (`AFFIX_POOL`): `atkPct/hpPct/defPct/mpPct` (%) + `critPts/dodgePts` (flat). Magnitude scales by rarity (`RARITY_AFFIX_MULT`) × refine grade (`affixGradeMult`, +12%/grade). Refining rescales affixes (`rescaleAffixesForGrade`).
-- **Equipped storage**: `state.equipmentMods[slot] = {rarity, rarityMult, affixes}` (set in `equipItem`, cleared/restored in `unequipItem` — parallels `equipmentGrades`). Combat reads it via `getEquippedAffixTotals` in `calcPlayerCombatStats`: `atkPct`→primaryAtk/pAtk/magicAtk (so weapons finally matter in fights — fixes the dead-`eq.ATK` path), `hpPct`/`mpPct`→max pools, `defPct`→pDmgRed, `critPts`/`dodgePts`→those chances (all respect existing caps).
-- **Affix dimension caps** (`AFFIX_ATK_CAP`/`HP`/`MP` = 60): affixes sum across all 10 slots, so each dimension is capped to stay a strong complement (≤+60%) rather than a runaway ×3 that trivialises content. Offense then yields multi-turn fights (full-gear ~18 hits vs ~32 ungeared at A-rank). Defensive generosity beyond that is the pre-existing rank-anchored "gear lets you faceroll same-rank, push higher" model (`getScaledBossHP`/`ATK` anchor on `RANK_REF_*`, not the live player).
-- **Reroll**: `rerollAffixes(invIdx)` re-rolls an item's affix values for **Shards** (`getRerollCost` = 3 + slotCount). ⚠ This is a **sanctioned exception** to the "Shards never buy raw permanent power" rule — owner-approved as the premium forge chase. Button in the inventory inspect card next to `✦ REFINE`/`🎲 REFORGE`.
-- **Display**: 5-tier labels/colors/icons via `rarityMeta()`/`affixLabel()` (single source in `data/items.js`); forge reveal overlay shows rarity + affix chips (`.fr-affixes`); FORGE "RARITY ODDS" panel is data-driven from `RARITY_TIERS`; inventory inspect shows instance-rarity badge + `.inv-affix` chips + rarity-scaled stats.
-- **Migration** (`loadState`): old quality `fine→uncommon`, `superior→rare`, `masterwork→epic` (recompute statMult/label) across inventory/craftQueue/forgeLog; `state.equipmentMods` initialised.
-
----
-
-## Premium currency (Shards ✦) + SHOP tab — COMPLETED
-
-A third currency layered on top of gold/materials. **Design rule: Shards are a PRESTIGE currency — they drop ONLY from discipline-gated milestones, never from grindable work tasks; and Shards/Shop items buy convenience, boosts, mercy and cosmetics — NEVER raw permanent stats.** Tuned for ~40-60 ✦/week for a committed user.
-
-- **Faucets** (wired at canonical once-per-day/event sites, amounts in `SHARD_REWARDS`):
-  - perfect day → `checkAllDone` habitos guard (+2)
-  - iron-discipline streak hits ×7 → `checkAchievements` ironDisc block (+5)
-  - phoenix comeback → `checkAchievements` phoenix block (+1)
-  - weekly boss / dungeon clear → `claimRewards` (+8 / +1)
-  - achievement tier → `_doAwardTier` (`SHARD_REWARDS.achTier` by tier index)
-- **SHOP tab** (`renderShop`, dispatched in `renderAll`): currency panel, active-boost chips, FREE CACHES (timed daily/weekly/monthly via `state.shopChests` + `_shopPeriodKey`/`_shopResetInMs`), TODAY'S DEALS (`getShopRotation`, regen at midnight), CACHES (gold/shard chests, daily-capped via `state.shopBuys`), BOONS & MERCY (consumables), EXCHANGE (lossy mats), COSMETICS.
-- **Cross-tab effects** (all reversibly time-limited or capped):
-  - EXP Tonic → `getActiveBoostMult('xp')` multiplies **EXP only** in `toggleQuest` (not stats)
-  - Focus Draught → `getActiveBoostMult('dungeon')` boosts expedition rewards in `claimRewards`
-  - Forge Token → 0.5× material discount in `getEffectiveCraftCost`, consumed in `craftItem`
-  - Streak Shield → respects existing `state.streakShields` cap of 2
-  - Commission Reroll → calls `generateCommissions(todayKey())`
-  - Material exchange/sell → mutates `state.shopMaterials` / `state.gold`
-- **HUD**: persistent `🪙 / ✦` bar in the status panel (`#hudGoldVal` / `#hudShardVal`), updated in `renderHeader`. Cosmetic nameplate flair applied to `#playerNameEl` via `applyCosmeticToName`.
-- Morning Login Cache (`grantDailyLoginCache`) kept **separate** from the Shop daily chest (gold+mats from habits loop vs. shard-flavored Shop chest) per design decision.
-
-### Economy refinement pass — COMPLETED
-Sharpened the two currencies' jobs. **Gold = operations (abundant → practical, never power); Shards = prestige (scarce → few, meaningful spends).**
-- **Gold uses:** `buyMatWithGold` (25g → 1 chosen material, deliberately lossy QoL) in EXCHANGE; Supply Crate (`buyGoldChest`/`_goldChestCost`) now has 3 cheap daily slots then **escalates ×2 uncapped** so surplus gold always drains (fixes late-game gold inflation). Commission reroll / EXP Tonic / mat bundle remain minor gold sinks.
-- **Shard menu (short by design):** Streak Shield (mercy, cap 2) · **Streak Repair** (`repairStreak`/`canRepairStreak`, 25✦, only right after a break — mirrors `useStreakShield`'s restore) · Focus Draught (boost) · Prestige cosmetics (identity/aspiration). Each a real decision.
-- **Removed dilution:** the gold→shard rotation pack (`rot_shard_pack`) was deleted — prestige currency must not be mintable from grind; the purchasable shard Lockbox gamble (`SHOP_SHARD_CHEST`/`buyShardChest`) was retired (no exclusive value + tonally wrong).
-- **Boost honesty:** `addBoost` now **extends** an existing same-type boost's timer (keeps stronger rate) instead of stacking concurrent multipliers, so a repeat purchase is never wasted.
-- **UX:** Supply Crate and unavailable consumables (shield at cap, Streak Repair when no break) render **disabled** buttons instead of failing on click.
-
-## WORK-tab economy expansion (M1–M6) — COMPLETED
-Six milestones from a senior-design review of the WORK tab. All verified in preview.
-- **M1 — Transmuter** (guild `refinery` upgrade, ♻️, Lv1–3): fair material conversion (`refineMaterial`/`getRefineryRatio` — Lv1 3→1, Lv2 2→1, Lv3 3→2) to fix category-locked material starvation. Panel in `renderForge` near the material bar. ⚠ Named "Transmuter" to avoid clash with the SHOP's existing tier-refinement "REFINERY" (`refineMat`, T1→T2→T3).
-- **M2 — Gear sets** (`SET_BONUSES` in `data/items.js`): cross-slot sets (Warmonger / Arcanist / Juggernaut) — a slot counts when it holds a **crafted** item. `getActiveSets`/`_addSetBonuses` fold bonuses into the SAME capped affix dimensions (`AFFIX_*_CAP`) so they're a bounded complement. Shown on FORGE "GEAR SETS" panel + CHAR combat panel (`.char-active-sets`). Note: per-tree sets are impossible (1 item/slot), so sets span slots.
-- **M3 — Guild Treasury** (`state.treasury`/`state.treasuryClaim`): the repeatable/infinite gold sink. `investTreasury` (cost ×1.20/level, uncapped) raises a daily dividend; `claimTreasury` (once/day) pays `getTreasuryDividend` (gold + mat trickle ≥Lv5). Panel in `renderGuild`.
-- **M4 — Traveling Merchant** (`state.merchant`, daily rotation like commissions): gives unequipped crafted gear a buyer. `generateMerchant` posts buy orders (item-specific + rarity-tier, premium gold via `_RARITY_WANT_PRICE`) and a discounted material supply offer. `sellToMerchant` (gives weakest matching copy) / `buyFromMerchant`. Panel in QUESTS (`renderMerchantPanel`). Gold/material economy only — never shards.
-- **M5 — QUESTS polish:** slim **worker-rank bar** at top of workbench (rank + xp + next forge unlock); **focus pledge** (`focusTaskToggle`/`state.focusTask`, 🎯 button on undone trabajo cards → +15 XP on completing the pledged task, hooked in `toggleQuest`); **honesty nudge** (once/day soft toast at ≥6 hard/legendary completions, `state.honestyNudgeDay`).
-- **M6 — Forge/Guild QoL:** **batch craft** (`craftItem(id, silent)` returns a result; `craftItemBatch` forges up to 5 with one summary, `×5` button); **craft-to-fulfill** deep link on gear client requests (`⚒ FORGE IT` → switches to forge view); **pruned vestigial worker perks** (forge-time/forge-slots chips removed — crafting is instant); guild building `<img>` has an emoji `onerror` fallback (new `refinery` has no art). *Deliberately skipped:* slot filter (FORGE trees already = slots) and equip-from-forge (inventory already handles equipping).
-- New `state` fields (init in `loadState`): `treasury`, `treasuryClaim`, `focusTask`(lazy), `honestyNudgeDay`(lazy), `merchant`(lazy). `SHARD_REWARDS.commissionSweep` added in `data/shop.js`.
-
-## QUESTS UX hierarchy pass — COMPLETED
-Re-ordered the workbench (`renderTrabajo`) around **DO before MANAGE**. New order: view toggle → material bar → **status strip** → dungeon (kept prominent — core mechanic, shares space with tasks) → ⟦ YOUR QUESTS ⟧ + combo/earnings + task list + add-form → ⟦ JOB BOARD ⟧ → footer.
-- **Status strip** (`.quests-worker-bar`): single consolidated home for worker rank + next forge unlock + specialization chip (`.qwb-spec`), click → `showWorkerMilestoneOverlay`. Removed the **duplicate** worker badge (`_wlvEl`) that rendered again after the divider, and the standalone spec badge (folded into the strip).
-- **Job Board** (`.job-board-section`): commission board + traveling merchant + next-craft widget grouped UNDER the tasks (was above). Expanded by default (owner pref).
-- Completed-task collapse was already built into `renderWorkTasksByCat` (per-category pending + collapsed "▼ N COMPLETED"), so finishing tasks frees space automatically.
-- Practice Boss test utility now gated behind `localStorage.devTools==='1'` (was always-on in the main flow).
-- Divider renamed WORK QUESTS → YOUR QUESTS; toggle/title naming unified.
-
-## Data files (grep target, not mobile.html)
+## Data files
 | File | Contents |
 |---|---|
-| `data/classes.js` | `CLASS_TIERS`, `CLASSES`, `CLASS_DESCS`, mastery rewards, `CQ_MP`, `CQ_TARGETS`, **`CLASS_QUESTS`** (all 25 class quest definitions) |
-| `data/dungeons.js` | **`DUNGEON_CONFIG`** (all 18 dungeons + weekly boss) |
-| `data/items.js` | `EQUIP_SLOTS`, **`ITEMS_DB`** (55 items), `SELL_PRICES`, `CRAFT_DURATION_MS`, **`RARITY_TIERS`**/`RARITY_BY_ID`/`RARITY_AFFIX_MULT`, **`AFFIX_POOL`**/`AFFIX_BY_STAT`, `affixSlots`/`affixGradeMult`/`rarityMeta`/`affixLabel` |
-| `data/recipes.js` | **`CRAFT_RECIPES`** (20 recipes), **`GUILD_UPGRADES`** (8 upgrades) |
-| `data/achievements.js` | **`ACHIEVEMENTS`** (54 entries, full tier definitions) |
-| `data/content.js` | **`DAILY_QUOTES`** (31 entries) |
-| `data/events.js` | dungeon event/omen tables |
-| `data/shop.js` | **`SHARD_REWARDS`** (faucet amounts), `SHOP_MAT_IDS/META`, `SHOP_TIER_COLOR`, **`SHOP_FREE_CHESTS`** (daily/weekly/monthly), `SHOP_GOLD_CHEST` (escalating gold sink), **`SHOP_CONSUMABLES`** (incl. Streak Repair), `SHOP_EXCHANGE` (matToMat/matToGold/goldToMat), `SHOP_COSMETICS`, **`SHOP_ROTATION_POOL`** |
+| `data/classes.js` | `CLASS_TIERS`, `CLASSES` (25 classes, T1–T5), `CLASS_DESCS`, `CLASS_MASTERY_REWARD`, `CLASS_MASTERY_XP`, `TIER_COMPLETE_REWARD`, `CLASS_MASTERY_THRESHOLD`, `CQ_MP`, `CQ_TARGETS`, `CLASS_QUESTS` (all 25 class quest definitions) |
+| `data/dungeons.js` | `DUNGEON_CONFIG` (18 dungeons + weekly boss, E/D/C/B/A/S ranks × warrior/rogue/mage/engineer), `BOSS_TELLS` |
+| `data/items.js` | `EQUIP_SLOTS` (10 slots), `RARITY_TIERS`/`RARITY_BY_ID`/`RARITY_AFFIX_MULT`, `AFFIX_POOL`/`AFFIX_BY_STAT`, `affixSlots`/`affixGradeMult`/`rarityMeta`/`affixLabel`, `ITEMS_DB` (dungeon drops + legacy forge items + 8 forge trees × 9 tiers), `SELL_PRICES`, `CRAFT_DURATION_MS` |
+| `data/recipes.js` | `CRAFT_RECIPES` (legacy + 8 trees × 9 tiers = 72 active recipes), `MASTERY_BY_TIER`, `MASTERY_META`, `TIER_ALL_BONUSES`, `GRADE_MULT`/`GRADE_LABELS`/`GRADE_COLORS`/`REFINE_STEP_MULT`, `GUILD_UPGRADES` (11 upgrades across Growth/Forge/Power tiers) |
+| `data/achievements.js` | `ACHIEVEMENTS` (54+ entries — habits, ranks, class mastery, stats, streaks, work, dungeon) |
+| `data/content.js` | `DAILY_QUOTES` (31 entries), `showDailyQuoteOverlay`, `_buildHarvestInfo`, `_pendingAnims` |
+| `data/events.js` | `DUNGEON_EVENTS` (48+ exploration events — discovery/hazard/encounter/rest/omen/cache/challenge/echo/chain) |
+| `data/shop.js` | `SHARD_REWARDS`, `SHOP_MAT_IDS`/`SHOP_MAT_META`, `MAT_TIER_META` (T2/T3), `MAT_REFINE`, `SHOP_TIER_COLOR`. The legacy SHOP UI (`SHOP_FREE_CHESTS`, `SHOP_GOLD_CHEST`, `SHOP_CONSUMABLES`, `SHOP_EXCHANGE`, `SHOP_COSMETICS`, `SHOP_ROTATION_POOL`) was deleted — anything still referencing those constants is dead. |
 
-## Key functions reference (mobile.html)
-| Function | Grep pattern | Purpose |
-|---|---|---|
-| `applyWorkDrops` | `function applyWorkDrops` | Awards/reverses gold + materials |
-| `applyGainsWithClass` | `function applyGainsWithClass` | Awards stat gains with class+guild hall multiplier |
-| `getWorkTaskDrops` | `function getWorkTaskDrops` | Returns drop payload for a work task |
-| `generateCommissions` | `function generateCommissions` | Creates today's 3 commissions |
-| `updateCommissionProgress` | `function updateCommissionProgress` | Checks and awards commission rewards |
-| `getEffectiveCraftCost` | `function getEffectiveCraftCost` | Cost after anvil discount |
-| `craftItem` | `function craftItem` | Forge a gear item from materials |
-| `purchaseGuildUpgrade` | `function purchaseGuildUpgrade` | Buy a guild upgrade with gold |
-| `renderForge` | `function renderForge` | 🔥 FORGE view — recipe browser |
-| `renderGuild` | `function renderGuild` | 🏛 GUILD view — upgrades |
-| `renderCommissionBoard` | `function renderCommissionBoard` | Commission board widget |
-| `getEquippedStats` | `function getEquippedStats` | Total gear stats (incl. guild auras) |
-| `setForgeTask` | `function setForgeTask` | Links/unlinks dungeon to a work task |
-| `toggleQuest` | `function toggleQuest` | Task check/uncheck — branches for trabajo |
-| `renderHabits` | `function renderHabits` | HABITS tab render |
-| `renderChar` | `function renderChar` | CHAR tab render |
-| `renderDungeon` | `function renderDungeon` | DUNGEON tab render |
-| `renderLog` | `function renderLog` | LOG tab render |
-| `renderShop` | `function renderShop` | 🛒 SHOP tab render (all sections) |
-| `grantShards` / `spendShards` | `function grantShards` | Award/deduct premium currency (+ float, HUD pulse, shardLog) |
-| `getActiveBoostMult` | `function getActiveBoostMult` | Product of timed boosts of a type (`xp`/`dungeon`); prunes expired |
-| `openFreeChest` / `buyGoldChest` | `function openFreeChest` | Chest opens (free timed caches / escalating gold Supply Crate via `_goldChestCost`) |
-| `buyConsumable` / `repairStreak` / `canRepairStreak` | `function buyConsumable` | Buy shield/boost/token/action item; Streak Repair restores a just-broken streak |
-| `exchangeMats` / `sellMat` / `buyMatWithGold` | `function exchangeMats` | Lossy material exchange / sell / buy-mat-for-gold (QoL) |
-| `buyCosmetic` / `equipCosmetic` / `applyCosmeticToName` | `function buyCosmetic` | Cosmetic nameplate flair |
-| `generateShopRotation` / `getShopRotation` | `function getShopRotation` | Deterministic daily deals (seeded by date) |
-| `loadState` / `saveState` | `function loadState` | LocalStorage persistence + migration |
+---
+
+## Forge trees (data/items.js + data/recipes.js)
+8 equipment trees, each with 9 tiers (T1 common → T9 legendary):
+| Tree | Slot | Primary mat | Secondary | T7+ tertiary |
+|---|---|---|---|---|
+| `swrd` | weapon | timber | gear | crystal |
+| `armr` | armor | gear | timber | scroll |
+| `helm` | helmet | gear | scroll | crystal |
+| `shld` | shield | gear | timber | scroll |
+| `neck` | necklace | scroll | crystal | gear |
+| `earr` | earring | crystal | scroll | timber |
+| `brac` | bracelet | timber | scroll | crystal |
+| `belt` | gauntlets* | gear | timber | scroll |
+| `boot` | boots | crystal | timber | gear |
+
+*`belt` is the internal id for the gauntlets slot (save-data compat). UI says "Gauntlets".
+
+Unlock prerequisites: T2: 2×T1 · T3: 2×T2 + WLv5 · T4: 2×T3 + WLv10 · T5: WLv15 · T6: WLv20 · T7: WLv28 · T8: WLv38 + PLv25 · T9: WLv50 + PLv35
+
+---
+
+## Guild upgrades (data/recipes.js — GUILD_UPGRADES)
+11 upgrades across 3 tiers. All are leveled (not boolean):
+- **Growth**: Grand Guild Hall (habitAura, max10), Trade Post (goldBonus, max6), Scriptorium (commissionBonus, max6), Patron's Vault (wxpBonus, max5)
+- **Forge**: Forge Mastery/anvil (craftDiscount, max7), Material Cache/warehouse (bonusMat, max5), Transmuter/refinery (matRefine, max3), Quality Forge (qualityRoll, max5)
+- **Power**: Barracks (strengthAura, max7), Enchanting Sanctum (gearAura, max7), Alchemist's Lab (potionBoost, max5)
+
+`state.guildUpgrades` stores the current level (integer) for each upgrade id.
+
+---
+
+## Economy summary
+- **Gold**: earned from work tasks and commissions; spent on crafting, guild upgrades, guild treasury, item refine/reforge
+- **Shards (✦)**: prestige currency — earned only from perfect days, streaks, boss kills, achievements, commission sweeps; spent on streak repair and affix rerolls
+- **Materials (T1/T2/T3)**: timber/scroll/crystal/gear; dropped from work tasks and dungeons; consumed by forge recipes; T2/T3 refined from lower tiers via MAT_REFINE
+
+---
+
+## Key functions reference (index.html)
+| Function | Purpose |
+|---|---|
+| `applyWorkDrops(drops, mul)` | Awards/reverses gold + materials for work tasks |
+| `applyGainsWithClass(gains, mul)` | Awards stat gains with class + guild hall multiplier |
+| `getWorkTaskDrops(categoryId, difficultyId)` | Returns drop payload for a work task |
+| `toggleQuest(id, listKey, periodKey)` | Task check/uncheck — branches for trabajo vs habitos |
+| `generateCommissions(dateKey)` | Creates today's 3 commissions + 1 client request |
+| `updateCommissionProgress(periodKey)` | Checks and awards commission rewards |
+| `fulfillCommission(idx)` | Manually fulfill a client-kind commission |
+| `craftItem(recipeId, silent?)` | Forge a gear item — instant, gold+mat cost, rolls rarity+affixes |
+| `craftItemBatch(recipeId)` | Forge up to 5 at once (×5 button) |
+| `getEffectiveCraftCost(recipe)` | Cost after anvil discount + forge token + mastery discount |
+| `getCraftGoldCost(item)` | Gold cost for crafting (by tier or rarity fallback) |
+| `refineItem(invIdx)` | Grade up an item (G1→G6 max, gold+mat cost) |
+| `reforgeQuality(invIdx)` | Re-roll instance rarity (gold cost) |
+| `rerollAffixes(invIdx)` | Re-roll affix values (shard cost) |
+| `purchaseGuildUpgrade(id)` | Buy a guild upgrade level with gold |
+| `investTreasury(amount)` | Invest gold into guild treasury for daily dividend |
+| `claimTreasury()` | Claim today's treasury dividend |
+| `renderForge()` | 🔥 FORGE sub-view (Manin lives here) |
+| `renderGuild()` | 🏛 CITY sub-view (city tier + guild upgrades) |
+| `renderWorkshop()` | 🛠 WORKSHOP sub-view (gear refine + reroll, Manin alt context) |
+| `renderCommissionBoard()` | Commission board widget |
+| `renderMerchantPanel()` | Traveling merchant panel in QUESTS |
+| `renderChar()` | CHAR tab render (STATS + GEAR sub-tabs) |
+| `renderHabitos()` | QUESTS tab render (Yami lives here) |
+| `renderTrabajo()` | WORK tab dispatcher (workbench / forge / workshop / city) |
+| `renderLog()` | LOG tab render (Achievements / History / Dungeons sub-tabs) |
+| `getEquippedStats()` | Total gear stats (incl. guild barracks/sanctum auras) |
+| `calcPlayerCombatStats(includeGear?)` | Full combat stats used in dungeon fights |
+| `calcPowerLevel(cs)` | CP from base stats only (no gear) |
+| `calcGearCP(baseCP)` | Gear CP contribution (capped at 30% of base) |
+| `setForgeTask(taskId)` | Links/unlinks dungeon to a work task (pomodoro) |
+| `grantShards(n, reason)` / `spendShards(n)` | Award/deduct premium currency |
+| `getActiveBoostMult(type)` | Product of timed boosts (`xp`/`dungeon`) |
+| `repairStreak()` / `canRepairStreak()` | Restore a just-broken streak (25✦) |
+| `showLeahIntimateBanner(mood)` | Full-screen Leah modal — `'tender'` / `'bold'` / `'milestone'` / `'night'` |
+| `pickLeahLine(ctx)` / `pickLeahCityLine(ctx)` / `pickYamiLine(ctx)` / `pickManinLine(ctx)` | Cached dialogue pickers (10 min TTL per contextKey) |
+| `loadState()` / `saveState()` | localStorage persistence + migration |
+
+---
 
 ## CSS color conventions
-- Habit stat chips: per-stat colors (STR=#ff8a80, INT=#82b1ff, etc.)
+- Habit stat chips: per-stat colors (STR=#ff8a80, DEX=#69f0ae, CON=#80deea, INT=#82b1ff, VOL=#ab47bc, CHA=#ffca28)
 - Work gold chip: `.gain-gold` → #ffc107
 - Work material chip: `.gain-mat` → #80deea
-- Forge active border (pomodoro): rgba(255,193,7,0.45)
-- Forge/Guild view accent: #ffc107 (amber throughout)
-- Gear bonus on stat screen: `.stat-gear-bonus` → #ffc107 (⚔ icon)
-- Commission board border: rgba(255,193,7,0.28)
-- Shard / premium currency: `--sao-shard` (#b388ff), `--sao-shard-bright` (#d1b3ff); HUD `.hud-shard`, shop `.shard-btn`, float `.shard-float`
+- Shard / premium: `--sao-shard` (#b388ff), `--sao-shard-bright` (#d1b3ff)
+- Gear bonus on stat screen: `.stat-gear-bonus` → #ffc107
+- Grade colors: G1 #9e9e9e · G2 #4dd0e1 · G3 #82b1ff · G4 #ff8a65 · G5 #ea80fc · G6 #ffd700
+
+---
+
+## Rarity system (crafted instances)
+5 tiers rolled on craft: Common 50% · Uncommon 27% · Rare 15% · Epic 6% · Legendary 2%  
+Each tier gates a stat multiplier (1.00→1.75) and extra affix slots (Epic +1, Legendary +2).  
+Affix slots by tier: T1-3: 0 · T4-7: 1 · T8-9: 2 (+ rarity bonus).  
+Affix pool: atkPct / hpPct / defPct / mpPct (% combat) + critPts / dodgePts (flat).
+
+---
+
+## Item mastery system
+Each recipe has 3 mastery tiers (Apprentice/Journeyman/MASTERED) tracked by craft count.  
+Rewards: mat discounts, rarity bonuses, double-craft chance, shards.  
+All-mastered in a tier unlocks a permanent systemic bonus + shards (`TIER_ALL_BONUSES` in recipes.js).
+
+---
+
+## Grade refinement
+G1→G6 (G6 locked behind T8 ALL MASTERED milestone).  
+`GRADE_MULT`: [1.0, 1.35, 1.80, 2.40, 3.20, 4.20]  
+Refine costs: mat portion of recipe × `REFINE_STEP_MULT` + gold via `getRefineGoldCost(grade)`.
+
+---
+
+## Shard faucets (SHARD_REWARDS in data/shop.js)
+- Perfect day: +2 · Iron discipline ×7: +5 · Phoenix comeback: +1
+- Weekly boss: +8 · Dungeon clear: +1 · Commission sweep: +1
+- Achievement tier: [1, 2, 3, 5, 8] by tier index
+
+Shard sinks after SHOP delete: streak repair (25✦), affix reroll (`rerollAffixes`). Other sinks (Focus Draught, cosmetics) went away with SHOP.

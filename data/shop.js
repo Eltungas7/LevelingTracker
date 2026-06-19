@@ -24,11 +24,14 @@ const SHARD_REWARDS = {
 
 // Shared material definitions (mirror of WORK_MATERIALS) for chest payloads.
 const SHOP_MAT_IDS = ['timber', 'scroll', 'crystal', 'gear'];
+// Internal IDs (timber/scroll/crystal/gear) kept stable for save-data compat.
+// Display labels remapped to the gear-themed naming:
+//   timber → Wood   ·   gear → Iron   ·   scroll → Hide   ·   crystal → Crystal
 const SHOP_MAT_META = {
-  timber:  { emoji: '🪵', label: 'Timber',  color: '#a5d6a7' },
-  scroll:  { emoji: '📜', label: 'Scroll',  color: '#82b1ff' },
-  crystal: { emoji: '💎', label: 'Crystal', color: '#ea80fc' },
-  gear:    { emoji: '⚙️', label: 'Gear',    color: '#80deea' },
+  timber:  { emoji: '🪵', label: 'Wood',    color: '#a5d6a7', img: 'img/materials/timber_1.png'  },
+  scroll:  { emoji: '📜', label: 'Hide',    color: '#c9a37a', img: 'img/materials/scroll_1.png'  },
+  crystal: { emoji: '💎', label: 'Crystal', color: '#ea80fc', img: 'img/materials/crystal_1.png' },
+  gear:    { emoji: '⚙️', label: 'Iron',    color: '#b0bec5', img: 'img/materials/gear_1.png'    },
 };
 
 // ── Step A — Tiered materials ────────────────────────────────
@@ -37,16 +40,16 @@ const SHOP_MAT_META = {
 // dungeons (Step B). State buckets: shopMaterials (T1), shopMatsT2, shopMatsT3.
 const MAT_TIER_META = {
   2: {
-    timber:  { emoji: '🟫', label: 'Hardwood',   color: '#c5e1a5' },
-    scroll:  { emoji: '📃', label: 'Manuscript', color: '#b388ff' },
-    crystal: { emoji: '🔷', label: 'Prism',      color: '#f48fb1' },
-    gear:    { emoji: '🔩', label: 'Mechanism',  color: '#4dd0e1' },
+    timber:  { emoji: '🟤', label: 'Ironbark',     color: '#8d6e63', img: 'img/materials/timber_2.png'  },
+    scroll:  { emoji: '📃', label: 'Leather',      color: '#a1887f', img: 'img/materials/scroll_2.png'  },
+    crystal: { emoji: '🌙', label: 'Moonstone',    color: '#90caf9', img: 'img/materials/crystal_2.png' },
+    gear:    { emoji: '🔩', label: 'Steel',        color: '#b0bec5', img: 'img/materials/gear_2.png'    },
   },
   3: {
-    timber:  { emoji: '🟤', label: 'Ironbark',   color: '#aed581' },
-    scroll:  { emoji: '📕', label: 'Codex',      color: '#9575cd' },
-    crystal: { emoji: '🔶', label: 'Starstone',  color: '#ff80ab' },
-    gear:    { emoji: '⚛️', label: 'Core',        color: '#26c6da' },
+    timber:  { emoji: '🩸', label: 'Bloodwood',    color: '#c62828', img: 'img/materials/timber_3.png'  },
+    scroll:  { emoji: '📕', label: 'Dragonleather',color: '#6d4c41', img: 'img/materials/scroll_3.png'  },
+    crystal: { emoji: '⭐', label: 'Starstone',    color: '#ffd54f', img: 'img/materials/crystal_3.png' },
+    gear:    { emoji: '🪙', label: 'Mythril',      color: '#80cbc4', img: 'img/materials/gear_3.png'    },
   },
 };
 

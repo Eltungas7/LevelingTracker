@@ -1,7 +1,7 @@
-const CACHE = 'sao-quests-v4';
+const CACHE = 'sao-quests-v5';
 
 const FILES_TO_CACHE = [
-  './mobile.html',
+  './index.html',
   './data/classes.js',
   './data/dungeons.js',
   './data/items.js',
@@ -63,7 +63,7 @@ self.addEventListener('message', event => {
           tag:      n.id,
           renotify: true,
           vibrate:  [200, 100, 200],
-          data:     { url: './mobile.html' }
+          data:     { url: './index.html' }
         });
         delete _notifTimers[n.id];
       }, delay);
@@ -82,9 +82,9 @@ self.addEventListener('notificationclick', event => {
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
       for (const c of list) {
-        if (c.url.includes('mobile.html') && 'focus' in c) return c.focus();
+        if (c.url.includes('index.html') && 'focus' in c) return c.focus();
       }
-      return clients.openWindow('./mobile.html');
+      return clients.openWindow('./index.html');
     })
   );
 });

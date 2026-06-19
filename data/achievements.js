@@ -120,7 +120,7 @@ const ACHIEVEMENTS = [
     tiers:[{count:5,label:'First Contracts',reward:1,title:null},{count:25,label:'Field Agent',reward:2,title:null},{count:75,label:'Veteran Contractor',reward:4,title:'Veteran Contractor'},{count:200,label:'Elite Operative',reward:7,title:'Elite Operative'},{count:500,label:'SHADOW LEGEND',reward:11,title:'SHADOW LEGEND'}]},
 
   // ── WORK — GOLD  (1+3+5+8+12 = 29) ─────────────────────────
-  { id:'gold_earner', name:'Gold Hunter', icon:'🪙', category:'trabajo', desc:'Accumulate lifetime gold earned', statAll:true,
+  { id:'gold_earner', name:'Gold Hunter', icon:'<img src="img/gold.png" style="height:1em;width:auto;object-fit:contain;vertical-align:middle;display:inline-block">', category:'trabajo', desc:'Accumulate lifetime gold earned', statAll:true,
     tiers:[{count:100,label:'First Pouch',reward:1,title:null},{count:500,label:'Prospector',reward:3,title:null},{count:2000,label:'Merchant Lord',reward:5,title:'Merchant Lord'},{count:5000,label:'Tycoon',reward:8,title:'Tycoon'},{count:10000,label:'GOLD SOVEREIGN',reward:12,title:'GOLD SOVEREIGN'}]},
 
   // ── WORK — COMMISSIONS  (1+2+4+7+11 = 25) ──────────────────

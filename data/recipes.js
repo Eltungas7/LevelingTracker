@@ -46,104 +46,124 @@ const CRAFT_RECIPES = [
   //   T5: 1×T4 WLv15     T6: 1×T5 WLv20    T7: 1×T6 WLv28
   //   T8: 1×T7 WLv38 PLv25                 T9: 1×T8 WLv50 PLv35
 
-  // ⚔️ SWORD PATH — timber(P), gear(S), crystal(T7+)
-  { id:'r_swrd_1', itemId:'f_swrd_1', tree:'swrd', tier:1, cost:{ timber:8 } },
-  { id:'r_swrd_2', itemId:'f_swrd_2', tree:'swrd', tier:2, cost:{ timber:14 },                        reqCraft:{ f_swrd_1:2 } },
-  { id:'r_swrd_3', itemId:'f_swrd_3', tree:'swrd', tier:3, cost:{ timber:22, gear:6 },                reqCraft:{ f_swrd_2:2 }, reqWorkerLevel:5  },
-  { id:'r_swrd_4', itemId:'f_swrd_4', tree:'swrd', tier:4, cost:{ timber:35, gear:12 },               reqCraft:{ f_swrd_3:2 }, reqWorkerLevel:10 },
-  { id:'r_swrd_5', itemId:'f_swrd_5', tree:'swrd', tier:5, cost:{ timber:55, gear:20 },               reqCraft:{ f_swrd_4:1 }, reqWorkerLevel:15 },
-  { id:'r_swrd_6', itemId:'f_swrd_6', tree:'swrd', tier:6, cost:{ timber:82, gear:30 },               reqCraft:{ f_swrd_5:1 }, reqWorkerLevel:20 },
-  { id:'r_swrd_7', itemId:'f_swrd_7', tree:'swrd', tier:7, cost:{ timber:120, gear:44, crystal:14 },  reqCraft:{ f_swrd_6:1 }, reqWorkerLevel:28 },
-  { id:'r_swrd_8', itemId:'f_swrd_8', tree:'swrd', tier:8, cost:{ timber:170, gear:62, crystal:22 },  reqCraft:{ f_swrd_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
-  { id:'r_swrd_9', itemId:'f_swrd_9', tree:'swrd', tier:9, cost:{ timber:245, gear:90, crystal:36 },  reqCraft:{ f_swrd_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
+  // ── REBALANCED RECIPE COSTS ─────────────────────────────────────────────────
+  // Lifetime mat demand equalized across all 4 families (±6%, T1+T2+T3 incl.
+  // refining cascade). Every tree carries Primary + Secondary + 2 Tertiaries
+  // (T7+ only). Timber stops being co-primary — it's the universal secondary
+  // in sword/shield/jewelry and a tertiary splash in armor/helm/gaunt/boots.
+  // Scroll primary curve trimmed (was overweight from being primary in 4 trees).
+  // T2/T3 split across all 4 mats at T7-T9 so refined-mat demand balances too.
+  //
+  // Curves used (P = primary slot, S = secondary, T1 = tertiary 1 at T7+, T2 = tertiary 2 at T7+):
+  //   Scroll-P  : 5/8/13/22/33/50/60/70/85
+  //   Gear-P    : 8/14/16/27/42/62/70/80/100
+  //   Crystal-P : 8/14/16/27/42/62/70/80/100
+  //   Timber-S  :      10/17/28/42/42/50/63    (at T3-T9)
+  //   Gear-S    :       7/11/19/28/28/34/43    (at T3-T9)
+  //   Tert1     :                12/15/18      (at T7-T9)
+  //   Tert2     :                 8/10/11      (at T7-T9)
+  //   T2 split  : T7 P:3 S:2 T1:1 T2:1 · T8 P:5 S:3 T1:3 T2:2 · T9 P:6 S:6 T1:5 T2:5
+  //   T3 split  : T8 P:1 · T9 P:1 S:1
 
-  // 🥋 ARMOR PATH — gear(P), timber(S), scroll(T7+)
-  { id:'r_armr_1', itemId:'f_armr_1', tree:'armr', tier:1, cost:{ gear:8 } },
-  { id:'r_armr_2', itemId:'f_armr_2', tree:'armr', tier:2, cost:{ gear:14 },                          reqCraft:{ f_armr_1:2 } },
-  { id:'r_armr_3', itemId:'f_armr_3', tree:'armr', tier:3, cost:{ gear:22, timber:6 },                reqCraft:{ f_armr_2:2 }, reqWorkerLevel:5  },
-  { id:'r_armr_4', itemId:'f_armr_4', tree:'armr', tier:4, cost:{ gear:35, timber:12 },               reqCraft:{ f_armr_3:2 }, reqWorkerLevel:10 },
-  { id:'r_armr_5', itemId:'f_armr_5', tree:'armr', tier:5, cost:{ gear:55, timber:20 },               reqCraft:{ f_armr_4:1 }, reqWorkerLevel:15 },
-  { id:'r_armr_6', itemId:'f_armr_6', tree:'armr', tier:6, cost:{ gear:82, timber:30 },               reqCraft:{ f_armr_5:1 }, reqWorkerLevel:20 },
-  { id:'r_armr_7', itemId:'f_armr_7', tree:'armr', tier:7, cost:{ gear:120, timber:44, scroll:14 },   reqCraft:{ f_armr_6:1 }, reqWorkerLevel:28 },
-  { id:'r_armr_8', itemId:'f_armr_8', tree:'armr', tier:8, cost:{ gear:170, timber:62, scroll:22 },   reqCraft:{ f_armr_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
-  { id:'r_armr_9', itemId:'f_armr_9', tree:'armr', tier:9, cost:{ gear:245, timber:90, scroll:36 },   reqCraft:{ f_armr_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
+  // ⚔️ SWORD PATH — Gear primary · Timber secondary · Scroll T1 · Crystal T2
+  { id:'r_swrd_1', itemId:'f_swrd_1', tree:'swrd', tier:1, cost:{ gear:8 } },
+  { id:'r_swrd_2', itemId:'f_swrd_2', tree:'swrd', tier:2, cost:{ gear:14 },                                                                       reqCraft:{ f_swrd_1:2 } },
+  { id:'r_swrd_3', itemId:'f_swrd_3', tree:'swrd', tier:3, cost:{ gear:16, timber:10 },                                                            reqCraft:{ f_swrd_2:2 }, reqWorkerLevel:5  },
+  { id:'r_swrd_4', itemId:'f_swrd_4', tree:'swrd', tier:4, cost:{ gear:27, timber:17 },                                                            reqCraft:{ f_swrd_3:2 }, reqWorkerLevel:10 },
+  { id:'r_swrd_5', itemId:'f_swrd_5', tree:'swrd', tier:5, cost:{ gear:42, timber:28 },                                                            reqCraft:{ f_swrd_4:1 }, reqWorkerLevel:15 },
+  { id:'r_swrd_6', itemId:'f_swrd_6', tree:'swrd', tier:6, cost:{ gear:62, timber:42 },                                                            reqCraft:{ f_swrd_5:1 }, reqWorkerLevel:20 },
+  { id:'r_swrd_7', itemId:'f_swrd_7', tree:'swrd', tier:7, cost:{ gear:70,  timber:42, scroll:12, crystal:8 },  costT2:{ gear:3, timber:2, scroll:1, crystal:1 },                                  reqCraft:{ f_swrd_6:1 }, reqWorkerLevel:28 },
+  { id:'r_swrd_8', itemId:'f_swrd_8', tree:'swrd', tier:8, cost:{ gear:80,  timber:50, scroll:15, crystal:10 }, costT2:{ gear:5, timber:3, scroll:3, crystal:2 }, costT3:{ gear:1 },              reqCraft:{ f_swrd_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
+  { id:'r_swrd_9', itemId:'f_swrd_9', tree:'swrd', tier:9, cost:{ gear:100, timber:63, scroll:18, crystal:11 }, costT2:{ gear:6, timber:6, scroll:5, crystal:5 }, costT3:{ gear:1, timber:1 },    reqCraft:{ f_swrd_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
 
-  // ⛑️ HELMET PATH — gear(P), scroll(S), crystal(T7+)
-  { id:'r_helm_1', itemId:'f_helm_1', tree:'helm', tier:1, cost:{ gear:8 } },
-  { id:'r_helm_2', itemId:'f_helm_2', tree:'helm', tier:2, cost:{ gear:14 },                          reqCraft:{ f_helm_1:2 } },
-  { id:'r_helm_3', itemId:'f_helm_3', tree:'helm', tier:3, cost:{ gear:22, scroll:6 },                reqCraft:{ f_helm_2:2 }, reqWorkerLevel:5  },
-  { id:'r_helm_4', itemId:'f_helm_4', tree:'helm', tier:4, cost:{ gear:35, scroll:12 },               reqCraft:{ f_helm_3:2 }, reqWorkerLevel:10 },
-  { id:'r_helm_5', itemId:'f_helm_5', tree:'helm', tier:5, cost:{ gear:55, scroll:20 },               reqCraft:{ f_helm_4:1 }, reqWorkerLevel:15 },
-  { id:'r_helm_6', itemId:'f_helm_6', tree:'helm', tier:6, cost:{ gear:82, scroll:30 },               reqCraft:{ f_helm_5:1 }, reqWorkerLevel:20 },
-  { id:'r_helm_7', itemId:'f_helm_7', tree:'helm', tier:7, cost:{ gear:120, scroll:44, crystal:14 },  reqCraft:{ f_helm_6:1 }, reqWorkerLevel:28 },
-  { id:'r_helm_8', itemId:'f_helm_8', tree:'helm', tier:8, cost:{ gear:170, scroll:62, crystal:22 },  reqCraft:{ f_helm_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
-  { id:'r_helm_9', itemId:'f_helm_9', tree:'helm', tier:9, cost:{ gear:245, scroll:90, crystal:36 },  reqCraft:{ f_helm_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
-
-  // 🛡️ SHIELD PATH — gear(P), timber(S), scroll(T7+)
+  // 🛡️ SHIELD PATH — Gear primary · Timber secondary · Scroll T1 · Crystal T2
   { id:'r_shld_1', itemId:'f_shld_1', tree:'shld', tier:1, cost:{ gear:8 } },
-  { id:'r_shld_2', itemId:'f_shld_2', tree:'shld', tier:2, cost:{ gear:14 },                          reqCraft:{ f_shld_1:2 } },
-  { id:'r_shld_3', itemId:'f_shld_3', tree:'shld', tier:3, cost:{ gear:22, timber:6 },                reqCraft:{ f_shld_2:2 }, reqWorkerLevel:5  },
-  { id:'r_shld_4', itemId:'f_shld_4', tree:'shld', tier:4, cost:{ gear:35, timber:12 },               reqCraft:{ f_shld_3:2 }, reqWorkerLevel:10 },
-  { id:'r_shld_5', itemId:'f_shld_5', tree:'shld', tier:5, cost:{ gear:55, timber:20 },               reqCraft:{ f_shld_4:1 }, reqWorkerLevel:15 },
-  { id:'r_shld_6', itemId:'f_shld_6', tree:'shld', tier:6, cost:{ gear:82, timber:30 },               reqCraft:{ f_shld_5:1 }, reqWorkerLevel:20 },
-  { id:'r_shld_7', itemId:'f_shld_7', tree:'shld', tier:7, cost:{ gear:120, timber:44, scroll:14 },   reqCraft:{ f_shld_6:1 }, reqWorkerLevel:28 },
-  { id:'r_shld_8', itemId:'f_shld_8', tree:'shld', tier:8, cost:{ gear:170, timber:62, scroll:22 },   reqCraft:{ f_shld_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
-  { id:'r_shld_9', itemId:'f_shld_9', tree:'shld', tier:9, cost:{ gear:245, timber:90, scroll:36 },   reqCraft:{ f_shld_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
+  { id:'r_shld_2', itemId:'f_shld_2', tree:'shld', tier:2, cost:{ gear:14 },                                                                       reqCraft:{ f_shld_1:2 } },
+  { id:'r_shld_3', itemId:'f_shld_3', tree:'shld', tier:3, cost:{ gear:16, timber:10 },                                                            reqCraft:{ f_shld_2:2 }, reqWorkerLevel:5  },
+  { id:'r_shld_4', itemId:'f_shld_4', tree:'shld', tier:4, cost:{ gear:27, timber:17 },                                                            reqCraft:{ f_shld_3:2 }, reqWorkerLevel:10 },
+  { id:'r_shld_5', itemId:'f_shld_5', tree:'shld', tier:5, cost:{ gear:42, timber:28 },                                                            reqCraft:{ f_shld_4:1 }, reqWorkerLevel:15 },
+  { id:'r_shld_6', itemId:'f_shld_6', tree:'shld', tier:6, cost:{ gear:62, timber:42 },                                                            reqCraft:{ f_shld_5:1 }, reqWorkerLevel:20 },
+  { id:'r_shld_7', itemId:'f_shld_7', tree:'shld', tier:7, cost:{ gear:70,  timber:42, scroll:12, crystal:8 },  costT2:{ gear:3, timber:2, scroll:1, crystal:1 },                                  reqCraft:{ f_shld_6:1 }, reqWorkerLevel:28 },
+  { id:'r_shld_8', itemId:'f_shld_8', tree:'shld', tier:8, cost:{ gear:80,  timber:50, scroll:15, crystal:10 }, costT2:{ gear:5, timber:3, scroll:3, crystal:2 }, costT3:{ gear:1 },              reqCraft:{ f_shld_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
+  { id:'r_shld_9', itemId:'f_shld_9', tree:'shld', tier:9, cost:{ gear:100, timber:63, scroll:18, crystal:11 }, costT2:{ gear:6, timber:6, scroll:5, crystal:5 }, costT3:{ gear:1, timber:1 },    reqCraft:{ f_shld_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
 
-  // 📿 NECKLACE PATH — scroll(P), crystal(S), gear(T7+)
-  { id:'r_neck_1', itemId:'f_neck_1', tree:'neck', tier:1, cost:{ scroll:8 } },
-  { id:'r_neck_2', itemId:'f_neck_2', tree:'neck', tier:2, cost:{ scroll:14 },                        reqCraft:{ f_neck_1:2 } },
-  { id:'r_neck_3', itemId:'f_neck_3', tree:'neck', tier:3, cost:{ scroll:22, crystal:6 },             reqCraft:{ f_neck_2:2 }, reqWorkerLevel:5  },
-  { id:'r_neck_4', itemId:'f_neck_4', tree:'neck', tier:4, cost:{ scroll:35, crystal:12 },            reqCraft:{ f_neck_3:2 }, reqWorkerLevel:10 },
-  { id:'r_neck_5', itemId:'f_neck_5', tree:'neck', tier:5, cost:{ scroll:55, crystal:20 },            reqCraft:{ f_neck_4:1 }, reqWorkerLevel:15 },
-  { id:'r_neck_6', itemId:'f_neck_6', tree:'neck', tier:6, cost:{ scroll:82, crystal:30 },            reqCraft:{ f_neck_5:1 }, reqWorkerLevel:20 },
-  { id:'r_neck_7', itemId:'f_neck_7', tree:'neck', tier:7, cost:{ scroll:120, crystal:44, gear:14 },  reqCraft:{ f_neck_6:1 }, reqWorkerLevel:28 },
-  { id:'r_neck_8', itemId:'f_neck_8', tree:'neck', tier:8, cost:{ scroll:170, crystal:62, gear:22 },  reqCraft:{ f_neck_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
-  { id:'r_neck_9', itemId:'f_neck_9', tree:'neck', tier:9, cost:{ scroll:245, crystal:90, gear:36 },  reqCraft:{ f_neck_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
+  // 🥋 ARMOR PATH — Scroll primary · Gear secondary · Timber T1 · Crystal T2
+  { id:'r_armr_1', itemId:'f_armr_1', tree:'armr', tier:1, cost:{ scroll:5 } },
+  { id:'r_armr_2', itemId:'f_armr_2', tree:'armr', tier:2, cost:{ scroll:8 },                                                                      reqCraft:{ f_armr_1:2 } },
+  { id:'r_armr_3', itemId:'f_armr_3', tree:'armr', tier:3, cost:{ scroll:13, gear:7 },                                                             reqCraft:{ f_armr_2:2 }, reqWorkerLevel:5  },
+  { id:'r_armr_4', itemId:'f_armr_4', tree:'armr', tier:4, cost:{ scroll:22, gear:11 },                                                            reqCraft:{ f_armr_3:2 }, reqWorkerLevel:10 },
+  { id:'r_armr_5', itemId:'f_armr_5', tree:'armr', tier:5, cost:{ scroll:33, gear:19 },                                                            reqCraft:{ f_armr_4:1 }, reqWorkerLevel:15 },
+  { id:'r_armr_6', itemId:'f_armr_6', tree:'armr', tier:6, cost:{ scroll:50, gear:28 },                                                            reqCraft:{ f_armr_5:1 }, reqWorkerLevel:20 },
+  { id:'r_armr_7', itemId:'f_armr_7', tree:'armr', tier:7, cost:{ scroll:60, gear:28, timber:12, crystal:8 },  costT2:{ scroll:3, gear:2, timber:1, crystal:1 },                                    reqCraft:{ f_armr_6:1 }, reqWorkerLevel:28 },
+  { id:'r_armr_8', itemId:'f_armr_8', tree:'armr', tier:8, cost:{ scroll:70, gear:34, timber:15, crystal:10 }, costT2:{ scroll:5, gear:3, timber:3, crystal:2 }, costT3:{ scroll:1 },              reqCraft:{ f_armr_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
+  { id:'r_armr_9', itemId:'f_armr_9', tree:'armr', tier:9, cost:{ scroll:85, gear:43, timber:18, crystal:11 }, costT2:{ scroll:6, gear:6, timber:5, crystal:5 }, costT3:{ scroll:1, gear:1 },      reqCraft:{ f_armr_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
 
-  // 💎 EARRING PATH — crystal(P), scroll(S), timber(T7+)
+  // ⛑️ HELMET PATH — Scroll primary · Gear secondary · Timber T1 · Crystal T2
+  { id:'r_helm_1', itemId:'f_helm_1', tree:'helm', tier:1, cost:{ scroll:5 } },
+  { id:'r_helm_2', itemId:'f_helm_2', tree:'helm', tier:2, cost:{ scroll:8 },                                                                      reqCraft:{ f_helm_1:2 } },
+  { id:'r_helm_3', itemId:'f_helm_3', tree:'helm', tier:3, cost:{ scroll:13, gear:7 },                                                             reqCraft:{ f_helm_2:2 }, reqWorkerLevel:5  },
+  { id:'r_helm_4', itemId:'f_helm_4', tree:'helm', tier:4, cost:{ scroll:22, gear:11 },                                                            reqCraft:{ f_helm_3:2 }, reqWorkerLevel:10 },
+  { id:'r_helm_5', itemId:'f_helm_5', tree:'helm', tier:5, cost:{ scroll:33, gear:19 },                                                            reqCraft:{ f_helm_4:1 }, reqWorkerLevel:15 },
+  { id:'r_helm_6', itemId:'f_helm_6', tree:'helm', tier:6, cost:{ scroll:50, gear:28 },                                                            reqCraft:{ f_helm_5:1 }, reqWorkerLevel:20 },
+  { id:'r_helm_7', itemId:'f_helm_7', tree:'helm', tier:7, cost:{ scroll:60, gear:28, timber:12, crystal:8 },  costT2:{ scroll:3, gear:2, timber:1, crystal:1 },                                    reqCraft:{ f_helm_6:1 }, reqWorkerLevel:28 },
+  { id:'r_helm_8', itemId:'f_helm_8', tree:'helm', tier:8, cost:{ scroll:70, gear:34, timber:15, crystal:10 }, costT2:{ scroll:5, gear:3, timber:3, crystal:2 }, costT3:{ scroll:1 },              reqCraft:{ f_helm_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
+  { id:'r_helm_9', itemId:'f_helm_9', tree:'helm', tier:9, cost:{ scroll:85, gear:43, timber:18, crystal:11 }, costT2:{ scroll:6, gear:6, timber:5, crystal:5 }, costT3:{ scroll:1, gear:1 },      reqCraft:{ f_helm_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
+
+  // 📿 NECKLACE PATH — Crystal primary · Timber secondary · Scroll T1 · Gear T2
+  { id:'r_neck_1', itemId:'f_neck_1', tree:'neck', tier:1, cost:{ crystal:8 } },
+  { id:'r_neck_2', itemId:'f_neck_2', tree:'neck', tier:2, cost:{ crystal:14 },                                                                    reqCraft:{ f_neck_1:2 } },
+  { id:'r_neck_3', itemId:'f_neck_3', tree:'neck', tier:3, cost:{ crystal:16, timber:10 },                                                         reqCraft:{ f_neck_2:2 }, reqWorkerLevel:5  },
+  { id:'r_neck_4', itemId:'f_neck_4', tree:'neck', tier:4, cost:{ crystal:27, timber:17 },                                                         reqCraft:{ f_neck_3:2 }, reqWorkerLevel:10 },
+  { id:'r_neck_5', itemId:'f_neck_5', tree:'neck', tier:5, cost:{ crystal:42, timber:28 },                                                         reqCraft:{ f_neck_4:1 }, reqWorkerLevel:15 },
+  { id:'r_neck_6', itemId:'f_neck_6', tree:'neck', tier:6, cost:{ crystal:62, timber:42 },                                                         reqCraft:{ f_neck_5:1 }, reqWorkerLevel:20 },
+  { id:'r_neck_7', itemId:'f_neck_7', tree:'neck', tier:7, cost:{ crystal:70,  timber:42, scroll:12, gear:8 },  costT2:{ crystal:3, timber:2, scroll:1, gear:1 },                                  reqCraft:{ f_neck_6:1 }, reqWorkerLevel:28 },
+  { id:'r_neck_8', itemId:'f_neck_8', tree:'neck', tier:8, cost:{ crystal:80,  timber:50, scroll:15, gear:10 }, costT2:{ crystal:5, timber:3, scroll:3, gear:2 }, costT3:{ crystal:1 },            reqCraft:{ f_neck_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
+  { id:'r_neck_9', itemId:'f_neck_9', tree:'neck', tier:9, cost:{ crystal:100, timber:63, scroll:18, gear:11 }, costT2:{ crystal:6, timber:6, scroll:5, gear:5 }, costT3:{ crystal:1, timber:1 },  reqCraft:{ f_neck_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
+
+  // 💎 EARRING PATH — Crystal primary · Timber secondary · Scroll T1 · Gear T2
   { id:'r_earr_1', itemId:'f_earr_1', tree:'earr', tier:1, cost:{ crystal:8 } },
-  { id:'r_earr_2', itemId:'f_earr_2', tree:'earr', tier:2, cost:{ crystal:14 },                       reqCraft:{ f_earr_1:2 } },
-  { id:'r_earr_3', itemId:'f_earr_3', tree:'earr', tier:3, cost:{ crystal:22, scroll:6 },             reqCraft:{ f_earr_2:2 }, reqWorkerLevel:5  },
-  { id:'r_earr_4', itemId:'f_earr_4', tree:'earr', tier:4, cost:{ crystal:35, scroll:12 },            reqCraft:{ f_earr_3:2 }, reqWorkerLevel:10 },
-  { id:'r_earr_5', itemId:'f_earr_5', tree:'earr', tier:5, cost:{ crystal:55, scroll:20 },            reqCraft:{ f_earr_4:1 }, reqWorkerLevel:15 },
-  { id:'r_earr_6', itemId:'f_earr_6', tree:'earr', tier:6, cost:{ crystal:82, scroll:30 },            reqCraft:{ f_earr_5:1 }, reqWorkerLevel:20 },
-  { id:'r_earr_7', itemId:'f_earr_7', tree:'earr', tier:7, cost:{ crystal:120, scroll:44, timber:14 },reqCraft:{ f_earr_6:1 }, reqWorkerLevel:28 },
-  { id:'r_earr_8', itemId:'f_earr_8', tree:'earr', tier:8, cost:{ crystal:170, scroll:62, timber:22 },reqCraft:{ f_earr_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
-  { id:'r_earr_9', itemId:'f_earr_9', tree:'earr', tier:9, cost:{ crystal:245, scroll:90, timber:36 },reqCraft:{ f_earr_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
+  { id:'r_earr_2', itemId:'f_earr_2', tree:'earr', tier:2, cost:{ crystal:14 },                                                                    reqCraft:{ f_earr_1:2 } },
+  { id:'r_earr_3', itemId:'f_earr_3', tree:'earr', tier:3, cost:{ crystal:16, timber:10 },                                                         reqCraft:{ f_earr_2:2 }, reqWorkerLevel:5  },
+  { id:'r_earr_4', itemId:'f_earr_4', tree:'earr', tier:4, cost:{ crystal:27, timber:17 },                                                         reqCraft:{ f_earr_3:2 }, reqWorkerLevel:10 },
+  { id:'r_earr_5', itemId:'f_earr_5', tree:'earr', tier:5, cost:{ crystal:42, timber:28 },                                                         reqCraft:{ f_earr_4:1 }, reqWorkerLevel:15 },
+  { id:'r_earr_6', itemId:'f_earr_6', tree:'earr', tier:6, cost:{ crystal:62, timber:42 },                                                         reqCraft:{ f_earr_5:1 }, reqWorkerLevel:20 },
+  { id:'r_earr_7', itemId:'f_earr_7', tree:'earr', tier:7, cost:{ crystal:70,  timber:42, scroll:12, gear:8 },  costT2:{ crystal:3, timber:2, scroll:1, gear:1 },                                  reqCraft:{ f_earr_6:1 }, reqWorkerLevel:28 },
+  { id:'r_earr_8', itemId:'f_earr_8', tree:'earr', tier:8, cost:{ crystal:80,  timber:50, scroll:15, gear:10 }, costT2:{ crystal:5, timber:3, scroll:3, gear:2 }, costT3:{ crystal:1 },            reqCraft:{ f_earr_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
+  { id:'r_earr_9', itemId:'f_earr_9', tree:'earr', tier:9, cost:{ crystal:100, timber:63, scroll:18, gear:11 }, costT2:{ crystal:6, timber:6, scroll:5, gear:5 }, costT3:{ crystal:1, timber:1 },  reqCraft:{ f_earr_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
 
-  // 💍 BRACELET PATH — timber(P), scroll(S), crystal(T7+)
-  { id:'r_brac_1', itemId:'f_brac_1', tree:'brac', tier:1, cost:{ timber:8 } },
-  { id:'r_brac_2', itemId:'f_brac_2', tree:'brac', tier:2, cost:{ timber:14 },                        reqCraft:{ f_brac_1:2 } },
-  { id:'r_brac_3', itemId:'f_brac_3', tree:'brac', tier:3, cost:{ timber:22, scroll:6 },              reqCraft:{ f_brac_2:2 }, reqWorkerLevel:5  },
-  { id:'r_brac_4', itemId:'f_brac_4', tree:'brac', tier:4, cost:{ timber:35, scroll:12 },             reqCraft:{ f_brac_3:2 }, reqWorkerLevel:10 },
-  { id:'r_brac_5', itemId:'f_brac_5', tree:'brac', tier:5, cost:{ timber:55, scroll:20 },             reqCraft:{ f_brac_4:1 }, reqWorkerLevel:15 },
-  { id:'r_brac_6', itemId:'f_brac_6', tree:'brac', tier:6, cost:{ timber:82, scroll:30 },             reqCraft:{ f_brac_5:1 }, reqWorkerLevel:20 },
-  { id:'r_brac_7', itemId:'f_brac_7', tree:'brac', tier:7, cost:{ timber:120, scroll:44, crystal:14 },reqCraft:{ f_brac_6:1 }, reqWorkerLevel:28 },
-  { id:'r_brac_8', itemId:'f_brac_8', tree:'brac', tier:8, cost:{ timber:170, scroll:62, crystal:22 },reqCraft:{ f_brac_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
-  { id:'r_brac_9', itemId:'f_brac_9', tree:'brac', tier:9, cost:{ timber:245, scroll:90, crystal:36 },reqCraft:{ f_brac_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
+  // 💍 BRACELET PATH — Crystal primary · Timber secondary · Scroll T1 · Gear T2
+  { id:'r_brac_1', itemId:'f_brac_1', tree:'brac', tier:1, cost:{ crystal:8 } },
+  { id:'r_brac_2', itemId:'f_brac_2', tree:'brac', tier:2, cost:{ crystal:14 },                                                                    reqCraft:{ f_brac_1:2 } },
+  { id:'r_brac_3', itemId:'f_brac_3', tree:'brac', tier:3, cost:{ crystal:16, timber:10 },                                                         reqCraft:{ f_brac_2:2 }, reqWorkerLevel:5  },
+  { id:'r_brac_4', itemId:'f_brac_4', tree:'brac', tier:4, cost:{ crystal:27, timber:17 },                                                         reqCraft:{ f_brac_3:2 }, reqWorkerLevel:10 },
+  { id:'r_brac_5', itemId:'f_brac_5', tree:'brac', tier:5, cost:{ crystal:42, timber:28 },                                                         reqCraft:{ f_brac_4:1 }, reqWorkerLevel:15 },
+  { id:'r_brac_6', itemId:'f_brac_6', tree:'brac', tier:6, cost:{ crystal:62, timber:42 },                                                         reqCraft:{ f_brac_5:1 }, reqWorkerLevel:20 },
+  { id:'r_brac_7', itemId:'f_brac_7', tree:'brac', tier:7, cost:{ crystal:70,  timber:42, scroll:12, gear:8 },  costT2:{ crystal:3, timber:2, scroll:1, gear:1 },                                  reqCraft:{ f_brac_6:1 }, reqWorkerLevel:28 },
+  { id:'r_brac_8', itemId:'f_brac_8', tree:'brac', tier:8, cost:{ crystal:80,  timber:50, scroll:15, gear:10 }, costT2:{ crystal:5, timber:3, scroll:3, gear:2 }, costT3:{ crystal:1 },            reqCraft:{ f_brac_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
+  { id:'r_brac_9', itemId:'f_brac_9', tree:'brac', tier:9, cost:{ crystal:100, timber:63, scroll:18, gear:11 }, costT2:{ crystal:6, timber:6, scroll:5, gear:5 }, costT3:{ crystal:1, timber:1 },  reqCraft:{ f_brac_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
 
-  // 🥊 GAUNTLETS PATH — tree id 'belt' kept internally (save-data compat) — gear(P), timber(S), scroll(T7+)
-  { id:'r_belt_1', itemId:'f_belt_1', tree:'belt', tier:1, cost:{ gear:8 } },
-  { id:'r_belt_2', itemId:'f_belt_2', tree:'belt', tier:2, cost:{ gear:14 },                          reqCraft:{ f_belt_1:2 } },
-  { id:'r_belt_3', itemId:'f_belt_3', tree:'belt', tier:3, cost:{ gear:22, timber:6 },                reqCraft:{ f_belt_2:2 }, reqWorkerLevel:5  },
-  { id:'r_belt_4', itemId:'f_belt_4', tree:'belt', tier:4, cost:{ gear:35, timber:12 },               reqCraft:{ f_belt_3:2 }, reqWorkerLevel:10 },
-  { id:'r_belt_5', itemId:'f_belt_5', tree:'belt', tier:5, cost:{ gear:55, timber:20 },               reqCraft:{ f_belt_4:1 }, reqWorkerLevel:15 },
-  { id:'r_belt_6', itemId:'f_belt_6', tree:'belt', tier:6, cost:{ gear:82, timber:30 },               reqCraft:{ f_belt_5:1 }, reqWorkerLevel:20 },
-  { id:'r_belt_7', itemId:'f_belt_7', tree:'belt', tier:7, cost:{ gear:120, timber:44, scroll:14 },   reqCraft:{ f_belt_6:1 }, reqWorkerLevel:28 },
-  { id:'r_belt_8', itemId:'f_belt_8', tree:'belt', tier:8, cost:{ gear:170, timber:62, scroll:22 },   reqCraft:{ f_belt_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
-  { id:'r_belt_9', itemId:'f_belt_9', tree:'belt', tier:9, cost:{ gear:245, timber:90, scroll:36 },   reqCraft:{ f_belt_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
+  // 🥊 GAUNTLETS PATH — Scroll primary · Gear secondary · Timber T1 · Crystal T2
+  // (tree id 'belt' kept internally for save-data compat)
+  { id:'r_belt_1', itemId:'f_belt_1', tree:'belt', tier:1, cost:{ scroll:5 } },
+  { id:'r_belt_2', itemId:'f_belt_2', tree:'belt', tier:2, cost:{ scroll:8 },                                                                      reqCraft:{ f_belt_1:2 } },
+  { id:'r_belt_3', itemId:'f_belt_3', tree:'belt', tier:3, cost:{ scroll:13, gear:7 },                                                             reqCraft:{ f_belt_2:2 }, reqWorkerLevel:5  },
+  { id:'r_belt_4', itemId:'f_belt_4', tree:'belt', tier:4, cost:{ scroll:22, gear:11 },                                                            reqCraft:{ f_belt_3:2 }, reqWorkerLevel:10 },
+  { id:'r_belt_5', itemId:'f_belt_5', tree:'belt', tier:5, cost:{ scroll:33, gear:19 },                                                            reqCraft:{ f_belt_4:1 }, reqWorkerLevel:15 },
+  { id:'r_belt_6', itemId:'f_belt_6', tree:'belt', tier:6, cost:{ scroll:50, gear:28 },                                                            reqCraft:{ f_belt_5:1 }, reqWorkerLevel:20 },
+  { id:'r_belt_7', itemId:'f_belt_7', tree:'belt', tier:7, cost:{ scroll:60, gear:28, timber:12, crystal:8 },  costT2:{ scroll:3, gear:2, timber:1, crystal:1 },                                    reqCraft:{ f_belt_6:1 }, reqWorkerLevel:28 },
+  { id:'r_belt_8', itemId:'f_belt_8', tree:'belt', tier:8, cost:{ scroll:70, gear:34, timber:15, crystal:10 }, costT2:{ scroll:5, gear:3, timber:3, crystal:2 }, costT3:{ scroll:1 },              reqCraft:{ f_belt_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
+  { id:'r_belt_9', itemId:'f_belt_9', tree:'belt', tier:9, cost:{ scroll:85, gear:43, timber:18, crystal:11 }, costT2:{ scroll:6, gear:6, timber:5, crystal:5 }, costT3:{ scroll:1, gear:1 },      reqCraft:{ f_belt_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
 
-  // 👢 BOOTS PATH — crystal(P), timber(S), gear(T7+)
-  { id:'r_boot_1', itemId:'f_boot_1', tree:'boot', tier:1, cost:{ crystal:8 } },
-  { id:'r_boot_2', itemId:'f_boot_2', tree:'boot', tier:2, cost:{ crystal:14 },                       reqCraft:{ f_boot_1:2 } },
-  { id:'r_boot_3', itemId:'f_boot_3', tree:'boot', tier:3, cost:{ crystal:22, timber:6 },             reqCraft:{ f_boot_2:2 }, reqWorkerLevel:5  },
-  { id:'r_boot_4', itemId:'f_boot_4', tree:'boot', tier:4, cost:{ crystal:35, timber:12 },            reqCraft:{ f_boot_3:2 }, reqWorkerLevel:10 },
-  { id:'r_boot_5', itemId:'f_boot_5', tree:'boot', tier:5, cost:{ crystal:55, timber:20 },            reqCraft:{ f_boot_4:1 }, reqWorkerLevel:15 },
-  { id:'r_boot_6', itemId:'f_boot_6', tree:'boot', tier:6, cost:{ crystal:82, timber:30 },            reqCraft:{ f_boot_5:1 }, reqWorkerLevel:20 },
-  { id:'r_boot_7', itemId:'f_boot_7', tree:'boot', tier:7, cost:{ crystal:120, timber:44, gear:14 },  reqCraft:{ f_boot_6:1 }, reqWorkerLevel:28 },
-  { id:'r_boot_8', itemId:'f_boot_8', tree:'boot', tier:8, cost:{ crystal:170, timber:62, gear:22 },  reqCraft:{ f_boot_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
-  { id:'r_boot_9', itemId:'f_boot_9', tree:'boot', tier:9, cost:{ crystal:245, timber:90, gear:36 },  reqCraft:{ f_boot_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
+  // 👢 BOOTS PATH — Scroll primary · Gear secondary · Timber T1 · Crystal T2
+  { id:'r_boot_1', itemId:'f_boot_1', tree:'boot', tier:1, cost:{ scroll:5 } },
+  { id:'r_boot_2', itemId:'f_boot_2', tree:'boot', tier:2, cost:{ scroll:8 },                                                                      reqCraft:{ f_boot_1:2 } },
+  { id:'r_boot_3', itemId:'f_boot_3', tree:'boot', tier:3, cost:{ scroll:13, gear:7 },                                                             reqCraft:{ f_boot_2:2 }, reqWorkerLevel:5  },
+  { id:'r_boot_4', itemId:'f_boot_4', tree:'boot', tier:4, cost:{ scroll:22, gear:11 },                                                            reqCraft:{ f_boot_3:2 }, reqWorkerLevel:10 },
+  { id:'r_boot_5', itemId:'f_boot_5', tree:'boot', tier:5, cost:{ scroll:33, gear:19 },                                                            reqCraft:{ f_boot_4:1 }, reqWorkerLevel:15 },
+  { id:'r_boot_6', itemId:'f_boot_6', tree:'boot', tier:6, cost:{ scroll:50, gear:28 },                                                            reqCraft:{ f_boot_5:1 }, reqWorkerLevel:20 },
+  { id:'r_boot_7', itemId:'f_boot_7', tree:'boot', tier:7, cost:{ scroll:60, gear:28, timber:12, crystal:8 },  costT2:{ scroll:3, gear:2, timber:1, crystal:1 },                                    reqCraft:{ f_boot_6:1 }, reqWorkerLevel:28 },
+  { id:'r_boot_8', itemId:'f_boot_8', tree:'boot', tier:8, cost:{ scroll:70, gear:34, timber:15, crystal:10 }, costT2:{ scroll:5, gear:3, timber:3, crystal:2 }, costT3:{ scroll:1 },              reqCraft:{ f_boot_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
+  { id:'r_boot_9', itemId:'f_boot_9', tree:'boot', tier:9, cost:{ scroll:85, gear:43, timber:18, crystal:11 }, costT2:{ scroll:6, gear:6, timber:5, crystal:5 }, costT3:{ scroll:1, gear:1 },      reqCraft:{ f_boot_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
 ];
 
 // ── Item Mastery ───────────────────────────────────────────────
@@ -218,7 +238,7 @@ const GUILD_UPGRADES = [
   { id:'hall',         name:'Grand Guild Hall',   emoji:'🏛️', maxLevel:10, baseCost:400, minWorkerLevel:1,
     effect:'habitAura',       perLevel:'+0.5% habit stat gains',
     desc:'Permanently boosts stat gains from all daily habits. Each level stacks.' },
-  { id:'trade',        name:'Trade Post',         emoji:'🪙', maxLevel:6,  baseCost:300, minWorkerLevel:5,
+  { id:'trade',        name:'Trade Post',         emoji:'<img src="img/gold.png" style="height:1em;width:auto;object-fit:contain;vertical-align:middle;display:inline-block">', maxLevel:6,  baseCost:300, minWorkerLevel:5,
     effect:'goldBonus',       perLevel:'+12% gold from work tasks',
     desc:'Increases gold earned from completing work tasks.' },
   { id:'scriptorium',  name:'Scriptorium',        emoji:'📜', maxLevel:6,  baseCost:375, minWorkerLevel:10,
