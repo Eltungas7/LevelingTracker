@@ -18366,7 +18366,11 @@ function getCityPopulation() {
   const playerLv = calcLevel(state.totalXp || 0).level;
   const workerLv = calcWorkerLevel(state.workXp || 0).level;
   const upgradeLevels = GUILD_UPGRADES.reduce((a, u) => a + (gu[u.id] || 0), 0);
-  return 5000 + 800 * playerLv + 400 * workerLv + 1200 * upgradeLevels + 100 * getLifetimePomos();
+  // Slow climb 0→~1000 (around 15 upgrade levels), then exponential growth.
+  // Curve: floor(upgradeLevels^2.4 * 1.2) + linear (upgrades*10 + worker*4 + player*3 + pomos*0.6)
+  const exponential = Math.floor(Math.pow(upgradeLevels, 2.4) * 1.2);
+  const linear = upgradeLevels * 10 + workerLv * 4 + playerLv * 3 + Math.floor(getLifetimePomos() * 0.6);
+  return exponential + linear;
 }
 
 // Rolling count-up animation — used when the citizen count increases after a CITY upgrade.
@@ -18399,21 +18403,17 @@ function renderGuild() {
   const _curLevels = GUILD_UPGRADES.reduce((a, u) => a + (gu[u.id] || 0), 0);
   const _completionPct = Math.round((_curLevels / MAX_GUILD_LEVELS) * 100);
 
-  // ── GUILD CREST — one identity band: rank + power + treasury gold ──
-  const _GUILD_RANKS = GUILD_RANK_DEFS;
-  let _rankIdx = 0; _GUILD_RANKS.forEach((r, i) => { if (_curLevels >= r.min) _rankIdx = i; });
-  const _rank = _GUILD_RANKS[_rankIdx];
-  const _nextRank = _GUILD_RANKS[_rankIdx + 1] || null;
+  // ── CITY CREST — slimmed: city name + CITY POWER + population + gold. No competing tier/rank displays.
   const _compColor = _completionPct >= 80 ? '#ffd700' : _completionPct >= 55 ? '#ffc107' : _completionPct >= 31 ? '#ffa726' : '#4dd0e1';
-  const crest = document.createElement('div'); crest.className = `guild-crest ${_rank.cls}`;
+  const crest = document.createElement('div'); crest.className = 'guild-crest';
   crest.style.setProperty('--gc', _compColor);
   crest.innerHTML = `
     <div class="gc-top">
       <div class="gc-rank">
-        <span class="gc-rank-icon">${_rank.icon}</span>
+        <span class="gc-rank-icon">🏛</span>
         <div class="gc-rank-text">
-          <div class="gc-rank-name">${_rank.name}</div>
-          <div class="gc-rank-sub">${_rank.sub}</div>
+          <div class="gc-rank-name">${getCityName()}</div>
+          <div class="gc-rank-sub">⟦ YOUR CITY ⟧</div>
         </div>
       </div>
       <div class="gc-gold">
@@ -18429,29 +18429,8 @@ function renderGuild() {
     <div class="gc-power-row" style="margin-top:6px">
       <span class="gc-power-lbl">🏙 POPULATION</span>
       <span class="gc-power-val" id="gcPopVal" style="color:#ffd54f">${getCityPopulation().toLocaleString()} citizens</span>
-    </div>
-    <div class="gc-next">${_nextRank ? `<span class="gc-next-need">${_nextRank.min - _curLevels}</span> upgrade levels → <strong>${_nextRank.name}</strong>` : '👑 APEX CITY RANK REACHED'}</div>`;
+    </div>`;
   wrap.appendChild(crest);
-
-  // ── TIER-UP PROXIMITY BANNER ── shown when next CITY tier (CITY_TIERS) is 1 upgrade away
-  {
-    const _curTier  = getCityTier();
-    const _nextTier = getNextCityTier();
-    if (_nextTier) {
-      const _away = _nextTier.upgs - _curLevels;
-      if (_away > 0 && _away <= 1) {
-        const tub = document.createElement('div');
-        tub.className = 'tier-up-banner';
-        tub.innerHTML = `
-          <span class="tub-emoji">${_nextTier.emoji}</span>
-          <div class="tub-info">
-            <div class="tub-eyebrow">⟦ ${_nextTier.name.toUpperCase()} IN ${_away} LEVEL ⟧</div>
-            <div class="tub-msg">Buy <strong>any</strong> Growth/Forge/Power upgrade to advance ${_curTier.name} → <strong>${_nextTier.name}</strong></div>
-          </div>`;
-        wrap.appendChild(tub);
-      }
-    }
-  }
 
   // Population-roll trigger — animate from previous value to current when it grows.
   {
@@ -18489,25 +18468,8 @@ function renderGuild() {
     wrap.appendChild(wChip);
   }
 
-  // ── Guild Reputation bar ─────────────────────────────────────
-  const _rep = state.guildRep || 0;
-  const _repTier = getGuildRepTier(_rep);
-  const _repTierIdx = GUILD_REP_TIERS.indexOf(_repTier);
-  const _nextRepTier = GUILD_REP_TIERS[_repTierIdx + 1];
-  const _repPct = _nextRepTier ? Math.round((_rep - _repTier.min) / (_nextRepTier.min - _repTier.min) * 100) : 100;
-  const repSec = document.createElement('div'); repSec.className = 'guild-rep-section';
-  repSec.innerHTML = `
-    <div class="guild-rep-header">
-      <span class="guild-rep-title">CITY REPUTATION</span>
-      <span class="guild-rep-tier" style="color:${_repTier.color}">${_repTier.name.toUpperCase()}</span>
-    </div>
-    <div class="guild-rep-bar-wrap"><div class="guild-rep-bar-fill" style="width:${_repPct}%;background:linear-gradient(90deg,${_repTier.color}99,${_repTier.color})"></div></div>
-    <div class="guild-rep-meta">
-      <span>${_rep} REP total</span>
-      ${_nextRepTier ? `<span>${_nextRepTier.min - _rep} to <strong>${_nextRepTier.name}</strong></span>` : '<span style="color:#ffd700">MAX TIER REACHED</span>'}
-    </div>
-    ${_repTier.bonus ? `<div class="guild-rep-unlock">▶ ${_repTier.bonus}</div>` : ''}`;
-  wrap.appendChild(repSec);
+  // (CITY REPUTATION display removed — guildRep mechanic still drives commission gold bonuses
+  // internally via getGuildRepTier(state.guildRep) in _awardCommissionRewards, just no UI here.)
 
   // ── Treasury — repeatable gold sink + daily dividend ─────────
   {
