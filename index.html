@@ -19792,21 +19792,6 @@ function renderPersonaje() {
   panelContent.innerHTML=`<div id="charStatusHeader" class="char-status-header"></div><div id="classPanelEl"></div><div class="stats-list" id="statsList"></div><div class="social-card" id="socialCardEl"></div><div id="combatStatsEl"></div><div id="lockedClassGalleryEl"></div>`;
   renderCharStatusHeader();
   renderClassPanel();
-  const _charSug = getSystemSuggestion();
-  if (_charSug) {
-    const _sugEl = document.createElement('div');
-    _sugEl.className = 'sys-suggest';
-    _sugEl.style.setProperty('--ss-color', _charSug.color);
-    const _habitNames = _charSug.habits.map(h => `"${h.text.length > 20 ? h.text.substring(0,20)+'…' : h.text}"`).join(' or ');
-    _sugEl.innerHTML = `
-      <div class="sys-suggest-body">
-        <div class="sys-suggest-label">⟦ SYSTEM SUGGESTION ⟧</div>
-        <div class="sys-suggest-text">${STAT_NAMES[_charSug.stat]} is your lagging stat · try ${_habitNames} today</div>
-      </div>
-      <span class="sys-suggest-stat-badge" style="color:${_charSug.color};border-color:${_charSug.color}44">${_charSug.stat}</span>`;
-    const _slRef = document.getElementById('statsList');
-    if (_slRef) _slRef.parentNode.insertBefore(_sugEl, _slRef);
-  }
   const sl=document.getElementById('statsList');
   const SCOL = STAT_COLORS;
 
@@ -21052,10 +21037,44 @@ function drawRadar() {
 let _socialPickerOpen = null;
 let _habitSocialPickerOpen = null;
 
+const SOCIAL_TRACKER_PHRASES = {
+  kindness:   "You've been kinder",
+  courage:    "You've been bolder",
+  diligence:  "You've been more driven",
+  wisdom:     "You've been more thoughtful",
+  expression: "You've been more expressive",
+  resilience: "You've been more resilient",
+};
+
 function renderSocialStats() {
   const card = document.getElementById('socialCardEl'); if (!card) return;
   const ss = state.socialStats || {};
-  card.innerHTML = `<div class="social-card-title">⟦ SOCIAL STATS ⟧</div><div class="social-stats-grid" id="socialGrid"></div>`;
+
+  // ── Weekly bonds tracker — 7-day rolling count of logged social acts ──
+  const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const recent = (state.socialActsRecent || []).filter(a => a && a.t >= cutoff);
+  const wkCounts = {};
+  recent.forEach(a => { wkCounts[a.statId] = (wkCounts[a.statId] || 0) + 1; });
+  const wkSorted = Object.keys(wkCounts).sort((a, b) => wkCounts[b] - wkCounts[a]);
+  const wkTopId = wkSorted[0];
+  const wkTopCt = wkTopId ? wkCounts[wkTopId] : 0;
+  let trackerHtml = '';
+  if (wkTopId && wkTopCt >= 2) {
+    const tDef = SOCIAL_STATS.find(s => s.id === wkTopId);
+    const phrase = SOCIAL_TRACKER_PHRASES[wkTopId] || `You've been more ${tDef.name.toLowerCase()}`;
+    trackerHtml = `
+      <div class="bonds-tracker" style="display:flex;align-items:center;gap:8px;padding:8px 10px;margin:6px 0 10px;border-left:3px solid ${tDef.color};background:${tDef.color}12;border-radius:4px;font-size:11px;color:rgba(224,247,250,0.85)">
+        <span style="font-size:16px">${tDef.emoji}</span>
+        <span><strong style="color:${tDef.color}">${phrase}</strong> this week — ${wkTopCt} ${wkTopCt === 1 ? 'act' : 'acts'} of ${tDef.name.toLowerCase()}</span>
+      </div>`;
+  } else if (recent.length === 0) {
+    trackerHtml = `
+      <div class="bonds-tracker" style="padding:8px 10px;margin:6px 0 10px;border-left:3px solid rgba(224,247,250,0.18);background:rgba(255,255,255,0.02);border-radius:4px;font-size:10px;color:rgba(224,247,250,0.45);font-style:italic">
+        No bonds logged this week — tap + on a stat to start tracking.
+      </div>`;
+  }
+
+  card.innerHTML = `<div class="social-card-title">⟦ SOCIAL STATS ⟧</div>${trackerHtml}<div class="social-stats-grid" id="socialGrid"></div>`;
   const grid = card.querySelector('#socialGrid');
   SOCIAL_STATS.forEach(def => {
     const pts = ss[def.id] || 0;
@@ -21086,6 +21105,10 @@ function logSocialAct(statId, actLabel) {
   const prevRank = getSocialRank(prevPts);
   state.socialStats[statId] = prevPts + 10;
   const newRank = getSocialRank(state.socialStats[statId]);
+  // Recent-acts log for the weekly bonds tracker (keep last 50, ~7 weeks of moderate use)
+  if (!Array.isArray(state.socialActsRecent)) state.socialActsRecent = [];
+  state.socialActsRecent.push({ t: Date.now(), statId });
+  if (state.socialActsRecent.length > 50) state.socialActsRecent = state.socialActsRecent.slice(-50);
   _socialPickerOpen = null;
   _habitSocialPickerOpen = null;
   saveState();
