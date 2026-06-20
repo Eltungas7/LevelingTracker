@@ -1,13 +1,17 @@
-const CACHE = 'sao-quests-v5';
+const CACHE = 'sao-quests-v6';
 
 const FILES_TO_CACHE = [
   './index.html',
+  './manifest.json',
+  './icon.svg',
   './data/classes.js',
   './data/dungeons.js',
   './data/items.js',
   './data/recipes.js',
   './data/achievements.js',
   './data/content.js',
+  './data/events.js',
+  './data/shop.js',
 ];
 
 self.addEventListener('install', e => {
@@ -27,7 +31,8 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   const isAppFile = FILES_TO_CACHE.some(f => url.pathname.endsWith(f.replace('./', '/')));
-  if (e.request.mode === 'navigate' || isAppFile) {
+  const isLeahImg = url.pathname.includes('/img/Leah/');
+  if (e.request.mode === 'navigate' || isAppFile || isLeahImg) {
     e.respondWith(
       fetch(e.request)
         .then(r => {
