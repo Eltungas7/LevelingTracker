@@ -19668,120 +19668,6 @@ function getCharNextMilestones() {
   return out;
 }
 
-// ── ADVENTURER CARD — the Mirror ────────────────────────────
-// One synthesis surface in CHAR tab that crystallizes who Tuni has become:
-// Hunter Grade + Adventurer title + top stat's STAT_REAL_WORLD identity quote
-// + top 2 Social Stat bonds + active discipline (streak + avg fortitude)
-// + a "how far you've come" comparison to the earliest tracked month.
-function renderAdventurerCard() {
-  const el = document.getElementById('adventurerCardEl'); if (!el) return;
-
-  // Top stat by points = the most-developed facet of who you are right now
-  const topStatKey = STAT_KEYS.reduce((a, b) =>
-    (state.stats[a] || 0) >= (state.stats[b] || 0) ? a : b, STAT_KEYS[0]);
-  const topStatPts  = state.stats[topStatKey] || 0;
-  const topStatTier = tierFor(topStatPts).tier;
-  const topStatDescriptor = (STAT_REAL_WORLD[topStatKey] || {})[topStatTier] || '';
-  const topStatColor = (typeof STAT_COLORS !== 'undefined' && STAT_COLORS[topStatKey]) || '#4dd0e1';
-
-  // Hunter Grade + Adventurer title + level
-  const { level } = calcLevel(state.totalXp || 0);
-  const adventureTitle = getAdventureTitle(level);
-  const _cp = calcPowerLevel();
-  const gradeInfo = cpTierFor(_cp.cp);
-  const hunterGrade = gradeInfo.tier;
-  const gradeColor  = TIER_COLORS[hunterGrade] || '#9e9e9e';
-
-  // Top 2 Social Stats by rank (then by pts as tiebreaker), only if rank > 1
-  const ss = state.socialStats || {};
-  const socialRows = SOCIAL_STATS
-    .map(def => ({ def, pts: ss[def.id] || 0, rank: getSocialRank(ss[def.id] || 0) }))
-    .filter(r => r.rank > 1)
-    .sort((a, b) => b.rank - a.rank || b.pts - a.pts)
-    .slice(0, 2);
-
-  // Discipline: current streak + avg fortitude across avoid habits that have any
-  const streak = state.streak || 0;
-  const forts = (state.negativos || []).map(n => n.fortitudeXp || 0).filter(f => f > 0);
-  const avgFortitude = forts.length ? Math.round(forts.reduce((a, b) => a + b, 0) / forts.length) : null;
-
-  // "How far you've come" — pull earliest chronicle month + delta to current
-  let becomingHtml = '';
-  try {
-    const months = _buildChronicleMonths();
-    const curMonth = todayKey().slice(0, 7);
-    const earliest = months.find(m => m !== curMonth);
-    if (earliest) {
-      const snap = _getChronicleSnapshot(earliest);
-      const gradeOrder = ['F','E','D','C','B','A','S','SS','SSS'];
-      const lvDelta = level - (snap.level || 1);
-      const gradeDelta = gradeOrder.indexOf(hunterGrade) - gradeOrder.indexOf(snap.grade || 'F');
-      if (lvDelta > 0 || gradeDelta > 0) {
-        const MNAMES_S = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-        const [yE, mE] = earliest.split('-');
-        const fromLabel = `${MNAMES_S[parseInt(mE)-1]} '${yE.slice(2)}`;
-        becomingHtml = `
-          <div class="adv-card-becoming">
-            <div class="adv-becoming-label">⟦ HOW FAR YOU'VE COME ⟧</div>
-            <div class="adv-becoming-line">
-              <span class="adv-becoming-then">${fromLabel} · Lv ${snap.level} · ${snap.grade}-rank</span>
-              <span class="adv-becoming-arrow">→</span>
-              <span class="adv-becoming-now">Lv ${level} · ${hunterGrade}-rank</span>
-            </div>
-          </div>`;
-      }
-    }
-  } catch (e) { /* no chronicle data yet — skip */ }
-
-  const socialHtml = socialRows.length
-    ? socialRows.map(r => {
-        const rname = (SOCIAL_RANK_NAMES[r.def.id] || [])[r.rank - 1] || '';
-        return `
-          <div class="adv-card-social-row" style="border-left:2px solid ${r.def.color}55">
-            <span class="adv-social-emoji">${r.def.emoji}</span>
-            <span class="adv-social-name" style="color:${r.def.color}">${r.def.name.toUpperCase()}</span>
-            <span class="adv-social-rank" style="color:${r.def.color}">RANK ${r.rank}</span>
-            <span class="adv-social-rname">${rname}</span>
-          </div>`;
-      }).join('')
-    : `<div class="adv-card-social-empty">No bonds forged yet — log a social act in STATS below.</div>`;
-
-  const disciplineParts = [];
-  if (streak > 0) disciplineParts.push(`<span class="adv-disc-streak">🔥 ${streak}-day streak</span>`);
-  if (avgFortitude !== null) disciplineParts.push(`<span class="adv-disc-fort">🛡 ${avgFortitude}% fortitude</span>`);
-  const disciplineHtml = disciplineParts.length
-    ? `<div class="adv-card-discipline">${disciplineParts.join('<span class="adv-disc-sep">·</span>')}</div>`
-    : '';
-
-  const identityHtml = topStatDescriptor
-    ? `<div class="adv-card-identity">
-         <div class="adv-id-emoji">${STAT_EMOJI[topStatKey] || '⚡'}</div>
-         <div class="adv-id-body">
-           <div class="adv-id-label" style="color:${topStatColor}">${STAT_NAMES[topStatKey]} · RANK ${topStatTier}</div>
-           <div class="adv-id-quote">"${topStatDescriptor}"</div>
-         </div>
-       </div>`
-    : '';
-
-  el.style.setProperty('--adv-color', gradeColor);
-  el.innerHTML = `
-    <div class="adv-card-scan"></div>
-    <div class="adv-card-eyebrow">⟦ THE MIRROR ⟧</div>
-    <div class="adv-card-title-row">
-      <span class="adv-card-grade" style="color:${gradeColor}">${hunterGrade}-RANK</span>
-      <span class="adv-card-sep">·</span>
-      <span class="adv-card-adventure">${adventureTitle.toUpperCase()}</span>
-      <span class="adv-card-sep">·</span>
-      <span class="adv-card-lv">LV ${level}</span>
-    </div>
-    ${identityHtml}
-    <div class="adv-card-section-label">⟦ BONDS ⟧</div>
-    <div class="adv-card-socials">${socialHtml}</div>
-    ${disciplineHtml}
-    ${becomingHtml}
-  `;
-}
-
 function renderCharStatusHeader() {
   const el = document.getElementById('charStatusHeader'); if (!el) return;
 
@@ -19824,6 +19710,23 @@ function renderCharStatusHeader() {
         <span class="char-gear-aura-label">EQUIPPED</span>
         ${_topGearItems.slice(0, 3).map(it => `<span class="char-gear-aura-badge" style="color:${_GEAR_COLORS[it.rarity]||'#fff'};border-color:${_GEAR_COLORS[it.rarity]||'#fff'}44">${itemImgHtml(it, 12)} ${it.name}</span>`).join('')}
       </div>` : '';
+
+  // ── Identity quote: top-stat real-world descriptor (from the old Mirror card) ──
+  const _topStatKey = STAT_KEYS.reduce((a, b) =>
+    (state.stats[a] || 0) >= (state.stats[b] || 0) ? a : b, STAT_KEYS[0]);
+  const _topStatPts = state.stats[_topStatKey] || 0;
+  const _topStatTier = tierFor(_topStatPts).tier;
+  const _topStatDescriptor = (STAT_REAL_WORLD[_topStatKey] || {})[_topStatTier] || '';
+  const _topStatColor = (typeof STAT_COLORS !== 'undefined' && STAT_COLORS[_topStatKey]) || '#4dd0e1';
+  const _identityHtml = _topStatDescriptor
+    ? `<div class="adv-card-identity" style="margin:8px 0 4px">
+         <div class="adv-id-emoji">${STAT_EMOJI[_topStatKey] || '⚡'}</div>
+         <div class="adv-id-body">
+           <div class="adv-id-label" style="color:${_topStatColor}">${STAT_NAMES[_topStatKey]} · RANK ${_topStatTier}</div>
+           <div class="adv-id-quote">"${_topStatDescriptor}"</div>
+         </div>
+       </div>`
+    : '';
 
   // ── Near-term milestones (complementary to the long CP grade climb) ──
   const _milestones = getCharNextMilestones();
@@ -19878,6 +19781,7 @@ function renderCharStatusHeader() {
           : `<span style="color:${nextColor}">${cpToNext.toLocaleString()} CP to Grade ${nextGrade}</span>`}
       </div>
     </div>
+    ${_identityHtml}
     ${_milestonesHtml}
     ${titleStr ? `<div class="char-active-title">「${titleStr.toUpperCase()}」</div>` : ''}
     ${_gearAuraHtml}`;
@@ -19885,9 +19789,8 @@ function renderCharStatusHeader() {
 
 function renderPersonaje() {
   panelTitle.textContent='CHARACTER STATUS'; panelSubtitle.textContent='Player attributes';
-  panelContent.innerHTML=`<div id="charStatusHeader" class="char-status-header"></div><div id="adventurerCardEl" class="adv-card"></div><div id="classPanelEl"></div><div class="stats-list" id="statsList"></div><div class="social-card" id="socialCardEl"></div><div id="combatStatsEl"></div><div id="lockedClassGalleryEl"></div>`;
+  panelContent.innerHTML=`<div id="charStatusHeader" class="char-status-header"></div><div id="classPanelEl"></div><div class="stats-list" id="statsList"></div><div class="social-card" id="socialCardEl"></div><div id="combatStatsEl"></div><div id="lockedClassGalleryEl"></div>`;
   renderCharStatusHeader();
-  renderAdventurerCard();
   renderClassPanel();
   const _charSug = getSystemSuggestion();
   if (_charSug) {
@@ -27559,6 +27462,7 @@ document.querySelectorAll('.tab').forEach(tab=>{
   tab.addEventListener('click',()=>{
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
     tab.classList.add('active'); currentTab=tab.dataset.tab; invSelected=null; renderAll();
+    window.scrollTo({ top: 0, behavior: 'auto' });
   });
 });
 
@@ -29628,7 +29532,7 @@ function renderDungeonSelect() {
       <div class="dcc-portal">${cfg.img?`<img class="dcc-img" src="${cfg.img}" alt="${cfg.emoji}" onerror="this.outerHTML='<div class=\\'dcc-emoji\\'>'+this.alt+'</div>'">`:`<div class="dcc-emoji">${cfg.emoji}</div>`}</div>
       <div class="dcc-name">${cfg.name}</div>
       <div class="dcc-badges">
-        ${(()=>{ const _dcr=getDungeonCompletionReward(cfg); return _dcr?`<span class="dcc-stat-badge">${_dcr.matEmoji} ${_dcr.matLabel}</span>`:cfg.isWeeklyBoss?`<span class="dcc-stat-badge">👑 LEGENDARY ITEM</span>`:''; })()}
+        ${cfg.isWeeklyBoss?`<span class="dcc-stat-badge">👑 LEGENDARY ITEM</span>`:''}
         ${cfg.isWeeklyBoss?'':_isMatched
           ?`<span class="dcc-affinity-badge" style="border-color:rgba(102,187,106,0.7);color:#66bb6a;background:rgba(102,187,106,0.1)">✓ MATCHED</span>`
           :`<span class="dcc-affinity-badge" style="border-color:rgba(255,82,82,0.7);color:#ff5252;background:rgba(255,82,82,0.1)">⚠ DEBUFF</span>`}
