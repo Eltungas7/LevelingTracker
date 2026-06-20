@@ -14,9 +14,17 @@
 ## Architecture overview
 
 ### Navigation
-Bottom nav: QUESTS | CHAR | WORK | SHOP | LOG  
-CHAR tab has sub-tabs: STATS | WORK | CLASS  
-Within WORK there is a 3-way toggle: **⚒ QUESTS** | **🔥 FORGE** | **🏛 GUILD** (`workShopView` global: `'workbench'|'forge'|'guild'`)
+Bottom nav: **QUESTS | CHAR | WORK | LOG** (4 tabs, no SHOP — it was deleted).
+- **CHAR** sub-tabs: **👤 STATS** | **🎒 GEAR**
+- **WORK** has a 4-way toggle: **⚒ QUESTS** | **🔥 FORGE** | **🛠 WORKSHOP** | **🏛 CITY** (`workShopView` global: `'workbench'|'forge'|'workshop'|'guild'`). Note the global key `'guild'` is for the CITY view — legacy naming, do not rename without searching all uses.
+- **LOG** sub-tabs: **🏆 Achievements** | **📊 History** | **⚔ Dungeons**
+
+### NPC ownership
+| NPC | Tabs |  Voice |
+|---|---|---|
+| **Yami** | QUESTS | Yami Sukehiro from Black Clover. Profanity, tough love, treats Tuni like a lazy fuck. Anchor catchphrase: "Surpass your limits." ~32% absentee gags (he's offscreen — at HQ, eating, hiding from Charlotte, etc). |
+| **Leah** | WORK + CITY | Rise from Persona 4 baseline, but adult/+18 honest. Funny, motivational, openly flirty. Brand-specific work references (orders queue, DMs, content calendar, ads dashboard). Addresses Tuni as "Tuni" — pet names "Muns"/"Tungas" reserved for high-emotion peaks only (3-5 lines total). Less commanding, more partner-energy. |
+| **Manin** | FORGE + WORKSHOP | Deadpool, but a blacksmith. Fourth-wall-breaking, chaotic, fun-as-hell. Aware he's an NPC in a habit tracker. Profanity allowed. |
 
 ### State shape (key fields)
 ```js
@@ -31,15 +39,11 @@ state = {
   totalGoldEarned: 0,   // lifetime gold — drives shop level
   shards: 0,            // PREMIUM currency — earned only from discipline milestones
   totalShardsEarned: 0,
-  shopMaterials: { timber:0, scroll:0, crystal:0, gear:0 },  // T1
+  shopMaterials: { timber:0, scroll:0, crystal:0, gear:0 },  // T1 — forge mat storage (name is legacy, still used by FORGE/WORKSHOP)
   shopMatsT2: { timber:0, scroll:0, crystal:0, gear:0 },     // T2 refined
   shopMatsT3: { timber:0, scroll:0, crystal:0, gear:0 },     // T3 refined
-  shopChests: { daily, weekly, monthly },
-  shopBuys: { dateKey, gold_chest, shard_chest, rot_shard_pack },
-  consumables: { forgeToken:0 },
-  activeBoosts: [ { type, mult, expires } ],
-  cosmetics: { owned:[], equipped },
-  shopRotation: { dateKey, ids:[...] } | null,
+  consumables: { forgeToken:0 },                              // earned from achievements / boss drops
+  activeBoosts: [ { type, mult, expires } ],                  // xp/dungeon boosts (from chests, events, etc.)
   shardLog: [ { t, n, reason } ],
   guildUpgrades: { anvil:0, warehouse:0, refinery:0, hall:0, trade:0, scriptorium:0,
                    patron_vault:0, quality_forge:0, barracks:0, sanctum:0, alchemy:0 },
@@ -82,7 +86,7 @@ state = {
 | `data/achievements.js` | `ACHIEVEMENTS` (54+ entries — habits, ranks, class mastery, stats, streaks, work, dungeon) |
 | `data/content.js` | `DAILY_QUOTES` (31 entries), `showDailyQuoteOverlay`, `_buildHarvestInfo`, `_pendingAnims` |
 | `data/events.js` | `DUNGEON_EVENTS` (48+ exploration events — discovery/hazard/encounter/rest/omen/cache/challenge/echo/chain) |
-| `data/shop.js` | `SHARD_REWARDS`, `SHOP_MAT_IDS`/`SHOP_MAT_META`, `MAT_TIER_META` (T2/T3), `MAT_REFINE`, `SHOP_TIER_COLOR`, `SHOP_FREE_CHESTS` (daily/weekly/monthly), `SHOP_GOLD_CHEST`, `SHOP_CONSUMABLES`, `SHOP_EXCHANGE`, `SHOP_COSMETICS`, `SHOP_ROTATION_POOL` |
+| `data/shop.js` | `SHARD_REWARDS`, `SHOP_MAT_IDS`/`SHOP_MAT_META`, `MAT_TIER_META` (T2/T3), `MAT_REFINE`, `SHOP_TIER_COLOR`. The legacy SHOP UI (`SHOP_FREE_CHESTS`, `SHOP_GOLD_CHEST`, `SHOP_CONSUMABLES`, `SHOP_EXCHANGE`, `SHOP_COSMETICS`, `SHOP_ROTATION_POOL`) was deleted — anything still referencing those constants is dead. |
 
 ---
 
@@ -117,8 +121,8 @@ Unlock prerequisites: T2: 2×T1 · T3: 2×T2 + WLv5 · T4: 2×T3 + WLv10 · T5: 
 ---
 
 ## Economy summary
-- **Gold**: earned from work tasks and commissions; spent on crafting, guild upgrades, guild treasury, supply crates, consumables, material exchange
-- **Shards (✦)**: prestige currency — earned only from perfect days, streaks, boss kills, achievements, commission sweeps; spent on streak shields/repair, Focus Draught, cosmetics, affix rerolls
+- **Gold**: earned from work tasks and commissions; spent on crafting, guild upgrades, guild treasury, item refine/reforge
+- **Shards (✦)**: prestige currency — earned only from perfect days, streaks, boss kills, achievements, commission sweeps; spent on streak repair and affix rerolls
 - **Materials (T1/T2/T3)**: timber/scroll/crystal/gear; dropped from work tasks and dungeons; consumed by forge recipes; T2/T3 refined from lower tiers via MAT_REFINE
 
 ---
@@ -143,15 +147,15 @@ Unlock prerequisites: T2: 2×T1 · T3: 2×T2 + WLv5 · T4: 2×T3 + WLv10 · T5: 
 | `purchaseGuildUpgrade(id)` | Buy a guild upgrade level with gold |
 | `investTreasury(amount)` | Invest gold into guild treasury for daily dividend |
 | `claimTreasury()` | Claim today's treasury dividend |
-| `renderForge()` | 🔥 FORGE view |
-| `renderGuild()` | 🏛 GUILD view |
+| `renderForge()` | 🔥 FORGE sub-view (Manin lives here) |
+| `renderGuild()` | 🏛 CITY sub-view (city tier + guild upgrades) |
+| `renderWorkshop()` | 🛠 WORKSHOP sub-view (gear refine + reroll, Manin alt context) |
 | `renderCommissionBoard()` | Commission board widget |
 | `renderMerchantPanel()` | Traveling merchant panel in QUESTS |
-| `renderShop()` | 🛒 SHOP tab (all sections) |
-| `renderChar()` | CHAR tab render |
-| `renderHabits()` | HABITS tab render |
-| `renderDungeon()` | DUNGEON tab render |
-| `renderLog()` | LOG tab render |
+| `renderChar()` | CHAR tab render (STATS + GEAR sub-tabs) |
+| `renderHabitos()` | QUESTS tab render (Yami lives here) |
+| `renderTrabajo()` | WORK tab dispatcher (workbench / forge / workshop / city) |
+| `renderLog()` | LOG tab render (Achievements / History / Dungeons sub-tabs) |
 | `getEquippedStats()` | Total gear stats (incl. guild barracks/sanctum auras) |
 | `calcPlayerCombatStats(includeGear?)` | Full combat stats used in dungeon fights |
 | `calcPowerLevel(cs)` | CP from base stats only (no gear) |
@@ -159,10 +163,9 @@ Unlock prerequisites: T2: 2×T1 · T3: 2×T2 + WLv5 · T4: 2×T3 + WLv10 · T5: 
 | `setForgeTask(taskId)` | Links/unlinks dungeon to a work task (pomodoro) |
 | `grantShards(n, reason)` / `spendShards(n)` | Award/deduct premium currency |
 | `getActiveBoostMult(type)` | Product of timed boosts (`xp`/`dungeon`) |
-| `openFreeChest(chestId)` | Open a timed free cache |
-| `buyGoldChest()` | Buy a Supply Crate (escalating daily cost) |
-| `buyConsumable(id)` | Buy a consumable/boost/token |
 | `repairStreak()` / `canRepairStreak()` | Restore a just-broken streak (25✦) |
+| `showLeahIntimateBanner(mood)` | Full-screen Leah modal — `'tender'` / `'bold'` / `'milestone'` / `'night'` |
+| `pickLeahLine(ctx)` / `pickLeahCityLine(ctx)` / `pickYamiLine(ctx)` / `pickManinLine(ctx)` | Cached dialogue pickers (10 min TTL per contextKey) |
 | `loadState()` / `saveState()` | localStorage persistence + migration |
 
 ---
@@ -203,3 +206,5 @@ Refine costs: mat portion of recipe × `REFINE_STEP_MULT` + gold via `getRefineG
 - Perfect day: +2 · Iron discipline ×7: +5 · Phoenix comeback: +1
 - Weekly boss: +8 · Dungeon clear: +1 · Commission sweep: +1
 - Achievement tier: [1, 2, 3, 5, 8] by tier index
+
+Shard sinks after SHOP delete: streak repair (25✦), affix reroll (`rerollAffixes`). Other sinks (Focus Draught, cosmetics) went away with SHOP.

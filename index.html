@@ -25053,21 +25053,17 @@ function renderManinPanel(view) {
   return el;
 }
 
-// ── LEAH OUTFIT SYSTEM — outfit changes by day-of-week, time, and special states.
-// Priority: At Night > Crisis (Black Mage on freeze) > Phoenix (White Mage on comeback)
-// > Milestone (White Dress) > Summer weekend (Dec-Feb only) > Day-of-week (Everyday/Casual).
+// ── LEAH OUTFIT SYSTEM — 5-outfit set, changes by day-of-week, time, and special states.
+// Priority: At Night > Crisis (Black Mage on freeze) > Banner/milestone/Phoenix (White Mage)
+// > Weekend (Casual) > Weekday (Everyday).
 const LEAH_OUTFIT_VARIANTS = {
-  at_night:    { angry:3, crying:3, embarrassed:2, neutral:3, sad:3, smiling:3, smug:3, surprised:3 },
-  bath_towel:  { angry:1, crying:2, embarrassed:2, neutral:2, sad:2, smiling:2, smug:2, surprised:2 },
-  black_mage:  { angry:1, crying:1, embarrassed:1, neutral:1, sad:1, smiling:1, smug:1, surprised:1 },
-  casual:      { angry:1, crying:1, embarrassed:1, neutral:1, sad:1, smiling:1, smug:1, surprised:1 },
-  close_up:    { angry:3, crying:3, embarrassed:3, neutral:3, sad:3, smiling:3, smug:3, surprised:3 },
-  everyday:    { angry:2, crying:2, embarrassed:2, neutral:2, sad:2, smiling:2, smug:2, surprised:2 },
-  summer:      { angry:2, crying:2, embarrassed:2, neutral:1, sad:2, smiling:2, smug:2, surprised:2 },
-  white_dress: { angry:1, crying:1, embarrassed:1, neutral:1, sad:1, smiling:1, smug:1, surprised:1 },
-  white_mage:  { angry:1, crying:1, embarrassed:1, neutral:1, sad:1, smiling:1, smug:1, surprised:1 },
+  at_night:   { angry:3, crying:3, embarrassed:2, neutral:3, sad:3, smiling:3, smug:3, surprised:3 },
+  black_mage: { angry:1, crying:1, embarrassed:1, neutral:1, sad:1, smiling:1, smug:1, surprised:1 },
+  casual:     { angry:1, crying:1, embarrassed:1, neutral:1, sad:1, smiling:1, smug:1, surprised:1 },
+  everyday:   { angry:2, crying:2, embarrassed:2, neutral:2, sad:2, smiling:2, smug:2, surprised:2 },
+  white_mage: { angry:1, crying:1, embarrassed:1, neutral:1, sad:1, smiling:1, smug:1, surprised:1 },
 };
-// Auto-instrument true-milestone days so the white_dress outfit only fires on those.
+// Auto-instrument true-milestone days so the white_mage outfit fires for banners/events.
 // City tier-up: detected by comparing current tier to last-seen.
 // Streak milestones: only fires on specific thresholds (14, 30, 60, 100, 200, 365).
 function _leahCheckMilestones() {
@@ -25095,24 +25091,21 @@ function pickLeahOutfit() {
   const now = new Date();
   const hour = now.getHours();
   const day = now.getDay();      // 0=Sun, 6=Sat
-  const month = now.getMonth();  // 0=Jan, 11=Dec
   const isWeekend = day === 0 || day === 6;
   const isNight = hour >= 22 || hour < 6;
-  const isSummerMonth = month === 11 || month === 0 || month === 1; // Dec, Jan, Feb (AR summer)
   const tk = todayKey();
   if (isNight) return 'at_night';
   if (typeof isWinterActive === 'function' && isWinterActive()) return 'black_mage';
+  // White mage — banner / milestone / Phoenix-comeback days.
   if (state.logros && state.logros.lastPhoenixDay === tk) return 'white_mage';
-  // White dress — true milestone days only (city tier-up OR high streak threshold).
-  if (state.lastCityTierUpDay === tk || state.lastStreakMilestoneDay === tk) return 'white_dress';
-  if (isWeekend && isSummerMonth) return 'summer';
+  if (state.lastCityTierUpDay === tk || state.lastStreakMilestoneDay === tk) return 'white_mage';
   if (isWeekend) return 'casual';
   return 'everyday';
 }
 function getLeahImagePath(outfit, expression) {
   const variants = (LEAH_OUTFIT_VARIANTS[outfit] || {})[expression] || 1;
   const n = Math.floor(Math.random() * variants) + 1;
-  return `img/leah/outfits/${outfit}/${expression}_${n}.png`;
+  return `img/Leah/Outfits/${outfit}/${expression}_${n}.jpg`;
 }
 
 // ── LEAH NIGHT — dialogue pools for late hours (10pm-6am) on WORK + CITY.
@@ -25198,7 +25191,7 @@ function _firePendingMilestoneBannerIfAny() {
 function showLeahMilestoneBanner(type, key) {
   const pool = LEAH_MILESTONE_BANNERS[type] || {};
   const line = pool[key] || `Milestone reached. ${key}. I dressed for the occasion. Look at us.`;
-  const imgSrc = getLeahImagePath('white_dress', Math.random() < 0.6 ? 'smiling' : 'smug');
+  const imgSrc = getLeahImagePath('white_mage', Math.random() < 0.6 ? 'smiling' : 'smug');
   const eyebrowMap = {
     city_tier: '⟦ LEAH · CITY MILESTONE ⟧',
     streak:    '⟦ LEAH · STREAK MILESTONE ⟧',

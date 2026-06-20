@@ -1,0 +1,6 @@
+# Local helper / build scripts
+*.ps1
+
+# OS / editor
+Thumbs.db
+.DS_Store
