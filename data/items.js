@@ -209,15 +209,17 @@ const ITEMS_DB = {
   f_earr_9: {id:'f_earr_9', name:'Star Fragment',     slot:'earring',  rarity:'legendary', emoji:'⭐', img:'img/forge/earring9.png', crafted:true, tree:'earr', tier:9, stats:{DEX:40,CHA:32,VOL:14,dodgeBonus:10},    desc:'A piece of something vast. Worn by the extraordinary.'},
 
   // 💍 BRACELET TREE — bracelet — timber primary, scroll secondary, crystal T7+
-  f_brac_1: {id:'f_brac_1', name:'Leather Cuff',      slot:'bracelet', rarity:'common',    emoji:'🥊', crafted:true, tree:'brac', tier:1, stats:{STR:1,CON:1},                           desc:'A simple wrist wrap. Functional from day one.'},
+  // (f_brac_2 has no img: same hammered-metal texture problem as f_earr_2 — the source
+  // cell's dented iron surface defeats the background cleanup. Emoji fallback for that one.)
+  f_brac_1: {id:'f_brac_1', name:'Leather Cuff',      slot:'bracelet', rarity:'common',    emoji:'🥊', img:'img/forge/bracelet1.png', crafted:true, tree:'brac', tier:1, stats:{STR:1,CON:1},                           desc:'A simple wrist wrap. Functional from day one.'},
   f_brac_2: {id:'f_brac_2', name:'Iron Bracers',       slot:'bracelet', rarity:'common',    emoji:'🥊', crafted:true, tree:'brac', tier:2, stats:{STR:3,CON:2},                           desc:'Hammered iron for a stronger grip.'},
-  f_brac_3: {id:'f_brac_3', name:'Steel Wristguard',   slot:'bracelet', rarity:'uncommon',  emoji:'🦾', crafted:true, tree:'brac', tier:3, stats:{STR:6,CON:4,DEX:2},                    desc:'Full wrist coverage. Built for power and precision.'},
-  f_brac_4: {id:'f_brac_4', name:"Scholar's Ring",     slot:'bracelet', rarity:'uncommon',  emoji:'💍', crafted:true, tree:'brac', tier:4, stats:{INT:7,VOL:4,DEX:3},                    desc:'A ring that focuses the mind.'},
-  f_brac_5: {id:'f_brac_5', name:'War Band',           slot:'bracelet', rarity:'rare',      emoji:'⚔️', crafted:true, tree:'brac', tier:5, stats:{STR:12,CON:6,DEX:5,ATK:8},             desc:'Forged for warriors who combine strength and wit.'},
-  f_brac_6: {id:'f_brac_6', name:'Power Bracelet',     slot:'bracelet', rarity:'rare',      emoji:'💪', crafted:true, tree:'brac', tier:6, stats:{STR:17,INT:8,CON:8,ATK:12},            desc:'Channels inner force. Physical and mental combined.'},
-  f_brac_7: {id:'f_brac_7', name:'Arcane Cuff',        slot:'bracelet', rarity:'epic',      emoji:'🔮', crafted:true, tree:'brac', tier:7, stats:{INT:20,VOL:14,MP:48,DEX:8},            desc:'Resonates with arcane frequency. A mark of mastery.'},
-  f_brac_8: {id:'f_brac_8', name:"Titan's Grip",       slot:'bracelet', rarity:'epic',      emoji:'🏆', crafted:true, tree:'brac', tier:8, stats:{STR:28,INT:16,CON:14,DEX:10,ATK:18},   desc:'Grips the future by sheer force of will.'},
-  f_brac_9: {id:'f_brac_9', name:'Ouroboros Band',     slot:'bracelet', rarity:'legendary', emoji:'🐍', crafted:true, tree:'brac', tier:9, stats:{STR:38,INT:28,CON:20,DEX:15,VOL:12},   desc:'The infinite loop of growth. Worn by the relentless.'},
+  f_brac_3: {id:'f_brac_3', name:'Steel Wristguard',   slot:'bracelet', rarity:'uncommon',  emoji:'🦾', img:'img/forge/bracelet3.png', crafted:true, tree:'brac', tier:3, stats:{STR:6,CON:4,DEX:2},                    desc:'Full wrist coverage. Built for power and precision.'},
+  f_brac_4: {id:'f_brac_4', name:"Scholar's Ring",     slot:'bracelet', rarity:'uncommon',  emoji:'💍', img:'img/forge/bracelet4.png', crafted:true, tree:'brac', tier:4, stats:{INT:7,VOL:4,DEX:3},                    desc:'A ring that focuses the mind.'},
+  f_brac_5: {id:'f_brac_5', name:'War Band',           slot:'bracelet', rarity:'rare',      emoji:'⚔️', img:'img/forge/bracelet5.png', crafted:true, tree:'brac', tier:5, stats:{STR:12,CON:6,DEX:5,ATK:8},             desc:'Forged for warriors who combine strength and wit.'},
+  f_brac_6: {id:'f_brac_6', name:'Power Bracelet',     slot:'bracelet', rarity:'rare',      emoji:'💪', img:'img/forge/bracelet6.png', crafted:true, tree:'brac', tier:6, stats:{STR:17,INT:8,CON:8,ATK:12},            desc:'Channels inner force. Physical and mental combined.'},
+  f_brac_7: {id:'f_brac_7', name:'Arcane Cuff',        slot:'bracelet', rarity:'epic',      emoji:'🔮', img:'img/forge/bracelet7.png', crafted:true, tree:'brac', tier:7, stats:{INT:20,VOL:14,MP:48,DEX:8},            desc:'Resonates with arcane frequency. A mark of mastery.'},
+  f_brac_8: {id:'f_brac_8', name:"Titan's Grip",       slot:'bracelet', rarity:'epic',      emoji:'🏆', img:'img/forge/bracelet8.png', crafted:true, tree:'brac', tier:8, stats:{STR:28,INT:16,CON:14,DEX:10,ATK:18},   desc:'Grips the future by sheer force of will.'},
+  f_brac_9: {id:'f_brac_9', name:'Ouroboros Band',     slot:'bracelet', rarity:'legendary', emoji:'🐍', img:'img/forge/bracelet9.png', crafted:true, tree:'brac', tier:9, stats:{STR:38,INT:28,CON:20,DEX:15,VOL:12},   desc:'The infinite loop of growth. Worn by the relentless.'},
 
   // 🥊 GAUNTLETS TREE — slot id 'belt' kept internally (save-data compat) — gear primary, timber secondary, scroll T7+
   // img: one transparent PNG per tier (gauntlets1.png..gauntlets9.png) — no sprite cropping.
