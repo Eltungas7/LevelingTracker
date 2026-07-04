@@ -209,10 +209,8 @@ const ITEMS_DB = {
   f_earr_9: {id:'f_earr_9', name:'Star Fragment',     slot:'earring',  rarity:'legendary', emoji:'⭐', img:'img/forge/earring9.png', crafted:true, tree:'earr', tier:9, stats:{DEX:40,CHA:32,VOL:14,dodgeBonus:10},    desc:'A piece of something vast. Worn by the extraordinary.'},
 
   // 💍 BRACELET TREE — bracelet — timber primary, scroll secondary, crystal T7+
-  // (f_brac_2 has no img: same hammered-metal texture problem as f_earr_2 — the source
-  // cell's dented iron surface defeats the background cleanup. Emoji fallback for that one.)
   f_brac_1: {id:'f_brac_1', name:'Leather Cuff',      slot:'bracelet', rarity:'common',    emoji:'🥊', img:'img/forge/bracelet1.png', crafted:true, tree:'brac', tier:1, stats:{STR:1,CON:1},                           desc:'A simple wrist wrap. Functional from day one.'},
-  f_brac_2: {id:'f_brac_2', name:'Iron Bracers',       slot:'bracelet', rarity:'common',    emoji:'🥊', crafted:true, tree:'brac', tier:2, stats:{STR:3,CON:2},                           desc:'Hammered iron for a stronger grip.'},
+  f_brac_2: {id:'f_brac_2', name:'Iron Bracers',       slot:'bracelet', rarity:'common',    emoji:'🥊', img:'img/forge/bracelet2.png', crafted:true, tree:'brac', tier:2, stats:{STR:3,CON:2},                           desc:'Hammered iron for a stronger grip.'},
   f_brac_3: {id:'f_brac_3', name:'Steel Wristguard',   slot:'bracelet', rarity:'uncommon',  emoji:'🦾', img:'img/forge/bracelet3.png', crafted:true, tree:'brac', tier:3, stats:{STR:6,CON:4,DEX:2},                    desc:'Full wrist coverage. Built for power and precision.'},
   f_brac_4: {id:'f_brac_4', name:"Scholar's Ring",     slot:'bracelet', rarity:'uncommon',  emoji:'💍', img:'img/forge/bracelet4.png', crafted:true, tree:'brac', tier:4, stats:{INT:7,VOL:4,DEX:3},                    desc:'A ring that focuses the mind.'},
   f_brac_5: {id:'f_brac_5', name:'War Band',           slot:'bracelet', rarity:'rare',      emoji:'⚔️', img:'img/forge/bracelet5.png', crafted:true, tree:'brac', tier:5, stats:{STR:12,CON:6,DEX:5,ATK:8},             desc:'Forged for warriors who combine strength and wit.'},
