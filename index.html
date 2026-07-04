@@ -4058,6 +4058,7 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .dexp-btn-exit    { background: rgba(105,240,174,0.1); border-color: var(--sao-green); color: var(--sao-green); }
 .dexp-btn-boss    { background: rgba(244,67,54,0.1);  border-color: var(--sao-red); color: var(--sao-red); }
 .dexp-btn-abandon { background: rgba(255,82,82,0.07); border-color: rgba(255,82,82,0.4); color: var(--sao-red); }
+.dexp-btn-finish  { background: rgba(179,136,255,0.1); border-color: var(--sao-shard); color: var(--sao-shard); }
 .dexp-complete-badge { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1px; color: var(--sao-gold); text-align: center; margin-top: 8px; border: 1px solid rgba(255,193,7,0.3); border-radius: 4px; padding: 5px; }
 
 /* ── DUNGEON EXPLORE — IDLE COMBAT & LOG ── */
@@ -28099,6 +28100,52 @@ function setForgeTask(taskId) {
   saveState(); renderAll();
 }
 
+// Honor-system credit for focused work done off-app (phone, pen & paper, etc.)
+// without ever starting/live-running the dungeon timer. Fast-forwards the
+// pomodoro clock and replays it through the normal tickDungeon() catch-up loop,
+// so stage drops, forge-task bonuses, and mid-boss/boss triggers all fire exactly
+// as they would have if the timer had been running the whole time.
+function finishOutsideSessions(n) {
+  n = Math.max(1, Math.min(20, Math.round(Number(n)) || 1));
+  if (!state.dungeon) {
+    const did = selectedDungeonId || state.lastDungeonId;
+    if (!did || !DUNGEON_CONFIG[did]) { showNotif('⚠ Select a dungeon first'); return; }
+    startDungeon(did);
+  }
+  if (!state.dungeon || state.dungeon.phase !== 'exploring') { showNotif('⚠ No active expedition to log into'); return; }
+  if (state.dungeon.pausedAt) resumeDungeon();
+  showNotif(`⚒ Trusting you — logging ${n} outside session${n!==1?'s':''}`);
+  state.dungeon.pomodoroPhaseStart -= n * (getPomoWorkMs() + POMODORO_BREAK_MS);
+  tickDungeon();
+  saveState(); renderAll();
+}
+function showLogSessionModal() {
+  const did = state.dungeon ? state.dungeon.difficulty : (selectedDungeonId || state.lastDungeonId);
+  const cfg = did ? DUNGEON_CONFIG[did] : null;
+  if (!cfg) { showNotif('⚠ Select a dungeon first'); return; }
+  const ov = document.createElement('div'); ov.className = 'confirm-overlay';
+  ov.innerHTML = `<div class="confirm-box" style="border-top-color:var(--sao-shard)">
+    <div class="confirm-badge" style="color:var(--sao-shard)">⚒ FINISH SESSION</div>
+    <div class="confirm-msg">Already put in focused work off-app? Log it here — no timer needed, no catch-up guilt.<br><br>${cfg.emoji} ${cfg.name}</div>
+    <div class="stat-sel-amt">
+      <button class="stat-sel-btn" id="lsMinus">-</button>
+      <input id="lsCount" class="stat-sel-num" type="number" min="1" max="20" value="1" style="width:36px">
+      <button class="stat-sel-btn" id="lsPlus">+</button>
+    </div>
+    <div class="confirm-btns" style="margin-top:16px">
+      <button class="confirm-btn-cancel">CANCEL</button>
+      <button class="confirm-btn-ok" style="background:rgba(179,136,255,0.12);border-color:var(--sao-shard);color:var(--sao-shard)">LOG IT</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  const input = ov.querySelector('#lsCount');
+  ov.querySelector('#lsMinus').addEventListener('click', () => { input.value = Math.max(1, (parseInt(input.value)||1) - 1); });
+  ov.querySelector('#lsPlus').addEventListener('click', () => { input.value = Math.min(20, (parseInt(input.value)||1) + 1); });
+  ov.querySelector('.confirm-btn-cancel').addEventListener('click', () => ov.remove());
+  ov.querySelector('.confirm-btn-ok').addEventListener('click', () => { const n = parseInt(input.value)||1; ov.remove(); finishOutsideSessions(n); });
+  ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+}
+
 function pauseDungeon() {
   if (!state.dungeon||state.dungeon.pausedAt) return;
   state.dungeon.pausedAt=Date.now(); stopDungeonTimer(); saveState(); renderAll();
@@ -29521,6 +29568,15 @@ function renderDungeonSelect() {
     btn.addEventListener('click',()=>startDungeon(selectedDungeonId));
     w.appendChild(btn);
   }
+  // Already put in focused work off-app? Credit it without ever starting the live timer.
+  if (selectedDungeonId || (state.lastDungeonId && DUNGEON_CONFIG[state.lastDungeonId])) {
+    const finishBtn=document.createElement('button');
+    finishBtn.className='dungeon-enter-btn';
+    finishBtn.style.cssText='--denter-color:#b388ff;--denter-glow:rgba(179,136,255,0.5);margin-top:8px;opacity:0.9';
+    finishBtn.textContent='⚒  FINISH SESSION — LOG WORK DONE OFF-APP';
+    finishBtn.addEventListener('click',showLogSessionModal);
+    w.appendChild(finishBtn);
+  }
   return w;
 }
 
@@ -29654,7 +29710,7 @@ function renderDungeonExplore() {
       ${isComplete
         ?`<button class="dexp-btn dexp-btn-boss" onclick="challengeBoss()">💀  FIGHT BOSS</button>
           <button class="dexp-btn dexp-btn-exit" onclick="confirmRetreatDungeon()">←  RETREAT</button>`
-        :''}
+        :`<button class="dexp-btn dexp-btn-finish" onclick="showLogSessionModal()">⚒  FINISH SESSION</button>`}
       <button class="dexp-btn dexp-btn-abandon" onclick="confirmAbandonDungeon()">✗  ABANDON</button>
     </div>
     ${isComplete?`<div class="dexp-complete-badge">⟦ ALL STAGES CLEARED — THE BOSS AWAITS ⟧</div>`:''}`;
