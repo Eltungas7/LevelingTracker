@@ -19396,8 +19396,9 @@ function renderTrabajo() {
     _renderMatTierRow(1, 'T1', '#9aa0a6') +
     _renderMatTierRow(2, 'T2', '#b388ff') +
     _renderMatTierRow(3, 'T3', '#ffd700');
-  // 🏛 City status — the heartbeat of the work tab. Always shown above sub-views.
-  panelContent.appendChild(renderCityStatus());
+  // 🏛 City status (name, mood, next-tier progress) — CITY tab only, so QUESTS/FORGE/WORKSHOP
+  // aren't cluttered with city flavor that isn't about them.
+  if (workShopView === 'guild') panelContent.appendChild(renderCityStatus());
 
   // The FORGE view renders its own full ⟦ MATERIALS ⟧ panel, so the slim pinned bar
   // would only duplicate it there. Show the pinned bar on workbench & guild only.
