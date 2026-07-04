@@ -1602,6 +1602,11 @@ body {
 .quest-action-btn.del       { color: var(--sao-red); }
 .quest-action-btn.archive   { color: var(--sao-gold); }
 .quest-action-btn.unarchive { color: var(--sao-green); }
+.quest-action-btn.extra-session { color: var(--sao-green); font-size: 13px; }
+.weekly-extra-chip {
+  background: rgba(105,240,174,0.12); color: var(--sao-green);
+  border: 1px solid rgba(105,240,174,0.32); border-radius: 3px;
+}
 .quest-action-primary  { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
 
 .drag-handle {
@@ -9709,7 +9714,7 @@ const DEFAULT_NEGATIVOS = [
 ];
 
 const DEFAULT_WEEKLY = [
-  { id:'w0', text:'Fútbol ⚽',                         xp:380, gains:{STR:13,DEX:14,CON:6,CHA:5}  },
+  { id:'w0', text:'Running 🏃',                        xp:380, gains:{STR:8,DEX:8,CON:16,VOL:6}    },
   { id:'w1', text:'Pádel 🎾',                          xp:310, gains:{STR:10,DEX:12,CON:5,CHA:4}  },
   { id:'w2', text:'In-depth home cleaning 🏠',          xp:170, gains:{DEX:4,VOL:6,CHA:7}          },
   { id:'w3', text:'Cook a complex meal 🍳',             xp:210, gains:{CON:6,INT:5,VOL:5,CHA:5}    },
@@ -10593,6 +10598,15 @@ function loadState() {
         // Only collapse to the 10-habit set if we matched a healthy majority (guards a
         // wildly-custom save from being gutted). Anything unmatched (sun/wash/phone) is dropped.
         if (_kept2606.length >= 8) s.habitos = _kept2606;
+      }
+      // ── One-time swap (2026-07): Football → Running ──
+      // Football's off the table; keeps the same weekly slot/id (w0) and its whole
+      // completion history, just retexted and rebalanced for a solo cardio habit.
+      if (!s._runningSwap2026 && Array.isArray(s.weekly)) {
+        s._runningSwap2026 = true;
+        const _nr3 = t => (t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+        const w = s.weekly.find(w => w.id === 'w0') || s.weekly.find(w => _nr3(w.text).includes('futbol'));
+        if (w) { w.text = 'Running 🏃'; w.gains = {STR:8,DEX:8,CON:16,VOL:6}; w.xp = 380; }
       }
       return s;
     }
@@ -12469,7 +12483,7 @@ function itemImgHtml(item, size) {
   // Sprite-sheet icon (e.g. the forge sword tree → "Swords PNG.png", a 6×5 grid of 32px cells).
   if (item.sprite) {
     const c = item.sprite.col, r = item.sprite.row;
-    const sheet = item.sprite.sheet || 'Swords PNG.png';
+    const sheet = item.sprite.sheet || 'img/Swords%20PNG.png';
     const cols = item.sprite.cols || 6, rows = item.sprite.rows || 5;
     return `<span style="display:inline-block;vertical-align:middle;width:${size}px;height:${size}px;`
       + `background-image:url('${sheet}');background-repeat:no-repeat;`
@@ -16503,6 +16517,13 @@ function renderQuestItem(task, opts) {
       wkChip.textContent = `Wk ${_wkTotal}✓`;
       gains.appendChild(wkChip);
     }
+    // Extra sessions logged THIS week (e.g. padel 3x) — separate from the weeks-completed count above.
+    const _extraCount = ((task.extra||{})[opts.periodKey]||[]).length;
+    if (done && _extraCount > 0) {
+      const xChip = document.createElement('span'); xChip.className = 'gain-chip weekly-extra-chip';
+      xChip.textContent = `×${_extraCount + 1} this week`;
+      gains.appendChild(xChip);
+    }
   }
 
   if (opts.allowReorder) { const h=document.createElement('div'); h.className='drag-handle'; h.textContent='⠿'; el.appendChild(h); }
@@ -16571,6 +16592,21 @@ function renderQuestItem(task, opts) {
       const editBtn=document.createElement('button'); editBtn.className='quest-action-btn edit'; editBtn.title='Edit'; editBtn.textContent='✎';
       editBtn.addEventListener('click',(e)=>{ e.stopPropagation(); openHabitModal('edit', opts.listKey, task.id); });
       actions.appendChild(editBtn);
+    }
+    // Weekly habits can be done more than once a week (padel 3x, running 4x, ...) — once the
+    // base completion is in, offer to log extra sessions for extra rewards, plus undo-last.
+    if (opts.isWeekly && done) {
+      const _extraN = ((task.extra||{})[opts.periodKey]||[]).length;
+      const extraBtn=document.createElement('button'); extraBtn.className='quest-action-btn extra-session';
+      extraBtn.title='Log another session this week for extra rewards'; extraBtn.textContent='➕';
+      extraBtn.addEventListener('click',(e)=>{ e.stopPropagation(); logExtraWeeklyCompletion(task.id); });
+      actions.appendChild(extraBtn);
+      if (_extraN > 0) {
+        const undoExtraBtn=document.createElement('button'); undoExtraBtn.className='quest-action-btn undo';
+        undoExtraBtn.title='Undo last extra session'; undoExtraBtn.textContent='↺';
+        undoExtraBtn.addEventListener('click',(e)=>{ e.stopPropagation(); undoExtraWeeklyCompletion(task.id); });
+        actions.appendChild(undoExtraBtn);
+      }
     }
     // Forge button — undone trabajo tasks when a dungeon session is running
     if (opts.listKey==='trabajo' && !done && state.dungeon && state.dungeon.phase==='exploring' && !state.dungeon.pausedAt) {
@@ -19283,9 +19319,12 @@ function renderMerchantPanel() {
 }
 
 function renderTrabajo() {
-  // Title + subtitle now sing the city: tier, district, and a flavor line that reacts to winter.
+  // City branding (name + tier) belongs to the CITY sub-tab only — other views just say WORK,
+  // so QUESTS/FORGE/WORKSHOP aren't cluttered with a title that isn't about them.
   const _city = getCityTier();
-  panelTitle.textContent = `${getCityName().toUpperCase()} · ${_city.name.toUpperCase()}`;
+  panelTitle.textContent = workShopView === 'guild'
+    ? `${getCityName().toUpperCase()} · ${_city.name.toUpperCase()}`
+    : 'WORK';
   panelSubtitle.textContent = getDistrictSubtitle(workShopView);
   // Monthly work report — fires once on first WORK tab visit of a new month
   const _curMonthKey = `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`;
@@ -25765,6 +25804,47 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
   if (listKey==='habitos' && periodKey===todayKey()) { checkTodayStreak(); checkShieldEarning(); }
   saveState(); renderAll();
   if (listKey==='trabajo' && !wasDone) setTimeout(flashGoldDisplay, 30);
+}
+
+// Weekly habits often happen more than once a week (padel 3x, running 4x, ...). The base
+// tap (toggleQuest) still marks the week done for streaks/achievements as before; this logs
+// EXTRA sessions on top for extra rewards, once the week's base completion already exists.
+function logExtraWeeklyCompletion(id) {
+  const task = state.weekly.find(t => t.id === id); if (!task) return;
+  const week = isoWeekKey();
+  if (!task.done[week]) return; // log the first completion normally before stacking extras
+  if (!task.extra) task.extra = {};
+  if (!task.extra[week]) task.extra[week] = [];
+  const prevLv = calcLevel(state.totalXp).level;
+  const _pt = {}; STAT_KEYS.forEach(k => { _pt[k] = tierFor(state.stats[k]).tier; });
+  const _isCrit = rollCrit();
+  const _mult = _isCrit ? 2.0 : 1.0;
+  const _scaledXp = Math.round((task.xp || 0) * _mult);
+  const _scaledGains = {}; Object.entries(task.gains || {}).forEach(([k, v]) => { _scaledGains[k] = Math.round(v * _mult); });
+  const _ag = applyGainsWithClass(_scaledGains);
+  state.totalXp += _scaledXp; state.col += _scaledXp;
+  task.extra[week].push({ gains: _ag, xp: _scaledXp, wasCrit: _isCrit });
+  const n = task.extra[week].length + 1;
+  playWeeklyTap();
+  if (navigator.vibrate) navigator.vibrate(_isCrit ? [10,20,80,25,160,25,80] : 40);
+  showNotif(`[SYSTEM] ${task.text} ×${n} this week${_isCrit ? ' ⚡CRIT' : ''} · +${_scaledXp} EXP · ${_gainsStr(_ag,_scaledGains)}`);
+  if (_isCrit) showCritFloat(_scaledGains); else showXpFloat(_scaledXp, _ag);
+  const newLv = calcLevel(state.totalXp).level;
+  if (newLv > prevLv) afterLevelUp(newLv, prevLv, _ag, _pt);
+  else checkStatRankUps(_ag, _pt);
+  checkAchievements();
+  saveState(); renderAll();
+}
+function undoExtraWeeklyCompletion(id) {
+  const task = state.weekly.find(t => t.id === id); if (!task) return;
+  const week = isoWeekKey();
+  const list = (task.extra || {})[week];
+  if (!list || !list.length) return;
+  const last = list.pop();
+  applyGains(last.gains, -1);
+  state.totalXp = Math.max(0, state.totalXp - (last.xp || 0));
+  state.col = Math.max(0, state.col - (last.xp || 0));
+  saveState(); renderAll();
 }
 
 

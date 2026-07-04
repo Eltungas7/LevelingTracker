@@ -38,8 +38,8 @@ const ACHIEVEMENTS = [
     tiers:[{count:1,label:'First Brush',reward:1,title:null},{count:10,label:'Fresh',reward:1,title:null},{count:30,label:'Spotless',reward:2,title:null},{count:100,label:'Pristine',reward:4,title:'Pristine'},{count:200,label:'Enamel Guardian',reward:7,title:'Enamel Guardian'},{count:365,label:'IVORY SOVEREIGN',reward:13,title:'IVORY SOVEREIGN'}]},
 
   // ── PROGRESIÓN — 8 hábitos semanales  (one achievement per weekly habit; each: 1/2/3/5/11) ──
-  { id:'weekly_futbol',   name:'Football',      icon:'⚽', category:'progresion', desc:'Play football',            weeklyId:'w0', weeklyTextMatch:'fútbol', stat:'STR', statAll:true,
-    tiers:[{count:1,label:'First Match',reward:1,title:null},{count:3,label:'Regular',reward:2,title:null},{count:10,label:'Seasoned Player',reward:3,title:'Seasoned Player'},{count:25,label:'Field General',reward:5,title:'Field General'},{count:50,label:'LIVING BALL',reward:11,title:'LIVING BALL'}]},
+  { id:'weekly_futbol',   name:'Runner',        icon:'🏃', category:'progresion', desc:'Go for a run',              weeklyId:'w0', weeklyTextMatch:'running', stat:'CON', statAll:true,
+    tiers:[{count:1,label:'First Stride',reward:1,title:null},{count:3,label:'Regular',reward:2,title:null},{count:10,label:'Seasoned Runner',reward:3,title:'Seasoned Runner'},{count:25,label:'Road Warrior',reward:5,title:'Road Warrior'},{count:50,label:'MARATHON LEGEND',reward:11,title:'MARATHON LEGEND'}]},
   { id:'weekly_padel',    name:'Padel',         icon:'🎾', category:'progresion', desc:'Play padel',               weeklyId:'w1', weeklyTextMatch:'pádel', stat:'DEX', statAll:true,
     tiers:[{count:1,label:'First Rally',reward:1,title:null},{count:3,label:'Regular',reward:2,title:null},{count:10,label:'Court Regular',reward:3,title:'Court Regular'},{count:25,label:'Net Master',reward:5,title:'Net Master'},{count:50,label:'PADEL KING',reward:11,title:'PADEL KING'}]},
   { id:'weekly_cleaning', name:'Home Guardian', icon:'🏠', category:'progresion', desc:'Deep clean the house',     weeklyId:'w2', weeklyTextMatch:'home cleaning', stat:'VOL', statAll:true,
