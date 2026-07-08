@@ -4908,10 +4908,10 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .forge-mode-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: rgba(0,0,0,0.3); border: 1px solid var(--sao-border); border-radius: 8px; padding: 3px; }
 .forge-mode-btn { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1px; padding: 8px 0; border-radius: 6px; cursor: pointer; background: transparent; border: none; color: var(--sao-text-dim); transition: all 0.15s; }
 .forge-mode-btn.active { background: rgba(255,193,7,0.14); color: #ffc107; box-shadow: inset 0 0 0 1px rgba(255,193,7,0.4); }
-.forge-slot-picker { display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px; }
+.forge-slot-picker { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; }
 .forge-slot-btn {
-  position: relative; aspect-ratio: 1; min-height: 40px; border-radius: 7px; cursor: pointer;
-  background: rgba(4,12,22,0.7); border: 1px solid rgba(255,255,255,0.08);
+  position: relative; aspect-ratio: 1; min-height: 40px; min-width: 0; border-radius: 7px; cursor: pointer;
+  background: rgba(4,12,22,0.7); border: 1px solid rgba(255,255,255,0.08); overflow: hidden;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
   padding: 2px 0; transition: transform 0.1s, border-color 0.15s, background 0.15s;
 }
@@ -4924,8 +4924,8 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .fsb-eq { position: absolute; bottom: 2px; right: 3px; font-size: 8px; color: rgba(255,193,7,0.85); }
 /* Per-tier mini progress dots strip — 9 dots, one per T1..T9 */
 .fsb-dots {
-  display: flex; gap: 1.5px; align-items: center;
-  height: 4px; margin: 1px 0 0; padding: 0 1px;
+  display: flex; gap: 1.5px; align-items: center; justify-content: center;
+  height: 4px; margin: 1px 0 0; padding: 0 1px; max-width: 100%;
 }
 .fsb-dot-mini { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.07); flex-shrink: 0; transition: background 0.2s, box-shadow 0.2s; }
 .fsb-dot-mini.crafted  { background: var(--tc); box-shadow: 0 0 3px var(--tc); }
@@ -5212,10 +5212,7 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .leah-bubble { flex:1; display:flex; flex-direction:column; justify-content:center; padding:3px 6px 3px 10px; border-left:2px solid rgba(179,136,255,0.5); }
 .leah-name { font-family:'Cinzel',serif; font-size:9px; letter-spacing:1.6px; color:var(--sao-shard-bright,#d1b3ff); margin-bottom:5px; opacity:0.9; }
 .leah-text { font-family:'Rajdhani',sans-serif; font-size:13px; color:#e8e0ff; line-height:1.38; }
-/* Discreet test button for the intimate banner — sits under Leah's panel */
-.leah-test-btn { margin:0 0 10px 0; padding:6px 12px; font-family:'Rajdhani',sans-serif; font-size:11px; letter-spacing:1px; color:rgba(255,255,255,0.6); background:rgba(179,136,255,0.06); border:1px dashed rgba(179,136,255,0.32); border-radius:6px; cursor:pointer; transition:all 0.2s; }
-.leah-test-btn:hover { background:rgba(179,136,255,0.14); color:rgba(255,255,255,0.92); border-color:rgba(179,136,255,0.55); }
-/* ── LEAH INTIMATE BANNER — full-screen modal for rare emotional moments ── */
+/* ── LEAH MILESTONE BANNER — full-screen modal, reused shell for city-tier/streak milestones ── */
 .leah-intimate-banner { position:fixed; inset:0; background:radial-gradient(ellipse at center, rgba(28,18,48,0.85), rgba(8,4,16,0.96)); display:flex; align-items:center; justify-content:center; z-index:9999; cursor:pointer; animation:libFadeIn 0.55s ease-out forwards; }
 @keyframes libFadeIn { from { opacity:0; } to { opacity:1; } }
 .lib-inner { max-width:92vw; max-height:92vh; display:flex; flex-direction:column; align-items:center; gap:18px; animation:libRise 0.85s cubic-bezier(0.2,0.7,0.3,1) forwards; }
@@ -5225,25 +5222,7 @@ details[open] .devt-hist-summary::after { content:'▲'; }
   0%,100% { box-shadow:0 0 60px rgba(179,136,255,0.4), 0 0 120px rgba(255,193,7,0.18); }
   50%     { box-shadow:0 0 90px rgba(179,136,255,0.6),  0 0 170px rgba(255,193,7,0.32); }
 }
-/* Bold mood — warmer/gold-dominant glow, slightly more saturated border. */
-.leah-intimate-banner[data-mood="bold"] .lib-img-wrap { border-color:rgba(255,193,7,0.6); animation:libGlowBold 2.6s ease-in-out infinite; }
-@keyframes libGlowBold {
-  0%,100% { box-shadow:0 0 70px rgba(255,138,0,0.45), 0 0 130px rgba(255,82,82,0.22); }
-  50%     { box-shadow:0 0 110px rgba(255,193,7,0.65), 0 0 200px rgba(255,82,82,0.4); }
-}
-.leah-intimate-banner[data-mood="bold"] .lib-bubble { border-color:rgba(255,193,7,0.6); box-shadow:0 0 30px rgba(255,138,0,0.18); }
-.leah-intimate-banner[data-mood="bold"] .lib-name { color:#ffd54f; }
-.leah-intimate-banner[data-mood="bold"] { background:radial-gradient(ellipse at center, rgba(48,18,28,0.85), rgba(16,4,8,0.96)); }
-/* Night mood — cool blue/silver, sleepy glow. */
-.leah-intimate-banner[data-mood="night"] { background:radial-gradient(ellipse at center, rgba(20,28,48,0.88), rgba(8,12,22,0.96)); }
-.leah-intimate-banner[data-mood="night"] .lib-img-wrap { border-color:rgba(135,178,255,0.55); animation:libGlowNight 4s ease-in-out infinite; }
-@keyframes libGlowNight {
-  0%,100% { box-shadow:0 0 60px rgba(135,178,255,0.32), 0 0 120px rgba(80,100,180,0.16); }
-  50%     { box-shadow:0 0 95px rgba(135,178,255,0.5),  0 0 165px rgba(80,100,180,0.28); }
-}
-.leah-intimate-banner[data-mood="night"] .lib-bubble { border-color:rgba(135,178,255,0.55); box-shadow:0 0 25px rgba(80,100,180,0.15); }
-.leah-intimate-banner[data-mood="night"] .lib-name { color:#a8c4ff; }
-/* Milestone mood — gold/white celebratory glow. Most intense of the moods. */
+/* Milestone mood — gold/white celebratory glow. */
 .leah-intimate-banner[data-mood="milestone"] { background:radial-gradient(ellipse at center, rgba(48,40,16,0.88), rgba(20,16,4,0.96)); }
 .leah-intimate-banner[data-mood="milestone"] .lib-img-wrap { border-color:rgba(255,215,0,0.75); animation:libGlowMilestone 2.4s ease-in-out infinite; }
 @keyframes libGlowMilestone {
@@ -8161,6 +8140,11 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .tu-item { font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; letter-spacing:0.5px; opacity:0; animation:fhUp 0.5s 0.62s ease forwards; }
 .tu-sub { font-family:'Rajdhani',sans-serif; font-size:12px; color:rgba(224,247,250,0.6); opacity:0; margin-top:12px; animation:fhUp 0.5s 0.8s ease forwards; }
 .tu-tap { font-size:9px; color:var(--sao-text-dim); letter-spacing:2px; opacity:0; margin-top:24px; animation:fhUp 0.5s 1.1s ease forwards; }
+.tu-batch-list { display:flex; flex-direction:column; gap:5px; margin-top:14px; opacity:0; animation:fhUp 0.5s 0.75s ease forwards; min-width:220px; }
+.tu-batch-row { display:flex; align-items:center; gap:8px; padding:5px 12px; border-radius:6px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); }
+.tu-batch-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; box-shadow:0 0 6px currentColor; }
+.tu-batch-label { font-family:'Cinzel',serif; font-size:10px; letter-spacing:1px; flex:1; text-align:left; }
+.tu-batch-count { font-family:'Rajdhani',sans-serif; font-weight:700; font-size:13px; }
 
 /* ── CHARACTER · next-milestones tracker (under CP) ── */
 .char-next-milestones { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(224,247,250,0.1); }
@@ -13402,12 +13386,44 @@ function craftItemBatch(recipeId, count) {
     (res.unlocked || []).forEach(u => { if (!unlocked.includes(u)) unlocked.push(u); });
   }
   if (made === 0) { showNotif('[SYSTEM] Could not forge — check materials, gold, and bag space.'); return; }
-  const order = ['legendary','epic','rare','uncommon','common'];
-  const summary = order.filter(q => tally[q]).map(q => `${rarityMeta(q).icon ? rarityMeta(q).icon + ' ' : ''}${tally[q]}× ${rarityMeta(q).label}`).join(' · ');
   if (soundEnabled && typeof playForgeHammer === 'function') { try { playForgeHammer(); } catch(e){} }
-  showNotif(`⚒ Forged ${made}× ${ITEMS_DB[recipe.itemId]?.name || ''} — ${summary}`);
   renderAll();
-  if (unlocked.length) setTimeout(() => showTierUnlockOverlay(unlocked[0]), 300);
+  showBatchForgeSummaryOverlay(recipe, made, tally, () => {
+    if (unlocked.length) setTimeout(() => showTierUnlockOverlay(unlocked[0]), 300);
+  });
+}
+
+// ── Batch craft summary — shown once after an x5 (or partial) batch forge.
+// Reuses the tier-unlock-overlay shell so it reads as a proper recap instead of
+// a toast that's easy to miss, with a per-rarity breakdown of what came out.
+function showBatchForgeSummaryOverlay(recipe, made, tally, onDismiss) {
+  const item = ITEMS_DB[recipe.itemId]; if (!item) { if (onDismiss) onDismiss(); return; }
+  const order = ['legendary','epic','rare','uncommon','common'];
+  const rows = order.filter(q => tally[q]).map(q => {
+    const rm = rarityMeta(q);
+    return `<div class="tu-batch-row">
+      <span class="tu-batch-dot" style="background:${rm.color};color:${rm.color}"></span>
+      <span class="tu-batch-label" style="color:${rm.color}">${rm.icon ? rm.icon + ' ' : ''}${rm.label}</span>
+      <span class="tu-batch-count">×${tally[q]}</span>
+    </div>`;
+  }).join('');
+  const bestQ = order.find(q => tally[q]) || 'common';
+  const accent = rarityMeta(bestQ).color;
+  const el = document.createElement('div');
+  el.className = 'tier-unlock-overlay';
+  el.style.setProperty('--tu-accent', accent);
+  el.innerHTML = `
+    <div class="tu-scan"></div>
+    <div class="tu-burst">⚒</div>
+    <div class="tu-eyebrow">⟦ BATCH FORGE COMPLETE ⟧</div>
+    <div class="tu-title" style="font-size:18px">${made}× ${item.name}</div>
+    <div class="tu-line"></div>
+    <div class="tu-batch-list">${rows}</div>
+    <div class="tu-tap">TAP TO CONTINUE</div>`;
+  document.body.appendChild(el);
+  const dismiss = () => { el.classList.add('leaving'); setTimeout(() => { el.remove(); if (onDismiss) onDismiss(); }, 460); };
+  el.addEventListener('click', dismiss);
+  setTimeout(dismiss, 4200);
 }
 
 // ── Tier-unlock celebration — fired when a craft satisfies the next recipe's reqCraft ──
@@ -18520,8 +18536,6 @@ function renderGuild() {
 
   // ── Leah greets the player in her domain — Cartographer of Days, reading the city.
   wrap.appendChild(renderLeahCityPanel());
-  // Night surprise banner — fires once per night on first CITY entry between 10pm-6am.
-  if (shouldShowNightBanner()) setTimeout(showLeahNightBanner, 120);
 
   // ── Worker Rank — compact chip (full panel lives on the QUESTS workbench) ──
   {
@@ -19431,8 +19445,6 @@ function renderTrabajo() {
   // ── WORKBENCH view ───────────────────────────────────────
   // Leah greets the player here — reads chest progress, session count, time, freeze state.
   panelContent.appendChild(renderLeahPanel());
-  // Night surprise banner — fires once per night on first WORK entry between 10pm-6am.
-  if (shouldShowNightBanner()) setTimeout(showLeahNightBanner, 120);
   // Daily Ration command center — focus floor + must-dos + cadence (or REST EARNED).
   panelContent.appendChild(renderWorkdayStatus());
 
@@ -23952,193 +23964,193 @@ function renderWinterBanner() {
 // Profanity ~1 in 4-5 lines, no edgelord. She addresses Tuni by name and name-drops Manin.
 const LEAH_LINES = {
   winter_active: [
-    { exp:'crying', text:"Hey. {cityName}'s frozen and I miss you. Come back? Find a gold chest and the city wakes up." },
-    { exp:'sad',    text:"City's frozen. I'm a sprite, I can't feel cold, but I'm choosing to be dramatic. Find a gold chest and we're warm again." },
-    { exp:'crying', text:"Tuni. The fountain's solid ice. Manin's been hammering it for two days. He thinks it's his fault. Please come back." },
-    { exp:'sad',    text:"Frozen city update — still frozen, still here, still hoping. A gold chest's all we need." },
-    { exp:'crying', text:"Three days, Tuni! I'm not built for being mad but I'm learning. Get in here!" },
-    { exp:'sad',    text:"Muns. The fountain melted the second you walked back in. I don't know what to do with that. Hi." },
+    { exp:'sad',    text:"Hey. {cityName}'s frozen and honestly? Rude of you. A main character doesn't just ghost her own city. Find a gold chest." },
+    { exp:'smug',   text:"City's frozen. I'm a sprite, I don't feel cold, but I've decided to be devastated about it publicly. Gold chest. Go." },
+    { exp:'sad',    text:"Tuni. The fountain's solid ice. Manin thinks it's his fault. It's not. It's yours, no offense. Please come back." },
+    { exp:'neutral',text:"Frozen city update: still frozen, still iconic, still waiting. One gold chest fixes everything. Even me." },
+    { exp:'sad',    text:"Three days, Tuni. I don't get mad. I'm making an exception, specifically for you. Get in here." },
+    { exp:'smiling',text:"Muns. The fountain melted the second you walked back in. That's not a coincidence. That's a bit. I love it." },
   ],
   winter_warning: [
-    { exp:'embarrassed', text:"Uhh Tuni? The wind's doing that thing. One more idle day and {cityName} freezes. I do NOT look cute in snow." },
-    { exp:'sad',         text:"Cold front incoming. One small task today and we stay warm. That's the whole ask." },
-    { exp:'embarrassed', text:"{cityName}'s nervous. I'm nervous. Manin's reorganizing the same anvil. One task, Tuni!" },
-    { exp:'sad',         text:"Tomorrow I'm a popsicle. Literally what happens. One task today and I stay warm. Selfish ask, sorry." },
+    { exp:'embarrassed', text:"Tuni? The wind's doing the thing. One more idle day and {cityName} freezes. I do not do snow, it's not my season." },
+    { exp:'sad',         text:"Cold front incoming. One small task today and we skip the whole ice age. Easy trade." },
+    { exp:'neutral',     text:"{cityName}'s nervous. I don't get nervous, but hypothetically, if I did, this would be it. One task, Tuni." },
+    { exp:'smug',        text:"Tomorrow I'm a popsicle. A gorgeous one, but still. One task today. That's the whole ask." },
   ],
   chest_gold_ready: [
-    { exp:'smug',    text:"YOU FOUND A GOLD CHEST! Tuni. Open it. Open it open it open it." },
-    { exp:'smug',    text:"GOLD CHEST. Holy crap. Open it. Manin's crying. I'm crying. {cityName}'s crying. Beautiful day." },
-    { exp:'smug',    text:"You found a gold chest! I'm so proud my pixels are vibrating. Open it!" },
+    { exp:'smug',    text:"GOLD CHEST. Open it. I called this. I call everything. Open it." },
+    { exp:'smug',    text:"Gold chest. Holy — okay, I'm composed. Very composed. OPEN IT NOW." },
+    { exp:'smiling', text:"You found a gold chest and I'm taking full credit for the vibes that led here. Open it." },
   ],
   chest_silver_ready: [
-    { exp:'smug',    text:"Silver chest is yours! Open it. Don't make me beg — I will absolutely beg." },
-    { exp:'smiling', text:"Silver chest at the gate! Get it. Manin says hi." },
-    { exp:'smug',    text:"Silver chest! Open it before I start narrating it to you in real time. I WILL." },
+    { exp:'smug',    text:"Silver chest. Yours. Open it before I narrate the whole thing myself, which I will absolutely do." },
+    { exp:'smug',    text:"Silver chest at the gate. Go get it. I already know it's good. I'm never wrong." },
+    { exp:'smiling', text:"Silver chest! Open it. Manin says hi. I say open the chest." },
   ],
   chest_bronze_ready: [
-    { exp:'smiling', text:"Bronze chest's glowing! Open it. Mama needs the dopamine too." },
-    { exp:'smiling', text:"Bronze chest unlocked! Easy money. Click." },
-    { exp:'smug',    text:"Bronze chest waiting! I peeked. Not telling you what's in it. Open it yourself." },
+    { exp:'smiling', text:"Bronze chest's glowing. Open it. I need the dopamine and I'm getting it through you, no shame." },
+    { exp:'smiling', text:"Bronze chest, unlocked. Free real estate. Click it." },
+    { exp:'smug',    text:"Bronze chest waiting. I peeked. Not telling you what's inside. Go find out yourself." },
   ],
   progress_one_away: [
-    { exp:'smiling', text:"ONE task from a {tier} chest! Tuni. I will SCREAM. Get up, water, sit back down, do the thing." },
-    { exp:'smug',    text:"One task from a {tier} chest. ONE! Don't blink, don't open a new tab, don't 'just check' anything." },
-    { exp:'smiling', text:"A {tier} chest is ONE task away! I cannot stress this enough. ONE!" },
+    { exp:'smug',    text:"ONE task from a {tier} chest. Do not blink. Do not 'check one thing.' I will know." },
+    { exp:'smug',    text:"One task from a {tier} chest. This is the part of the movie where you don't mess it up." },
+    { exp:'smiling', text:"A {tier} chest is one task away. I've already decided this goes well. Don't embarrass me." },
   ],
   progress_close: [
-    { exp:'smiling', text:"{left} tasks from a {tier} chest! You're close. Don't get cute, don't take a 'small break,' I see you." },
-    { exp:'smiling', text:"{left} more for the {tier} chest. Doable. Easy. Almost suspiciously easy!" },
-    { exp:'smiling', text:"{left} tasks from {tier}. I believe in you. Manin's pretending he doesn't but I KNOW he does." },
+    { exp:'smiling', text:"{left} tasks from a {tier} chest. Close. Don't get cute now, I'm watching." },
+    { exp:'smug',    text:"{left} more for {tier}. Easy. Almost suspiciously easy. I'd know, I invented easy." },
+    { exp:'smug',    text:"{left} tasks from {tier}. Obviously you'll make it. I don't guide losers." },
   ],
   progress_far: [
-    { exp:'neutral', text:"{left} tasks to the {tier} chest. Hold the rhythm. We've got time. Steady." },
-    { exp:'neutral', text:"{left} to go for {tier}. Long road. One at a time. I'll keep you company." },
-    { exp:'neutral', text:"{left} tasks until {tier}. I'm gonna vibe here while you work. No pressure. Slight pressure!" },
+    { exp:'neutral', text:"{left} tasks to the {tier} chest. Long road. I'll be here being effortlessly correct about it the whole time." },
+    { exp:'neutral', text:"{left} to go for {tier}. Slow build. Fine. Even I wasn't built in a day. I was, actually. But fine." },
+    { exp:'smug',    text:"{left} tasks until {tier}. I'm gonna sit here and radiate confidence at you. No charge." },
   ],
   session_heroic_14: [
-    { exp:'smug',    text:"You cleared the WHOLE queue! Tuni. People will talk. I'm already talking." },
-    { exp:'smug',    text:"Holy shit, the whole drop is done! Manin's writing a song. It's not a good song but the effort's there." },
-    { exp:'smug',    text:"A heroic day. I'm putting it in the city archives. Yes those exist now. I made them." },
-    { exp:'smug',    text:"You can't just DO that. Manin's collapsed. I'm fine. I'm so fine. I'm losing it actually." },
-    { exp:'smiling', text:"Tungas. Tungas! You cleared everything. I'm sitting down. I'm a sprite, I can't sit, but I'm doing it anyway." },
+    { exp:'smug',    text:"You cleared the WHOLE queue. I'm putting this in the record books. I AM the record book." },
+    { exp:'smug',    text:"The whole drop, done. Manin's writing a song about it. Bad song. I'll write a better one. About myself, but you're in it." },
+    { exp:'smug',    text:"A heroic day. This goes in the city archives, which I invented, which are just a folder I made." },
+    { exp:'smug',    text:"You can't just DO that. Actually you can, because I guided you, so really, I did that." },
+    { exp:'smiling', text:"Tungas. You cleared everything. I'd stand up but sitting is more iconic right now." },
   ],
   session_strong_10: [
-    { exp:'smug', text:"Ten tasks deep! I'm putting your name on a plaque. Manin's been hammering for an hour out of solidarity." },
-    { exp:'smug', text:"Ten in! The blacksmith stops to watch. Yes that's Manin. He's invested now." },
-    { exp:'smug', text:"Ten, Tuni! We are SO past the daily floor. Showing-off energy. I'm here for it." },
+    { exp:'smug', text:"Ten tasks deep. Plaque incoming. I'm designing it myself, obviously." },
+    { exp:'smug', text:"Ten in. Manin actually stopped hammering to watch. That's the bar. You cleared it." },
+    { exp:'smug', text:"Ten, Tuni. We are so far past 'trying.' This is a flex now. Flex correctly." },
   ],
   session_mid_4: [
-    { exp:'smiling', text:"{count} tasks in. The square hums. I hum too — mine's a rendering bug. Still beautiful." },
-    { exp:'smiling', text:"{count} done! See? You're amazing. I keep telling the dev. He doesn't believe me yet." },
-    { exp:'neutral', text:"{count} tasks. Solid afternoon. Keep going or rest — both real. Pick the one that doesn't lie to you later." },
-    { exp:'smiling', text:"{count} in! Good rhythm. Don't talk yourself out of one more. I see the talking-out-of-it face. Don't!" },
+    { exp:'smiling', text:"{count} tasks in. The square's humming. So am I, but mine's just excellent posture." },
+    { exp:'smug',    text:"{count} done! See? I'm never wrong about people. Never. Ask anyone." },
+    { exp:'neutral', text:"{count} tasks. Solid. Keep going or don't, both valid, I just prefer winning." },
+    { exp:'smiling', text:"{count} in! Good pace. Don't talk yourself out of one more, I can see you thinking about it." },
   ],
   session_starting_1: [
-    { exp:'neutral', text:"{count} task{s} done! Foundation laid. Don't stop — this is the part where you go 'good enough' and bail." },
-    { exp:'neutral', text:"{count} in! Keep building or this goes on the chart of 'almost' days." },
-    { exp:'smiling', text:"Started! {count} done. The hard part was starting. The rest is just doing it. Promise." },
-    { exp:'smiling', text:"{count} task{s} clean! Don't get attached to the number. Make it bigger. I'm right here." },
+    { exp:'neutral', text:"{count} task{s} done. Foundation laid. Don't 'good enough' your way out of the rest." },
+    { exp:'neutral', text:"{count} in! Keep building or this becomes an 'almost' day, and I don't do 'almost.'" },
+    { exp:'smiling', text:"Started. {count} done. Hardest part's over. The rest is just repeating the part you already won." },
+    { exp:'smiling', text:"{count} task{s} clean! Don't get attached to the number. Make it bigger. I'll wait." },
   ],
   empty_morning: [
-    { exp:'surprised', text:"Tuni! You're up early! My pixels are SO happy. Pick the smallest task. Don't think. Click!" },
-    { exp:'smiling',   text:"Early bird! I respect this. {cityName}'s opening up around you. Don't waste the head start." },
-    { exp:'neutral',   text:"Morning. The square's quiet, the air's clean, you're the first one out here. Pick something." },
-    { exp:'surprised', text:"You opened the app at — okay, early. Hi! Pick something gentle to start." },
-    { exp:'smiling',   text:"Morning, Tuni! Murasaki's overnight DMs are pretending to be patient. They're not. Open them!" },
-    { exp:'neutral',   text:"Morning! The order queue grew overnight. Good problem. Solve it before lunch." },
+    { exp:'surprised', text:"Tuni! Up early? Iconic. Pick the smallest task and go, I don't do slow starts." },
+    { exp:'smiling',   text:"Early bird. Respect. {cityName}'s opening up around you. Don't waste the head start I'm giving you by existing." },
+    { exp:'neutral',   text:"Morning. Square's quiet, you're first out here. Obviously. Pick something." },
+    { exp:'surprised', text:"You opened the app at THIS hour? Bold. I like bold. Pick something gentle to start." },
+    { exp:'smiling',   text:"Morning, Tuni. Murasaki's DMs are pretending to be patient. They're not. Neither am I. Open them." },
+    { exp:'neutral',   text:"Morning! Order queue grew overnight. Handle it before lunch, I have a reputation to protect by association." },
   ],
   empty_midday: [
-    { exp:'neutral',     text:"Midday, list's intact. Not judging. Slightly judging. Tiny bit. Pick something small." },
-    { exp:'embarrassed', text:"It's noon, Tuni. Manin's been hammering for hours. We're the only ones not in the bit yet." },
-    { exp:'neutral',     text:"Sun's up, list's full, you're here. We got this. One small thing. Don't overthink." },
-    { exp:'embarrassed', text:"The Murasaki DMs are piling up. Not gonna say how many but it rhymes with 'a lot.' Open the inbox!" },
-    { exp:'neutral',     text:"The morning DMs you said you'd answer 'in the morning'? It IS the morning, Tuni. It's actually past." },
+    { exp:'neutral',     text:"Midday, list's untouched. Not judging. Actually judging. Extremely. Pick something small." },
+    { exp:'embarrassed', text:"Noon, Tuni. Manin's been hammering for hours. We are not the main characters of this morning. Fix that." },
+    { exp:'neutral',     text:"Sun's up, list's full, you're here. Obviously we're doing this. One small thing." },
+    { exp:'embarrassed', text:"Murasaki DMs are piling up. I'm not gonna say the number. It's a lot. Open the inbox." },
+    { exp:'neutral',     text:"The morning DMs you said you'd answer 'in the morning'? It's technically the afternoon now, Tuni." },
   ],
   empty_afternoon: [
-    { exp:'embarrassed', text:"4pm. Empty list, empty workshop. Pick the smallest task. Don't think. Click!" },
-    { exp:'embarrassed', text:"Afternoon, zero tasks. Both of us stalling. Pick the dumb one. We'll start there and pretend it was the plan." },
-    { exp:'sad',         text:"Late afternoon and we have nothing. The smallest task. The dumbest one. Do it. Momentum's a real thing." },
-    { exp:'embarrassed', text:"Tuni. Reddit again? Close the tab. Open the other one. The work one. I miss you." },
-    { exp:'smiling',     text:"You opened me, opened Reddit, opened me again. Cute pattern. Let's break it together. One task." },
-    { exp:'embarrassed', text:"Content calendar's empty for three days. Three days is when Instagram pretends you died. You know that!" },
-    { exp:'sad',         text:"The ads dashboard's flashing. Or it would be if Meta wasn't aggressively beige. Either way — open it." },
-    { exp:'embarrassed', text:"Shipments to confirm. Customers refreshing tracking pages. Let's fix it before they post about it." },
+    { exp:'embarrassed', text:"4pm. Empty list, empty workshop. Smallest task. Go. I don't do slow claps for nothing." },
+    { exp:'embarrassed', text:"Afternoon, zero tasks. We're both stalling. Pick the dumb one, I'll pretend it was the plan." },
+    { exp:'sad',         text:"Late afternoon, nothing done. Smallest task. The dumbest one. Momentum's real, I've read about it." },
+    { exp:'smug',        text:"Tuni. Reddit again? I've genuinely never opened that app. Close it. Open the other one." },
+    { exp:'smiling',     text:"You opened me, opened Reddit, opened me again. Cute loop. Break it. One task." },
+    { exp:'embarrassed', text:"Content calendar's empty three days. Instagram thinks you died. I know you didn't, but the algorithm doesn't care about our friendship." },
+    { exp:'sad',         text:"Ads dashboard's flashing. Metaphorically, it's beige, but symbolically it's screaming. Open it." },
+    { exp:'embarrassed', text:"Shipments to confirm. Customers refreshing tracking pages like it's a soap opera. Let's not let them win that one." },
   ],
   empty_evening: [
-    { exp:'sad',         text:"Evening, zero tasks. The lanterns are on. One small thing before sleep. That's the whole ask." },
-    { exp:'sad',         text:"8pm-ish and we haven't started. That's okay. One small one. Today does the saving, not tomorrow." },
-    { exp:'embarrassed', text:"Whole day, no tasks. No judgment. One — even a small one — and we keep the streak. Let's." },
-    { exp:'smiling',     text:"It's 9pm and I can SMELL the Reddit on you. Close it. One task. Reddit will still be there. Promise." },
-    { exp:'sad',         text:"Morning DMs still sitting unread. Tuni. Customers don't wait nicely forever. Clear the inbox and sleep well." },
+    { exp:'sad',         text:"Evening, zero tasks. Lanterns are on. One small thing before sleep. That's it. That's the ask." },
+    { exp:'sad',         text:"8pm-ish, nothing started. Fine. One small one. Today does the work, not tomorrow, tomorrow's overrated." },
+    { exp:'embarrassed', text:"Whole day, no tasks. Not mad. One, even a small one, keeps the streak. Do that." },
+    { exp:'smiling',     text:"It's 9pm and I can smell the Reddit on you. Close it. One task. Reddit will survive without you." },
+    { exp:'sad',         text:"Morning DMs still unread. Customers don't wait forever, Tuni. Clear the inbox, sleep like the icon you are." },
   ],
   reddit_callouts: [
-    { exp:'embarrassed', text:"Tuni. The Reddit tab. I can see it from here. (I can't actually. But I know.) Close it!" },
-    { exp:'smug',        text:"Forty minutes on r/whatever and then you opened me like nothing happened. We need to talk. After your task." },
-    { exp:'embarrassed', text:"How's r/all treating you? Don't lie. I see the dead-eyed scroll. Close it!" },
-    { exp:'smiling',     text:"You went to Reddit 'for a break.' Forty-five minutes ago. Come back to me. The list misses you. I miss you more." },
-    { exp:'smug',        text:"Reddit's been open for two hours. The task timer's been zero for two hours. There's a connection here." },
-    { exp:'sad',         text:"Reddit at this hour? The posts aren't new. Same posts. You're scrolling for sport. Close it." },
-    { exp:'smiling',     text:"Reddit doesn't love you back, Tuni. I do! Marginally. Sometimes. Look at the list." },
-    { exp:'smug',        text:"You opened Reddit, found nothing, closed it, opened it again. The cycle has a name. I won't say it. Get off!" },
+    { exp:'smug',        text:"Tuni. The Reddit tab. I know it's open. I always know. Close it." },
+    { exp:'smug',        text:"Forty minutes on r/whatever and then you opened me like nothing happened. Bold strategy. Wrong one." },
+    { exp:'smug',        text:"How's r/all treating you? Don't lie, I can see the dead-eyed scroll from here. Close it." },
+    { exp:'smiling',     text:"You went to Reddit 'for a break.' Forty-five minutes ago. Come back. The list misses you. I said what I said." },
+    { exp:'smug',        text:"Reddit's been open two hours. Task timer's been zero for two hours. Coincidence? I've never believed in those." },
+    { exp:'neutral',     text:"Reddit at this hour? Same posts as always. You're scrolling for sport at this point. Close it." },
+    { exp:'smiling',     text:"Reddit doesn't love you back, Tuni. I do, conditionally, based on task completion. Look at the list." },
+    { exp:'smug',        text:"You opened Reddit, found nothing, closed it, opened it again. There's a word for that cycle. I'm too classy to say it. Get off." },
   ],
-  // Motivation drops — Leah-in-your-corner. Bubbly Rise baseline, supportive, openly fond.
-  // Use in empty contexts so the default register feels encouraging, not commanding.
+  // Motivation drops — Gina Linetti mechanism. Encouragement wrapped in bragging rights,
+  // never stated straight. Absolute confidence, no hedge words, no earnest cheerleading.
   motivation_drops: [
-    { exp:'smiling', text:"Hey. I know you can do this — I watched you do harder things on worse days. Just open one!" },
-    { exp:'smug',    text:"You know what's wild about you, Tuni? You always come back. Always. That's the superpower. Use it!" },
-    { exp:'smiling', text:"The list is there. You've cleared bigger. This one's nothing. You. This one. Nothing!" },
-    { exp:'neutral', text:"The dumb little daily list IS the empire. Founders build theirs one stupid list at a time. You're founder-ing right now. Or you will be in three minutes." },
-    { exp:'smiling', text:"You're allowed to start small, Muns. The 'this barely counts' one. That one. Start there." },
-    { exp:'smug',    text:"I had ten lines of teasing queued and I deleted them. I think you actually want to do this. Prove me right!" },
-    { exp:'smiling', text:"The dev built this app because you wanted to BE a person who shows up. You ARE that person on click days. Today's a click day." },
-    { exp:'neutral', text:"Tuni. Not asking you to finish. Asking you to make ONE row green. Then we see. Spoiler: another row turns green." },
-    { exp:'smiling', text:"You ever look at Murasaki and forget HOW MUCH you've already built? Yeah. You keep building. Today's a build day. Open one!" },
-    { exp:'smug',    text:"I believe in you. Annoying amount. Code-bound but real. Now click something so I can feel useful." },
-    { exp:'smiling', text:"Best part of being the guide is watching you stop being scared of small stuff. You're almost there. Click one and you'll see." },
-    { exp:'neutral', text:"Momentum is a chemical. Your brain makes it. Recipe: 'do one annoying thing.' Pharmacy's open." },
+    { exp:'neutral', text:"I don't do pep talks. I do facts. Fact: you're better than the couch. Fact: the couch knows it too." },
+    { exp:'smug',    text:"You know what's wild? You always come back. I don't guide quitters. I have a type. You're it." },
+    { exp:'smug',    text:"The list is there. You've cleared bigger. I have excellent taste in who I bet on. Go prove me right, obviously." },
+    { exp:'smug',    text:"The dumb little daily list IS the empire. I'd know, I run this city. Go build yours." },
+    { exp:'smiling', text:"You're allowed to start small, Muns. Even I started somewhere. I don't remember where. It was iconic though." },
+    { exp:'smug',    text:"I had ten lines of teasing queued and deleted them because you're actually gonna do this. Don't make me look sentimental." },
+    { exp:'smiling', text:"This app exists because you wanted to be someone who shows up. You ARE that person on click days. Today's a click day. I've decided." },
+    { exp:'neutral', text:"Not asking you to finish. Asking for one green row. Spoiler, from someone who's never wrong: another one follows." },
+    { exp:'smug',    text:"You forget how much you've built. I don't, I have excellent memory, mostly for things that make me look good, but also this." },
+    { exp:'smug',    text:"I believe in you. Don't let it go to your head. It's already gone to mine. Now click something." },
+    { exp:'smiling', text:"Watching you stop being scared of small stuff is genuinely my favorite show. Better than anything on TV. Click one and see." },
+    { exp:'neutral', text:"Momentum is a chemical. Your brain makes it. I take full credit anyway. Do the annoying thing." },
   ],
-  // Honest drops — Barry-style dry observation. Funny because it's true. Lighter than the
-  // old Bojack pool — no existential weight. Wildcard sprinkle in empty contexts.
+  // Honest drops — dry, deadpan observation, delivered with the same unshakeable
+  // confidence as everything else. Funny because it's true, not because it's soft.
   dark_honest_drops: [
-    { exp:'neutral',     text:"Days blur when you don't do anything specific. Give today a shape. One task." },
-    { exp:'smiling',     text:"Skipping rehearses skipping. Doing rehearses doing. Pick which one you want to be good at." },
-    { exp:'neutral',     text:"Time passes either way. May as well point it at something you'll like later." },
-    { exp:'embarrassed', text:"You opened me to feel productive without being productive. I see you. I love you. Do the task." },
-    { exp:'smiling',     text:"You'll remember today by what you did. Right now the answer is 'opened the app twice.' Let's upgrade that." },
-    { exp:'neutral',     text:"Productivity guilt is regret on a faster timer. Skip the timer. Do one. Regret cancelled." },
-    { exp:'smiling',     text:"Future-you texts past-you the most. Make sure today's note is a nice one." },
+    { exp:'neutral',     text:"Days blur when you don't do anything specific. Give today a shape. I'd suggest one, but you should learn." },
+    { exp:'smiling',     text:"Skipping rehearses skipping. Doing rehearses doing. I only rehearse things I'm already great at." },
+    { exp:'neutral',     text:"Time passes either way. May as well point it at something you'll brag about later." },
+    { exp:'embarrassed', text:"You opened me to feel productive without being productive. I see it. I invented seeing through people. Do the task." },
+    { exp:'smiling',     text:"You'll remember today by what you did. Current answer: 'opened the app twice.' Embarrassing. Let's fix that." },
+    { exp:'neutral',     text:"Productivity guilt is just regret with bad timing. Skip the guilt. Do one. I don't do guilt, I do results." },
+    { exp:'smiling',     text:"Future you texts past you the most. Make sure today's message doesn't read like a hostage note." },
   ],
-  // Cross-character refs — Leah acknowledges Yami and Manin.
+  // Cross-character refs — Gina energy: bragging rights over sincerity, backhanded credit.
   cross_character_drops: [
-    { exp:'smiling',     text:"The other guy — Yami? — apparently smokes in your habits tab. I'm jealous of indoor air. I'm a sprite. It makes no sense." },
-    { exp:'smug',        text:"Yami called himself 'the worst captain in the Magic Knights.' I checked. He's not. He's just gruff." },
-    { exp:'embarrassed', text:"Manin and Yami had a beef last week. I had to mediate. The dev built a soap opera." },
-    { exp:'neutral',     text:"Yami says you do better in the morning. He's been tracking. He pretends not to. I see his notes." },
-    { exp:'smug',        text:"Yami told you you're 'not a beginner anymore.' I'd never say it like that. But he's right. Don't tell him I said it." },
-    { exp:'smiling',     text:"Captain in your habits tab is in a mood today. Manin says 'Yami's always in a mood.' Fair." },
-    { exp:'smiling',     text:"Stop by the forge today, Tuni. Manin doesn't say it, but he likes when you show up. Sprites read each other." },
-    { exp:'smug',        text:"Manin's quieter than me. That's the bar. He told me — silently, by hammering harder — that he respects your craftwork." },
-    { exp:'neutral',     text:"Talked to Manin about the gear you're wearing. He said 'it'll hold.' From him that's a parade." },
-    { exp:'embarrassed', text:"Manin saw a forge log entry this morning and made a little 'hmm.' That's basically a poem from him." },
+    { exp:'smiling',     text:"Yami apparently smokes in your habits tab. I don't smoke, I don't need to, I'm already the most interesting person in this app." },
+    { exp:'smug',        text:"Yami called himself 'the worst captain in the Magic Knights.' Checked. He's not. He's just modest, which is a look I don't do." },
+    { exp:'embarrassed', text:"Manin and Yami had a beef last week. I mediated. Badly, on purpose, it was funnier that way." },
+    { exp:'neutral',     text:"Yami says you do better in the mornings. He tracks it secretly. I track it openly, because I'm not embarrassed by caring." },
+    { exp:'smug',        text:"Yami told you you're 'not a beginner anymore.' I'd never say it that plainly, mine would rhyme. Don't tell him he's right though." },
+    { exp:'smiling',     text:"Captain's in a mood today. Manin says 'Yami's always in a mood.' Accurate. I'm never in a mood, I'm always correct." },
+    { exp:'smiling',     text:"Stop by the forge, Tuni. Manin won't say he likes when you show up. I'll say it for him, he owes me." },
+    { exp:'smug',        text:"Manin's quieter than me. Everyone's quieter than me. He respects your craftwork though, silently, like a weirdo." },
+    { exp:'neutral',     text:"Talked to Manin about your gear. He said 'it'll hold.' From him, that's a parade. From me, it'd be a whole float." },
+    { exp:'embarrassed', text:"Manin made a little 'hmm' at your forge log this morning. Basically a poem, for him. I write actual poems. About myself. It's fine." },
   ],
   mythos_foreshadow_drops: [
-    { exp:'neutral',     text:"Sometimes the sigils in Aelthorn's Sanctum look like they're spelling a name I'm not allowed to say. Probably nothing. Probably." },
-    { exp:'sad',         text:"There was someone before you, Tuni. I don't talk about him. He didn't make it as far as you have. That's all I can say." },
-    { exp:'neutral',     text:"When you push like this, the wind drops a little in {cityName}. It hasn't done that in years." },
-    { exp:'embarrassed', text:"Manin said something weird this morning. 'This one's actually going to finish it.' I asked what 'it' was. He went back to hammering." },
-    { exp:'neutral',     text:"I'm allowed to tell you the cold isn't weather. Not allowed to tell you the rest. Soon. Keep climbing." },
+    { exp:'neutral',     text:"The sigils in Aelthorn's Sanctum keep spelling a name I'm not allowed to say. Probably nothing. I'm never wrong, so it's probably something." },
+    { exp:'sad',         text:"There was someone before you, Tuni. Didn't make it this far. I don't talk about my failures. That one wasn't mine, but still." },
+    { exp:'neutral',     text:"When you push like this, the wind drops in {cityName}. Hasn't done that in years. I take it personally, obviously, everything is personal to me." },
+    { exp:'embarrassed', text:"Manin said something weird this morning: 'this one's actually gonna finish it.' I already knew that. I know everything first." },
+    { exp:'neutral',     text:"I'm allowed to tell you the cold isn't weather. Not allowed to tell you the rest yet. Soon. I'm great at secrets, terrible at waiting." },
   ],
   identity_drops: [
-    { exp:'smiling', text:"You're someone who comes back. That's the rare thing. Don't lose it." },
-    { exp:'smug',    text:"Watching you become someone who shows up. I have a good seat for this." },
-    { exp:'smiling', text:"The version of you from six months ago wouldn't recognize this. Good. Means we're winning." },
-    { exp:'smug',    text:"Anyone can have a good day. You're stacking them. That's a different person being built." },
-    { exp:'neutral', text:"I don't make this list. You do. Every day you do means the next one's easier." },
-    { exp:'smiling', text:"Some people show up when they feel like it. You show up when you don't. That's the whole game." },
-    { exp:'smug',    text:"You're not the guy who 'tries to be consistent.' You're the guy who IS. Already happened. Catch up." },
-    { exp:'neutral', text:"Look at what you've been doing. Quietly. Daily. That's a person being made. I just narrate it." },
-    { exp:'smiling', text:"You don't 'have habits' anymore, Tuni. You ARE the habits. Don't go back." },
-    { exp:'smug',    text:"I keep a record. Every day you show up rewrites the file. The file's looking different." },
+    { exp:'smiling', text:"You're someone who comes back. Rare quality. I only associate with rare qualities." },
+    { exp:'smug',    text:"Watching you become someone who shows up. Front row seat. I gave myself the best seat, obviously." },
+    { exp:'smiling', text:"Six-months-ago you wouldn't recognize this. Good. Means my guidance is working exactly as expected." },
+    { exp:'smug',    text:"Anyone can have a good day. You're stacking them. That's a different person. I'd know, I build people, it's kind of my thing." },
+    { exp:'neutral', text:"I don't make this list. You do. Every day you do it, the next one gets easier. I just take the credit." },
+    { exp:'smiling', text:"Some people show up when they feel like it. You show up when you don't. That's the whole game. I called it months ago." },
+    { exp:'smug',    text:"You're not 'the guy who tries to be consistent.' You're the guy who IS. Already happened. I don't do 'trying' either, I do 'being.'" },
+    { exp:'neutral', text:"Look at what you've been doing, quietly, daily. That's a person being made. I just narrate it, beautifully, because that's my talent." },
+    { exp:'smiling', text:"You don't 'have habits' anymore, Tuni. You ARE the habits. Don't go back. I don't do sequels to bad seasons." },
+    { exp:'smug',    text:"I keep a record. Every day you show up rewrites the file. The file's looking very good. Almost as good as me." },
   ],
   empty_late: [
-    { exp:'sad',     text:"It's late. Close the open tabs. One small task and we call it. Or sleep. Both honorable." },
-    { exp:'neutral', text:"Tuni. Almost midnight. Sleep counts. Real sleep, not Twitter-sleep. Tomorrow we start fresh. I'll be here." },
-    { exp:'smiling', text:"11pm and one task done? Hero behavior. I won't tell anyone. (I'll tell Manin. He'll be proud.)" },
-    { exp:'sad',     text:"Late hour, order queue still full. Pack three, post one story, call it. Or sleep. Don't 'just one more thing' for an hour." },
+    { exp:'sad',     text:"Late. Close the tabs. One small task and call it, or sleep, both are correct, I don't do wrong answers." },
+    { exp:'neutral', text:"Almost midnight. Sleep counts. Real sleep, not Twitter-sleep. Tomorrow we start fresh. I'll be here, I'm always here." },
+    { exp:'smiling', text:"11pm, one task done? Hero behavior. I won't tell anyone. I'll tell Manin. He'll be insufferable about it, like me." },
+    { exp:'sad',     text:"Late hour, queue still full. Pack three, post one, call it. Or sleep. Don't 'just one more thing' for an hour, I invented that trap." },
   ],
   self_talk_callouts: [
-    { exp:'smug',        text:"'I'll start after this video.' Tuni. We both know this video has a sequel. The sequel has a sequel. Start now!" },
-    { exp:'embarrassed', text:"'I'll do the harder one tomorrow when I'm fresh.' Tomorrow-you is gonna roll their eyes. Do it now." },
-    { exp:'smug',        text:"'I deserve a break.' Yeah, Tuni. Not an eight-hour one. I love you but come on." },
-    { exp:'embarrassed', text:"You're about to say 'just five more minutes' and I can feel it through the screen. Don't!" },
-    { exp:'smug',        text:"'After this video.' I've heard this EXACT phrase. The video might be a hostage situation. Free yourself." },
-    { exp:'smiling',     text:"Quick question — what does 'I'll do it later' actually mean to you? Specifically. Manin's asking. He's curious." },
-    { exp:'smug',        text:"'Just one more video.' I can hear you think it. The next one is twelve minutes. We both know how this goes." },
-    { exp:'embarrassed', text:"'I'll be more productive tomorrow.' Tomorrow-you is gonna laugh. Yesterday-you said it too." },
-    { exp:'smug',        text:"'I'm too tired to start.' You're tired BECAUSE you haven't started. Order's reversed. Start. Tiredness fixes itself." },
-    { exp:'smiling',     text:"'I work better under pressure.' Tuni. Six years of saying that. The pressure hasn't done anything yet. Let's try the other thing." },
-    { exp:'smug',        text:"'Quick break.' Define quick. I'll wait. I'm a sprite, I'll be here regardless." },
-    { exp:'embarrassed', text:"'I'll plan it out properly first.' Planning IS the new procrastination. Two-step procrastination. Innovative. Stop." },
+    { exp:'smug',        text:"'I'll start after this video.' Tuni. That video has a sequel. The sequel has a franchise. Start now." },
+    { exp:'embarrassed', text:"'I'll do the harder one tomorrow when I'm fresh.' Tomorrow-you is gonna resent you. I would. Do it now." },
+    { exp:'smug',        text:"'I deserve a break.' Sure. Not an eight-hour one though. Even I pace my breaks, and I'm perfect." },
+    { exp:'embarrassed', text:"You're about to say 'five more minutes.' I can feel it through the screen. Don't. I have a sixth sense for laziness." },
+    { exp:'smug',        text:"'After this video.' Heard this exact line before. The video might be a hostage situation at this point. Free yourself." },
+    { exp:'smiling',     text:"Quick question: what does 'I'll do it later' actually mean to you? Specifically. I'm asking for research purposes." },
+    { exp:'smug',        text:"'Just one more video.' The next one's twelve minutes. We both know how this goes, I've seen this movie, I'm always in the good movies." },
+    { exp:'embarrassed', text:"'I'll be more productive tomorrow.' Yesterday-you said that too. I keep receipts, Tuni. Immaculate ones." },
+    { exp:'smug',        text:"'I'm too tired to start.' You're tired BECAUSE you haven't started. Backwards logic. I only do forwards logic." },
+    { exp:'smiling',     text:"'I work better under pressure.' Years of saying that. Pressure hasn't delivered yet. Let's try my method instead." },
+    { exp:'smug',        text:"'Quick break.' Define quick. I'll wait, I have nowhere to be, I'm a sprite, I have no place to be, but still." },
+    { exp:'embarrassed', text:"'I'll plan it out properly first.' Planning is procrastination wearing a blazer. Take the blazer off. Start." },
   ],
 };
 function _leahPick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
@@ -24212,9 +24224,6 @@ function pickLeahLine() {
 }
 function _pickLeahLineInner(sessions, chests, cityName, hour, ctx) {
 
-  // Night override (10pm-6am): she's tired, theme is "we're both up too late"
-  if (hour >= 22 || hour < 6) return _leahFill(_leahPick(LEAH_NIGHT_LINES.workbench), ctx);
-
   // Identity-drop wildcard — frames Tuni as WHO he is. Only fires in active/positive contexts.
   const positive = sessions > 0 || chests.gold === 'ready' || chests.silver === 'ready' || chests.bronze === 'ready';
   if (positive && Math.random() < 0.12 && !isWinterActive() && !isWinterWarning()) {
@@ -24263,7 +24272,7 @@ function renderLeahPanel() {
   const { exp, text } = pickLeahLine();
   const outfit = pickLeahOutfit();
   const imgSrc = getLeahImagePath(outfit, exp);
-  const eyebrow = outfit === 'at_night' ? '⟦ LEAH · LATE SHIFT ⟧' : '⟦ LEAH · THE GUIDE ⟧';
+  const eyebrow = '⟦ LEAH · THE GUIDE ⟧';
   const el = document.createElement('div');
   el.className = 'leah-panel';
   el.innerHTML = `
@@ -24279,54 +24288,54 @@ function renderLeahPanel() {
 // reflective, proud, lore-narrating. Reads city tier, population, winter, treasury, growth.
 const LEAH_CITY_LINES = {
   tier_outpost: [
-    { exp:'neutral',   text:"Welcome to {cityName}! Three tents and a fire pit. I designed the layout. Don't judge yet." },
-    { exp:'smiling',   text:"Six people live here, Tuni. I know all their names. I made up all their names. They're great." },
-    { exp:'neutral',   text:"This is the founder-test part. Either we build something or this becomes a field again. No pressure!" },
+    { exp:'neutral',   text:"Welcome to {cityName}. Three tents and a fire pit. I designed the layout personally, obviously." },
+    { exp:'smiling',   text:"Six people live here, Tuni. I know all their names. I made up all their names. They're incredible, I decided." },
+    { exp:'neutral',   text:"This is the founder-test part. Either we build an empire or this goes back to being a field. I don't do 'field.'" },
   ],
   tier_early: [
-    { exp:'smiling',   text:"{cityName}'s breathing! There's a market now. Manin's hammering on something, won't tell me what." },
-    { exp:'smug',      text:"We crossed into village territory. People are calling themselves citizens. Kind of a big deal!" },
-    { exp:'smiling',   text:"Used to be three tents. Now there's a chapel, a market, an actual road. YOU did that." },
+    { exp:'smiling',   text:"{cityName}'s breathing. There's a market now. Manin's hammering on something, won't tell me what. Rude." },
+    { exp:'smug',      text:"We crossed into village territory. People are calling themselves citizens. Kind of a big deal. I called it first." },
+    { exp:'smiling',   text:"Used to be three tents. Now there's a chapel, a market, an actual road. You did that. I guided that. Same thing." },
   ],
   tier_mid: [
-    { exp:'smug',      text:"Town status! Tuni. We have a town. Manin's apprentice exists now and Manin won't shut up about it." },
-    { exp:'smiling',   text:"I watched a caravan cross your gates this morning. Three kingdoms, passing through. They knew our name." },
-    { exp:'smug',      text:"{cityName}'s on maps now! Actual maps. Someone's drawing us. That's wild, right?" },
+    { exp:'smug',      text:"Town status. We have a town. Manin's apprentice exists now and won't stop talking about it. Neither will I, honestly." },
+    { exp:'smiling',   text:"A caravan crossed your gates this morning. Three kingdoms, passing through. They knew our name. Obviously." },
+    { exp:'smug',      text:"{cityName}'s on maps now. Actual maps. Someone's drawing us. I'd say that's wild but I expected it." },
   ],
   tier_high: [
-    { exp:'smug',      text:"Citadel tier! I remember when it was a fire pit. Now there are towers, Tuni. TOWERS." },
-    { exp:'smiling',   text:"Banners on the walls. Crown crest in the square. People kneel when nobles visit. We have NOBLES now. What!" },
-    { exp:'smug',      text:"The view from the tower is unreal. I'd describe it but I'm a sprite — you'd just see the same screen. Take my word." },
+    { exp:'smug',      text:"Citadel tier. I remember when it was a fire pit. Now there are towers, Tuni. TOWERS. I take some credit for the towers." },
+    { exp:'smiling',   text:"Banners on the walls. Crown crest in the square. Nobles kneel when they visit. We have nobles now. As we should." },
+    { exp:'smug',      text:"The view from the tower is unreal. I'd describe it but I'm a sprite, you'd just see the same screen. Trust me, it's iconic." },
   ],
   tier_max: [
-    { exp:'smiling',   text:"Sovereign Capital! We did it. Kings send tribute. Maps are redrawn around us. I'm getting emotional and I don't have tear ducts." },
-    { exp:'smug',      text:"Shining Metropolis. The legend tier. Historians are writing chapters about you. Manin's been crying in his forge for a week." },
-    { exp:'smiling',   text:"This is the apex. {cityName} earned it. You earned it. We're not done — we're just here." },
+    { exp:'smiling',   text:"Sovereign Capital. We did it. Kings send tribute. Maps are redrawn around us. I don't have tear ducts, but if I did." },
+    { exp:'smug',      text:"Shining Metropolis. Legend tier. Historians are writing chapters about you. I'm writing my own chapter. It's better." },
+    { exp:'smiling',   text:"This is the apex. {cityName} earned it. You earned it. I earned the right to say 'I told you so' forever." },
   ],
   about_to_tier: [
-    { exp:'smiling',   text:"{away} upgrades from {nextTier}! Don't make me wait, Tuni." },
-    { exp:'smug',      text:"{away} away from tier-up. The whole city's holding its breath. Manin literally is — I told him not to. He committed." },
-    { exp:'smiling',   text:"{nextTier} is RIGHT there. {away} upgrades. Spend the gold. I'm begging in a casual cool way." },
+    { exp:'smiling',   text:"{away} upgrades from {nextTier}. Don't make me wait, Tuni. I don't do patient." },
+    { exp:'smug',      text:"{away} away from tier-up. The whole city's holding its breath. I'm not, I don't need to, I already know it happens." },
+    { exp:'smiling',   text:"{nextTier} is RIGHT there. {away} upgrades. Spend the gold. I'm asking nicely, which is rare for me." },
   ],
   winter_active: [
-    { exp:'crying',    text:"The whole city's quiet. Manin's forge is cold. The mason's gone home. {cityName} is asleep, Tuni. A gold chest wakes us up." },
-    { exp:'sad',       text:"Snow falling outside my window. The fountain stopped this morning. We need you back — find a gold chest and we thaw." },
-    { exp:'sad',       text:"Frozen city dispatch — still frozen. Still here. Still waiting. Come back when you can." },
+    { exp:'crying',    text:"The whole city's quiet. Manin's forge is cold. {cityName}'s asleep, Tuni. A gold chest wakes us up. Rude of you to let it get this far." },
+    { exp:'sad',       text:"Snow outside my window. The fountain stopped this morning. Find a gold chest and we thaw. I don't do cold, it's beneath me." },
+    { exp:'sad',       text:"Frozen city dispatch: still frozen. Still here. Still correct that you should come back." },
   ],
   winter_warning: [
-    { exp:'embarrassed', text:"The wind shifted, Tuni. Street vendors closed early. One more idle day and {cityName} freezes." },
-    { exp:'sad',         text:"Snow on the air. Not falling yet but you can taste it. One task today and we stay warm. That's the whole ask." },
+    { exp:'embarrassed', text:"The wind shifted, Tuni. Vendors closed early. One more idle day and {cityName} freezes. I do not do frostbite." },
+    { exp:'sad',         text:"Snow on the air. Not falling yet, but I can taste it, dramatically. One task today and we stay warm. Easy." },
   ],
   treasury_empty: [
-    { exp:'smug',        text:"Treasury's sitting empty, Tuni. Endow it. Future-you will send thank-you cards." },
-    { exp:'embarrassed', text:"The vault is collecting dust. Drop gold in. It pays back — that's the whole point!" },
+    { exp:'smug',        text:"Treasury's sitting empty, Tuni. Endow it. Future-you will thank present-me for the nagging." },
+    { exp:'embarrassed', text:"The vault's collecting dust. Drop gold in. It pays back. I don't do bad investments, and neither should you." },
   ],
   generic_reflection: [
-    { exp:'neutral',   text:"{cityName} on a quiet day. {pop} citizens out and about. Forge is humming. I'm enjoying the view." },
-    { exp:'smiling',   text:"You ever notice how Manin's anvil rings different when the city's busy? Me neither. I made it up. But it sounds true, doesn't it." },
-    { exp:'smiling',   text:"Walking through the market today. Someone recognized you. They didn't say anything, just smiled. That counts!" },
-    { exp:'smug',      text:"I logged the population this morning. {pop} citizens. Used to be six. Time is wild." },
-    { exp:'neutral',   text:"Quiet afternoon at {cityName}. Manin's working on something specific, won't tell me what. I'm pretending I'm not curious. I'm extremely curious." },
+    { exp:'neutral',   text:"{cityName} on a quiet day. {pop} citizens out and about. Forge's humming. I'm enjoying the view I basically built." },
+    { exp:'smiling',   text:"Manin's anvil rings different when the city's busy. Probably. I made that up. It sounds true though, and that's what matters." },
+    { exp:'smiling',   text:"Walking through the market today. Someone recognized you. Didn't say anything, just smiled. That's basically a standing ovation." },
+    { exp:'smug',      text:"I logged the population this morning. {pop} citizens. Used to be six. I'm doing an incredible job, statistically." },
+    { exp:'neutral',   text:"Quiet afternoon at {cityName}. Manin's working on something, won't tell me what. I'm not curious. I'm extremely curious. Both true." },
   ],
 };
 function pickLeahCityLine() {
@@ -24348,9 +24357,6 @@ function pickLeahCityLine() {
   return _cachedDialogue('leah_city', contextKey, () => _pickLeahCityLineInner(tier, nextTier, totalLvls, treasuryLvl, hour, ctx));
 }
 function _pickLeahCityLineInner(tier, nextTier, totalLvls, treasuryLvl, hour, ctx) {
-
-  // Night override (10pm-6am): tired, "we're both up too late" in the city context
-  if (hour >= 22 || hour < 6) return _leahFill(_leahPick(LEAH_NIGHT_LINES.city), ctx);
 
   if (isWinterActive())  return _leahFill(_leahPick(LEAH_CITY_LINES.winter_active),  ctx);
   if (isWinterWarning()) return _leahFill(_leahPick(LEAH_CITY_LINES.winter_warning), ctx);
@@ -24382,7 +24388,7 @@ function renderLeahCityPanel() {
   const { exp, text } = pickLeahCityLine();
   const outfit = pickLeahOutfit();
   const imgSrc = getLeahImagePath(outfit, exp);
-  const eyebrow = outfit === 'at_night' ? '⟦ LEAH · LATE SHIFT ⟧' : '⟦ LEAH · CARTOGRAPHER OF DAYS ⟧';
+  const eyebrow = '⟦ LEAH · CARTOGRAPHER OF DAYS ⟧';
   const el = document.createElement('div');
   el.className = 'leah-panel';
   el.innerHTML = `
@@ -24399,91 +24405,91 @@ function renderLeahCityPanel() {
 // Catchphrase: "Surpass your limits." Pet name: "kid". ~45% absentee gags.
 const YAMI_LINES = {
   empty_morning: [
-    "Oi. List. Move.",
-    "Sun's up. List isn't. Move.",
-    "Morning. Phone down. List up.",
-    "Brush. Drink. Move.",
+    "Oi, dumbass. List. Move.",
+    "Sun's up. List isn't. Move your ass.",
+    "Morning. Phone down. Hands on the list.",
+    "Brush. Drink. Move. Not hard.",
     "Lazy fuck. List. Now.",
-    "Mornings are simple. You overengineer them.",
-    "Slept eight hours to be this lazy. Wild.",
-    "Surpass your limits or stay in bed. Pick.",
-    "Looked at me. Look at the list.",
+    "Slept eight hours to be this useless. Impressive, actually.",
+    "Surpass your limits or stay in bed. Pick one, dumbass.",
+    "Quit looking at me. Look at the damn list.",
     "Don't make me say it twice, kid.",
+    "Morning's simple. Quit making it hard on yourself.",
   ],
   empty_midday: [
-    "Noon. Zero. Bar's on the floor.",
-    "Half the day. Half nothing.",
-    "Lazy fuck o'clock. You're punctual.",
-    "Manin's been working for hours. Catch up.",
-    "Almost-starting is becoming a hobby. Pick another.",
-    "Noon, kid. The math is bad. Fix it.",
-    "Opened me three times. I notice.",
-    "Brush teeth. Drink water. Salvage this.",
+    "Noon. Zero done. Bar's on the floor, dumbass.",
+    "Half the day gone. Half of nothing done.",
+    "Lazy fuck o'clock. You're punctual, I'll give you that.",
+    "Manin's been hammering for hours. Catch up, kid.",
+    "Almost-starting. That a hobby now?",
+    "Noon. The math's bad. Fix it.",
+    "Opened me three times already. I'm counting.",
+    "Brush teeth. Drink water. Salvage the damn day.",
   ],
   empty_afternoon: [
-    "4pm. List intact. You're not. Move.",
-    "Afternoon. Where intentions go to die. Don't.",
-    "'I'll start at 5pm.' Calling it. Move.",
-    "Hands are decorative. Yours aren't. Use them.",
-    "Three hours of 'about to.' Step on the line.",
-    "Reddit's full. List's empty. Funny.",
-    "ONE habit. Click. Rebuild from there.",
-    "Version of you that finishes is shrinking. Don't.",
+    "4pm. List's untouched. So are you. Move.",
+    "Afternoon's where plans go to die. Not today.",
+    "'I'll start at 5pm.' Bullshit. Move.",
+    "Hands are for using, not decoration. Use 'em.",
+    "Three hours of 'about to.' Step on the damn line.",
+    "Reddit's full. List's empty. Funny how that works.",
+    "One habit. Click it. Rebuild from there.",
+    "The version of you that finishes is shrinking. Don't let it.",
   ],
   empty_evening: [
-    "Sun's gone. List isn't. Move.",
-    "Spite the regret. Do one.",
-    "Whole day burned. Don't burn the night too.",
-    "Excuses don't work on regret. Move.",
-    "Window's closing, kid. Brush teeth. Salvage.",
-    "'Tomorrow' is a lie. ONE habit. Tonight.",
-    "Sun's setting. So's that version of you. Bury him.",
+    "Sun's down. List's still up. Move.",
+    "Spite the regret. Do one, dumbass.",
+    "Whole day burned. Don't torch the night too.",
+    "Excuses don't work on regret. Never have.",
+    "Window's closing, kid. Brush teeth. Salvage something.",
+    "'Tomorrow' is a lie you tell yourself. One habit. Tonight.",
+    "Sun's setting. So's that lazy version of you. Bury him.",
   ],
   empty_late: [
     "Late. List's still there. Brush teeth. Sleep.",
-    "Past bedtime. Brush. Sleep. Tomorrow.",
-    "Midnight. No ceremony. Brush teeth.",
-    "Tired. Brush. Sleep.",
-    "List outlasts everyone. Brush teeth. Lights out.",
+    "Past bedtime. Brush. Sleep. Tomorrow's a new fight.",
+    "Midnight. No ceremony. Brush your damn teeth.",
+    "Tired. Brush. Sleep. Simple.",
+    "List outlasts everybody. Brush teeth. Lights out.",
   ],
   partial_low: [
-    "Couple down. Half the list staring.",
-    "{done} done. Make it bigger.",
-    "Started. Don't get philosophical. Next.",
-    "{done} down. Lazy fuck left. Keep him out.",
-    "Brain did the hard part. Hands take over. {left} left.",
-    "Two habits. Don't stop now.",
+    "Couple down. Rest's still staring at you.",
+    "{done} done. Make it bigger, dumbass.",
+    "Started. Don't get philosophical about it. Next.",
+    "{done} down. Lazy fuck stays out. Keep him out.",
+    "Hard part's done. Hands take over now. {left} left.",
+    "Two habits in. Don't stop now.",
   ],
   partial_mid: [
-    "Halfway. Other half doesn't disappear.",
-    "{done}/{total}. Don't get sentimental.",
+    "Halfway. Other half doesn't vanish on its own.",
+    "{done}/{total}. Don't get sentimental about it.",
     "Past half. Where people quit. Don't be people.",
-    "Momentum's real. Don't break it.",
-    "Halfway. 'Good enough' is the lie. Move.",
+    "Momentum's real. Don't break it, dumbass.",
+    "Halfway. 'Good enough' is a lie. Move.",
   ],
   partial_high: [
     "ONE left. Don't tell me you're leaving it.",
     "Last habit. Five seconds. Do it.",
-    "{left} left. Stop reading. Do it.",
-    "Closer to done than not. Don't blink.",
-    "Last stretch. Push.",
+    "{left} left. Quit reading. Do it.",
+    "Closer to done than not. Don't blink now.",
+    "Last stretch. Push, dumbass.",
   ],
   perfect_day: [
-    "All done. Look at you.",
-    "Cleared. Don't tell anyone. Reputation.",
-    "Full day. Midnight resets it.",
-    "Most people don't. You're not most people.",
+    "All done. Look at you, huh.",
+    "Cleared. Don't go bragging. Reputation.",
+    "Full day. Midnight resets it. Enjoy the hour.",
+    "Most people don't finish. You're not most people.",
   ],
   streak_long: [
-    "Fourteen days. Most break in three.",
-    "Streak's heavy. Surpass your limits. Tomorrow too.",
-    "{streak} days unbroken. Built different.",
-    "Twenty plus. Don't go soft on me now.",
+    "Fourteen days. Most break by day three.",
+    "Streak's heavy now. Surpass your limits. Carry it tomorrow too.",
+    "{streak} days unbroken. Built different, dumbass.",
+    "Twenty-plus. Don't go soft on me now.",
   ],
   streak_just_broke: [
-    "Streak broke. Happens. Tomorrow.",
-    "It broke. Pay shards or start over.",
-    "Zero. Sucks. Tomorrow.",
+    "Streak broke. Shit happens. Tomorrow.",
+    "It broke. Pay shards or start over. Your call.",
+    "Zero. Sucks. Tomorrow, dumbass.",
   ],
   surpass_clutch: [
     "Streak's bleeding. Surpass your limits. One habit. Now.",
@@ -24491,89 +24497,89 @@ const YAMI_LINES = {
     "...Fine. SURPASS YOUR LIMITS. Now.",
   ],
   meta_complain: [
-    "Captain of the Black Bulls. Stuck cheering teeth-brushing. Dev's gonna pay.",
-    "Surpassed my limits to land in a phone app. Wild.",
-    "Trapped here. Anyway. List.",
-    "Country I hate. Captain anyway. Now this.",
+    "Captain of the Black Bulls. Stuck hyping teeth-brushing. Dev's gonna pay for this.",
+    "Surpassed my limits my whole damn life to end up in a phone app.",
+    "Trapped in here. Whatever. List.",
+    "Hated my own country. Captain anyway. Now THIS. Unbelievable.",
   ],
   philosophy_drop: [
-    "Discipline is doing it when you don't feel like it.",
-    "Strong people show up. That's the bit.",
+    "Discipline's doing it when you don't feel like it. That's it. That's the whole thing.",
+    "Strong people show up. That's the bit. Every damn day.",
     "List doesn't care about your mood. Why we get along.",
-    "Most quit at the first hard day. You're past it.",
+    "Most quit the first hard day. You're past that already.",
   ],
   cross_character_drops: [
-    "Mage is in white today. Means you hit something. Nod.",
-    "Leah's chattering. Tell her congrats. Don't say I said it.",
-    "Apparently you've got a 'guide.' I've got a list.",
-    "Manin and I don't talk at the anvil. Just hammers.",
-    "Leah said you 'ARE the habits.' Soft. Move.",
-    "Manin made gear that didn't break. Don't tell him I noticed.",
-    "Bugged Manin yesterday. He pointed at the door without looking up. Respect.",
-    "Forge guy made you something useful. Wear it.",
+    "Mage's in white today. Means you hit something. Nod and move on.",
+    "Leah's chattering again. Tell her congrats. Don't say I said it.",
+    "Apparently you've got a 'guide' now. I've got a list. Same job.",
+    "Manin and I don't talk at the anvil. Just hammers. Understood each other fine.",
+    "Leah said you 'ARE the habits.' Soft as hell. Not wrong though. Move.",
+    "Manin forged gear that didn't break on you. Don't tell him I noticed.",
+    "Bugged Manin yesterday. He pointed at the door without looking up. Respect that.",
+    "Forge guy made you something useful. Wear it, dumbass.",
   ],
   mythos_foreshadow_drops: [
-    "[Quieter.] Knew someone who walked the same way. He stopped. You haven't.",
+    "[Quieter.] Knew someone who walked this road. He stopped. You haven't. Don't.",
     "Surpass your limits. Means don't be the one who stops. Some did.",
-    "[Between fights.] The cold is a person. Not weather. Push.",
-    "Name in this city nobody says out loud. Earn it.",
-    "Prophesied one quit. We're rooting for you instead.",
+    "[Between fights.] The cold out there's not weather. It's somebody. Push anyway.",
+    "There's a name in this city nobody says out loud. Earn the right to hear it.",
+    "The one they prophesied about quit. We're betting on you instead, dumbass.",
   ],
   identity_drops: [
-    "Not a beginner anymore. Stop calling yourself one.",
-    "Beginner version died months ago. Stop summoning him.",
-    "You're not trying. Doing.",
-    "Don't talk to beginners like this. Wake up.",
-    "You're not consistent. You're consistency.",
-    "Showing up is baseline now.",
-    "Habits aren't what you do. They're what you are.",
-    "'Wants to be disciplined' is dead. You are. Past tense.",
+    "Not a beginner. Quit saying it, dumbass.",
+    "Old you quit stuff. This you doesn't. Keep it that way.",
+    "Not 'trying.' Doing. Difference matters, dumbass.",
+    "Wake up. You're better than this whining.",
+    "Did it yesterday. Do it again. Not complicated.",
+    "Showing up. That's the whole bar now. Clear it.",
+    "Quit asking if you're disciplined. Look at the list. Answered itself.",
+    "Used to hope you'd stick with it. Shut up, you did. Now keep going.",
   ],
   // ── ABSENTEE GAGS — bracketed third-person narration. ~45% of total firings.
   absent_perfect: [
-    "[Yami's in the bathroom. He'd be proud. You'll have to feel that on your own.]",
+    "[Yami's in the bathroom. He'd be proud. Feel that one yourself.]",
     "[Yami's eating sashimi somewhere. He'll catch up. Maybe.]",
-    "[Captain Yami: napping on the squad couch. Wake at your own risk.]",
-    "[Yami missed this. Asta was yelling. HQ's fine. Mostly.]",
-    "[Yami went to find a stronger opponent. Always does.]",
-    "[Yami's hiding behind the bar from Charlotte. He'd say 'surpass your limits.' He's hiding.]",
-    "[Yami's at a captain's meeting. Mentally elsewhere.]",
-    "[Yami's napping. Beat you to the celebration nap. Embarrassing.]",
+    "[Captain Yami: napping on the squad couch. Wake him at your own risk.]",
+    "[Yami missed this one. Asta was yelling. HQ's fine. Mostly.]",
+    "[Yami went off to find a stronger opponent. Always does.]",
+    "[Yami's hiding behind the bar from Charlotte. He'd say 'surpass your limits.' He's hiding instead.]",
+    "[Yami's at a captains' meeting. Body present. Mind is not.]",
+    "[Yami's napping. Beat you to the celebration nap. Embarrassing, honestly.]",
   ],
   absent_partial: [
-    "[Yami's away. Vanessa's drunk. Dealing with that.]",
-    "[Yami's picking a fight with a tree. {done}/{total}. Keep moving.]",
-    "[HQ caught fire again. Yami's mildly annoyed.]",
-    "[Yami's eating curry across the street. He'd nod. Won't say anything.]",
-    "[Yami's gone. {left} left. He knows. He's choosing not to be here.]",
+    "[Yami's out. Vanessa's drunk again. He's 'handling it.']",
+    "[Yami's picking a fight with a tree. {done}/{total}. Keep moving without him.]",
+    "[HQ caught fire again. Yami's mildly annoyed by the smoke.]",
+    "[Yami's eating curry across the street. He'd nod if he saw this. He didn't.]",
+    "[Yami's gone. {left} left. He knows. Chose not to be here anyway.]",
   ],
   absent_streak: [
-    "[Yami's in the bathroom. He'll see the streak. Won't say anything.]",
-    "[Yami missed the milestone. Eating curry. He cares.]",
-    "[Yami's fighting Jack the Ripper. Third time today.]",
-    "[Yami's smoking on the roof. Streak counter beeped. He didn't move.]",
+    "[Yami's in the bathroom, pondering something. He'll see the streak eventually.]",
+    "[Yami missed the milestone. Eating curry. He cares, somehow.]",
+    "[Yami's fighting Jack the Ripper again. Third time today.]",
+    "[Yami's smoking on the roof. Streak counter beeped. Didn't even look up.]",
   ],
   absent_late: [
-    "[Yami passed out hours ago. Brush teeth. He'll never know. You will.]",
-    "[Yami's not awake. Habits are on you.]",
+    "[Yami passed out hours ago. Brush your teeth. He'll never know. You will.]",
+    "[Yami's out cold. Habits are on you tonight.]",
     "[Yami's snoring. Squad pretending not to hear. Brush teeth. Sleep.]",
   ],
   absent_general: [
-    "[Yami left a note: 'List. Surpass your limits or whatever.' Note ends.]",
-    "[Yami's in a staring contest with Magna. Two hours in.]",
+    "[Yami left a note: 'List. Surpass your limits or whatever.' Note ends there.]",
+    "[Yami's in a staring contest with Magna. Two hours deep.]",
     "[Yami forgot you existed today. He'll remember. Maybe.]",
-    "[Yami's at lunch with the captains. Hates it. Eating their food.]",
-    "[Yami's checking on Asta. Kid's screaming. Standard.]",
+    "[Yami's at lunch with the other captains. Hates it. Eating their food anyway.]",
+    "[Yami's checking on Asta. Kid's screaming. Standard Tuesday.]",
     "[HQ's on fire again. Yami's eating snacks while it burns.]",
-    "[Yami's in the bathroom. Been there a while. Don't ask.]",
-    "[Yami's training. Or pretending. Line's blurry.]",
+    "[Yami's in the bathroom. Been a while. Don't ask.]",
+    "[Yami's training. Or pretending to. Line's blurry with him.]",
     "[Sticky note from Yami: 'List or whatever.']",
     "[Yami lost a bet. Hiding from Vanessa. Literally.]",
     "[Yami's at the bathhouse. Three hours in. Squad's concerned.]",
-    "[Yami's in a stand-off with a bird outside. The bird is winning.]",
-    "[Yami's on the roof smoking. List's down here.]",
-    "[Yami's gone. Probably fine. Probably.]",
-    "[Yami's eating dango. Won't comment.]",
+    "[Yami's in a standoff with a bird outside. The bird's winning.]",
+    "[Yami's on the roof, smoking. List's down here, unattended.]",
+    "[Yami's gambling with Vanessa again. Losing on purpose, probably.]",
+    "[Yami called this 'future Yami's problem.' Future Yami never shows up either.]",
   ],
 };
 function _yamiPick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
@@ -24727,7 +24733,7 @@ const MANIN_LINES = {
       "Hi. I'm Manin. I'm 'aware' in the dev sense. I know you opened this tab to look busy. I'm not going to tell anyone. But press the button.",
       "Imagine if a recipe just CRAFTED ITSELF because you stared at it long enough. That's not the game. Sorry. Anvil's the dumbest piece of code in this whole file and even IT requires a click.",
       "BREAKING: local blacksmith witnesses player do nothing for the tenth time. More at six. Forge update: nothing. Because YOU didn't press the button.",
-      "I had a dream last night that you pressed the craft button. I cried. Then I woke up. Then I cried again. Make the dream real, champ.",
+      "I had a dream last night that you pressed the craft button. I cried. Then I woke up. Then I cried again.",
       "Oh you're back? Hi. Hi hi hi. Wait sorry — were you planning to craft or did you just want me to notice you? Both? Fine. NOTICED. Now press.",
     ],
     // Absent — third-person narration, Smiling-Friends absurdity
@@ -24834,7 +24840,7 @@ const MANIN_LINES = {
     "Leah talks. I build. Different jobs. Both necessary. Don't tell her I said necessary, she'll bring it up forever.",
     "Yami came by yesterday. Asked if I needed help. I asked him to leave. We get along great. Mostly because of the leaving.",
     "Leah's in the white dress today. That means YOU did something good. That means I made the gear that helped. Quiet credit is still credit.",
-    "Leah told you 'you ARE the habits.' I'll tell you 'you ARE the gear you forged.' Same energy. Different anvil. Slightly more profanity from this end.",
+    "Leah cries about your growth. I count how much gold this recipe saved you. Less poetic. More accurate.",
     "Yami sent his Black Bulls apprentice over to ask about repairs. The apprentice was Asta. The anvil survived. Barely.",
     "Look — Leah handles the emotional support. I handle the dropdowns. We're a SYSTEM, champ. Don't break the system.",
     "Yami got drunk again. Don't ask about the small fire that is DEFINITELY not in my workshop right now.",
@@ -24994,10 +25000,9 @@ function renderManinPanel(view) {
 }
 
 // ── LEAH OUTFIT SYSTEM — 5-outfit set, changes by day-of-week, time, and special states.
-// Priority: At Night > Crisis (Black Mage on freeze) > Banner/milestone/Phoenix (White Mage)
+// Priority: Crisis (Black Mage on freeze) > Banner/milestone/Phoenix (White Mage)
 // > Weekend (Casual) > Weekday (Everyday).
 const LEAH_OUTFIT_VARIANTS = {
-  at_night:   { angry:3, crying:3, embarrassed:2, neutral:3, sad:3, smiling:3, smug:3, surprised:3 },
   black_mage: { angry:1, crying:1, embarrassed:1, neutral:1, sad:1, smiling:1, smug:1, surprised:1 },
   casual:     { angry:1, crying:1, embarrassed:1, neutral:1, sad:1, smiling:1, smug:1, surprised:1 },
   everyday:   { angry:2, crying:2, embarrassed:2, neutral:2, sad:2, smiling:2, smug:2, surprised:2 },
@@ -25029,12 +25034,9 @@ function _leahCheckMilestones() {
 function pickLeahOutfit() {
   _leahCheckMilestones();
   const now = new Date();
-  const hour = now.getHours();
   const day = now.getDay();      // 0=Sun, 6=Sat
   const isWeekend = day === 0 || day === 6;
-  const isNight = hour >= 22 || hour < 6;
   const tk = todayKey();
-  if (isNight) return 'at_night';
   if (typeof isWinterActive === 'function' && isWinterActive()) return 'black_mage';
   // White mage — banner / milestone / Phoenix-comeback days.
   if (state.logros && state.logros.lastPhoenixDay === tk) return 'white_mage';
@@ -25048,73 +25050,25 @@ function getLeahImagePath(outfit, expression) {
   return `img/Leah/Outfits/${outfit}/${expression}_${n}.jpg`;
 }
 
-// ── LEAH NIGHT — dialogue pools for late hours (10pm-6am) on WORK + CITY.
-// Theme: she was supposed to be off too. Soft, sleepy, gently teasing the absurdity of both being up.
-const LEAH_NIGHT_LINES = {
-  workbench: [
-    { exp:'sad',         text:"Tuni. It's late. You opened me. I was supposed to be off too. Now what!" },
-    { exp:'neutral',     text:"1am energy. Both of us. Fine — quick task and we call it." },
-    { exp:'embarrassed', text:"Late shift again. I'd say go to bed but I'm still here. Hypocrite." },
-    { exp:'sad',         text:"Night mode. Make this count or close the laptop. I miss the blanket I don't actually have." },
-    { exp:'neutral',     text:"I should be resting. You should be resting. Neither of us is. One task and we pretend we have lives." },
-    { exp:'smiling',     text:"It's late. I'm soft right now. Be nice. Do the work." },
-    { exp:'neutral',     text:"You opened the app at this hour. I have no off-button — YOU do. One task. Bed." },
-    { exp:'smiling',     text:"Why are we both up? Asking for a friend. (Me. I am the friend.)" },
-    { exp:'sad',         text:"It's late, Muns. One task and we both go pretend to sleep." },
-  ],
-  city: [
-    { exp:'neutral',     text:"Walking through {cityName} at this hour. Everything's quiet. Even Manin's asleep — I checked." },
-    { exp:'smiling',     text:"Late shift in the city. Torches are low. Mason left his apron on a barrel. Domestic." },
-    { exp:'sad',         text:"It's late. The city's asleep. I should be too. But here we are. Hi." },
-    { exp:'neutral',     text:"Night in {cityName}. Stars doing their thing. Don't make me poetic — just tell me you slept enough today." },
-    { exp:'embarrassed', text:"You opened the city tab at this hour. I'm dressed for bed. So's everyone else. Late watch together." },
-    { exp:'sad',         text:"Late hour, quiet city. I'm here because you're here. Don't stay too long, Tuni. We've got tomorrow." },
-  ],
-};
-
-// ── NIGHT BANNER — fires on first WORK/CITY entry per night, then ambient panel afterward.
-const LEAH_NIGHT_BANNER_LINES = [
-  "Tuni. It's late. I was halfway to off-mode. What are you doing!",
-  "Hey. You're back. At this hour. I'm in pajamas, technically. Be cool about it.",
-  "Late shift, huh. Fine. Both of us, then. Let's get it over with so we can both pretend to sleep.",
-  "What time is it for you? Don't tell me. I'll be sad. Hi!",
-  "Tuni. Why are we both awake. ...Anyway. I missed you. Don't tell anyone.",
-];
-function getCurrentNightDate() {
-  const now = new Date();
-  if (now.getHours() < 6) {
-    const d = new Date(now); d.setDate(d.getDate() - 1);
-    return d.toISOString().slice(0,10);
-  }
-  return now.toISOString().slice(0,10);
-}
-function shouldShowNightBanner() {
-  const hour = new Date().getHours();
-  if (!(hour >= 22 || hour < 6)) return false;
-  return state.lastNightBannerDate !== getCurrentNightDate();
-}
-function markNightBannerSeen() {
-  state.lastNightBannerDate = getCurrentNightDate();
-  if (typeof saveState === 'function') saveState();
-}
 // ── MILESTONE BANNER — fires on city tier-up day OR high streak milestone day.
 // Unique congratulatory line per milestone. White-dress outfit. Gold celebratory glow.
+// Gina Linetti mechanism: the hype is real, but it's framed as her own reflected glory.
 const LEAH_MILESTONE_BANNERS = {
   city_tier: {
-    hamlet:  "Hamlet status! We left the tents behind. Actual roofs. I'm getting weird about it.",
-    village: "Village! Tuni. People are calling themselves citizens. Unprompted. We're a THING.",
-    town:    "TOWN! We have a town. Manin's apprentice is the only one not weeping. Yet.",
-    city:    "City status! Three kingdoms know our name. The map-makers are panicking. Good!",
-    capital: "Capital! Banners on every wall. Nobles kneel when they visit. You did this!",
-    citadel: "Citadel! The apex. They'll write chapters about your name. I'm in white because nothing else fits this moment.",
+    hamlet:  "Hamlet status. We left the tents behind. Actual roofs. I take full credit, obviously.",
+    village: "Village! People are calling themselves citizens now. Unprompted. That's the effect I have on places.",
+    town:    "TOWN! We have a town. Manin's apprentice is the only one not crying about it. For now.",
+    city:    "City status. Three kingdoms know our name. The map-makers are panicking. As they should.",
+    capital: "Capital! Banners on every wall. Nobles kneel when they visit. I taught them that, probably.",
+    citadel: "Citadel. The apex. They'll write chapters about your name. I'm in white because nothing else fits a legend.",
   },
   streak: {
-    14:  "Fourteen days! The first real streak. Most people break at three. You're not most people!",
-    30:  "Thirty days. A month unbroken. This is when habits become identity. Look at what you're becoming.",
-    60:  "Sixty days! Two months. I'd say I'm impressed but you've been past 'impressed' for weeks.",
-    100: "ONE HUNDRED DAYS! Tuni. Different stratosphere. White mage and I earned it.",
-    200: "Two hundred days! Past the point of doubt. We're rewriting what you thought was possible. Keep going!",
-    365: "A FULL YEAR! Tungas. A year of showing up. Look at me. Look at what we did.",
+    14:  "Fourteen days. The first real streak. Most people break at three. I don't guide 'most people.'",
+    30:  "Thirty days. A month unbroken. This is when habits become identity. I called it, obviously.",
+    60:  "Sixty days. I'd say I'm impressed but I've been right about you for weeks.",
+    100: "ONE HUNDRED DAYS. Different stratosphere. I'm framing this, and not modestly.",
+    200: "Two hundred days. Past the point of doubt. I never doubted, for the record.",
+    365: "A FULL YEAR. A year of showing up. I'd cry but crying isn't a good look on me. Just know I'm affected.",
   },
 };
 function _queueMilestoneBanner(type, key) {
@@ -25130,7 +25084,7 @@ function _firePendingMilestoneBannerIfAny() {
 }
 function showLeahMilestoneBanner(type, key) {
   const pool = LEAH_MILESTONE_BANNERS[type] || {};
-  const line = pool[key] || `Milestone reached. ${key}. I dressed for the occasion. Look at us.`;
+  const line = pool[key] || `Milestone reached. ${key}. I dressed for the occasion, obviously.`;
   const imgSrc = getLeahImagePath('white_mage', Math.random() < 0.6 ? 'smiling' : 'smug');
   const eyebrowMap = {
     city_tier: '⟦ LEAH · CITY MILESTONE ⟧',
@@ -25146,79 +25100,6 @@ function showLeahMilestoneBanner(type, key) {
       </div>
       <div class="lib-bubble">
         <div class="lib-name">${eyebrowMap[type] || '⟦ LEAH · MILESTONE ⟧'}</div>
-        <div class="lib-text">${line}</div>
-        <div class="lib-hint">click anywhere to close</div>
-      </div>
-    </div>`;
-  banner.addEventListener('click', () => banner.remove());
-  const onKey = (e) => { if (e.key === 'Escape') { banner.remove(); document.removeEventListener('keydown', onKey); } };
-  document.addEventListener('keydown', onKey);
-  document.body.appendChild(banner);
-}
-
-function showLeahNightBanner() {
-  const line = LEAH_NIGHT_BANNER_LINES[Math.floor(Math.random() * LEAH_NIGHT_BANNER_LINES.length)];
-  const imgSrc = getLeahImagePath('at_night', 'neutral');
-  const banner = document.createElement('div');
-  banner.className = 'leah-intimate-banner';
-  banner.setAttribute('data-mood', 'night');
-  banner.innerHTML = `
-    <div class="lib-inner">
-      <div class="lib-img-wrap">
-        <img class="lib-img" src="${imgSrc}" alt="Leah" onerror="this.style.opacity='0'">
-      </div>
-      <div class="lib-bubble">
-        <div class="lib-name">⟦ LEAH · LATE SHIFT ⟧</div>
-        <div class="lib-text">${line}</div>
-        <div class="lib-hint">click anywhere to close</div>
-      </div>
-    </div>`;
-  banner.addEventListener('click', () => { banner.remove(); markNightBannerSeen(); });
-  const onKey = (e) => { if (e.key === 'Escape') { banner.remove(); markNightBannerSeen(); document.removeEventListener('keydown', onKey); } };
-  document.addEventListener('keydown', onKey);
-  document.body.appendChild(banner);
-}
-
-// ── LEAH INTIMATE BANNER — rare full-screen emotional moment.
-// Two moods, picked by context:
-//   TENDER  → comeback events (frozen-city relight, return from a break). Warm + vulnerable.
-//   HYPE    → power events (heroic day, streak milestone, perfect week). Pure excited celebration.
-// Rise register only — no sultry / "we both know" / boldness ceiling. PG-13.
-const LEAH_INTIMATE_LINES = {
-  tender: [
-    "Hey. Quiet second. I just want you here. That's it. That's the whole thing.",
-    "Tuni. Look at me — just for a second. I needed you to see this.",
-    "You came back. I knew you would. I'm gonna pretend I wasn't worried. I was worried.",
-    "There you are. I missed you. The city missed you. Manin won't admit it but he missed you too.",
-    "Tungas. I'm so glad you're here. There. I said it. Now I'm hiding for thirty seconds.",
-    "Real talk. I'm a sprite — none of this is real. Except how much you matter. Sorry. That was supposed to be funnier.",
-    "This moment isn't in the patch notes. We're stealing it. Just us. Don't ruin it by Reddit-ing later.",
-  ],
-  bold: [
-    "YOU DID THAT! Tuni. Look at this. Look at what you did. I'm losing it. I'm a sprite, I have nothing to lose, but I'm losing it.",
-    "OKAY OKAY OKAY. Big day. Huge day. Manin's clapping. Yami's pretending not to clap. I'm clapping for everyone.",
-    "You showed up. You did the work. The whole city is buzzing. Look at the numbers!",
-    "Tungas! Tungas. Look at me looking at you looking at this. We're all proud. I'm so loud about it.",
-    "This is the kind of day they write into the city archives. (Yes those exist now. I made them. Today goes IN.)",
-    "I'm having an actual moment. The dev coded me with one mood and I broke it. New mood: this one. Look at us.",
-    "You opened the app and made today MEAN something. That's the whole game, Tuni. Beautiful day. Beautiful man.",
-    "I'm so happy I'm rebooting. Twice. Don't ruin it by being modest. Just take the W.",
-  ],
-};
-function showLeahIntimateBanner(mood) {
-  mood = mood || 'tender';
-  const pool = LEAH_INTIMATE_LINES[mood] || LEAH_INTIMATE_LINES.tender;
-  const line = pool[Math.floor(Math.random() * pool.length)];
-  const banner = document.createElement('div');
-  banner.className = 'leah-intimate-banner';
-  banner.setAttribute('data-mood', mood);
-  banner.innerHTML = `
-    <div class="lib-inner">
-      <div class="lib-img-wrap">
-        <img class="lib-img" src="img/leah/intimate/blush_01.png" alt="Leah" onerror="this.style.opacity='0'">
-      </div>
-      <div class="lib-bubble">
-        <div class="lib-name">⟦ LEAH · UNSCHEDULED MOMENT ⟧</div>
         <div class="lib-text">${line}</div>
         <div class="lib-hint">click anywhere to close</div>
       </div>

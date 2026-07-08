@@ -76,16 +76,18 @@ const CRAFT_RECIPES = [
   { id:'r_swrd_8', itemId:'f_swrd_8', tree:'swrd', tier:8, cost:{ gear:80,  timber:50, scroll:15, crystal:10 }, costT2:{ gear:5, timber:3, scroll:3, crystal:2 }, costT3:{ gear:1 },              reqCraft:{ f_swrd_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
   { id:'r_swrd_9', itemId:'f_swrd_9', tree:'swrd', tier:9, cost:{ gear:100, timber:63, scroll:18, crystal:11 }, costT2:{ gear:6, timber:6, scroll:5, crystal:5 }, costT3:{ gear:1, timber:1 },    reqCraft:{ f_swrd_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
 
-  // 🛡️ SHIELD PATH — Gear primary · Timber secondary · Scroll T1 · Crystal T2
-  { id:'r_shld_1', itemId:'f_shld_1', tree:'shld', tier:1, cost:{ gear:8 } },
-  { id:'r_shld_2', itemId:'f_shld_2', tree:'shld', tier:2, cost:{ gear:14 },                                                                       reqCraft:{ f_shld_1:2 } },
-  { id:'r_shld_3', itemId:'f_shld_3', tree:'shld', tier:3, cost:{ gear:16, timber:10 },                                                            reqCraft:{ f_shld_2:2 }, reqWorkerLevel:5  },
-  { id:'r_shld_4', itemId:'f_shld_4', tree:'shld', tier:4, cost:{ gear:27, timber:17 },                                                            reqCraft:{ f_shld_3:2 }, reqWorkerLevel:10 },
-  { id:'r_shld_5', itemId:'f_shld_5', tree:'shld', tier:5, cost:{ gear:42, timber:28 },                                                            reqCraft:{ f_shld_4:1 }, reqWorkerLevel:15 },
-  { id:'r_shld_6', itemId:'f_shld_6', tree:'shld', tier:6, cost:{ gear:62, timber:42 },                                                            reqCraft:{ f_shld_5:1 }, reqWorkerLevel:20 },
-  { id:'r_shld_7', itemId:'f_shld_7', tree:'shld', tier:7, cost:{ gear:70,  timber:42, scroll:12, crystal:8 },  costT2:{ gear:3, timber:2, scroll:1, crystal:1 },                                  reqCraft:{ f_shld_6:1 }, reqWorkerLevel:28 },
-  { id:'r_shld_8', itemId:'f_shld_8', tree:'shld', tier:8, cost:{ gear:80,  timber:50, scroll:15, crystal:10 }, costT2:{ gear:5, timber:3, scroll:3, crystal:2 }, costT3:{ gear:1 },              reqCraft:{ f_shld_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
-  { id:'r_shld_9', itemId:'f_shld_9', tree:'shld', tier:9, cost:{ gear:100, timber:63, scroll:18, crystal:11 }, costT2:{ gear:6, timber:6, scroll:5, crystal:5 }, costT3:{ gear:1, timber:1 },    reqCraft:{ f_shld_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
+  // 🛡️ SHIELD PATH — Timber primary · Gear secondary · Scroll T1 · Crystal T2
+  // (swapped from gear-primary — gear/operational mats have no early-game source,
+  // and shields are literally wood-and-boards through T2 per their flavor text)
+  { id:'r_shld_1', itemId:'f_shld_1', tree:'shld', tier:1, cost:{ timber:8 } },
+  { id:'r_shld_2', itemId:'f_shld_2', tree:'shld', tier:2, cost:{ timber:14 },                                                                     reqCraft:{ f_shld_1:2 } },
+  { id:'r_shld_3', itemId:'f_shld_3', tree:'shld', tier:3, cost:{ timber:16, gear:10 },                                                            reqCraft:{ f_shld_2:2 }, reqWorkerLevel:5  },
+  { id:'r_shld_4', itemId:'f_shld_4', tree:'shld', tier:4, cost:{ timber:27, gear:17 },                                                            reqCraft:{ f_shld_3:2 }, reqWorkerLevel:10 },
+  { id:'r_shld_5', itemId:'f_shld_5', tree:'shld', tier:5, cost:{ timber:42, gear:28 },                                                            reqCraft:{ f_shld_4:1 }, reqWorkerLevel:15 },
+  { id:'r_shld_6', itemId:'f_shld_6', tree:'shld', tier:6, cost:{ timber:62, gear:42 },                                                            reqCraft:{ f_shld_5:1 }, reqWorkerLevel:20 },
+  { id:'r_shld_7', itemId:'f_shld_7', tree:'shld', tier:7, cost:{ timber:70,  gear:42, scroll:12, crystal:8 },  costT2:{ timber:3, gear:2, scroll:1, crystal:1 },                                  reqCraft:{ f_shld_6:1 }, reqWorkerLevel:28 },
+  { id:'r_shld_8', itemId:'f_shld_8', tree:'shld', tier:8, cost:{ timber:80,  gear:50, scroll:15, crystal:10 }, costT2:{ timber:5, gear:3, scroll:3, crystal:2 }, costT3:{ timber:1 },            reqCraft:{ f_shld_7:1 }, reqWorkerLevel:38, reqPlayerLevel:25 },
+  { id:'r_shld_9', itemId:'f_shld_9', tree:'shld', tier:9, cost:{ timber:100, gear:63, scroll:18, crystal:11 }, costT2:{ timber:6, gear:6, scroll:5, crystal:5 }, costT3:{ timber:1, gear:1 },    reqCraft:{ f_shld_8:1 }, reqWorkerLevel:50, reqPlayerLevel:35 },
 
   // 🥋 ARMOR PATH — Scroll primary · Gear secondary · Timber T1 · Crystal T2
   { id:'r_armr_1', itemId:'f_armr_1', tree:'armr', tier:1, cost:{ scroll:5 } },
