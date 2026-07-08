@@ -28117,9 +28117,54 @@ function resolveBreakEventChoice(choiceIdx) {
   const event = d.breakEvents[0];
   const cfg = DUNGEON_CONFIG[d.difficulty];
   const rankIdx = _RANK_IDX[cfg?.rank]??0;
-  applyDungeonEventOutcome(choiceIdx, event, d, cfg, rankIdx);
-  const hint = event.choices?.[choiceIdx]?.label;
-  if (hint) showNotif(`⟦ ${_EVT_CAT_LABEL[event.category]||'EVENT'} ⟧ ${hint}`);
+  const choice = event.choices[choiceIdx];
+  if (!choice) return;
+  // Guard: if choice requires more gold than player has, reject silently (mirrors resolveEndEventChoice)
+  const _goldCost = _rval((choice.outcome||{}).gold||0, rankIdx);
+  if (_goldCost < 0 && Math.abs(_goldCost) > (state.gold||0)) { renderAll(); return; }
+  let outcome = choice.outcome||{};
+
+  // Special: riddle door — one pre-rolled correct answer
+  if (event.riddleDoor) {
+    const correct = choiceIdx===event.correctChoiceIdx;
+    if (correct) {
+      showNotif('⟦ CORRECT ⟧ The glyph sequence holds. The door swings open.');
+    } else {
+      outcome = {hp:[-15,-18,-22,-28,-35,-45]};
+      showNotif('⟦ WRONG ⟧ The trap fires. You recover, shaken.');
+    }
+  }
+
+  // Special: worthy gate — stat threshold check
+  if (event.worthyGate||choice.worthyGate) {
+    const thresholds = [20,30,40,50,60,80];
+    const threshold = thresholds[rankIdx];
+    const statMap = {warrior:'STR',rogue:'DEX',mage:'INT',monk:'VOL'};
+    const statKey = statMap[cfg?.dungeonClass]||'STR';
+    const statVal = (state.stats&&state.stats[statKey])||0;
+    if (statVal>=threshold) {
+      outcome = {gold:[50,60,75,95,120,150], mats:2, matType:'archetype'};
+      showNotif(`⟦ WORTHY ⟧ ${statKey} ${statVal} — the gate recognizes you.`);
+    } else {
+      outcome = {hp:[-10,-12,-15,-18,-22,-28]};
+      showNotif(`⟦ NOT YET ⟧ ${statKey} ${statVal} / ${threshold} required — the gate rejects you.`);
+    }
+  }
+
+  // Roll-based choices
+  if (choice.roll) {
+    const ok = Math.random()<choice.roll.chance;
+    if (ok && choice.successOutcome) {
+      outcome = choice.successOutcome;
+    } else if (!ok && choice.failOutcome) {
+      outcome = choice.failOutcome;
+      showNotif('⟦ FAILED ⟧ Fortune was not with you.');
+    }
+  }
+
+  applyDungeonEventOutcome(outcome, rankIdx, cfg);
+  const hint = _buildEventOutcomeNotif(outcome, rankIdx, cfg);
+  if (hint) showNotif(`⟦ ${_EVT_CAT_LABEL[event.category]||'EVENT'} ⟧ ${choice.label} — ${hint}`);
   if (!d.eventHistory) d.eventHistory=[];
   d.eventHistory.push({eventId:event.id, stage:d.pomodoroCount, slot:'break', choiceIdx, ts:Date.now()});
   d.breakEvents.shift();
@@ -28277,6 +28322,29 @@ function setForgeTask(taskId) {
 // pomodoro clock and replays it through the normal tickDungeon() catch-up loop,
 // so stage drops, forge-task bonuses, and mid-boss/boss triggers all fire exactly
 // as they would have if the timer had been running the whole time.
+// Pick a choice for a break event the player wasn't here to choose themselves: prefer a
+// guaranteed, non-gated, non-negative-cost option (a "safe" pick) over a gamble.
+function _pickAutoEventChoiceIdx(event) {
+  const choices = event.choices || [];
+  const rankIdx = _RANK_IDX[DUNGEON_CONFIG[state.dungeon?.difficulty]?.rank] ?? 0;
+  const safeIdx = choices.findIndex(c => {
+    if (c.roll || c.worthyGate || event.riddleDoor) return false;
+    const gold = _rval((c.outcome||{}).gold||0, rankIdx);
+    return gold >= 0;
+  });
+  return safeIdx >= 0 ? safeIdx : 0;
+}
+function _autoResolveBreakEvents() {
+  const d = state.dungeon; if (!d) return;
+  while (d.breakEvents && d.breakEvents.length) {
+    resolveBreakEventChoice(_pickAutoEventChoiceIdx(d.breakEvents[0]));
+  }
+}
+// Honor-system credit for focused work done off-app, one full session (work + break) at a
+// time so mid-session dungeon events actually resolve — picking a safe default choice for
+// each — instead of being silently discarded like a single big time-jump would do. Stops
+// cleanly (with a clear notice) if a session completion opens a mid-boss fight, since that
+// still needs to be played out like it would live.
 function finishOutsideSessions(n) {
   n = Math.max(1, Math.min(20, Math.round(Number(n)) || 1));
   if (!state.dungeon) {
@@ -28286,9 +28354,32 @@ function finishOutsideSessions(n) {
   }
   if (!state.dungeon || state.dungeon.phase !== 'exploring') { showNotif('⚠ No active expedition to log into'); return; }
   if (state.dungeon.pausedAt) resumeDungeon();
-  showNotif(`⚒ Trusting you — logging ${n} outside session${n!==1?'s':''}`);
-  state.dungeon.pomodoroPhaseStart -= n * (getPomoWorkMs() + POMODORO_BREAK_MS);
-  tickDungeon();
+  const startCount = state.dungeon.pomodoroCount || 0;
+  let stopped = false, allStagesCleared = false;
+  for (let i = 0; i < n; i++) {
+    const d = state.dungeon;
+    if (!d || d.phase !== 'exploring' || d.pomodoroPhase !== 'work') { stopped = true; break; }
+    const cfg = DUNGEON_CONFIG[d.difficulty];
+    if (cfg && (d.pomodoroCount||0) >= cfg.stages) { stopped = true; allStagesCleared = true; break; }
+    d.pomodoroPhaseStart -= getPomoWorkMs() + 1000;
+    tickDungeon(); // completes exactly this one work stage — may trigger a mid-boss
+    if (!state.dungeon || state.dungeon.phase !== 'exploring') { stopped = true; break; }
+    _autoResolveBreakEvents();
+    if (state.dungeon.pomodoroPhase === 'break') {
+      state.dungeon.pomodoroPhaseStart -= POMODORO_BREAK_MS + 1000;
+      tickDungeon(); // completes the break so the next loop pass starts clean in 'work'
+    }
+    if (!state.dungeon || state.dungeon.phase !== 'exploring') { stopped = true; break; }
+  }
+  const completed = (state.dungeon ? (state.dungeon.pomodoroCount||0) : startCount) - startCount;
+  if (allStagesCleared) {
+    showNotif(`⚒ Logged ${completed}/${n} — all stages cleared. Fight the boss to close out the run.`);
+  } else if (stopped) {
+    showNotif(`⚒ Logged ${completed}/${n} — a mid-boss appeared. Fight it to keep going.`);
+  } else {
+    showNotif(`⚒ Trusting you — logged ${completed} outside session${completed!==1?'s':''}`);
+  }
+  checkAchievements();
   saveState(); renderAll();
 }
 function showLogSessionModal() {
