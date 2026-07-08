@@ -28340,11 +28340,20 @@ function _autoResolveBreakEvents() {
     resolveBreakEventChoice(_pickAutoEventChoiceIdx(d.breakEvents[0]));
   }
 }
+// Same CP-vs-rank check the dungeon-select screen shows as READY/PERILOUS/DEADLY — READY
+// (ratio >= 1) means you're strong enough that the fight isn't really in question.
+function _isRushCpReady(d) {
+  const cfg = DUNGEON_CONFIG[d.difficulty]; if (!cfg) return false;
+  const cpGear = calcPowerLevel(calcPlayerCombatStats(true)).cp;
+  const cpNow = Math.round(cpGear * Math.pow(getHabitCompoundMultiplier(), CP_SNOWBALL));
+  return cpReadiness(cpNow, cfg.rank).ratio >= 1;
+}
 // Honor-system credit for focused work done off-app, one full session (work + break) at a
 // time so mid-session dungeon events actually resolve — picking a safe default choice for
-// each — instead of being silently discarded like a single big time-jump would do. Stops
-// cleanly (with a clear notice) if a session completion opens a mid-boss fight, since that
-// still needs to be played out like it would live.
+// each — instead of being silently discarded like a single big time-jump would do. If a
+// mid-boss checkpoint comes up, an over-CP player (READY on the dungeon-select gauge) auto-
+// clears it instantly — no ticket cost, the only requirement is the CP you actually earned.
+// Under-CP players still stop there and have to fight it live, same as normal exploring.
 function finishOutsideSessions(n) {
   n = Math.max(1, Math.min(20, Math.round(Number(n)) || 1));
   if (!state.dungeon) {
@@ -28355,7 +28364,7 @@ function finishOutsideSessions(n) {
   if (!state.dungeon || state.dungeon.phase !== 'exploring') { showNotif('⚠ No active expedition to log into'); return; }
   if (state.dungeon.pausedAt) resumeDungeon();
   const startCount = state.dungeon.pomodoroCount || 0;
-  let stopped = false, allStagesCleared = false;
+  let stopped = false, allStagesCleared = false, midBossesRushed = 0;
   for (let i = 0; i < n; i++) {
     const d = state.dungeon;
     if (!d || d.phase !== 'exploring' || d.pomodoroPhase !== 'work') { stopped = true; break; }
@@ -28363,6 +28372,10 @@ function finishOutsideSessions(n) {
     if (cfg && (d.pomodoroCount||0) >= cfg.stages) { stopped = true; allStagesCleared = true; break; }
     d.pomodoroPhaseStart -= getPomoWorkMs() + 1000;
     tickDungeon(); // completes exactly this one work stage — may trigger a mid-boss
+    if (state.dungeon && state.dungeon.phase === 'mid_boss' && state.dungeon.combat?.isMidBoss && _isRushCpReady(state.dungeon)) {
+      claimMidBossRewards();
+      midBossesRushed++;
+    }
     if (!state.dungeon || state.dungeon.phase !== 'exploring') { stopped = true; break; }
     _autoResolveBreakEvents();
     if (state.dungeon.pomodoroPhase === 'break') {
@@ -28372,12 +28385,13 @@ function finishOutsideSessions(n) {
     if (!state.dungeon || state.dungeon.phase !== 'exploring') { stopped = true; break; }
   }
   const completed = (state.dungeon ? (state.dungeon.pomodoroCount||0) : startCount) - startCount;
+  const rushTag = midBossesRushed > 0 ? ` · ⚡ ${midBossesRushed} mid-boss${midBossesRushed!==1?'es':''} RUSHED` : '';
   if (allStagesCleared) {
-    showNotif(`⚒ Logged ${completed}/${n} — all stages cleared. Fight the boss to close out the run.`);
+    showNotif(`⚡ Logged ${completed}/${n} — all stages cleared. Fight the boss to close out the run.${rushTag}`);
   } else if (stopped) {
-    showNotif(`⚒ Logged ${completed}/${n} — a mid-boss appeared. Fight it to keep going.`);
+    showNotif(`⚡ Logged ${completed}/${n} — a mid-boss appeared. Fight it to keep going.${rushTag}`);
   } else {
-    showNotif(`⚒ Trusting you — logged ${completed} outside session${completed!==1?'s':''}`);
+    showNotif(`⚡ Trusting you — logged ${completed} outside session${completed!==1?'s':''}${rushTag}`);
   }
   checkAchievements();
   saveState(); renderAll();
@@ -28388,8 +28402,8 @@ function showLogSessionModal() {
   if (!cfg) { showNotif('⚠ Select a dungeon first'); return; }
   const ov = document.createElement('div'); ov.className = 'confirm-overlay';
   ov.innerHTML = `<div class="confirm-box" style="border-top-color:var(--sao-shard)">
-    <div class="confirm-badge" style="color:var(--sao-shard)">⚒ FINISH SESSION</div>
-    <div class="confirm-msg">Already put in focused work off-app? Log it here — no timer needed, no catch-up guilt.<br><br>${cfg.emoji} ${cfg.name}</div>
+    <div class="confirm-badge" style="color:var(--sao-shard)">⚡ RUSH</div>
+    <div class="confirm-msg">Already put in focused work off-app? Rush it here — no timer, no catch-up guilt, no ticket cost. Just the work you actually did.<br>Over-CP mid-bosses clear instantly.<br><br>${cfg.emoji} ${cfg.name}</div>
     <div class="stat-sel-amt">
       <button class="stat-sel-btn" id="lsMinus">-</button>
       <input id="lsCount" class="stat-sel-num" type="number" min="1" max="20" value="1" style="width:36px">
@@ -29836,7 +29850,7 @@ function renderDungeonSelect() {
     const finishBtn=document.createElement('button');
     finishBtn.className='dungeon-enter-btn';
     finishBtn.style.cssText='--denter-color:#b388ff;--denter-glow:rgba(179,136,255,0.5);margin-top:8px;opacity:0.9';
-    finishBtn.textContent='⚒  FINISH SESSION — LOG WORK DONE OFF-APP';
+    finishBtn.textContent='⚡  RUSH — LOG WORK DONE OFF-APP';
     finishBtn.addEventListener('click',showLogSessionModal);
     w.appendChild(finishBtn);
   }
@@ -29973,7 +29987,7 @@ function renderDungeonExplore() {
       ${isComplete
         ?`<button class="dexp-btn dexp-btn-boss" onclick="challengeBoss()">💀  FIGHT BOSS</button>
           <button class="dexp-btn dexp-btn-exit" onclick="confirmRetreatDungeon()">←  RETREAT</button>`
-        :`<button class="dexp-btn dexp-btn-finish" onclick="showLogSessionModal()">⚒  FINISH SESSION</button>`}
+        :`<button class="dexp-btn dexp-btn-finish" onclick="showLogSessionModal()">⚡  RUSH</button>`}
       <button class="dexp-btn dexp-btn-abandon" onclick="confirmAbandonDungeon()">✗  ABANDON</button>
     </div>
     ${isComplete?`<div class="dexp-complete-badge">⟦ ALL STAGES CLEARED — THE BOSS AWAITS ⟧</div>`:''}`;
