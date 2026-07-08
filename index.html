@@ -28322,17 +28322,24 @@ function setForgeTask(taskId) {
 // pomodoro clock and replays it through the normal tickDungeon() catch-up loop,
 // so stage drops, forge-task bonuses, and mid-boss/boss triggers all fire exactly
 // as they would have if the timer had been running the whole time.
-// Pick a choice for a break event the player wasn't here to choose themselves: prefer a
-// guaranteed, non-gated, non-negative-cost option (a "safe" pick) over a gamble.
+// Pick a choice for a break event the player wasn't here to choose themselves: never gamble
+// (skip roll/worthyGate/riddleDoor picks — outcome can't be predicted), then rank the rest by
+// least downside, weighing HP loss heaviest since gold/mats are easily earned back. Falls back
+// to index 0 if every choice is gated, matching the existing "ignored the toast" auto-timeout.
 function _pickAutoEventChoiceIdx(event) {
   const choices = event.choices || [];
   const rankIdx = _RANK_IDX[DUNGEON_CONFIG[state.dungeon?.difficulty]?.rank] ?? 0;
-  const safeIdx = choices.findIndex(c => {
-    if (c.roll || c.worthyGate || event.riddleDoor) return false;
-    const gold = _rval((c.outcome||{}).gold||0, rankIdx);
-    return gold >= 0;
+  let bestIdx = -1, bestScore = -Infinity;
+  choices.forEach((c, i) => {
+    if (c.roll || c.worthyGate || event.riddleDoor) return;
+    const o = c.outcome || {};
+    const gold = _rval(o.gold||0, rankIdx);
+    const hp = _rval(o.hp||0, rankIdx);
+    const mats = _rval(o.mats||0, rankIdx);
+    const score = Math.min(0, hp) * 3 + Math.min(0, gold) + Math.min(0, mats) * 0.5 + (o.xpBonus||0) * 0.1;
+    if (score > bestScore) { bestScore = score; bestIdx = i; }
   });
-  return safeIdx >= 0 ? safeIdx : 0;
+  return bestIdx >= 0 ? bestIdx : 0;
 }
 function _autoResolveBreakEvents() {
   const d = state.dungeon; if (!d) return;
@@ -28385,6 +28392,11 @@ function finishOutsideSessions(n) {
     if (!state.dungeon || state.dungeon.phase !== 'exploring') { stopped = true; break; }
   }
   const completed = (state.dungeon ? (state.dungeon.pomodoroCount||0) : startCount) - startCount;
+  // Back-date the run's startTime so elapsed-time stats (session summary, dungeon log
+  // "focus time") reflect the sessions you actually logged, not the seconds this took to click.
+  if (completed > 0 && state.dungeon) {
+    state.dungeon.startTime -= completed * (getPomoWorkMs() + POMODORO_BREAK_MS);
+  }
   const rushTag = midBossesRushed > 0 ? ` · ⚡ ${midBossesRushed} mid-boss${midBossesRushed!==1?'es':''} RUSHED` : '';
   if (allStagesCleared) {
     showNotif(`⚡ Logged ${completed}/${n} — all stages cleared. Fight the boss to close out the run.${rushTag}`);
