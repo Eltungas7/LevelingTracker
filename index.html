@@ -5192,6 +5192,7 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .cs-next strong { color:#ffd54f; }
 .city-frozen .cs-next { color:rgba(128,222,234,0.7); }
 .city-frozen .cs-next strong { color:#80deea; }
+.cs-rename-hint { position:absolute; top:8px; right:12px; z-index:1; font-family:'Rajdhani',sans-serif; font-size:9px; letter-spacing:0.5px; color:rgba(255,213,79,0.4); }
 
 /* ── ❄ Winter banner — frozen city ─────────────────────── */
 .winter-banner { display:flex; align-items:center; gap:10px; padding:10px 14px; margin-bottom:10px; border-radius:10px; background:linear-gradient(135deg,rgba(13,38,68,0.95),rgba(8,22,42,0.95)); border:1px solid rgba(128,222,234,0.55); box-shadow:0 0 18px rgba(77,208,225,0.25), inset 0 0 22px rgba(77,208,225,0.06); position:relative; overflow:hidden; }
@@ -13892,10 +13893,8 @@ function renderInventory() {
     const _matChips = Object.entries(_chCost).map(([k,v]) => {
       const have  = _chMats[k] || 0;
       const short = Math.max(0, v - have);
-      const tail  = short > 0
-        ? ` <span style="opacity:0.7">(need ${short})</span>`
-        : ' ✓';
-      return `<span class="igc-mat${short > 0 ? ' igc-mat-short' : ''}">${matIconHtml(k, 14, 1)} ${v}${tail}</span>`;
+      const tail  = short > 0 ? '' : ' ✓';
+      return `<span class="igc-mat${short > 0 ? ' igc-mat-short' : ''}">${matIconHtml(k, 14, 1)} ${have}/${v}${tail}</span>`;
     }).join('');
     const chase = document.createElement('div');
     chase.className = 'inv-gear-chase';
@@ -18270,7 +18269,7 @@ function renderForge() {
           const have = bucket[k] || 0;
           const miss = have < v;
           const meta = getMatTierMeta(k, tier);
-          return `<span class="forge-cost-mat${tierClass}${miss?' missing':''}">${matIconHtml(k, 14, tier)}${v}<span style="font-size:8px;opacity:0.6">(${have})</span></span>`;
+          return `<span class="forge-cost-mat${tierClass}${miss?' missing':''}">${matIconHtml(k, 14, tier)}${have}/${v}</span>`;
         }).join('');
       };
       const costHtml =
@@ -22879,9 +22878,9 @@ function renderLog() {
   const bar = document.createElement('div');
   bar.className = 'log-subtab-bar';
   bar.innerHTML = `
-    <button class="log-subtab ${logSubTab==='achievements'?'active':''}" onclick="logSubTab='achievements';renderLog()">🏆 Achievements</button>
-    <button class="log-subtab ${logSubTab==='history'?'active':''}" onclick="logSubTab='history';renderLog()">📊 History</button>
-    <button class="log-subtab ${logSubTab==='dungeons'?'active':''}" onclick="logSubTab='dungeons';renderLog()">⚔ Dungeons</button>
+    <button class="log-subtab ${logSubTab==='achievements'?'active':''}" onclick="logSubTab='achievements';renderLog()">🏆 ACHIEVEMENTS</button>
+    <button class="log-subtab ${logSubTab==='history'?'active':''}" onclick="logSubTab='history';renderLog()">📊 HISTORY</button>
+    <button class="log-subtab ${logSubTab==='dungeons'?'active':''}" onclick="logSubTab='dungeons';renderLog()">⚔ DUNGEONS</button>
   `;
   panelContent.insertBefore(bar, panelContent.firstChild);
   panelTitle.textContent = 'LOG';
@@ -23944,10 +23943,10 @@ function renderCityStatus() {
   el.innerHTML = `
     <div class="cs-skyline">${cur.skyline}</div>
     <div class="cs-body">
-      <div class="cs-title">⟦ ${name.toUpperCase()} · ${cur.name.toUpperCase()} ${cur.emoji} ⟧</div>
       <div class="cs-mood">${mood}</div>
       <div class="cs-next">${nextStr}</div>
-    </div>`;
+    </div>
+    <span class="cs-rename-hint">✎ rename</span>`;
   el.title = 'Click to rename your city';
   el.style.cursor = 'pointer';
   el.addEventListener('click', () => {
@@ -28645,12 +28644,6 @@ function renderDungeonSelect() {
     rb.innerHTML=`<span class="rw-icon">⚠</span><div class="rw-text"><div class="rw-title">RELIQUARY CURSE ACTIVE</div><div class="rw-sub">You broke the seal last run. Enemy resistance is up — stage drops reduced by 15% this run.</div></div>`;
     w.appendChild(rb);
   }
-
-  // ── ARENA placeholder (weekly boss removed — arena system coming) ──
-  const _arenaBanner = document.createElement('div');
-  _arenaBanner.style.cssText=`background:linear-gradient(135deg,rgba(179,136,255,0.06),rgba(10,8,20,0.9));border:1px solid rgba(179,136,255,0.25);border-radius:10px;overflow:hidden;margin-bottom:10px;display:flex;align-items:center;gap:12px;padding:12px 16px;opacity:0.7`;
-  _arenaBanner.innerHTML=`<span style="font-size:22px">⚔️</span><div style="flex:1"><div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:#b388ff">ARENA</div><div style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:2px">Challenge fights · coming soon</div></div><span style="font-family:'Cinzel',serif;font-size:8px;color:rgba(179,136,255,0.5);letter-spacing:1px">IN DEVELOPMENT</span>`;
-  w.appendChild(_arenaBanner);
 
   // Rank tabs
   const tabs=document.createElement('div'); tabs.className='dungeon-rank-tabs';
