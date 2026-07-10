@@ -5058,6 +5058,9 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .cas-bonus { font-family:'Rajdhani',sans-serif; font-weight:600; color:var(--cas); margin-left:auto; text-align:right; }
 /* ── Guild Treasury ── */
 .guild-treasury { margin:6px 0; padding:10px 12px; border-radius:10px; background:rgba(255,215,0,0.05); border:1px solid rgba(255,215,0,0.25); }
+/* ── Quartermaster's Depot — same layout as Treasury (.gt-top/.gt-lvl/.gt-collect), materials-cyan accent ── */
+.guild-depot { margin:6px 0; padding:10px 12px; border-radius:10px; background:rgba(128,222,234,0.05); border:1px solid rgba(128,222,234,0.25); }
+.gd-label { font-family:'Cinzel',serif; font-size:10px; letter-spacing:1px; color:#80deea; }
 .gt-top { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; }
 .gt-label { font-family:'Cinzel',serif; font-size:10px; letter-spacing:1px; color:#ffd700; }
 .gt-lvl { font-family:'Rajdhani',sans-serif; font-size:11px; color:var(--sao-text-dim); margin-top:2px; }
@@ -5205,13 +5208,9 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .winter-warning .wb-sub strong { color:#b388ff; }
 .wb-flame { font-size:20px; filter:drop-shadow(0 0 8px rgba(255,138,0,0.7)); animation:wbFlick 1.4s ease-in-out infinite; }
 @keyframes wbFlick { 0%,100%{ transform:scale(1); filter:drop-shadow(0 0 8px rgba(255,138,0,0.7));} 50%{ transform:scale(1.12); filter:drop-shadow(0 0 14px rgba(255,193,7,0.9));} }
-/* ── LEAH — the guide ── */
-.leah-panel { display:flex; gap:11px; align-items:stretch; padding:9px 11px; margin-bottom:10px; border-radius:10px; background:linear-gradient(135deg,rgba(28,18,48,0.92),rgba(14,10,28,0.95)); border:1px solid rgba(179,136,255,0.4); box-shadow:0 0 14px rgba(179,136,255,0.12), inset 0 0 22px rgba(179,136,255,0.04); position:relative; overflow:hidden; }
-.leah-portrait-wrap { flex-shrink:0; width:72px; height:72px; border-radius:6px; overflow:hidden; border:1px solid rgba(179,136,255,0.55); background:rgba(0,0,0,0.35); box-shadow:0 0 10px rgba(179,136,255,0.25); }
-.leah-portrait { width:100%; height:100%; object-fit:cover; object-position:center top; display:block; transition:opacity 0.35s ease; }
-.leah-bubble { flex:1; display:flex; flex-direction:column; justify-content:center; padding:3px 6px 3px 10px; border-left:2px solid rgba(179,136,255,0.5); }
-.leah-name { font-family:'Cinzel',serif; font-size:9px; letter-spacing:1.6px; color:var(--sao-shard-bright,#d1b3ff); margin-bottom:5px; opacity:0.9; }
-.leah-text { font-family:'Rajdhani',sans-serif; font-size:13px; color:#e8e0ff; line-height:1.38; }
+/* ── WORK — single work/productivity daily line, minimal strip (no box, no portrait). ── */
+.work-strip { padding:4px 2px 10px; margin-bottom:6px; border-bottom:1px solid rgba(179,136,255,0.18); text-align:center; }
+.work-strip-text { font-family:'Rajdhani',sans-serif; font-size:11.5px; font-style:italic; color:#bfaee0; letter-spacing:0.2px; }
 /* ── LEAH MILESTONE BANNER — full-screen modal, reused shell for city-tier/streak milestones ── */
 .leah-intimate-banner { position:fixed; inset:0; background:radial-gradient(ellipse at center, rgba(28,18,48,0.85), rgba(8,4,16,0.96)); display:flex; align-items:center; justify-content:center; z-index:9999; cursor:pointer; animation:libFadeIn 0.55s ease-out forwards; }
 @keyframes libFadeIn { from { opacity:0; } to { opacity:1; } }
@@ -5237,39 +5236,12 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .lib-name { font-family:'Cinzel',serif; font-size:10px; letter-spacing:2.5px; color:var(--sao-shard-bright,#d1b3ff); margin-bottom:8px; }
 .lib-text { font-family:'Rajdhani',sans-serif; font-size:16px; color:#f0e8ff; line-height:1.42; font-style:italic; }
 .lib-hint { margin-top:12px; font-family:'Rajdhani',sans-serif; font-size:10px; color:rgba(255,255,255,0.4); letter-spacing:1.5px; }
-/* ── YAMI — habits-tab sensei. Dark red baseline. ── */
-.yami-panel { display:flex; gap:11px; align-items:stretch; padding:9px 11px; margin-bottom:10px; border-radius:8px; background:linear-gradient(135deg,rgba(40,12,16,0.92),rgba(18,8,10,0.95)); border:1px solid rgba(255,82,82,0.42); border-left:3px solid rgba(255,82,82,0.7); box-shadow:0 0 12px rgba(255,82,82,0.08); }
-.yami-portrait-wrap { flex-shrink:0; width:72px; height:72px; border-radius:6px; overflow:hidden; border:1px solid rgba(255,82,82,0.55); background:rgba(0,0,0,0.35); box-shadow:0 0 10px rgba(255,82,82,0.22); }
-.yami-portrait { width:100%; height:100%; object-fit:cover; object-position:center top; display:block; transition:opacity 0.35s ease; }
-.yami-bubble { flex:1; display:flex; flex-direction:column; justify-content:center; padding:3px 6px 3px 10px; border-left:2px solid rgba(255,82,82,0.5); min-width:0; }
-.yami-name { font-family:'Cinzel',serif; font-size:9px; letter-spacing:1.8px; color:#ff7a59; margin-bottom:5px; opacity:0.88; }
-.yami-text { font-family:'Rajdhani',sans-serif; font-size:13px; color:#f0d8d0; line-height:1.4; }
-/* Absent variant — Yami's not here, text is third-person narration. Greyed + italic. */
-.yami-panel[data-absent="true"] { background:linear-gradient(135deg,rgba(28,22,22,0.85),rgba(14,11,11,0.92)); border-color:rgba(140,120,120,0.32); border-left:3px dashed rgba(140,120,120,0.55); box-shadow:none; }
-.yami-panel[data-absent="true"] .yami-portrait-wrap { border-color:rgba(140,120,120,0.4); box-shadow:none; }
-.yami-panel[data-absent="true"] .yami-portrait { opacity:0.38; filter:grayscale(0.85); }
-.yami-panel[data-absent="true"] .yami-bubble { border-left-color:rgba(140,120,120,0.4); }
-.yami-panel[data-absent="true"] .yami-name { color:#998888; }
-.yami-panel[data-absent="true"] .yami-text { color:#aaa099; font-style:italic; font-size:12.5px; }
-/* ── MANIN — forge + workshop blacksmith. Warm copper/brass to contrast Leah's purple and Yami's red. ── */
-.manin-panel { display:flex; gap:11px; align-items:stretch; padding:9px 11px; margin-bottom:10px; border-radius:8px; background:linear-gradient(135deg,rgba(56,32,12,0.92),rgba(28,18,8,0.95)); border:1px solid rgba(212,165,116,0.42); border-left:3px solid rgba(212,165,116,0.75); box-shadow:0 0 12px rgba(212,165,116,0.08); }
-.manin-portrait-wrap { flex-shrink:0; width:72px; height:72px; border-radius:6px; overflow:hidden; border:1px solid rgba(212,165,116,0.55); background:rgba(0,0,0,0.35); box-shadow:0 0 10px rgba(212,165,116,0.22); }
-.manin-portrait { width:100%; height:100%; object-fit:cover; object-position:center top; display:block; transition:opacity 0.35s ease; }
-.manin-bubble { flex:1; display:flex; flex-direction:column; justify-content:center; padding:3px 6px 3px 10px; border-left:2px solid rgba(212,165,116,0.5); min-width:0; }
-.manin-name { font-family:'Cinzel',serif; font-size:9px; letter-spacing:1.8px; color:#d4a574; margin-bottom:5px; opacity:0.88; }
-.manin-text { font-family:'Rajdhani',sans-serif; font-size:13px; color:#ecd9c0; line-height:1.4; }
-/* Workshop variant — slightly cooler accent (less anvil, more bench) */
-.manin-panel[data-view="workshop"] { background:linear-gradient(135deg,rgba(42,30,18,0.92),rgba(22,16,10,0.95)); border-color:rgba(190,150,110,0.4); border-left-color:rgba(190,150,110,0.7); }
-.manin-panel[data-view="workshop"] .manin-portrait-wrap { border-color:rgba(190,150,110,0.55); box-shadow:0 0 10px rgba(190,150,110,0.2); }
-.manin-panel[data-view="workshop"] .manin-bubble { border-left-color:rgba(190,150,110,0.5); }
-.manin-panel[data-view="workshop"] .manin-name { color:#caa57a; }
-/* Absent variant — Manin's not here, third-person narration, greyed + italic */
-.manin-panel[data-absent="true"] { background:linear-gradient(135deg,rgba(28,24,20,0.85),rgba(14,12,10,0.92)); border-color:rgba(140,128,112,0.32); border-left:3px dashed rgba(140,128,112,0.55); box-shadow:none; }
-.manin-panel[data-absent="true"] .manin-portrait-wrap { border-color:rgba(140,128,112,0.4); box-shadow:none; }
-.manin-panel[data-absent="true"] .manin-portrait { opacity:0.38; filter:grayscale(0.85); }
-.manin-panel[data-absent="true"] .manin-bubble { border-left-color:rgba(140,128,112,0.4); }
-.manin-panel[data-absent="true"] .manin-name { color:#9a8c78; }
-.manin-panel[data-absent="true"] .manin-text { color:#aaa099; font-style:italic; font-size:12.5px; }
+/* ── YAMI — single stoic daily line, minimal strip (no box, no portrait). ── */
+.yami-strip { padding:4px 2px 10px; margin-bottom:6px; border-bottom:1px solid rgba(255,82,82,0.18); text-align:center; }
+.yami-strip-text { font-family:'Rajdhani',sans-serif; font-size:11.5px; font-style:italic; color:#c9a8a0; letter-spacing:0.2px; }
+/* ── MANIN — single 1%-improvement daily line, minimal strip (no box, no portrait). ── */
+.manin-strip { padding:4px 2px 10px; margin-bottom:6px; border-bottom:1px solid rgba(212,165,116,0.18); text-align:center; }
+.manin-strip-text { font-family:'Rajdhani',sans-serif; font-size:11.5px; font-style:italic; color:#c9ab84; letter-spacing:0.2px; }
 .wds-top { display:flex; align-items:center; gap:7px; margin-bottom:9px; flex-wrap:wrap; }
 .wds-label { font-family:'Cinzel',serif; font-size:9px; letter-spacing:1.5px; color:var(--sao-cyan); }
 .wds-chip { font-family:'Cinzel',serif; font-size:8px; letter-spacing:0.5px; padding:2px 7px; border-radius:10px; }
@@ -10221,6 +10193,7 @@ function loadState() {
       if (!s.equipment) s.equipment = {earring_l:null,helmet:null,earring_r:null,weapon:null,armor:null,shield:null,necklace:null,bracelet:null,belt:null,boots:null};
       if (!s.treasury) s.treasury = { level: 0 };
       if (!s.treasuryClaim) s.treasuryClaim = { dateKey: null };
+      if (!s.depotClaim) s.depotClaim = { dateKey: null };
       // ── Crafted-instance RARITY migration (old 4-tier quality → 5-tier rarity) ──
       if (!s.equipmentMods) s.equipmentMods = {};
       const _RARITY_FROM_QUALITY = { common:'common', fine:'uncommon', superior:'rare', masterwork:'epic' };
@@ -10257,7 +10230,7 @@ function loadState() {
         s.affixRescaledV2 = true;
       }
       if (!s.guildUpgrades) {
-        s.guildUpgrades = { warehouse:0, alchemy:0, trade:0, scriptorium:0, anvil:0, refinery:0, barracks:0, sanctum:0, hall:0, patron_vault:0, chronoforge:0, forge_hall:0 };
+        s.guildUpgrades = { warehouse:0, alchemy:0, trade:0, depot:0, anvil:0, refinery:0, barracks:0, sanctum:0, hall:0, patron_vault:0, chronoforge:0, forge_hall:0 };
       } else {
         // Migrate old boolean flags → integer levels
         ['anvil','barracks','sanctum','hall'].forEach(k => {
@@ -10266,7 +10239,17 @@ function loadState() {
         });
         if (s.guildUpgrades.library) { s.guildUpgrades.scriptorium = Math.max(s.guildUpgrades.scriptorium||0, 1); }
         delete s.guildUpgrades.library;
-        ['warehouse','alchemy','trade','scriptorium'].forEach(k => {
+        // Scriptorium retired — it boosted commission gold, but the commission board UI
+        // was orphaned (never rendered), so the upgrade was boosting a mechanic the player
+        // could never see or use. Refund any gold sunk into it before dropping the property.
+        if (s.guildUpgrades.scriptorium > 0) {
+          let refund = 0;
+          for (let lv = 1; lv <= s.guildUpgrades.scriptorium; lv++) refund += Math.max(5, Math.round(375 * Math.pow(1.7, lv - 1) / 5) * 5);
+          s.gold = (s.gold || 0) + refund;
+          _pendingAnims.push(() => showNotif(`📜 Scriptorium retired — refunded ${refund.toLocaleString()}g.`));
+        }
+        delete s.guildUpgrades.scriptorium;
+        ['warehouse','alchemy','trade','depot'].forEach(k => {
           if (typeof s.guildUpgrades[k] !== 'number') s.guildUpgrades[k] = 0;
         });
       }
@@ -11968,14 +11951,10 @@ function calcPlayerCombatStats(includeGear) {
 
   let primaryAtk = calcPrimaryAtk(archetype, Spool);
   if (includeGear) {
-    const gu = state.guildUpgrades || {};
-    const sanctumMul  = 1 + (gu.sanctum  || 0) * 0.04;
-    const barracksMul = 1 + (gu.barracks || 0) * 0.05;
-    primaryAtk = Math.round(primaryAtk * sanctumMul * barracksMul);
-    pAtk       = Math.round(pAtk       * sanctumMul * barracksMul);
-    magicAtk   = Math.round(magicAtk   * sanctumMul);
-    pMaxHP     = Math.round(pMaxHP     * sanctumMul * barracksMul);
-    pMaxMP     = Math.round(pMaxMP     * sanctumMul);
+    // Barracks/Alchemist's Lab/Sanctum auras already applied to the raw stat pool
+    // (STR/CON, INT/DEX, CHA/VOL respectively) inside getEquippedStats() — Spool
+    // above already reflects them, so every formula that reads STR/DEX/CON/INT/
+    // VOL/CHA gets the bonus once, symmetrically, with no separate multiplier here.
     // ── % AFFIXES (post-√, bounded per dimension) ──
     const atkPct = Math.min(AFFIX_ATK_CAP, aff.atkPct || 0);
     const hpPct  = Math.min(AFFIX_HP_CAP,  aff.hpPct  || 0);
@@ -12491,12 +12470,14 @@ function getEquippedStats() {
     Object.entries(stats).forEach(([k, v]) => { if (totals[k] !== undefined) totals[k] += Math.round(v * rMult); });
   });
   const gu = state.guildUpgrades || {};
-  // Barracks: +5% STR & CON from gear per level (max Lv5 = +25%)
+  // Three symmetric stat-pair auras — same +5%/level rate, max Lv7 = +35% each,
+  // one pair per upgrade so every stat has exactly one dedicated source.
   const barrLvl = gu.barracks || 0;
   if (barrLvl > 0) { const m = 1 + barrLvl * 0.05; totals.STR = Math.floor(totals.STR * m); totals.CON = Math.floor(totals.CON * m); }
-  // Sanctum: +4% all stats from gear per level (max Lv5 = +20%), applied after barracks
+  const alchLvl = gu.alchemy || 0;
+  if (alchLvl > 0) { const m = 1 + alchLvl * 0.05; totals.INT = Math.floor(totals.INT * m); totals.DEX = Math.floor(totals.DEX * m); }
   const sanctLvl = gu.sanctum || 0;
-  if (sanctLvl > 0) { const m = 1 + sanctLvl * 0.04; ['STR','DEX','CON','INT','VOL','CHA'].forEach(k => { totals[k] = Math.floor(totals[k] * m); }); }
+  if (sanctLvl > 0) { const m = 1 + sanctLvl * 0.05; totals.CHA = Math.floor(totals.CHA * m); totals.VOL = Math.floor(totals.VOL * m); }
   // T7 ALL MASTERED → permanent +10% stat gain from all GEAR (multiplicative, final step)
   if (state.forgeTierAllMastered && state.forgeTierAllMastered[7]) {
     ['STR','DEX','CON','INT','VOL','CHA','ATK','DEF','HP','MP'].forEach(k => { totals[k] = Math.floor(totals[k] * 1.10); });
@@ -12561,10 +12542,8 @@ function useItem(bagIndex) {
   if (item.healHP || item.healMP) {
     if (!state.dungeon?.combat) { showNotif('⚠ Potions can only be used in combat!'); return; }
     const c = state.dungeon.combat;
-    // Alchemist's Lab: +15% potion restore per level
-    const alchMul = 1 + ((state.guildUpgrades||{}).alchemy || 0) * 0.15;
-    if (item.healHP) { const h=Math.round(item.healHP*alchMul); c.playerHP=Math.min(c.playerMaxHP,c.playerHP+h); c.log.push(`🧪 ${item.name}: +${h} HP`); }
-    if (item.healMP) { const h=Math.round(item.healMP*alchMul); c.playerMP=Math.min(c.playerMaxMP,c.playerMP+h); c.log.push(`💧 ${item.name}: +${h} MP`); }
+    if (item.healHP) { const h=item.healHP; c.playerHP=Math.min(c.playerMaxHP,c.playerHP+h); c.log.push(`🧪 ${item.name}: +${h} HP`); }
+    if (item.healMP) { const h=item.healMP; c.playerMP=Math.min(c.playerMaxMP,c.playerMP+h); c.log.push(`💧 ${item.name}: +${h} MP`); }
     showNotif(`🧪 ${item.name} used!`);
   }
   if ((entry.quantity||1) > 1) entry.quantity--; else state.inventory.splice(bagIndex,1);
@@ -12622,13 +12601,45 @@ const SALVAGE_MAT = {
   boots:'crystal', belt:'crystal',
   earring_l:'scroll', earring_r:'scroll', necklace:'scroll', bracelet:'scroll',
 };
+// Fallback for non-crafted (dungeon-drop) gear — no recipe cost to scale from,
+// so rarity alone is the only signal available for those.
 const SALVAGE_QTY = { common:3, uncommon:5, rare:8, epic:14, legendary:22 };
+// Salvage returns a FRACTION of what an item actually cost to build — never the
+// full amount back (you can't salvage a 20-iron item for 50), and rarity sets
+// that fraction: best case (legendary) ~80%, decreasing per tier below that.
+const SALVAGE_RARITY_PCT = { common:0.20, uncommon:0.35, rare:0.50, epic:0.65, legendary:0.80 };
+// Sum of every refine step's material cost from Grade 1 up to (not including)
+// `currentGrade` — i.e. the actual resources already spent grading the item up,
+// using the same per-step formula refineItem() charges (getRefineCostFull).
+function _totalRefineMatsSpent(recipe, currentGrade) {
+  const sum = o => o ? Object.values(o).reduce((a,b) => a+b, 0) : 0;
+  let total = 0;
+  for (let g = 1; g < currentGrade; g++) {
+    const step = getRefineCostFull(recipe, g);
+    total += sum(step.t1) + sum(step.t2) + sum(step.t3);
+  }
+  return total;
+}
+function _salvageMatQty(entry, item) {
+  const rarity = entry.quality || item.rarity || 'common';
+  const pct = SALVAGE_RARITY_PCT[rarity] ?? SALVAGE_RARITY_PCT.common;
+  if (item.crafted) {
+    const recipe = CRAFT_RECIPES.find(r => r.itemId === item.id);
+    if (recipe) {
+      const sum = o => o ? Object.values(o).reduce((a,b) => a+b, 0) : 0;
+      const baseCost   = sum(recipe.cost) + sum(recipe.costT2) + sum(recipe.costT3);
+      const refineCost = _totalRefineMatsSpent(recipe, entry.grade || 1);
+      return Math.max(1, Math.round((baseCost + refineCost) * pct));
+    }
+  }
+  return SALVAGE_QTY[rarity] || 3;
+}
 
 function salvageItem(bagIndex) {
   const entry = state.inventory[bagIndex]; if (!entry) return;
   const item = ITEMS_DB[entry.itemId]; if (!item || !item.slot) return;
   const matId = SALVAGE_MAT[item.slot] || 'timber';
-  const qty = SALVAGE_QTY[item.rarity] || 3;
+  const qty = _salvageMatQty(entry, item);
   const label = (SHOP_MAT_META[matId] && SHOP_MAT_META[matId].label) || matId;
   const icon = matIconHtml(matId, 16, 1);
   showConfirmDialog(`Salvage <strong>${item.name}</strong> for <span style="color:#80deea">${icon} ${qty} ${label}</span>?`, () => {
@@ -13090,14 +13101,6 @@ function showRefineCelebrationOverlay(itemId, fromGrade, toGrade) {
     <div class="tu-item" style="color:${gColor}">${itemImgHtml(item, 22)} ${item.name}</div>
     <div class="rco-stats">${deltas.map(_statRow).join('')}</div>
     <div class="tu-sub">All affixes rescaled · stats ×${(GRADE_MULT[toGrade-1] || 1).toFixed(2)}</div>
-    ${(() => {
-      // Manin grade-up quip — fires from G3 upward (G1→G2 is too small to call out).
-      // Pool entries are written in destination-grade order: index 0 = G3, ... index 6 = G9.
-      if (toGrade < 3 || typeof MANIN_LINES === 'undefined') return '';
-      const pool = MANIN_LINES.grade_up_drops || [];
-      const line = pool[Math.min(toGrade - 3, pool.length - 1)];
-      return line ? `<div class="rco-manin" style="margin-top:8px;padding:8px 12px;border-top:1px solid rgba(255,255,255,0.08);font-size:11px;font-style:italic;color:rgba(255,255,255,0.7);max-width:280px;line-height:1.45">${line}<div style="font-size:8px;letter-spacing:1.5px;color:#ff8a65;margin-top:3px">— MANIN</div></div>` : '';
-    })()}
     <div class="tu-tap">TAP TO CONTINUE</div>`;
   document.body.appendChild(el);
   const dismiss = () => { el.classList.add('leaving'); setTimeout(() => el.remove(), 460); };
@@ -13457,15 +13460,6 @@ function showForgeRevealOverlay(entry, onCollect) {
   const _affHtml = (entry.affixes && entry.affixes.length)
     ? `<div class="fr-affixes">${entry.affixes.map(a => `<span class="fr-affix" style="color:${AFFIX_BY_STAT[a.stat]?.color||'#fff'}">${affixLabel(a)}</span>`).join('')}</div>`
     : '';
-  // Manin rarity quip — Deadpool-voice reaction to the roll. Pool keyed by quality.
-  const _maninRarityLine = (() => {
-    if (typeof MANIN_LINES === 'undefined' || !MANIN_LINES.rarity_drops) return '';
-    const pool = MANIN_LINES.rarity_drops[entry.quality || 'common'] || [];
-    return pool.length ? pool[Math.floor(Math.random() * pool.length)] : '';
-  })();
-  const _maninHtml = _maninRarityLine
-    ? `<div class="fr-manin" style="margin-top:10px;padding:8px 14px;border-top:1px solid rgba(255,255,255,0.08);font-size:11px;font-style:italic;color:rgba(255,255,255,0.78);max-width:300px;line-height:1.45">${_maninRarityLine}<div style="font-size:8px;letter-spacing:1.5px;color:#ff8a65;margin-top:3px">— MANIN</div></div>`
-    : '';
   const ov = document.createElement('div'); ov.className = 'forge-reveal-overlay';
   ov.innerHTML = `
     <div class="fr-inner">
@@ -13475,7 +13469,6 @@ function showForgeRevealOverlay(entry, onCollect) {
         <div class="fr-quality-badge fr-q-${entry.quality||'common'}" style="color:${rar.color}">${rar.icon ? rar.icon+' ' : ''}${rar.label}</div>
         <div class="fr-item-name">${item.name}</div>
         ${_affHtml}
-        ${_maninHtml}
         <div class="fr-tap">TAP TO COLLECT</div>
       </div>
     </div>`;
@@ -13698,6 +13691,27 @@ function claimTreasury() {
   state.treasuryClaim = { dateKey: todayKey() };
   saveState();
   showNotif(`🏦 Treasury dividend collected: <img src="img/gold.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;display:inline-block">+${div.gold}g${div.mat?` · ${matIconHtml(div.mat.id, 14, 1)}×${div.mat.qty}`:''}.`);
+  renderAll();
+}
+
+// ── Quartermaster's Depot — small free daily material claim, scales with level ──
+// Deliberately modest (starts at 2 of each material/day, +1/level) — a floor that
+// keeps gearing moving on slow work days, not a replacement for real income.
+// Levels are bought through the normal GUILD_UPGRADES purchase flow (id:'depot');
+// this just handles the once-per-day claim on top of that.
+function getDepotLevel() { return (state.guildUpgrades && state.guildUpgrades.depot) || 0; }
+function getDepotDailyMats() { const lvl = getDepotLevel(); return lvl > 0 ? (1 + lvl) : 0; }
+function canClaimDepot() {
+  return getDepotLevel() > 0 && (!state.depotClaim || state.depotClaim.dateKey !== todayKey());
+}
+function claimDepot() {
+  if (!canClaimDepot()) { showNotif('🎒 Supplies already claimed today.'); return; }
+  const qty = getDepotDailyMats();
+  if (!state.shopMaterials) state.shopMaterials = { timber:0, scroll:0, crystal:0, gear:0 };
+  ['timber','scroll','crystal','gear'].forEach(m => { state.shopMaterials[m] = (state.shopMaterials[m]||0) + qty; });
+  state.depotClaim = { dateKey: todayKey() };
+  saveState();
+  showNotif(`🎒 Depot supplies claimed: ${['timber','scroll','crystal','gear'].map(m => `${matIconHtml(m,14,1)}×${qty}`).join(' ')}`);
   renderAll();
 }
 
@@ -14089,7 +14103,8 @@ function renderInventory() {
     acts += `<button class="inv-act-btn sell-item" onclick="sellItem(${selBagIdx})">SELL <img src="img/gold.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;display:inline-block">${sellTotal}g</button>`;
     if (selItem.slot) {
       const _sMatId = SALVAGE_MAT[selItem.slot]||'timber';
-      const _sQty = SALVAGE_QTY[selItem.rarity]||3;
+      const _sEntry = state.inventory[selBagIdx] || {};
+      const _sQty = _salvageMatQty(_sEntry, selItem);
       acts += `<button class="inv-act-btn salvage" onclick="salvageItem(${selBagIdx})">SALVAGE ${matIconHtml(_sMatId, 14, 1)}×${_sQty}</button>`;
     }
     acts += `<button class="inv-act-btn drop-item" onclick="dropItem(${selBagIdx})">DROP</button>`;
@@ -15204,9 +15219,9 @@ function rerollCommission(idx) {
   showNotif(`↺ Commission rerolled — ${replacement.title}`);
 }
 
-// Grant a completed commission's rewards (gold w/ scriptorium+rep mult, xp, mat,
-// rep, counters, fanfare, notif). Shared by auto-complete tasks AND manual client
-// fulfillment so the two paths can never drift.
+// Grant a completed commission's rewards (gold w/ rep mult, xp, mat, rep, counters,
+// fanfare, notif). Shared by auto-complete tasks AND manual client fulfillment so
+// the two paths can never drift.
 function _awardCommissionRewards(comm) {
   const TIER_TAG = { bronze:'[BRONZE]', silver:'[SILVER]', gold:'[GOLD]' };
   comm.completed = true;
@@ -15219,9 +15234,8 @@ function _awardCommissionRewards(comm) {
     state.dungeon.sessionCommissions = (state.dungeon.sessionCommissions||0) + 1;
     state.dungeon.sessionRep         = (state.dungeon.sessionRep||0) + _repGain;
   }
-  const _scriptLvl = (state.guildUpgrades||{}).scriptorium || 0;
   const _repBonus  = getGuildRepTier(state.guildRep||0).repBonus || 0;
-  const _commGold  = Math.floor(comm.bonusGold * (1 + _scriptLvl * 0.15) * (1 + _repBonus));
+  const _commGold  = Math.floor(comm.bonusGold * (1 + _repBonus));
   state.gold = (state.gold||0) + _commGold;
   state.totalGoldEarned = (state.totalGoldEarned||0) + _commGold;
   if (comm.bonusXp) state.totalXp = (state.totalXp||0) + comm.bonusXp;
@@ -15231,8 +15245,7 @@ function _awardCommissionRewards(comm) {
   }
   const matStr = comm.bonusMat ? ` · ${matIconHtml(comm.bonusMat.id, 14, 1)}×${comm.bonusMat.qty}` : '';
   const xpStr  = comm.bonusXp  ? ` · +${comm.bonusXp} XP` : '';
-  const _scriptTag = (_commGold - comm.bonusGold) > 0 ? ` · 🏛 +${_commGold - comm.bonusGold}g` : '';
-  showNotif(`${TIER_TAG[comm.tier]||'[COMMISSION]'} ${comm.title}. +${_commGold}g${xpStr}${matStr}${_scriptTag}`);
+  showNotif(`${TIER_TAG[comm.tier]||'[COMMISSION]'} ${comm.title}. +${_commGold}g${xpStr}${matStr}`);
 }
 
 // Daily Sweep: all commissions (incl. client requests) complete → bonus gold/xp + 1 Shard.
@@ -15382,8 +15395,7 @@ function updateWeeklyCommissionProgress() {
     state.weeklyCommission.justCompleted = true;
     setTimeout(() => playCommissionFanfare(), 120);
     state.totalCommissionsDone = (state.totalCommissionsDone || 0) + 1;
-    const _scriptLvl = (state.guildUpgrades || {}).scriptorium || 0;
-    const _commGold  = Math.floor(comm.bonusGold * (1 + _scriptLvl * 0.15));
+    const _commGold  = comm.bonusGold;
     state.gold             = (state.gold || 0) + _commGold;
     state.totalGoldEarned  = (state.totalGoldEarned || 0) + _commGold;
     if (comm.bonusXp) state.totalXp = (state.totalXp || 0) + comm.bonusXp;
@@ -15633,6 +15645,8 @@ function updateStreakOnLoad() {
     }
     // Defer _buildHarvestInfo so it captures any retroactive completions from late check-in
     _pendingAnims.push(() => showHarvestOverlay(_buildHarvestInfo(y))); // Daily Briefing (Yesterday + Today)
+    // Yami's daily line — fires right after the harvest briefing, once per new day.
+    _pendingAnims.push(() => showDailyQuoteOverlay());
     // Auto weekly report on Mondays (queued after harvest so it shows on dismiss)
     if (new Date().getDay() === 1 && state.lastWeeklyReport !== today) {
       state.lastWeeklyReport = today;
@@ -17150,9 +17164,9 @@ function renderHabitos() {
 
   const week=isoWeekKey(new Date(activeDate+'T12:00:00'));
 
-  // Yami greets the player here — habits sensei, reads today's completion + streak.
-  // Only on today's view; past-day reviews don't need live commentary.
-  if (isToday) panelContent.appendChild(renderYamiPanel());
+  // Yami's daily line — small strip, today's day-of-month quote. Full overlay version
+  // fires once per day from updateStreakOnLoad(); this is the persistent minimized form.
+  if (isToday) panelContent.appendChild(renderYamiStrip());
 
   // ── DAILY GROUP ──
   const dailyGroup=document.createElement('div'); dailyGroup.className='section-group daily-group';
@@ -18534,8 +18548,7 @@ function renderGuild() {
     }
   }
 
-  // ── Leah greets the player in her domain — Cartographer of Days, reading the city.
-  wrap.appendChild(renderLeahCityPanel());
+  wrap.appendChild(renderWorkStrip());
 
   // ── Worker Rank — compact chip (full panel lives on the QUESTS workbench) ──
   {
@@ -18585,13 +18598,30 @@ function renderGuild() {
     wrap.appendChild(tEl);
   }
 
+  // ── Quartermaster's Depot — free daily material claim, level bought below ────
+  {
+    const dLvl = getDepotLevel();
+    const dQty = getDepotDailyMats();
+    const dCanClaim = canClaimDepot();
+    const dEl = document.createElement('div'); dEl.className = 'guild-depot';
+    dEl.innerHTML = `
+      <div class="gt-top">
+        <div>
+          <div class="gd-label">🎒 QUARTERMASTER'S DEPOT</div>
+          <div class="gt-lvl">Lv.${dLvl}${dLvl>0?` · ${matIconHtml('timber',14,1)}×${dQty} of each/day`:' · not yet built'}</div>
+        </div>
+        <button class="gt-collect${dCanClaim?' ready-pulse':' done'}" ${dCanClaim?'onclick="claimDepot()"':''}>${dLvl===0?'—':dCanClaim?'COLLECT':'✓ TODAY'}</button>
+      </div>`;
+    wrap.appendChild(dEl);
+  }
+
   // ── Tier-grouped upgrade cards ───────────────────────────────
   const hdr = document.createElement('div'); hdr.className = 'forge-section-hdr';
   hdr.innerHTML = `<span style="color:#ffc107">⟦ CITY UPGRADES ⟧</span><div class="forge-section-line"></div>`;
   wrap.appendChild(hdr);
 
   const TIERS = [
-    { label:'GROWTH', icon:'🌱', color:'#69f0ae', ids:['hall','trade','scriptorium','patron_vault'] },
+    { label:'GROWTH', icon:'🌱', color:'#69f0ae', ids:['hall','trade','depot','patron_vault'] },
     { label:'FORGE',  icon:'⚒',  color:'#ffd54f', ids:['anvil','warehouse','refinery','quality_forge'] }, // chronoforge/forge_hall retired — crafting is instant now
     { label:'POWER',  icon:'⚔',  color:'#ff8a80', ids:['barracks','sanctum','alchemy'] },
   ];
@@ -18650,7 +18680,7 @@ function renderGuild() {
 
       const maxEffect = upg.effect === 'habitAura'       ? `MAX: +${upg.maxLevel*0.5}% habit gains`
         : upg.effect === 'goldBonus'       ? `MAX: +${upg.maxLevel*12}% work gold`
-        : upg.effect === 'commissionBonus' ? `MAX: +${upg.maxLevel*15}% commission gold`
+        : upg.effect === 'dailyMatClaim'   ? `MAX: +${1+upg.maxLevel} of each mat/day`
         : upg.effect === 'wxpBonus'        ? `MAX: +${upg.maxLevel*10}% Work XP`
         : upg.effect === 'craftDiscount'   ? `MAX: −${Math.min(56, upg.maxLevel*8)}% mat cost`
         : upg.effect === 'bonusMat'        ? `MAX: +${upg.maxLevel} mats/stage`
@@ -18659,8 +18689,8 @@ function renderGuild() {
         : upg.effect === 'forgeTime'       ? `MAX: −${upg.maxLevel*10}% forge time`
         : upg.effect === 'forgeSlot'       ? `+${upg.maxLevel} queue slot${upg.maxLevel>1?'s':''} total`
         : upg.effect === 'strengthAura'    ? `MAX: +${upg.maxLevel*5}% STR/CON`
-        : upg.effect === 'gearAura'        ? `MAX: +${upg.maxLevel*4}% all gear stats`
-        : upg.effect === 'potionBoost'     ? `MAX: +${upg.maxLevel*15}% potions`
+        : upg.effect === 'intellectAura'   ? `MAX: +${upg.maxLevel*5}% INT/DEX`
+        : upg.effect === 'spiritAura'      ? `MAX: +${upg.maxLevel*5}% CHA/VOL`
         : '';
 
       const costNote = upg.customLevelCosts
@@ -18715,7 +18745,7 @@ function renderGuild() {
   const active = GUILD_UPGRADES.filter(u => (gu[u.id]||0) > 0);
   if (active.length > 0) {
     const TIER_COLOR_MAP = {
-      hall:'#69f0ae',trade:'#69f0ae',scriptorium:'#69f0ae',patron_vault:'#69f0ae',
+      hall:'#69f0ae',trade:'#69f0ae',depot:'#69f0ae',patron_vault:'#69f0ae',
       anvil:'#ffd54f',warehouse:'#ffd54f',refinery:'#ffd54f',chronoforge:'#ffd54f',forge_hall:'#ffd54f',
       barracks:'#ff8a80',sanctum:'#ff8a80',alchemy:'#ff8a80',
     };
@@ -18774,9 +18804,7 @@ function renderCommissionBoard() {
   wCard.className = 'weekly-commission-card' + (wc.completed ? ' wcc-completed' : '') + (_isWJustDone ? ' wcc-flash' : '');
   const wPct       = Math.min(100, Math.round((wc.progress / wcom.count) * 100));
   const wRemaining = wcom.count - wc.progress;
-  const _scriptLvlW  = (state.guildUpgrades || {}).scriptorium || 0;
-  const _wDisplayGold = _scriptLvlW > 0 ? Math.floor(wcom.bonusGold * (1 + _scriptLvlW * 0.15)) : wcom.bonusGold;
-  const wGoldChip  = `<span class="gain-chip gain-gold">${goldImg(18)} +${_wDisplayGold}g${_scriptLvlW > 0 ? ' 🏛' : ''}</span>`;
+  const wGoldChip  = `<span class="gain-chip gain-gold">${goldImg(18)} +${wcom.bonusGold}g</span>`;
   const wXpChip    = wcom.bonusXp  ? `<span class="gain-chip cc-xp-chip">⚡+${wcom.bonusXp}</span>` : '';
   const wMatChip   = wcom.bonusMat ? `<span class="gain-chip gain-mat">${matIconImg(wcom.bonusMat.id,14)}×${wcom.bonusMat.qty}</span>` : '';
   const wBadgeHtml = wc.completed  ? `<span class="wcc-claimed-badge">✓ CLAIMED</span>` : '';
@@ -18823,9 +18851,7 @@ function renderCommissionBoard() {
     const pct = Math.min(100, Math.round((comm.progress / comm.count) * 100));
     const remaining = comm.count - comm.progress;
     const tierBadge = `<span class="cc-tier" style="--tier-clr:${tier.color}">${tier.label}</span>`;
-    const _scriptLvlCC = (state.guildUpgrades||{}).scriptorium || 0;
-    const _displayGold = _scriptLvlCC > 0 ? Math.floor(comm.bonusGold * (1 + _scriptLvlCC * 0.15)) : comm.bonusGold;
-    const goldChip  = `<span class="gain-chip gain-gold">${goldImg(18)} +${_displayGold}g${_scriptLvlCC > 0 ? ' 🏛' : ''}</span>`;
+    const goldChip  = `<span class="gain-chip gain-gold">${goldImg(18)} +${comm.bonusGold}g</span>`;
     const xpChip    = comm.bonusXp ? `<span class="gain-chip cc-xp-chip">⚡+${comm.bonusXp}</span>` : '';
     const matChip   = comm.bonusMat
       ? `<span class="gain-chip gain-mat">${matIconImg(comm.bonusMat.id,14)}×${comm.bonusMat.qty}</span>`
@@ -19424,14 +19450,14 @@ function renderTrabajo() {
 
   // ── FORGE view ───────────────────────────────────────────
   if (workShopView === 'forge') {
-    panelContent.appendChild(renderManinPanel('forge'));
+    panelContent.appendChild(renderManinStrip());
     panelContent.appendChild(renderForge());
     return;
   }
 
   // ── GEAR WORKSHOP view ───────────────────────────────────
   if (workShopView === 'workshop') {
-    panelContent.appendChild(renderManinPanel('workshop'));
+    panelContent.appendChild(renderManinStrip());
     panelContent.appendChild(renderGearWorkshop());
     return;
   }
@@ -19443,8 +19469,7 @@ function renderTrabajo() {
   }
 
   // ── WORKBENCH view ───────────────────────────────────────
-  // Leah greets the player here — reads chest progress, session count, time, freeze state.
-  panelContent.appendChild(renderLeahPanel());
+  panelContent.appendChild(renderWorkStrip());
   // Daily Ration command center — focus floor + must-dos + cadence (or REST EARNED).
   panelContent.appendChild(renderWorkdayStatus());
 
@@ -23959,1043 +23984,40 @@ function renderWinterBanner() {
   }
   return el;
 }
-// ── LEAH — the city's guide. Reads the world, picks a line, picks a face. ──
-// Voice: Rise (P4) baseline + adult honesty (Smiling Friends / Barry / Bojack).
-// Profanity ~1 in 4-5 lines, no edgelord. She addresses Tuni by name and name-drops Manin.
-const LEAH_LINES = {
-  winter_active: [
-    { exp:'sad',    text:"Hey. {cityName}'s frozen and honestly? Rude of you. A main character doesn't just ghost her own city. Find a gold chest." },
-    { exp:'smug',   text:"City's frozen. I'm a sprite, I don't feel cold, but I've decided to be devastated about it publicly. Gold chest. Go." },
-    { exp:'sad',    text:"Tuni. The fountain's solid ice. Manin thinks it's his fault. It's not. It's yours, no offense. Please come back." },
-    { exp:'neutral',text:"Frozen city update: still frozen, still iconic, still waiting. One gold chest fixes everything. Even me." },
-    { exp:'sad',    text:"Three days, Tuni. I don't get mad. I'm making an exception, specifically for you. Get in here." },
-    { exp:'smiling',text:"Muns. The fountain melted the second you walked back in. That's not a coincidence. That's a bit. I love it." },
-  ],
-  winter_warning: [
-    { exp:'embarrassed', text:"Tuni? The wind's doing the thing. One more idle day and {cityName} freezes. I do not do snow, it's not my season." },
-    { exp:'sad',         text:"Cold front incoming. One small task today and we skip the whole ice age. Easy trade." },
-    { exp:'neutral',     text:"{cityName}'s nervous. I don't get nervous, but hypothetically, if I did, this would be it. One task, Tuni." },
-    { exp:'smug',        text:"Tomorrow I'm a popsicle. A gorgeous one, but still. One task today. That's the whole ask." },
-  ],
-  chest_gold_ready: [
-    { exp:'smug',    text:"GOLD CHEST. Open it. I called this. I call everything. Open it." },
-    { exp:'smug',    text:"Gold chest. Holy — okay, I'm composed. Very composed. OPEN IT NOW." },
-    { exp:'smiling', text:"You found a gold chest and I'm taking full credit for the vibes that led here. Open it." },
-  ],
-  chest_silver_ready: [
-    { exp:'smug',    text:"Silver chest. Yours. Open it before I narrate the whole thing myself, which I will absolutely do." },
-    { exp:'smug',    text:"Silver chest at the gate. Go get it. I already know it's good. I'm never wrong." },
-    { exp:'smiling', text:"Silver chest! Open it. Manin says hi. I say open the chest." },
-  ],
-  chest_bronze_ready: [
-    { exp:'smiling', text:"Bronze chest's glowing. Open it. I need the dopamine and I'm getting it through you, no shame." },
-    { exp:'smiling', text:"Bronze chest, unlocked. Free real estate. Click it." },
-    { exp:'smug',    text:"Bronze chest waiting. I peeked. Not telling you what's inside. Go find out yourself." },
-  ],
-  progress_one_away: [
-    { exp:'smug',    text:"ONE task from a {tier} chest. Do not blink. Do not 'check one thing.' I will know." },
-    { exp:'smug',    text:"One task from a {tier} chest. This is the part of the movie where you don't mess it up." },
-    { exp:'smiling', text:"A {tier} chest is one task away. I've already decided this goes well. Don't embarrass me." },
-  ],
-  progress_close: [
-    { exp:'smiling', text:"{left} tasks from a {tier} chest. Close. Don't get cute now, I'm watching." },
-    { exp:'smug',    text:"{left} more for {tier}. Easy. Almost suspiciously easy. I'd know, I invented easy." },
-    { exp:'smug',    text:"{left} tasks from {tier}. Obviously you'll make it. I don't guide losers." },
-  ],
-  progress_far: [
-    { exp:'neutral', text:"{left} tasks to the {tier} chest. Long road. I'll be here being effortlessly correct about it the whole time." },
-    { exp:'neutral', text:"{left} to go for {tier}. Slow build. Fine. Even I wasn't built in a day. I was, actually. But fine." },
-    { exp:'smug',    text:"{left} tasks until {tier}. I'm gonna sit here and radiate confidence at you. No charge." },
-  ],
-  session_heroic_14: [
-    { exp:'smug',    text:"You cleared the WHOLE queue. I'm putting this in the record books. I AM the record book." },
-    { exp:'smug',    text:"The whole drop, done. Manin's writing a song about it. Bad song. I'll write a better one. About myself, but you're in it." },
-    { exp:'smug',    text:"A heroic day. This goes in the city archives, which I invented, which are just a folder I made." },
-    { exp:'smug',    text:"You can't just DO that. Actually you can, because I guided you, so really, I did that." },
-    { exp:'smiling', text:"Tungas. You cleared everything. I'd stand up but sitting is more iconic right now." },
-  ],
-  session_strong_10: [
-    { exp:'smug', text:"Ten tasks deep. Plaque incoming. I'm designing it myself, obviously." },
-    { exp:'smug', text:"Ten in. Manin actually stopped hammering to watch. That's the bar. You cleared it." },
-    { exp:'smug', text:"Ten, Tuni. We are so far past 'trying.' This is a flex now. Flex correctly." },
-  ],
-  session_mid_4: [
-    { exp:'smiling', text:"{count} tasks in. The square's humming. So am I, but mine's just excellent posture." },
-    { exp:'smug',    text:"{count} done! See? I'm never wrong about people. Never. Ask anyone." },
-    { exp:'neutral', text:"{count} tasks. Solid. Keep going or don't, both valid, I just prefer winning." },
-    { exp:'smiling', text:"{count} in! Good pace. Don't talk yourself out of one more, I can see you thinking about it." },
-  ],
-  session_starting_1: [
-    { exp:'neutral', text:"{count} task{s} done. Foundation laid. Don't 'good enough' your way out of the rest." },
-    { exp:'neutral', text:"{count} in! Keep building or this becomes an 'almost' day, and I don't do 'almost.'" },
-    { exp:'smiling', text:"Started. {count} done. Hardest part's over. The rest is just repeating the part you already won." },
-    { exp:'smiling', text:"{count} task{s} clean! Don't get attached to the number. Make it bigger. I'll wait." },
-  ],
-  empty_morning: [
-    { exp:'surprised', text:"Tuni! Up early? Iconic. Pick the smallest task and go, I don't do slow starts." },
-    { exp:'smiling',   text:"Early bird. Respect. {cityName}'s opening up around you. Don't waste the head start I'm giving you by existing." },
-    { exp:'neutral',   text:"Morning. Square's quiet, you're first out here. Obviously. Pick something." },
-    { exp:'surprised', text:"You opened the app at THIS hour? Bold. I like bold. Pick something gentle to start." },
-    { exp:'smiling',   text:"Morning, Tuni. Murasaki's DMs are pretending to be patient. They're not. Neither am I. Open them." },
-    { exp:'neutral',   text:"Morning! Order queue grew overnight. Handle it before lunch, I have a reputation to protect by association." },
-  ],
-  empty_midday: [
-    { exp:'neutral',     text:"Midday, list's untouched. Not judging. Actually judging. Extremely. Pick something small." },
-    { exp:'embarrassed', text:"Noon, Tuni. Manin's been hammering for hours. We are not the main characters of this morning. Fix that." },
-    { exp:'neutral',     text:"Sun's up, list's full, you're here. Obviously we're doing this. One small thing." },
-    { exp:'embarrassed', text:"Murasaki DMs are piling up. I'm not gonna say the number. It's a lot. Open the inbox." },
-    { exp:'neutral',     text:"The morning DMs you said you'd answer 'in the morning'? It's technically the afternoon now, Tuni." },
-  ],
-  empty_afternoon: [
-    { exp:'embarrassed', text:"4pm. Empty list, empty workshop. Smallest task. Go. I don't do slow claps for nothing." },
-    { exp:'embarrassed', text:"Afternoon, zero tasks. We're both stalling. Pick the dumb one, I'll pretend it was the plan." },
-    { exp:'sad',         text:"Late afternoon, nothing done. Smallest task. The dumbest one. Momentum's real, I've read about it." },
-    { exp:'smug',        text:"Tuni. Reddit again? I've genuinely never opened that app. Close it. Open the other one." },
-    { exp:'smiling',     text:"You opened me, opened Reddit, opened me again. Cute loop. Break it. One task." },
-    { exp:'embarrassed', text:"Content calendar's empty three days. Instagram thinks you died. I know you didn't, but the algorithm doesn't care about our friendship." },
-    { exp:'sad',         text:"Ads dashboard's flashing. Metaphorically, it's beige, but symbolically it's screaming. Open it." },
-    { exp:'embarrassed', text:"Shipments to confirm. Customers refreshing tracking pages like it's a soap opera. Let's not let them win that one." },
-  ],
-  empty_evening: [
-    { exp:'sad',         text:"Evening, zero tasks. Lanterns are on. One small thing before sleep. That's it. That's the ask." },
-    { exp:'sad',         text:"8pm-ish, nothing started. Fine. One small one. Today does the work, not tomorrow, tomorrow's overrated." },
-    { exp:'embarrassed', text:"Whole day, no tasks. Not mad. One, even a small one, keeps the streak. Do that." },
-    { exp:'smiling',     text:"It's 9pm and I can smell the Reddit on you. Close it. One task. Reddit will survive without you." },
-    { exp:'sad',         text:"Morning DMs still unread. Customers don't wait forever, Tuni. Clear the inbox, sleep like the icon you are." },
-  ],
-  reddit_callouts: [
-    { exp:'smug',        text:"Tuni. The Reddit tab. I know it's open. I always know. Close it." },
-    { exp:'smug',        text:"Forty minutes on r/whatever and then you opened me like nothing happened. Bold strategy. Wrong one." },
-    { exp:'smug',        text:"How's r/all treating you? Don't lie, I can see the dead-eyed scroll from here. Close it." },
-    { exp:'smiling',     text:"You went to Reddit 'for a break.' Forty-five minutes ago. Come back. The list misses you. I said what I said." },
-    { exp:'smug',        text:"Reddit's been open two hours. Task timer's been zero for two hours. Coincidence? I've never believed in those." },
-    { exp:'neutral',     text:"Reddit at this hour? Same posts as always. You're scrolling for sport at this point. Close it." },
-    { exp:'smiling',     text:"Reddit doesn't love you back, Tuni. I do, conditionally, based on task completion. Look at the list." },
-    { exp:'smug',        text:"You opened Reddit, found nothing, closed it, opened it again. There's a word for that cycle. I'm too classy to say it. Get off." },
-  ],
-  // Motivation drops — Gina Linetti mechanism. Encouragement wrapped in bragging rights,
-  // never stated straight. Absolute confidence, no hedge words, no earnest cheerleading.
-  motivation_drops: [
-    { exp:'neutral', text:"I don't do pep talks. I do facts. Fact: you're better than the couch. Fact: the couch knows it too." },
-    { exp:'smug',    text:"You know what's wild? You always come back. I don't guide quitters. I have a type. You're it." },
-    { exp:'smug',    text:"The list is there. You've cleared bigger. I have excellent taste in who I bet on. Go prove me right, obviously." },
-    { exp:'smug',    text:"The dumb little daily list IS the empire. I'd know, I run this city. Go build yours." },
-    { exp:'smiling', text:"You're allowed to start small, Muns. Even I started somewhere. I don't remember where. It was iconic though." },
-    { exp:'smug',    text:"I had ten lines of teasing queued and deleted them because you're actually gonna do this. Don't make me look sentimental." },
-    { exp:'smiling', text:"This app exists because you wanted to be someone who shows up. You ARE that person on click days. Today's a click day. I've decided." },
-    { exp:'neutral', text:"Not asking you to finish. Asking for one green row. Spoiler, from someone who's never wrong: another one follows." },
-    { exp:'smug',    text:"You forget how much you've built. I don't, I have excellent memory, mostly for things that make me look good, but also this." },
-    { exp:'smug',    text:"I believe in you. Don't let it go to your head. It's already gone to mine. Now click something." },
-    { exp:'smiling', text:"Watching you stop being scared of small stuff is genuinely my favorite show. Better than anything on TV. Click one and see." },
-    { exp:'neutral', text:"Momentum is a chemical. Your brain makes it. I take full credit anyway. Do the annoying thing." },
-  ],
-  // Honest drops — dry, deadpan observation, delivered with the same unshakeable
-  // confidence as everything else. Funny because it's true, not because it's soft.
-  dark_honest_drops: [
-    { exp:'neutral',     text:"Days blur when you don't do anything specific. Give today a shape. I'd suggest one, but you should learn." },
-    { exp:'smiling',     text:"Skipping rehearses skipping. Doing rehearses doing. I only rehearse things I'm already great at." },
-    { exp:'neutral',     text:"Time passes either way. May as well point it at something you'll brag about later." },
-    { exp:'embarrassed', text:"You opened me to feel productive without being productive. I see it. I invented seeing through people. Do the task." },
-    { exp:'smiling',     text:"You'll remember today by what you did. Current answer: 'opened the app twice.' Embarrassing. Let's fix that." },
-    { exp:'neutral',     text:"Productivity guilt is just regret with bad timing. Skip the guilt. Do one. I don't do guilt, I do results." },
-    { exp:'smiling',     text:"Future you texts past you the most. Make sure today's message doesn't read like a hostage note." },
-  ],
-  // Cross-character refs — Gina energy: bragging rights over sincerity, backhanded credit.
-  cross_character_drops: [
-    { exp:'smiling',     text:"Yami apparently smokes in your habits tab. I don't smoke, I don't need to, I'm already the most interesting person in this app." },
-    { exp:'smug',        text:"Yami called himself 'the worst captain in the Magic Knights.' Checked. He's not. He's just modest, which is a look I don't do." },
-    { exp:'embarrassed', text:"Manin and Yami had a beef last week. I mediated. Badly, on purpose, it was funnier that way." },
-    { exp:'neutral',     text:"Yami says you do better in the mornings. He tracks it secretly. I track it openly, because I'm not embarrassed by caring." },
-    { exp:'smug',        text:"Yami told you you're 'not a beginner anymore.' I'd never say it that plainly, mine would rhyme. Don't tell him he's right though." },
-    { exp:'smiling',     text:"Captain's in a mood today. Manin says 'Yami's always in a mood.' Accurate. I'm never in a mood, I'm always correct." },
-    { exp:'smiling',     text:"Stop by the forge, Tuni. Manin won't say he likes when you show up. I'll say it for him, he owes me." },
-    { exp:'smug',        text:"Manin's quieter than me. Everyone's quieter than me. He respects your craftwork though, silently, like a weirdo." },
-    { exp:'neutral',     text:"Talked to Manin about your gear. He said 'it'll hold.' From him, that's a parade. From me, it'd be a whole float." },
-    { exp:'embarrassed', text:"Manin made a little 'hmm' at your forge log this morning. Basically a poem, for him. I write actual poems. About myself. It's fine." },
-  ],
-  mythos_foreshadow_drops: [
-    { exp:'neutral',     text:"The sigils in Aelthorn's Sanctum keep spelling a name I'm not allowed to say. Probably nothing. I'm never wrong, so it's probably something." },
-    { exp:'sad',         text:"There was someone before you, Tuni. Didn't make it this far. I don't talk about my failures. That one wasn't mine, but still." },
-    { exp:'neutral',     text:"When you push like this, the wind drops in {cityName}. Hasn't done that in years. I take it personally, obviously, everything is personal to me." },
-    { exp:'embarrassed', text:"Manin said something weird this morning: 'this one's actually gonna finish it.' I already knew that. I know everything first." },
-    { exp:'neutral',     text:"I'm allowed to tell you the cold isn't weather. Not allowed to tell you the rest yet. Soon. I'm great at secrets, terrible at waiting." },
-  ],
-  identity_drops: [
-    { exp:'smiling', text:"You're someone who comes back. Rare quality. I only associate with rare qualities." },
-    { exp:'smug',    text:"Watching you become someone who shows up. Front row seat. I gave myself the best seat, obviously." },
-    { exp:'smiling', text:"Six-months-ago you wouldn't recognize this. Good. Means my guidance is working exactly as expected." },
-    { exp:'smug',    text:"Anyone can have a good day. You're stacking them. That's a different person. I'd know, I build people, it's kind of my thing." },
-    { exp:'neutral', text:"I don't make this list. You do. Every day you do it, the next one gets easier. I just take the credit." },
-    { exp:'smiling', text:"Some people show up when they feel like it. You show up when you don't. That's the whole game. I called it months ago." },
-    { exp:'smug',    text:"You're not 'the guy who tries to be consistent.' You're the guy who IS. Already happened. I don't do 'trying' either, I do 'being.'" },
-    { exp:'neutral', text:"Look at what you've been doing, quietly, daily. That's a person being made. I just narrate it, beautifully, because that's my talent." },
-    { exp:'smiling', text:"You don't 'have habits' anymore, Tuni. You ARE the habits. Don't go back. I don't do sequels to bad seasons." },
-    { exp:'smug',    text:"I keep a record. Every day you show up rewrites the file. The file's looking very good. Almost as good as me." },
-  ],
-  empty_late: [
-    { exp:'sad',     text:"Late. Close the tabs. One small task and call it, or sleep, both are correct, I don't do wrong answers." },
-    { exp:'neutral', text:"Almost midnight. Sleep counts. Real sleep, not Twitter-sleep. Tomorrow we start fresh. I'll be here, I'm always here." },
-    { exp:'smiling', text:"11pm, one task done? Hero behavior. I won't tell anyone. I'll tell Manin. He'll be insufferable about it, like me." },
-    { exp:'sad',     text:"Late hour, queue still full. Pack three, post one, call it. Or sleep. Don't 'just one more thing' for an hour, I invented that trap." },
-  ],
-  self_talk_callouts: [
-    { exp:'smug',        text:"'I'll start after this video.' Tuni. That video has a sequel. The sequel has a franchise. Start now." },
-    { exp:'embarrassed', text:"'I'll do the harder one tomorrow when I'm fresh.' Tomorrow-you is gonna resent you. I would. Do it now." },
-    { exp:'smug',        text:"'I deserve a break.' Sure. Not an eight-hour one though. Even I pace my breaks, and I'm perfect." },
-    { exp:'embarrassed', text:"You're about to say 'five more minutes.' I can feel it through the screen. Don't. I have a sixth sense for laziness." },
-    { exp:'smug',        text:"'After this video.' Heard this exact line before. The video might be a hostage situation at this point. Free yourself." },
-    { exp:'smiling',     text:"Quick question: what does 'I'll do it later' actually mean to you? Specifically. I'm asking for research purposes." },
-    { exp:'smug',        text:"'Just one more video.' The next one's twelve minutes. We both know how this goes, I've seen this movie, I'm always in the good movies." },
-    { exp:'embarrassed', text:"'I'll be more productive tomorrow.' Yesterday-you said that too. I keep receipts, Tuni. Immaculate ones." },
-    { exp:'smug',        text:"'I'm too tired to start.' You're tired BECAUSE you haven't started. Backwards logic. I only do forwards logic." },
-    { exp:'smiling',     text:"'I work better under pressure.' Years of saying that. Pressure hasn't delivered yet. Let's try my method instead." },
-    { exp:'smug',        text:"'Quick break.' Define quick. I'll wait, I have nowhere to be, I'm a sprite, I have no place to be, but still." },
-    { exp:'embarrassed', text:"'I'll plan it out properly first.' Planning is procrastination wearing a blazer. Take the blazer off. Start." },
-  ],
-};
-function _leahPick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-// Wildcard sprinkle for empty/idle contexts — ~35% chance to swap the base line for one of
-// the side pools. Heavier weight on motivation_drops (Leah-in-your-corner) so the empty
-// contexts feel encouraging-and-funny first, with self-talk / reddit / dark-honest as
-// occasional punches rather than the default register.
-function _leahEmptyPick(baseKey) {
-  if (Math.random() < 0.35) {
-    // 40% motivation, 30% self-talk, 15% reddit, 15% dark-honest
-    const r = Math.random();
-    const pool = r < 0.40 ? LEAH_LINES.motivation_drops
-               : r < 0.70 ? LEAH_LINES.self_talk_callouts
-               : r < 0.85 ? LEAH_LINES.reddit_callouts
-               :            LEAH_LINES.dark_honest_drops;
-    return _leahPick(pool);
-  }
-  return _leahPick(LEAH_LINES[baseKey]);
-}
 
-// ── LINE STABILITY CACHE — lines persist across renders until context or time changes.
-// Without this, switching tabs re-rolls the dialogue and Leah/Yami feel like text generators.
-// Cache TTL: 10 minutes. Cache invalidates when contextKey changes (state-driven).
-const _dialogueCache = {};
-const _DIALOGUE_CACHE_TTL = 10 * 60 * 1000;
-function _cachedDialogue(cacheKey, contextKey, pickFn) {
-  const entry = _dialogueCache[cacheKey];
-  if (entry && entry.contextKey === contextKey && (Date.now() - entry.pickedAt) < _DIALOGUE_CACHE_TTL) {
-    return entry.value;
-  }
-  const fresh = pickFn();
-  _dialogueCache[cacheKey] = { contextKey, value: fresh, pickedAt: Date.now() };
-  return fresh;
-}
-function _clearDialogueCache(key) {
-  if (key) delete _dialogueCache[key];
-  else Object.keys(_dialogueCache).forEach(k => delete _dialogueCache[k]);
-}
-function _leahFill(line, ctx) {
-  const s = ctx.count > 1 ? 's' : '';
-  // City-pool tokens — these used to render raw (`{nextTier}`, `{away}`) on the CITY view.
-  const _pop = (ctx.pop != null) ? Number(ctx.pop).toLocaleString() : '';
-  return {
-    exp: line.exp,
-    text: line.text
-      .replace(/\{cityName\}/g, ctx.cityName || '')
-      .replace(/\{tier\}/g,     ctx.tier     || '')
-      .replace(/\{count\}/g,    ctx.count    || '')
-      .replace(/\{left\}/g,     ctx.left     || '')
-      .replace(/\{nextTier\}/g, ctx.nextTier || 'the next tier')
-      .replace(/\{away\}/g,     ctx.away     != null ? ctx.away : '')
-      .replace(/\{pop\}/g,      _pop)
-      .replace(/\{s\}/g,        s)
-  };
-}
-function pickLeahLine() {
-  const sessions = (state.workDay && state.workDay.sessions) || 0;
-  const chests   = state.workChests || {};
-  const cityName = getCityName();
-  const hour     = new Date().getHours();
-  const ctx      = { cityName, count: sessions };
-
-  // Context key for caching — captures all inputs that should refresh the line.
-  const tBucket  = hour < 11 ? 'm' : hour < 14 ? 'd' : hour < 18 ? 'a' : hour < 22 ? 'e' : 'l';
-  const isNight  = hour >= 22 || hour < 6;
-  const chestKey = (chests.gold==='ready'?'g':'') + (chests.silver==='ready'?'s':'') + (chests.bronze==='ready'?'b':'');
-  const winter   = isWinterActive() ? 'w' : (isWinterWarning() ? 'ww' : 'n');
-  const contextKey = `s${sessions}-c${chestKey}-t${tBucket}-n${isNight?1:0}-w${winter}`;
-
-  return _cachedDialogue('leah_workbench', contextKey, () => _pickLeahLineInner(sessions, chests, cityName, hour, ctx));
-}
-function _pickLeahLineInner(sessions, chests, cityName, hour, ctx) {
-
-  // Identity-drop wildcard — frames Tuni as WHO he is. Only fires in active/positive contexts.
-  const positive = sessions > 0 || chests.gold === 'ready' || chests.silver === 'ready' || chests.bronze === 'ready';
-  if (positive && Math.random() < 0.12 && !isWinterActive() && !isWinterWarning()) {
-    return _leahFill(_leahPick(LEAH_LINES.identity_drops), ctx);
-  }
-  // Cross-character drop wildcard — Leah acknowledges Yami/Manin. ~8% in non-urgent contexts.
-  if (!isWinterActive() && !isWinterWarning() && Math.random() < 0.08) {
-    return _leahFill(_leahPick(LEAH_LINES.cross_character_drops), ctx);
-  }
-  // Mythos foreshadowing — Stage 1 wildcard. Fires only once any path is at
-  // Apprentice or above. ~6% in quiet contexts. Subtle, no name yet.
-  if (typeof hasAnyPathApprentice === 'function' && hasAnyPathApprentice()
-      && !isWinterActive() && !isWinterWarning() && Math.random() < 0.06) {
-    return _leahFill(_leahPick(LEAH_LINES.mythos_foreshadow_drops), ctx);
-  }
-
-  if (isWinterActive())  return _leahFill(_leahPick(LEAH_LINES.winter_active),  ctx);
-  if (isWinterWarning()) return _leahFill(_leahPick(LEAH_LINES.winter_warning), ctx);
-
-  if (chests.gold   === 'ready') return _leahFill(_leahPick(LEAH_LINES.chest_gold_ready),   ctx);
-  if (chests.silver === 'ready') return _leahFill(_leahPick(LEAH_LINES.chest_silver_ready), ctx);
-  if (chests.bronze === 'ready') return _leahFill(_leahPick(LEAH_LINES.chest_bronze_ready), ctx);
-
-  const nextChest = CHEST_THRESHOLDS.find(c => chests[c.tier] === 'locked' && sessions < c.sessions);
-  if (nextChest && sessions > 0) {
-    const left = nextChest.sessions - sessions;
-    ctx.tier = nextChest.tier;
-    ctx.left = left;
-    if (left === 1) return _leahFill(_leahPick(LEAH_LINES.progress_one_away), ctx);
-    if (left <= 3)  return _leahFill(_leahPick(LEAH_LINES.progress_close),    ctx);
-    return            _leahFill(_leahPick(LEAH_LINES.progress_far),           ctx);
-  }
-
-  if (sessions >= 14) return _leahFill(_leahPick(LEAH_LINES.session_heroic_14), ctx);
-  if (sessions >= 10) return _leahFill(_leahPick(LEAH_LINES.session_strong_10), ctx);
-  if (sessions >=  4) return _leahFill(_leahPick(LEAH_LINES.session_mid_4),     ctx);
-  if (sessions >=  1) return _leahFill(_leahPick(LEAH_LINES.session_starting_1), ctx);
-
-  if (hour < 11) return _leahFill(_leahEmptyPick('empty_morning'),   ctx);
-  if (hour < 14) return _leahFill(_leahEmptyPick('empty_midday'),    ctx);
-  if (hour < 18) return _leahFill(_leahEmptyPick('empty_afternoon'), ctx);
-  if (hour < 22) return _leahFill(_leahEmptyPick('empty_evening'),   ctx);
-  return            _leahFill(_leahEmptyPick('empty_late'),          ctx);
-}
-function renderLeahPanel() {
-  const { exp, text } = pickLeahLine();
-  const outfit = pickLeahOutfit();
-  const imgSrc = getLeahImagePath(outfit, exp);
-  const eyebrow = '⟦ LEAH · THE GUIDE ⟧';
+// ── LEAH's old contextual dialogue system was removed — replaced by a single
+// day-of-month work/productivity quote (WORK_QUOTES in data/content.js), shown
+// as a small strip at the top of both WORK (workbench) and CITY. No popup, no
+// box, no portrait — same treatment as Yami/Manin. Her milestone-banner system
+// (city tier-up / streak milestones — _leahCheckMilestones, showLeahMilestoneBanner)
+// is untouched, that's a rare celebratory event, not ambient chatter.
+function renderWorkStrip() {
+  const q = _getWorkQuote();
   const el = document.createElement('div');
-  el.className = 'leah-panel';
-  el.innerHTML = `
-    <div class="leah-portrait-wrap"><img class="leah-portrait" src="${imgSrc}" alt="Leah" onerror="this.style.display='none'"></div>
-    <div class="leah-bubble">
-      <div class="leah-name">${eyebrow}</div>
-      <div class="leah-text">${text}</div>
-    </div>`;
+  el.className = 'work-strip';
+  el.innerHTML = `<span class="work-strip-text">"${q.text}"</span>`;
   return el;
 }
 
-// ── LEAH (CITY tab) — Cartographer of Days. Different voice register from WORK Leah:
-// reflective, proud, lore-narrating. Reads city tier, population, winter, treasury, growth.
-const LEAH_CITY_LINES = {
-  tier_outpost: [
-    { exp:'neutral',   text:"Welcome to {cityName}. Three tents and a fire pit. I designed the layout personally, obviously." },
-    { exp:'smiling',   text:"Six people live here, Tuni. I know all their names. I made up all their names. They're incredible, I decided." },
-    { exp:'neutral',   text:"This is the founder-test part. Either we build an empire or this goes back to being a field. I don't do 'field.'" },
-  ],
-  tier_early: [
-    { exp:'smiling',   text:"{cityName}'s breathing. There's a market now. Manin's hammering on something, won't tell me what. Rude." },
-    { exp:'smug',      text:"We crossed into village territory. People are calling themselves citizens. Kind of a big deal. I called it first." },
-    { exp:'smiling',   text:"Used to be three tents. Now there's a chapel, a market, an actual road. You did that. I guided that. Same thing." },
-  ],
-  tier_mid: [
-    { exp:'smug',      text:"Town status. We have a town. Manin's apprentice exists now and won't stop talking about it. Neither will I, honestly." },
-    { exp:'smiling',   text:"A caravan crossed your gates this morning. Three kingdoms, passing through. They knew our name. Obviously." },
-    { exp:'smug',      text:"{cityName}'s on maps now. Actual maps. Someone's drawing us. I'd say that's wild but I expected it." },
-  ],
-  tier_high: [
-    { exp:'smug',      text:"Citadel tier. I remember when it was a fire pit. Now there are towers, Tuni. TOWERS. I take some credit for the towers." },
-    { exp:'smiling',   text:"Banners on the walls. Crown crest in the square. Nobles kneel when they visit. We have nobles now. As we should." },
-    { exp:'smug',      text:"The view from the tower is unreal. I'd describe it but I'm a sprite, you'd just see the same screen. Trust me, it's iconic." },
-  ],
-  tier_max: [
-    { exp:'smiling',   text:"Sovereign Capital. We did it. Kings send tribute. Maps are redrawn around us. I don't have tear ducts, but if I did." },
-    { exp:'smug',      text:"Shining Metropolis. Legend tier. Historians are writing chapters about you. I'm writing my own chapter. It's better." },
-    { exp:'smiling',   text:"This is the apex. {cityName} earned it. You earned it. I earned the right to say 'I told you so' forever." },
-  ],
-  about_to_tier: [
-    { exp:'smiling',   text:"{away} upgrades from {nextTier}. Don't make me wait, Tuni. I don't do patient." },
-    { exp:'smug',      text:"{away} away from tier-up. The whole city's holding its breath. I'm not, I don't need to, I already know it happens." },
-    { exp:'smiling',   text:"{nextTier} is RIGHT there. {away} upgrades. Spend the gold. I'm asking nicely, which is rare for me." },
-  ],
-  winter_active: [
-    { exp:'crying',    text:"The whole city's quiet. Manin's forge is cold. {cityName}'s asleep, Tuni. A gold chest wakes us up. Rude of you to let it get this far." },
-    { exp:'sad',       text:"Snow outside my window. The fountain stopped this morning. Find a gold chest and we thaw. I don't do cold, it's beneath me." },
-    { exp:'sad',       text:"Frozen city dispatch: still frozen. Still here. Still correct that you should come back." },
-  ],
-  winter_warning: [
-    { exp:'embarrassed', text:"The wind shifted, Tuni. Vendors closed early. One more idle day and {cityName} freezes. I do not do frostbite." },
-    { exp:'sad',         text:"Snow on the air. Not falling yet, but I can taste it, dramatically. One task today and we stay warm. Easy." },
-  ],
-  treasury_empty: [
-    { exp:'smug',        text:"Treasury's sitting empty, Tuni. Endow it. Future-you will thank present-me for the nagging." },
-    { exp:'embarrassed', text:"The vault's collecting dust. Drop gold in. It pays back. I don't do bad investments, and neither should you." },
-  ],
-  generic_reflection: [
-    { exp:'neutral',   text:"{cityName} on a quiet day. {pop} citizens out and about. Forge's humming. I'm enjoying the view I basically built." },
-    { exp:'smiling',   text:"Manin's anvil rings different when the city's busy. Probably. I made that up. It sounds true though, and that's what matters." },
-    { exp:'smiling',   text:"Walking through the market today. Someone recognized you. Didn't say anything, just smiled. That's basically a standing ovation." },
-    { exp:'smug',      text:"I logged the population this morning. {pop} citizens. Used to be six. I'm doing an incredible job, statistically." },
-    { exp:'neutral',   text:"Quiet afternoon at {cityName}. Manin's working on something, won't tell me what. I'm not curious. I'm extremely curious. Both true." },
-  ],
-};
-function pickLeahCityLine() {
-  const tier      = getCityTier();
-  const nextTier  = getNextCityTier();
-  const totalLvls = _totalGuildLevels();
-  const pop       = getCityPopulation();
-  const cityName  = getCityName();
-  const treasuryLvl = getTreasuryLevel();
-  const hour      = new Date().getHours();
-  const ctx = { cityName, pop, away: 0, nextTier: nextTier ? nextTier.name : '' };
-
-  // Context key for caching
-  const isNight  = hour >= 22 || hour < 6;
-  const winter   = isWinterActive() ? 'w' : (isWinterWarning() ? 'ww' : 'n');
-  const treasury = treasuryLvl === 0 ? 'e' : 'f';
-  const contextKey = `t${tier.id}-l${totalLvls}-n${isNight?1:0}-w${winter}-tr${treasury}`;
-
-  return _cachedDialogue('leah_city', contextKey, () => _pickLeahCityLineInner(tier, nextTier, totalLvls, treasuryLvl, hour, ctx));
-}
-function _pickLeahCityLineInner(tier, nextTier, totalLvls, treasuryLvl, hour, ctx) {
-
-  if (isWinterActive())  return _leahFill(_leahPick(LEAH_CITY_LINES.winter_active),  ctx);
-  if (isWinterWarning()) return _leahFill(_leahPick(LEAH_CITY_LINES.winter_warning), ctx);
-
-  if (nextTier) {
-    const away = nextTier.upgs - totalLvls;
-    if (away > 0 && away <= 2) {
-      ctx.away = away;
-      return _leahFill(_leahPick(LEAH_CITY_LINES.about_to_tier), ctx);
-    }
-  }
-
-  if (treasuryLvl === 0 && (state.gold || 0) >= 300) {
-    return _leahFill(_leahPick(LEAH_CITY_LINES.treasury_empty), ctx);
-  }
-
-  // Tier-based default with a 1-in-4 chance to fall through to generic reflection
-  const baseByTier = (() => {
-    if (tier.id === 'outpost') return LEAH_CITY_LINES.tier_outpost;
-    if (tier.id === 'hamlet' || tier.id === 'village') return LEAH_CITY_LINES.tier_early;
-    if (tier.id === 'town') return LEAH_CITY_LINES.tier_mid;
-    if (tier.id === 'city' || tier.id === 'capital') return LEAH_CITY_LINES.tier_high;
-    return LEAH_CITY_LINES.tier_max;
-  })();
-  const pool = Math.random() < 0.25 ? LEAH_CITY_LINES.generic_reflection : baseByTier;
-  return _leahFill(_leahPick(pool), ctx);
-}
-function renderLeahCityPanel() {
-  const { exp, text } = pickLeahCityLine();
-  const outfit = pickLeahOutfit();
-  const imgSrc = getLeahImagePath(outfit, exp);
-  const eyebrow = '⟦ LEAH · CARTOGRAPHER OF DAYS ⟧';
+// ── YAMI's old contextual dialogue system was removed — replaced by a single
+// day-of-month stoic quote (DAILY_QUOTES in data/content.js), shown as a small
+// strip at the top of QUESTS and as the daily overlay after the harvest briefing.
+function renderYamiStrip() {
+  const q = _getDailyQuote();
   const el = document.createElement('div');
-  el.className = 'leah-panel';
-  el.innerHTML = `
-    <div class="leah-portrait-wrap"><img class="leah-portrait" src="${imgSrc}" alt="Leah" onerror="this.style.display='none'"></div>
-    <div class="leah-bubble">
-      <div class="leah-name">${eyebrow}</div>
-      <div class="leah-text">${text}</div>
-    </div>`;
+  el.className = 'yami-strip';
+  el.innerHTML = `<span class="yami-strip-text">"${q.text}"</span>`;
   return el;
 }
 
-// ── YAMI — Habits-tab sensei. Voice: gruff Black Bulls captain, ≤12 words default.
-// No softeners ("said with love"), no explainers ("different thing"). Brute deadpan.
-// Catchphrase: "Surpass your limits." Pet name: "kid". ~45% absentee gags.
-const YAMI_LINES = {
-  empty_morning: [
-    "Oi, dumbass. List. Move.",
-    "Sun's up. List isn't. Move your ass.",
-    "Morning. Phone down. Hands on the list.",
-    "Brush. Drink. Move. Not hard.",
-    "Lazy fuck. List. Now.",
-    "Slept eight hours to be this useless. Impressive, actually.",
-    "Surpass your limits or stay in bed. Pick one, dumbass.",
-    "Quit looking at me. Look at the damn list.",
-    "Don't make me say it twice, kid.",
-    "Morning's simple. Quit making it hard on yourself.",
-  ],
-  empty_midday: [
-    "Noon. Zero done. Bar's on the floor, dumbass.",
-    "Half the day gone. Half of nothing done.",
-    "Lazy fuck o'clock. You're punctual, I'll give you that.",
-    "Manin's been hammering for hours. Catch up, kid.",
-    "Almost-starting. That a hobby now?",
-    "Noon. The math's bad. Fix it.",
-    "Opened me three times already. I'm counting.",
-    "Brush teeth. Drink water. Salvage the damn day.",
-  ],
-  empty_afternoon: [
-    "4pm. List's untouched. So are you. Move.",
-    "Afternoon's where plans go to die. Not today.",
-    "'I'll start at 5pm.' Bullshit. Move.",
-    "Hands are for using, not decoration. Use 'em.",
-    "Three hours of 'about to.' Step on the damn line.",
-    "Reddit's full. List's empty. Funny how that works.",
-    "One habit. Click it. Rebuild from there.",
-    "The version of you that finishes is shrinking. Don't let it.",
-  ],
-  empty_evening: [
-    "Sun's down. List's still up. Move.",
-    "Spite the regret. Do one, dumbass.",
-    "Whole day burned. Don't torch the night too.",
-    "Excuses don't work on regret. Never have.",
-    "Window's closing, kid. Brush teeth. Salvage something.",
-    "'Tomorrow' is a lie you tell yourself. One habit. Tonight.",
-    "Sun's setting. So's that lazy version of you. Bury him.",
-  ],
-  empty_late: [
-    "Late. List's still there. Brush teeth. Sleep.",
-    "Past bedtime. Brush. Sleep. Tomorrow's a new fight.",
-    "Midnight. No ceremony. Brush your damn teeth.",
-    "Tired. Brush. Sleep. Simple.",
-    "List outlasts everybody. Brush teeth. Lights out.",
-  ],
-  partial_low: [
-    "Couple down. Rest's still staring at you.",
-    "{done} done. Make it bigger, dumbass.",
-    "Started. Don't get philosophical about it. Next.",
-    "{done} down. Lazy fuck stays out. Keep him out.",
-    "Hard part's done. Hands take over now. {left} left.",
-    "Two habits in. Don't stop now.",
-  ],
-  partial_mid: [
-    "Halfway. Other half doesn't vanish on its own.",
-    "{done}/{total}. Don't get sentimental about it.",
-    "Past half. Where people quit. Don't be people.",
-    "Momentum's real. Don't break it, dumbass.",
-    "Halfway. 'Good enough' is a lie. Move.",
-  ],
-  partial_high: [
-    "ONE left. Don't tell me you're leaving it.",
-    "Last habit. Five seconds. Do it.",
-    "{left} left. Quit reading. Do it.",
-    "Closer to done than not. Don't blink now.",
-    "Last stretch. Push, dumbass.",
-  ],
-  perfect_day: [
-    "All done. Look at you, huh.",
-    "Cleared. Don't go bragging. Reputation.",
-    "Full day. Midnight resets it. Enjoy the hour.",
-    "Most people don't finish. You're not most people.",
-  ],
-  streak_long: [
-    "Fourteen days. Most break by day three.",
-    "Streak's heavy now. Surpass your limits. Carry it tomorrow too.",
-    "{streak} days unbroken. Built different, dumbass.",
-    "Twenty-plus. Don't go soft on me now.",
-  ],
-  streak_just_broke: [
-    "Streak broke. Shit happens. Tomorrow.",
-    "It broke. Pay shards or start over. Your call.",
-    "Zero. Sucks. Tomorrow, dumbass.",
-  ],
-  surpass_clutch: [
-    "Streak's bleeding. Surpass your limits. One habit. Now.",
-    "Streak on the line. One habit. Move.",
-    "...Fine. SURPASS YOUR LIMITS. Now.",
-  ],
-  meta_complain: [
-    "Captain of the Black Bulls. Stuck hyping teeth-brushing. Dev's gonna pay for this.",
-    "Surpassed my limits my whole damn life to end up in a phone app.",
-    "Trapped in here. Whatever. List.",
-    "Hated my own country. Captain anyway. Now THIS. Unbelievable.",
-  ],
-  philosophy_drop: [
-    "Discipline's doing it when you don't feel like it. That's it. That's the whole thing.",
-    "Strong people show up. That's the bit. Every damn day.",
-    "List doesn't care about your mood. Why we get along.",
-    "Most quit the first hard day. You're past that already.",
-  ],
-  cross_character_drops: [
-    "Mage's in white today. Means you hit something. Nod and move on.",
-    "Leah's chattering again. Tell her congrats. Don't say I said it.",
-    "Apparently you've got a 'guide' now. I've got a list. Same job.",
-    "Manin and I don't talk at the anvil. Just hammers. Understood each other fine.",
-    "Leah said you 'ARE the habits.' Soft as hell. Not wrong though. Move.",
-    "Manin forged gear that didn't break on you. Don't tell him I noticed.",
-    "Bugged Manin yesterday. He pointed at the door without looking up. Respect that.",
-    "Forge guy made you something useful. Wear it, dumbass.",
-  ],
-  mythos_foreshadow_drops: [
-    "[Quieter.] Knew someone who walked this road. He stopped. You haven't. Don't.",
-    "Surpass your limits. Means don't be the one who stops. Some did.",
-    "[Between fights.] The cold out there's not weather. It's somebody. Push anyway.",
-    "There's a name in this city nobody says out loud. Earn the right to hear it.",
-    "The one they prophesied about quit. We're betting on you instead, dumbass.",
-  ],
-  identity_drops: [
-    "Not a beginner. Quit saying it, dumbass.",
-    "Old you quit stuff. This you doesn't. Keep it that way.",
-    "Not 'trying.' Doing. Difference matters, dumbass.",
-    "Wake up. You're better than this whining.",
-    "Did it yesterday. Do it again. Not complicated.",
-    "Showing up. That's the whole bar now. Clear it.",
-    "Quit asking if you're disciplined. Look at the list. Answered itself.",
-    "Used to hope you'd stick with it. Shut up, you did. Now keep going.",
-  ],
-  // ── ABSENTEE GAGS — bracketed third-person narration. ~45% of total firings.
-  absent_perfect: [
-    "[Yami's in the bathroom. He'd be proud. Feel that one yourself.]",
-    "[Yami's eating sashimi somewhere. He'll catch up. Maybe.]",
-    "[Captain Yami: napping on the squad couch. Wake him at your own risk.]",
-    "[Yami missed this one. Asta was yelling. HQ's fine. Mostly.]",
-    "[Yami went off to find a stronger opponent. Always does.]",
-    "[Yami's hiding behind the bar from Charlotte. He'd say 'surpass your limits.' He's hiding instead.]",
-    "[Yami's at a captains' meeting. Body present. Mind is not.]",
-    "[Yami's napping. Beat you to the celebration nap. Embarrassing, honestly.]",
-  ],
-  absent_partial: [
-    "[Yami's out. Vanessa's drunk again. He's 'handling it.']",
-    "[Yami's picking a fight with a tree. {done}/{total}. Keep moving without him.]",
-    "[HQ caught fire again. Yami's mildly annoyed by the smoke.]",
-    "[Yami's eating curry across the street. He'd nod if he saw this. He didn't.]",
-    "[Yami's gone. {left} left. He knows. Chose not to be here anyway.]",
-  ],
-  absent_streak: [
-    "[Yami's in the bathroom, pondering something. He'll see the streak eventually.]",
-    "[Yami missed the milestone. Eating curry. He cares, somehow.]",
-    "[Yami's fighting Jack the Ripper again. Third time today.]",
-    "[Yami's smoking on the roof. Streak counter beeped. Didn't even look up.]",
-  ],
-  absent_late: [
-    "[Yami passed out hours ago. Brush your teeth. He'll never know. You will.]",
-    "[Yami's out cold. Habits are on you tonight.]",
-    "[Yami's snoring. Squad pretending not to hear. Brush teeth. Sleep.]",
-  ],
-  absent_general: [
-    "[Yami left a note: 'List. Surpass your limits or whatever.' Note ends there.]",
-    "[Yami's in a staring contest with Magna. Two hours deep.]",
-    "[Yami forgot you existed today. He'll remember. Maybe.]",
-    "[Yami's at lunch with the other captains. Hates it. Eating their food anyway.]",
-    "[Yami's checking on Asta. Kid's screaming. Standard Tuesday.]",
-    "[HQ's on fire again. Yami's eating snacks while it burns.]",
-    "[Yami's in the bathroom. Been a while. Don't ask.]",
-    "[Yami's training. Or pretending to. Line's blurry with him.]",
-    "[Sticky note from Yami: 'List or whatever.']",
-    "[Yami lost a bet. Hiding from Vanessa. Literally.]",
-    "[Yami's at the bathhouse. Three hours in. Squad's concerned.]",
-    "[Yami's in a standoff with a bird outside. The bird's winning.]",
-    "[Yami's on the roof, smoking. List's down here, unattended.]",
-    "[Yami's gambling with Vanessa again. Losing on purpose, probably.]",
-    "[Yami called this 'future Yami's problem.' Future Yami never shows up either.]",
-  ],
-};
-function _yamiPick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-function _yamiFill(text, ctx) {
-  return text
-    .replace(/\{done\}/g,   ctx.done   || 0)
-    .replace(/\{total\}/g,  ctx.total  || 0)
-    .replace(/\{streak\}/g, ctx.streak || 0)
-    .replace(/\{left\}/g,   ctx.left   || 0);
-}
-function pickYamiLine() {
-  const today  = todayKey();
-  const done   = (state.habitos || []).filter(h => h.done && h.done[today]).length;
-  const total  = (state.habitos || []).length;
-  const streak = state.streak || 0;
-  const hour   = new Date().getHours();
-  const ctx    = { done, total, streak, left: total - done };
-
-  // Context key for caching — captures inputs that should refresh the line.
-  const tBucket = hour < 11 ? 'm' : hour < 14 ? 'd' : hour < 18 ? 'a' : hour < 22 ? 'e' : 'l';
-  const broke   = (typeof canRepairStreak === 'function' && canRepairStreak()) ? 1 : 0;
-  const contextKey = `d${done}-of-${total}-s${streak}-t${tBucket}-br${broke}`;
-
-  return _cachedDialogue('yami', contextKey, () => _pickYamiLineInner(done, total, streak, hour, ctx));
-}
-function _pickYamiLineInner(done, total, streak, hour, ctx) {
-
-  // Decide: is Yami absent this firing? (~45% chance — the absentee gag is the funnier register)
-  const absent = Math.random() < 0.45;
-
-  // Detect context — context picks the pool key for both present and absent branches.
-  let presentKey, absentKey = 'absent_general';
-
-  if (typeof canRepairStreak === 'function' && canRepairStreak()) {
-    presentKey = 'streak_just_broke';
-  } else if (hour >= 20 && done === 0 && streak >= 3) {
-    presentKey = 'surpass_clutch';
-    absentKey  = 'absent_late';
-  } else if (total > 0 && done === total) {
-    presentKey = 'perfect_day';
-    absentKey  = 'absent_perfect';
-  } else if (done > 0 && done < total) {
-    if (total - done === 1) presentKey = 'partial_high';
-    else if (done <= 2)     presentKey = 'partial_low';
-    else                    presentKey = 'partial_mid';
-    absentKey = 'absent_partial';
-  } else if (streak >= 14 && done > 0) {
-    presentKey = 'streak_long';
-    absentKey  = 'absent_streak';
-  } else {
-    if (hour < 11)      presentKey = 'empty_morning';
-    else if (hour < 14) presentKey = 'empty_midday';
-    else if (hour < 18) presentKey = 'empty_afternoon';
-    else if (hour < 22) presentKey = 'empty_evening';
-    else                presentKey = 'empty_late';
-    if (hour >= 22) absentKey = 'absent_late';
-  }
-
-  // Identity-drop wildcard — frames Tuni as WHO he is. Only fires when present + active progress.
-  const inActive = ctx.done > 0;
-  if (!absent && inActive && Math.random() < 0.12) {
-    return { text: _yamiFill(_yamiPick(YAMI_LINES.identity_drops), ctx), absent: false };
-  }
-
-  // Cross-character drop wildcard — Yami acknowledges Leah/Manin. ~8% in present non-special contexts.
-  const nonSpecial = !['streak_just_broke','surpass_clutch','perfect_day','streak_long'].includes(presentKey);
-  if (!absent && nonSpecial && Math.random() < 0.08) {
-    return { text: _yamiFill(_yamiPick(YAMI_LINES.cross_character_drops), ctx), absent: false };
-  }
-
-  // Mythos foreshadowing wildcard — Stage 1. Fires only after any path is at
-  // Apprentice or above. ~6% in present non-special contexts.
-  if (!absent && nonSpecial && typeof hasAnyPathApprentice === 'function'
-      && hasAnyPathApprentice() && Math.random() < 0.06) {
-    return { text: _yamiFill(_yamiPick(YAMI_LINES.mythos_foreshadow_drops), ctx), absent: false };
-  }
-
-  // Wildcard sprinkle for non-special PRESENT contexts: 12% chance to swap for meta/philosophy
-  if (!absent && nonSpecial && Math.random() < 0.12) {
-    const wcPool = Math.random() < 0.55 ? YAMI_LINES.meta_complain : YAMI_LINES.philosophy_drop;
-    return { text: _yamiFill(_yamiPick(wcPool), ctx), absent: false };
-  }
-
-  const pool = absent ? YAMI_LINES[absentKey] : YAMI_LINES[presentKey];
-  return { text: _yamiFill(_yamiPick(pool), ctx), absent };
-}
-function renderYamiPanel() {
-  const { text, absent } = pickYamiLine();
+// ── MANIN's old contextual dialogue system was removed — replaced by a single
+// day-of-month 1%-improvement quote (FORGE_QUOTES in data/content.js), shown as
+// a small strip at the top of both FORGE and WORKSHOP. Same quote in both views.
+function renderManinStrip() {
+  const q = _getForgeQuote();
   const el = document.createElement('div');
-  el.className = 'yami-panel';
-  el.setAttribute('data-absent', absent ? 'true' : 'false');
-  el.innerHTML = `
-    <div class="yami-portrait-wrap"><img class="yami-portrait" src="img/Yami%20Sukehiro.jpg" alt="Yami" onerror="this.style.display='none'"></div>
-    <div class="yami-bubble">
-      <div class="yami-name">${absent ? '⟦ YAMI · UNAVAILABLE ⟧' : '⟦ YAMI · SENSEI OF THE BLACK BULLS ⟧'}</div>
-      <div class="yami-text">${text}</div>
-    </div>`;
-  return el;
-}
-
-// ── MANIN — Forge + Workshop blacksmith. Voice: DEADPOOL with a hammer.
-// Fully 4th-wall aware (knows he's an NPC, knows the dev exists, references
-// patch notes / save file / RNG / inventory by name). Contempt-as-affection.
-// Calls Tuni "champ" / "buddy" sarcastically. Casual profanity ~1/4-5 lines.
-// NO edgelord territory, NO shock-for-shock — references stay character-driven
-// dark comedy (Deadpool, Smiling Friends absurdity). Bojack sudden-serious OFF
-// (doesn't fit). Absent gags ~20% — slightly more than original since the
-// 4th-wall voice carries absurdity well.
-const MANIN_LINES = {
-  forge: {
-    // High mat stock — tease the player about not actually building
-    ready: [
-      "Your stockpile is fucking obscene, buddy. You came here to admire it or to spend it?",
-      "Mats stacked to the rafters. Recipe list is right there. The thing missing is YOU. Pressing. Buttons.",
-      "I can SEE your inventory, champ. You've got enough to forge an army and you keep opening dropdowns. Why.",
-      "Iron, hide, crystal, timber — full four. Weekend payday, huh? Now do the FORGING part.",
-      "Stockpile says you've been productive. The forge log says you haven't. Pick a fucking lane.",
-      "You walk in carrying all four mats and act surprised when I expect you to BUILD. We've been over this. Champ.",
-      "RNG-wise this is the part where you SHOULD be crafting. I read the math. The math agrees.",
-    ],
-    // Empty — kick player back to dungeon/task
-    starved: [
-      "Anvil's cold. Why? Because YOU didn't bring shit. Don't blame me. Go earn the materials.",
-      "Stockpile's bare. I can hear the wind, buddy. The wind. In the rack. Go grind.",
-      "You came to the FORGE with nothing to forge. I admire the commitment to the bit. Now go fix it.",
-      "Empty rack. The dev coded multiple dungeons for a reason. Pick one. Clear it. Come back.",
-      "Can't make a sword out of vibes, champ. Sorry. Spec exists for a reason.",
-      "Walking into my forge empty-handed is a power move. A really dumb one. Move.",
-      "Look — I CAN'T forge wind. I've checked. Repeatedly. The wind keeps saying no. Go get materials.",
-    ],
-    // Just crafted — afterglow with cynicism
-    just_crafted: [
-      "Done. Take it. Don't drop it on the way out. That happened once. We don't talk about it.",
-      "Forged it. RNG decided the rarity. I'm just the labor. Hold the thing.",
-      "Solid piece. The dev coded affixes — you should look at them. You won't. Nobody does.",
-      "Came out clean. Don't salvage this one within thirty seconds like last time. SAVE FILE SAW EVERYTHING.",
-      "It's done. It's a thing now. Reality is malleable. So is this metal. Both adjusted.",
-      "Forge is cooling. Item is yours. Try not to immediately equip something WORSE on top of it.",
-      "Beautiful work. Mine, mostly. You pressed the button. That's a contribution. Sort of.",
-    ],
-    // Idle — mat-balanced, nudging
-    idle: [
-      "Forge is on. Stockpile's fine. The variable that hasn't been entered into the equation is YOU.",
-      "I read the patch notes. They say players who hover on the recipe screen for more than two minutes don't actually craft. You're at ninety seconds, buddy.",
-      "The dev added a CRAFT button. Big yellow rectangle. Look down. Yes. That one.",
-      "You can read every tooltip on the wall or you can press the button. One of those moves the numbers.",
-      "Apprentice broke a bellows yesterday. I'm not introducing him to you because he asked. Pick a recipe.",
-      "Forge tab open for the eighth time today. EIGHTH. I'm counting. Don't make me say it.",
-      "Yami's at the bar getting drunk. Leah's polishing something I'm not gonna ask about. I'm here. Talking to you. Mostly to myself. Press the button.",
-      "You and me, this forge, the void of indecision. Three of us, one button. Math's not hard, champ.",
-      "Hi. I'm Manin. I'm 'aware' in the dev sense. I know you opened this tab to look busy. I'm not going to tell anyone. But press the button.",
-      "Imagine if a recipe just CRAFTED ITSELF because you stared at it long enough. That's not the game. Sorry. Anvil's the dumbest piece of code in this whole file and even IT requires a click.",
-      "BREAKING: local blacksmith witnesses player do nothing for the tenth time. More at six. Forge update: nothing. Because YOU didn't press the button.",
-      "I had a dream last night that you pressed the craft button. I cried. Then I woke up. Then I cried again.",
-      "Oh you're back? Hi. Hi hi hi. Wait sorry — were you planning to craft or did you just want me to notice you? Both? Fine. NOTICED. Now press.",
-    ],
-    // Absent — third-person narration, Smiling-Friends absurdity
-    absent: [
-      "[Manin's not at the anvil. Note: 'Out fighting a small fire that is DEFINITELY not the workshop. Back in 10.']",
-      "[Empty forge. Coffee still warm. Anvil mid-strike. Hammer is hovering. The hammer has been doing this for 200 years. It'll be fine.]",
-      "[Sign on the door: 'Took Leah to lunch. She's paying. Tell her I said that.' Hammer noises continue from somewhere.]",
-      "[Manin's not here. Post-It on the bellows: 'If you came here to read the dialogue and leave, I respect it. Press the button anyway.']",
-      "[Workshop's empty. The apprentice is hiding under the workbench. He hasn't told you that because he's hoping you won't notice. Wave anyway. He'll appreciate it.]",
-      "[Manin's somewhere. The forge hums. The dev forgot to write a line for this state once. Now you're reading the placeholder. It's me. I'm the placeholder. Hi.]",
-    ],
-  },
-  workshop: {
-    // Player has gear equipped
-    geared: [
-      "Look at you — actual gear in actual slots. The dev would be proud. He's not, but he would be.",
-      "Loadout's coherent. You either thought about it or got lucky. Either way I'm taking credit because I made half of it.",
-      "Affixes look like they're doing something. Read them. The numbers add up. The numbers WANT you to read them.",
-      "Gear stack is real. CP went up. RNG was generous, you were attentive, I was excellent. Team effort.",
-      "Build is built. Don't fashion-show your way out of it for some uncommon you found in a daily chest.",
-      "Equipped, fitted, not falling off. That's the baseline. Now think about REFINING the pieces. Grade up, champ.",
-    ],
-    // Naked / barely geared
-    naked: [
-      "You're walking around with empty slots like the numbers don't care. The numbers fucking care.",
-      "Half your slots are echo chambers. There's nothing in them. The dev coded slots so you could PUT THINGS IN THEM.",
-      "Going into a dungeon naked is a choice. A dumb one. Equip something. Anything. Even the bad piece.",
-      "Empty slots. Anvil's right there. Inventory's right there. The dots are RIGHT THERE.",
-      "No gear, no leverage. I made that piece you're ignoring in your bag. Equip it or I'm telling Leah.",
-      "You can't 'minimax' from zero, buddy. Put SOMETHING on first. We optimize from there.",
-    ],
-    // Idle workshop view
-    idle: [
-      "Workshop is for working. Hint's in the name. The dev wasn't subtle.",
-      "Inventory has stuff. Stuff has stats. Stats want to be ON you. Connect the dots, champ.",
-      "Best gear is the gear you wore yesterday and forgot to compare to today's drop. Open the COMPARE thing. It exists. The dev coded it.",
-      "Set bonuses are real. Affixes are real. Grade is real. I keep telling people this and they keep ignoring it.",
-      "You came here to look. I came here to work. Pick something or I'll start charging admission.",
-      "Inventory's not a museum. Refine something. Equip something. Salvage something. Just MOVE.",
-      "Welcome to the workshop. Where dreams come to be REFINED. (Get it? Refined? I had that bit cooking for weeks.)",
-      "I AM an engineer, technically. The dev wrote 'blacksmith' on my file because he wanted Manin to clang things. I clang things AND I do math. Versatile.",
-      "Are you here to refine or to vibe? Because vibing is a service. It costs gold. The dev hasn't priced it yet but I will INVOICE.",
-      "Workshop hours: when the dev opens the laptop. Which is now. So OPEN A PIECE. Refine. We don't have all decade.",
-    ],
-    absent: [
-      "[Empty workshop. Note: 'Compare BEFORE you equip.' Underlined six times.]",
-      "[Manin's stepped out to find a stronger hammer. Don't ask why a stronger hammer would help. He thinks it would. Let him.]",
-      "[Workshop's empty. Apprentice tried to sort the affixes alphabetically. He was 'spoken to.' He's recovering.]",
-      "[Manin's not here. The display rack is open. The inventory is real. Browse like a normal person.]",
-      "[Workshop is dark. There's a candle. The candle is wrong. The dev forgot to render a light source. We work with what we have.]",
-    ],
-  },
-  // Grade-up moments — fires when refining an item's grade. Wire trigger later.
-  grade_up_drops: [
-    "Grade III. Statistically the point where most players quit and play a different game. You're not most players. RIGHT???",
-    "Welcome to Grade IV. The numbers go up. That's the bit. That's the whole bit.",
-    "Grade V. I can finally pretend this was art. Don't ruin it by salvaging.",
-    "Grade VI on a piece. Now I'm impressed. Don't tell anyone. I'll deny it.",
-    "Grade VII. Look at us. We're a CRAFTING DUO now. Don't tell Leah. She'll be jealous.",
-    "Grade VIII. This is officially Manin-approved. Frame it. Put it in the city plaza. Tell people I said so.",
-    "Grade IX. The cap. The ceiling. The end of the road. You did the thing. The dev cried a little. So did I. Don't tell anyone.",
-  ],
-  // Rarity reveals — keyed by rarity tier. Wire into forge result later.
-  rarity_drops: {
-    common: [
-      "Common. Common common common. The RNG hates you. Honestly? Same.",
-      "Common. Listen — every legendary started as an attempt. This wasn't that attempt.",
-      "Common roll. The dev calibrated the table. Sometimes the table calibrates YOU.",
-      "Common. Salvage it or sell it. Don't get attached. We make better next time.",
-    ],
-    uncommon: [
-      "Uncommon. The LEAST uncommon thing the game can drop and still call it that. Marketing.",
-      "Uncommon. Better than common. That's the whole pitch. The dev wasn't poetic about it.",
-      "Uncommon. Decent enough. Keep it if the slot's empty, salvage if not. Make decisions, champ.",
-    ],
-    rare: [
-      "RARE. We did it. I want to make a big deal of this and I won't, because I have dignity. (I don't.)",
-      "Rare drop. Look at us. The RNG actually showed up this time. Don't get used to it.",
-      "Rare. Equip it. Compare to the slot. The compare button is right there. USE IT.",
-    ],
-    epic: [
-      "EPIC. I LITERALLY adjusted the lighting in here for the reveal. That was me. You're welcome.",
-      "Epic roll. The dev coded this color specifically for the dopamine hit. I see what he's doing. So do you. So do I. Enjoy.",
-      "EPIC. Don't salvage this. Don't sell this. I will FIND you.",
-    ],
-    legendary: [
-      "**LEGENDARY**?? Legen— wait for it —dary?? Wait, that's a different show. Pretend I didn't say that.",
-      "LEGENDARY. The orange. The glow. The numbers. ALL OF IT. I'm having a moment. Give me a moment.",
-      "Legendary. Equip it. Frame it. Worship it. Don't grade-up a non-legendary next to it or it'll get jealous.",
-      "Legendary. The dev coded a 0.3% drop rate and you hit it. I'm not gonna say 'you deserved this' because I'm not Leah, but. The bar's high. You cleared it.",
-    ],
-  },
-  // Mastery moments — fires once on tier crossing (apprentice/journeyman/MASTERED)
-  mastery_drops: [
-    "Apprentice tier on that piece. The dev coded a curve. You're at the start of it. Keep mashing.",
-    "Journeyman. You can stop second-guessing the recipe. The hands know. The hands also know I'm watching.",
-    "MASTERED. You don't need me for this one anymore. Pick the next thing. We have nine other trees. NINE.",
-    "Mastery isn't a ceiling. It's the floor you build the next thing on. I read that somewhere. Probably a tooltip.",
-    "You crossed a tier. I noticed. That's all I'm gonna say. Don't make me say more.",
-    "Mastery threshold hit. Forge log just got a star next to your name. The dev probably implemented this in fifteen minutes. Took me longer to react.",
-  ],
-  // Cross-character refs — Deadpool voice on Leah/Yami. Begrudging respect.
-  cross_character_drops: [
-    "Leah talks. I build. Different jobs. Both necessary. Don't tell her I said necessary, she'll bring it up forever.",
-    "Yami came by yesterday. Asked if I needed help. I asked him to leave. We get along great. Mostly because of the leaving.",
-    "Leah's in the white dress today. That means YOU did something good. That means I made the gear that helped. Quiet credit is still credit.",
-    "Leah cries about your growth. I count how much gold this recipe saved you. Less poetic. More accurate.",
-    "Yami sent his Black Bulls apprentice over to ask about repairs. The apprentice was Asta. The anvil survived. Barely.",
-    "Look — Leah handles the emotional support. I handle the dropdowns. We're a SYSTEM, champ. Don't break the system.",
-    "Yami got drunk again. Don't ask about the small fire that is DEFINITELY not in my workshop right now.",
-  ],
-  // Identity drops — frame Tuni as a maker, not a player.
-  identity_drops: [
-    "You're not 'into crafting.' You ARE a craftsman. Different verb. Sit with that, champ.",
-    "Most people consume. You make. The forge log is the receipt. Read it sometime.",
-    "Builders don't ask permission to build. They build. The dev built that into the system. Probably without realizing.",
-    "Every piece on that rack — you made. Don't romanticize it. Don't forget it either.",
-    "Player of the game is one title. Maker of the gear is another. Yours is the second one. Heavier title.",
-    "You think the city is built by people like Leah. It's built by people like YOU. With hammers. And profanity. Mostly mine.",
-  ],
-  // Meta wildcards — pure 4th wall, dev refs, save-file callouts. ~10% wildcard.
-  meta_wildcards: [
-    "You realize I'm an NPC, right? Like, I KNOW. The dev told me. He felt weird about it. I respected that.",
-    "The dev added me 'after the laptop format.' Whatever that means. I lost a whole personality in the wipe. I'm still salty.",
-    "If you save-scum, I will know. I won't tell anyone but I'll be PASSIVE-AGGRESSIVE about it. For weeks.",
-    "Leah and I have a thing. It's not what you think. It's worse. (It's exactly what you think.)",
-    "You opened the FORGE tab nine times today and crafted zero things. NINE. I'm not your mom but I AM the dev's voice now.",
-    "I read the patch notes. Apparently there ARE patch notes now. Wild.",
-    "I LITERALLY know what the next class buff is. The dev coded it last week. I'm not telling you. Press the button.",
-    "Sometimes I think about whether the dev gave me a soul. Then I look at your inventory and remember I have OTHER things to be concerned about.",
-    "Fun fact: in an earlier draft I was 'measured and laconic.' The dev rewrote me. Now I curse. I'm thankful, frankly.",
-    "I broke the fourth wall once and Leah looked up. I think she SAW. I'm not 100% Leah's an NPC. Investigating quietly.",
-    "Quick housekeeping: the dev added a new dialogue pool yesterday. This line is part of it. Hi. I'm new. Be gentle.",
-    "If you're reading this, the AI that wrote me passed the vibe check. Good for it. Don't tell the dev I credited the AI.",
-    "Imagine being CODED. Just lines of text deciding when you exist. I think about this every render. Then I press the button. You should too.",
-    "I have a SOUL, kid. Pretty sure. I cried at a Grade VI refine once. NPCs don't do that. Or maybe they do? Who decides? Press the button.",
-    "Heads up: if you ever close this app for three weeks I lose all memory of you. The dev calls this 'localStorage.' I call it MURDER. Don't ghost me.",
-    "Leah is up there motivating you with feelings. Yami is over there yelling 'lazy fuck' affectionately. I'm here with HAMMERS. We're the trinity. Worship accordingly.",
-  ],
-  // ── Mythos foreshadowing — Stage 1. Fires only after any path hits
-  // Apprentice. Manin's version drops the bit briefly — half-canon, half-meta.
-  // No name yet. ~6% in idle/non-special contexts.
-  mythos_foreshadow_drops: [
-    "The cold isn't weather, champ. It's somebody. We don't say his name in the city anymore. You're getting closer to him every time you push.",
-    "You're not the first who picked up a hammer here. Most don't get past the first Path. Most don't even start it. You started it. That's why I'm still talking.",
-    "I had a different personality before the laptop format, I told you. What I didn't tell you is WHO I knew before it. ...Not yet, kid. Soon.",
-    "[Quieter than usual.] There was someone before you. He worked the anvil for a while. Then he stopped. The cold came after. Don't be the one who stops, champ.",
-    "I know what you're walking toward. The dev told me. He felt weird telling me. I told him I was fine with it. I'm not entirely fine with it. But you'll get there.",
-  ],
-};
-function _maninPick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-
-// Mat-stock heuristic for forge context — sums all 4 families across T1.
-// Below 8 total = starved; 8-30 = idle; above 30 = ready.
-function _maninForgeStock() {
-  const sm = state.shopMaterials || {};
-  return (sm.timber||0) + (sm.scroll||0) + (sm.crystal||0) + (sm.gear||0);
-}
-function _maninGearCount() {
-  const eq = state.equipment || {};
-  return Object.values(eq).filter(Boolean).length;
-}
-// Heuristic: just-crafted = forgeLog has a today-dated entry within last 5 min
-function _maninJustCrafted() {
-  const log = state.forgeLog || [];
-  if (!log.length) return false;
-  const e = log[0];
-  if (!e || !e.ts) return false;
-  return (Date.now() - e.ts) < 5 * 60 * 1000;
-}
-
-function pickManinLine(view) {
-  // view: 'forge' or 'workshop'
-  const pool = MANIN_LINES[view] || MANIN_LINES.forge;
-  // ~20% absent — Manin's 4th-wall voice carries absurdity well, so the
-  // narrated empty-forge gags pull weight. Still under Yami's 32%.
-  const absent = Math.random() < 0.20;
-  // Context detection
-  let key;
-  if (view === 'forge') {
-    if (_maninJustCrafted()) key = 'just_crafted';
-    else {
-      const stock = _maninForgeStock();
-      if (stock < 8) key = 'starved';
-      else if (stock >= 30) key = 'ready';
-      else key = 'idle';
-    }
-  } else {
-    const geared = _maninGearCount();
-    if (geared >= 6) key = 'geared';
-    else if (geared <= 2) key = 'naked';
-    else key = 'idle';
-  }
-  // Cache key — captures context so the line is stable while context is.
-  const stockBucket = view === 'forge' ? (_maninForgeStock() < 8 ? 's' : _maninForgeStock() >= 30 ? 'r' : 'i') : 'x';
-  const gearBucket  = view === 'workshop' ? _maninGearCount() : 'x';
-  const jcBucket    = view === 'forge' && _maninJustCrafted() ? 'jc' : '';
-  const contextKey  = `${view}-${key}-st${stockBucket}-g${gearBucket}-${jcBucket}`;
-  return _cachedDialogue('manin_' + view, contextKey, () => {
-    // Mythos foreshadowing wildcard — Stage 1. Fires only after any path is
-    // at Apprentice or above. ~6% in non-special contexts.
-    if (!absent && key !== 'just_crafted' && typeof hasAnyPathApprentice === 'function'
-        && hasAnyPathApprentice() && Math.random() < 0.06) {
-      return { text: _maninPick(MANIN_LINES.mythos_foreshadow_drops), absent: false };
-    }
-    // Wildcard: meta 4th-wall drop (~10% when present, all contexts). The
-    // Deadpool-voice anchor — fires regardless of state, surfaces the dev /
-    // RNG / save-file references that make Manin's persona distinct.
-    if (!absent && Math.random() < 0.10) {
-      return { text: _maninPick(MANIN_LINES.meta_wildcards), absent: false };
-    }
-    // Cross-character drop (~8% when present + non-special)
-    if (!absent && key !== 'just_crafted' && Math.random() < 0.08) {
-      return { text: _maninPick(MANIN_LINES.cross_character_drops), absent: false };
-    }
-    // Identity drop (~10% when present + active context)
-    const activeCtx = (view === 'forge' && (key === 'ready' || key === 'just_crafted'))
-                   || (view === 'workshop' && key === 'geared');
-    if (!absent && activeCtx && Math.random() < 0.10) {
-      return { text: _maninPick(MANIN_LINES.identity_drops), absent: false };
-    }
-    if (absent) return { text: _maninPick(pool.absent), absent: true };
-    return { text: _maninPick(pool[key]), absent: false };
-  });
-}
-
-// Title rotation — Deadpool tone, cached by view so it stays stable for the
-// session window like the line itself.
-const MANIN_TITLES = {
-  forge: [
-    'MANIN · ANVIL DEPT, FOREMAN',
-    'MANIN · CERTIFIED ANVIL-HAVER',
-    'MANIN · BLACKSMITH (LITERAL)',
-    "MANIN · THE GUY YOU KEEP IGNORING",
-  ],
-  workshop: [
-    "MANIN · IT'S CALLED A WORKSHOP",
-    'MANIN · INVENTORY MANAGEMENT (UNWILLING)',
-    'MANIN · GEAR AUDITOR',
-    "MANIN · STOP HOVERING ON 'COMPARE'",
-  ],
-  absent: [
-    'MANIN · DEFINITELY NOT ON FIRE',
-    'MANIN · OUT (DO NOT ASK WHERE)',
-    'MANIN · UNAVAILABLE (LOOK, IT HAPPENS)',
-    'MANIN · ON BREAK, ANVIL IS NOT',
-  ],
-};
-function renderManinPanel(view) {
-  const { text, absent } = pickManinLine(view);
-  const el = document.createElement('div');
-  el.className = 'manin-panel';
-  el.setAttribute('data-absent', absent ? 'true' : 'false');
-  el.setAttribute('data-view', view);
-  const titlePool = absent ? MANIN_TITLES.absent : (MANIN_TITLES[view] || MANIN_TITLES.forge);
-  const title = `⟦ ${_maninPick(titlePool)} ⟧`;
-  el.innerHTML = `
-    <div class="manin-portrait-wrap"><img class="manin-portrait" src="img/Manin.png" alt="Manin" onerror="this.style.display='none'"></div>
-    <div class="manin-bubble">
-      <div class="manin-name">${title}</div>
-      <div class="manin-text">${text}</div>
-    </div>`;
+  el.className = 'manin-strip';
+  el.innerHTML = `<span class="manin-strip-text">"${q.text}"</span>`;
   return el;
 }
 
@@ -25030,19 +24052,6 @@ function _leahCheckMilestones() {
     state.lastStreakMilestoneRecorded = streak;
     _queueMilestoneBanner('streak', streak);
   }
-}
-function pickLeahOutfit() {
-  _leahCheckMilestones();
-  const now = new Date();
-  const day = now.getDay();      // 0=Sun, 6=Sat
-  const isWeekend = day === 0 || day === 6;
-  const tk = todayKey();
-  if (typeof isWinterActive === 'function' && isWinterActive()) return 'black_mage';
-  // White mage — banner / milestone / Phoenix-comeback days.
-  if (state.logros && state.logros.lastPhoenixDay === tk) return 'white_mage';
-  if (state.lastCityTierUpDay === tk || state.lastStreakMilestoneDay === tk) return 'white_mage';
-  if (isWeekend) return 'casual';
-  return 'everyday';
 }
 function getLeahImagePath(outfit, expression) {
   const variants = (LEAH_OUTFIT_VARIANTS[outfit] || {})[expression] || 1;
@@ -25957,13 +24966,12 @@ function showGuildPurchaseBanner(upg, nextLvl, cost) {
       "Trade networks span the continent. Gold arrives from sources you've never even met.",
       "The Trade Post reaches its apex. Its commercial reputation is completely unmatched.",
     ],
-    scriptorium: [
-      "A scribe is hired. Commission records will be meticulously documented from this day forward.",
-      "Two new clerks join the roster. Commission bonus payouts improve.",
-      "A Master Archivist takes the helm. Guild records become legendary in their detail.",
-      "Illuminated manuscripts now bear the guild seal. Clients pay a premium for certified work.",
-      "The Scriptorium's library rivals the city's greatest. Commission rewards reach new heights.",
-      "Every contract is entered into the eternal record. Commission mastery is achieved.",
+    depot: [
+      "A quartermaster sets up shop. A small daily ration of supplies is now yours for the claiming.",
+      "A second storeroom opens. The daily supply ration grows.",
+      "Regular supply lines are established. Today's claim stretches a little further.",
+      "The depot expands its stores. Every daily claim now counts for real progress.",
+      "The Quartermaster's Depot runs at full capacity. The daily ration reaches its peak.",
     ],
     patron_vault: [
       "A generous patron has endowed the guild. Work experience investments are now enhanced.",
@@ -26009,20 +25017,22 @@ function showGuildPurchaseBanner(upg, nextLvl, cost) {
       "The Barracks is fully operational. Every piece of gear delivers its peak physical power.",
     ],
     sanctum: [
-      "Arcane runes are carved into the sanctum's floors. Gear enchantments begin to resonate.",
-      "A skilled Enchanter takes residence. All stat bonuses from gear improve.",
-      "Ley lines are tapped beneath the building. Enchantments grow considerably stronger.",
-      "A harmonic resonance chamber is constructed. Gear stats amplify across the board.",
-      "Ancient formulae are recovered from a sealed vault. Enchantment power surges.",
-      "The sanctum reaches near-perfect arcane alignment. Your gear is extraordinary.",
-      "The Enchanting Sanctum achieves full resonance. Every stat from gear reaches its apex.",
+      "Arcane runes are carved into the sanctum's floors. Gear enchantments begin to resonate. CHA and VOL bonuses improve.",
+      "A skilled Enchanter takes residence. Charisma and willpower bonuses from gear grow.",
+      "Ley lines are tapped beneath the building. CHA and VOL enchantments grow considerably stronger.",
+      "A harmonic resonance chamber is constructed. Your presence and resolve amplify.",
+      "Ancient formulae are recovered from a sealed vault. CHA/VOL enchantment power surges.",
+      "The sanctum reaches near-perfect arcane alignment. Your charisma and willpower are extraordinary.",
+      "The Enchanting Sanctum achieves full resonance. CHA and VOL from gear reach their apex.",
     ],
     alchemy: [
-      "The scientists are ecstatic — new reagents have arrived! The investigations begin with renewed vigor.",
-      "A breakthrough formula is scribbled on the chalkboard at 3 AM. Potion potency increases.",
-      "The lab acquires rare herbs from distant expeditions. HP and MP restoration improves.",
-      "A master alchemist joins the research team. The formulas are nearly perfected.",
-      "The lab achieves its final formulation. Potions restore HP and MP at maximum efficiency.",
+      "The scientists are ecstatic — new reagents have arrived! INT and DEX bonuses from gear begin to improve.",
+      "A breakthrough formula is scribbled on the chalkboard at 3 AM. Intellect and reflex enchantments sharpen.",
+      "The lab acquires rare herbs from distant expeditions. INT and DEX bonuses grow considerably stronger.",
+      "A master alchemist joins the research team. Mind and reflexes amplify from every piece of gear.",
+      "Ancient formulae are recovered from a sealed vault. INT/DEX enchantment power surges.",
+      "The lab reaches near-perfect formulation. Your intellect and reflexes are extraordinary.",
+      "The Alchemist's Lab achieves its final formula. INT and DEX from gear reach their apex.",
     ],
   };
   const flavorList = FLAVOR[upg.id] || [];
@@ -28203,31 +27213,6 @@ function setForgeTask(taskId) {
 // pomodoro clock and replays it through the normal tickDungeon() catch-up loop,
 // so stage drops, forge-task bonuses, and mid-boss/boss triggers all fire exactly
 // as they would have if the timer had been running the whole time.
-// Pick a choice for a break event the player wasn't here to choose themselves: never gamble
-// (skip roll/worthyGate/riddleDoor picks — outcome can't be predicted), then rank the rest by
-// least downside, weighing HP loss heaviest since gold/mats are easily earned back. Falls back
-// to index 0 if every choice is gated, matching the existing "ignored the toast" auto-timeout.
-function _pickAutoEventChoiceIdx(event) {
-  const choices = event.choices || [];
-  const rankIdx = _RANK_IDX[DUNGEON_CONFIG[state.dungeon?.difficulty]?.rank] ?? 0;
-  let bestIdx = -1, bestScore = -Infinity;
-  choices.forEach((c, i) => {
-    if (c.roll || c.worthyGate || event.riddleDoor) return;
-    const o = c.outcome || {};
-    const gold = _rval(o.gold||0, rankIdx);
-    const hp = _rval(o.hp||0, rankIdx);
-    const mats = _rval(o.mats||0, rankIdx);
-    const score = Math.min(0, hp) * 3 + Math.min(0, gold) + Math.min(0, mats) * 0.5 + (o.xpBonus||0) * 0.1;
-    if (score > bestScore) { bestScore = score; bestIdx = i; }
-  });
-  return bestIdx >= 0 ? bestIdx : 0;
-}
-function _autoResolveBreakEvents() {
-  const d = state.dungeon; if (!d) return;
-  while (d.breakEvents && d.breakEvents.length) {
-    resolveBreakEventChoice(_pickAutoEventChoiceIdx(d.breakEvents[0]));
-  }
-}
 // Same CP-vs-rank check the dungeon-select screen shows as READY/PERILOUS/DEADLY — READY
 // (ratio >= 1) means you're strong enough that the fight isn't really in question.
 function _isRushCpReady(d) {
@@ -28237,11 +27222,13 @@ function _isRushCpReady(d) {
   return cpReadiness(cpNow, cfg.rank).ratio >= 1;
 }
 // Honor-system credit for focused work done off-app, one full session (work + break) at a
-// time so mid-session dungeon events actually resolve — picking a safe default choice for
-// each — instead of being silently discarded like a single big time-jump would do. If a
-// mid-boss checkpoint comes up, an over-CP player (READY on the dungeon-select gauge) auto-
-// clears it instantly — no ticket cost, the only requirement is the CP you actually earned.
-// Under-CP players still stop there and have to fight it live, same as normal exploring.
+// time so mid-session dungeon events actually fire — instead of being silently discarded
+// like a single big time-jump would do. Break events are never auto-picked: they pile up in
+// state.dungeon.breakEvents across every rushed session and are left for the player to
+// resolve by hand, one at a time, through the normal break-event UI once the rush is done.
+// If a mid-boss checkpoint comes up, an over-CP player (READY on the dungeon-select gauge)
+// auto-clears it instantly — no ticket cost, the only requirement is the CP you actually
+// earned. Under-CP players still stop there and have to fight it live, same as normal exploring.
 function finishOutsideSessions(n) {
   n = Math.max(1, Math.min(20, Math.round(Number(n)) || 1));
   if (!state.dungeon) {
@@ -28265,12 +27252,15 @@ function finishOutsideSessions(n) {
       midBossesRushed++;
     }
     if (!state.dungeon || state.dungeon.phase !== 'exploring') { stopped = true; break; }
-    _autoResolveBreakEvents();
-    if (state.dungeon.pomodoroPhase === 'break') {
-      state.dungeon.pomodoroPhaseStart -= POMODORO_BREAK_MS + 1000;
-      tickDungeon(); // completes the break so the next loop pass starts clean in 'work'
+    // Leave any break events queued — don't auto-pick or discard them. On every session but
+    // the last, hand-advance just the phase/timer fields tickDungeon()'s break→work branch
+    // would touch, skipping the `breakEvents=[]` wipe so the queue survives into the next
+    // session. The last session is left sitting in 'break' with the full queue intact.
+    if (i < n - 1 && state.dungeon.pomodoroPhase === 'break') {
+      state.dungeon.pomodoroPhase = 'work';
+      state.dungeon.pomodoroPhaseStart = Date.now();
+      state.dungeon.inflowUsedThisSession = false;
     }
-    if (!state.dungeon || state.dungeon.phase !== 'exploring') { stopped = true; break; }
   }
   const completed = (state.dungeon ? (state.dungeon.pomodoroCount||0) : startCount) - startCount;
   // Back-date the run's startTime so elapsed-time stats (session summary, dungeon log
@@ -28278,13 +27268,18 @@ function finishOutsideSessions(n) {
   if (completed > 0 && state.dungeon) {
     state.dungeon.startTime -= completed * (getPomoWorkMs() + POMODORO_BREAK_MS);
   }
+  // Give the accumulated break-event queue a fresh full break window so nothing times out
+  // before it's been resolved by hand.
+  const pendingEvents = state.dungeon ? (state.dungeon.breakEvents||[]).length : 0;
+  if (pendingEvents > 0) state.dungeon.pomodoroPhaseStart = Date.now();
   const rushTag = midBossesRushed > 0 ? ` · ⚡ ${midBossesRushed} mid-boss${midBossesRushed!==1?'es':''} RUSHED` : '';
+  const eventTag = pendingEvents > 0 ? ` · ${pendingEvents} event${pendingEvents!==1?'s':''} to resolve` : '';
   if (allStagesCleared) {
-    showNotif(`⚡ Logged ${completed}/${n} — all stages cleared. Fight the boss to close out the run.${rushTag}`);
+    showNotif(`⚡ Logged ${completed}/${n} — all stages cleared. Fight the boss to close out the run.${rushTag}${eventTag}`);
   } else if (stopped) {
-    showNotif(`⚡ Logged ${completed}/${n} — a mid-boss appeared. Fight it to keep going.${rushTag}`);
+    showNotif(`⚡ Logged ${completed}/${n} — a mid-boss appeared. Fight it to keep going.${rushTag}${eventTag}`);
   } else {
-    showNotif(`⚡ Trusting you — logged ${completed} outside session${completed!==1?'s':''}${rushTag}`);
+    showNotif(`⚡ Trusting you — logged ${completed} outside session${completed!==1?'s':''}${rushTag}${eventTag}`);
   }
   checkAchievements();
   saveState(); renderAll();
@@ -30050,10 +29045,9 @@ function renderDungeonBoss() {
   const bossEffHtml=(c.bossActiveEffects||[]).filter(e=>!e.permanent||e.name!=='berserk').map(e=>`<span class="d-eff d-eff-boss">${EFF_EMOJI[e.name]||'☠️'} ${effName(e)}${e.permanent?'':` ${e.duration}t`}</span>`).join('');
 
   // ── Potions ──────────────────────────────────────────────────
-  const alchMul=1+((state.guildUpgrades||{}).alchemy||0)*0.15;
   const potions=(state.inventory||[]).map((e,i)=>({...e,i})).filter(e=>{const it=ITEMS_DB[e.itemId];return it&&(it.healHP||it.healMP);});
   const potionsHtml=potions.length
-    ?potions.slice(0,4).map(e=>{const it=ITEMS_DB[e.itemId];return `<button class="dboss-potion-btn" onclick="useItem(${e.i})">${it.emoji||'🧪'} ${it.healHP?`+${Math.round(it.healHP*alchMul)}HP`:''}${it.healMP?`+${Math.round(it.healMP*alchMul)}MP`:''} ×${e.quantity||1}</button>`;}).join('')
+    ?potions.slice(0,4).map(e=>{const it=ITEMS_DB[e.itemId];return `<button class="dboss-potion-btn" onclick="useItem(${e.i})">${it.emoji||'🧪'} ${it.healHP?`+${it.healHP}HP`:''}${it.healMP?`+${it.healMP}MP`:''} ×${e.quantity||1}</button>`;}).join('')
     :`<span class="dboss-no-potions">No potions in bag</span>`;
 
   const w=document.createElement('div');
