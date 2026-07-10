@@ -6311,6 +6311,7 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .fr-item-name { font-family:'Cinzel',serif; font-size:16px; color:rgba(255,255,255,0.85); letter-spacing:2px; margin-bottom:6px; }
 .fr-affixes { display:flex; flex-wrap:wrap; gap:5px; justify-content:center; margin:8px 0 2px; max-width:280px; }
 .fr-affix { font-family:'Rajdhani',sans-serif; font-weight:600; font-size:11px; letter-spacing:0.5px; padding:2px 7px; border:1px solid currentColor; border-radius:4px; opacity:0.92; }
+.fr-wxp { font-family:'Rajdhani',sans-serif; font-weight:600; font-size:11px; color:#ffc107; margin-top:6px; letter-spacing:0.3px; }
 .fr-tap { font-size:9px; color:rgba(255,193,7,0.35); letter-spacing:2px; margin-top:20px; }
 
 /* ── LEGENDARY FORGE CELEBRATION ── */
@@ -10335,6 +10336,10 @@ function loadState() {
         s.dungeon.sessionCommissions = 0;
         s.dungeon.sessionRep        = 0;
       }
+      if (s.dungeon && !s.dungeon.hasOwnProperty('sessionTaskWxp')) {
+        s.dungeon.sessionTaskWxp  = 0;
+        s.dungeon.sessionForgeWxp = 0;
+      }
       if (s.dungeon && !s.dungeon.hasOwnProperty('pendingItemDrop')) s.dungeon.pendingItemDrop = undefined;
       // Add event system fields to existing in-progress dungeons
       if (s.dungeon && !s.dungeon.hasOwnProperty('eventHistory'))    s.dungeon.eventHistory    = [];
@@ -11745,8 +11750,11 @@ function getTaskMatBonusChances(task) {
   return { t2: Math.min(1, t2), t3: Math.min(1, t3) };
 }
 
+// Returns the actual (boosted) WXP amount granted, so call sites can surface it in
+// their own notifications — the multiplier here (Patron's Vault etc.) means the raw
+// `amount` passed in isn't what the player actually received.
 function grantWorkXp(amount) {
-  if (!amount || amount <= 0) return;
+  if (!amount || amount <= 0) return 0;
   const wxpMul = getWorkerWxpMul() * (1 + ((state.guildUpgrades||{}).patron_vault||0) * 0.10);
   const boostedAmount = Math.max(1, Math.round(amount * wxpMul));
   const prevWlv = calcWorkerLevel(state.workXp || 0);
@@ -11765,6 +11773,7 @@ function grantWorkXp(amount) {
   } else if (newWlv.level > prevWlv.level) {
     setTimeout(() => showNotif(`⚒ Worker Lv.${newWlv.level} · Rank ${newWlv.rank} · ${newWlv.xpPerLevel - newWlv.xpProgress} WXP to next`), 700);
   }
+  return boostedAmount;
 }
 
 const DEFAULT_INVENTORY = [
@@ -12790,13 +12799,13 @@ function checkForgeItemMastery(itemId) {
   // WXP grant scales by mastery tier × gold cost (links mastery → worker progression)
   const goldCost = item ? getCraftGoldCost(item) : 10;
   const wxpMul = currentTier === 3 ? 10 : currentTier === 2 ? 3 : 1;
-  grantWorkXp(Math.max(10, Math.round(goldCost * wxpMul)));
+  const _masteryWxp = grantWorkXp(Math.max(10, Math.round(goldCost * wxpMul)));
   // Shards on MASTERED — scales by item tier
   if (currentTier === 3) {
     const itemTier = getItemTier(itemId);
     grantShards(Math.max(1, itemTier), `mastered — ${item?.name || itemId}`);
   }
-  setTimeout(() => showMasteryUnlockOverlay(itemId, meta), 650);
+  setTimeout(() => showMasteryUnlockOverlay(itemId, meta, _masteryWxp), 650);
   // Check if this triggers the tier-ALL-mastered milestone
   if (currentTier === 3) checkTierAllMastered(getItemTier(itemId));
 }
@@ -12840,7 +12849,7 @@ function showTierAllMasteredOverlay(tier, bonus) {
   el.addEventListener('click', dismiss);
   setTimeout(dismiss, 6500);
 }
-function showMasteryUnlockOverlay(itemId, mt) {
+function showMasteryUnlockOverlay(itemId, mt, wxp) {
   const item = ITEMS_DB[itemId]; if (!item || !mt) return;
   if (soundEnabled) { try { playTierComplete ? playTierComplete() : playForgeHammer(); } catch(e){} }
   if (navigator.vibrate) navigator.vibrate([30, 50, 120, 50, 180]);
@@ -12859,6 +12868,7 @@ function showMasteryUnlockOverlay(itemId, mt) {
     <div class="tu-line"></div>
     <div class="tu-item" style="color:${accentColor}">${itemImgHtml(item, 22)} ${item.name}</div>
     <div class="tu-sub">-${Math.round(mt.matDisc*100)}% mat · +${Math.round((mt.rarityBonus||0)*100)}% rarity${extraLine}</div>
+    ${wxp ? `<div class="fr-wxp">⚒ +${wxp} WXP</div>` : ''}
     <div class="tu-tap">TAP TO CONTINUE</div>`;
   document.body.appendChild(el);
   const dismiss = () => { el.classList.add('leaving'); setTimeout(() => el.remove(), 460); };
@@ -13323,7 +13333,7 @@ function craftItem(recipeId, silent) {
   const _t2Sum = Object.values(fullCost.t2).reduce((a,b)=>a+b,0);
   const _t3Sum = Object.values(fullCost.t3).reduce((a,b)=>a+b,0);
   const _craftMatTotal = _t1Sum + _t2Sum * 5 + _t3Sum * 25;
-  grantWorkXp(_craftMatTotal >= 70 ? 100 : _craftMatTotal >= 40 ? 50 : _craftMatTotal >= 20 ? 25 : 10);
+  const _craftWxp = grantWorkXp(_craftMatTotal >= 70 ? 100 : _craftMatTotal >= 40 ? 50 : _craftMatTotal >= 20 ? 25 : 10);
   // Forge log
   if (!state.forgeLog) state.forgeLog = [];
   state.forgeLog.unshift({ itemId: recipe.itemId, date: todayKey(), quality: qRoll.quality, qualityLabel: qRoll.label, affixes: _affixes });
@@ -13364,11 +13374,11 @@ function craftItem(recipeId, silent) {
   saveState();
   checkAchievements();
   // Batch/silent mode: skip the per-craft reveal; return the result for tallying.
-  if (silent) return { quality: qRoll.quality, affixes: _affixes, unlocked: _newlyUnlocked };
+  if (silent) return { quality: qRoll.quality, affixes: _affixes, unlocked: _newlyUnlocked, wxp: _craftWxp };
   // Reveal animation, then refresh (item is already granted).
   // If this craft unlocked a new tier, celebrate it after the reveal.
   // Set the "just crafted" flash AFTER reveal dismisses so the FORGE view shows a 4s recap strip the user can actually see.
-  showForgeRevealOverlay({ itemId: recipe.itemId, quality: qRoll.quality, qualityMult: qRoll.qualityMult, qualityLabel: qRoll.label, affixes: _affixes }, () => {
+  showForgeRevealOverlay({ itemId: recipe.itemId, quality: qRoll.quality, qualityMult: qRoll.qualityMult, qualityLabel: qRoll.label, affixes: _affixes, wxp: _craftWxp }, () => {
     _setRecentForgeFlash({ itemId: recipe.itemId, quality: qRoll.quality, qualityLabel: qRoll.label, affixes: _affixes });
     renderAll();
     if (_newlyUnlocked.length) setTimeout(() => showTierUnlockOverlay(_newlyUnlocked[0]), 300);
@@ -13381,17 +13391,18 @@ function craftItem(recipeId, silent) {
 // then show one summary. Great for grinding low-tier gear without N reveal pops.
 function craftItemBatch(recipeId, count) {
   const recipe = CRAFT_RECIPES.find(r => r.id === recipeId); if (!recipe) return;
-  const tally = {}; let made = 0; const unlocked = [];
+  const tally = {}; let made = 0; const unlocked = []; let totalWxp = 0;
   for (let i = 0; i < count; i++) {
     const res = craftItem(recipeId, true);
     if (!res) break;
     made++; tally[res.quality] = (tally[res.quality] || 0) + 1;
+    totalWxp += res.wxp || 0;
     (res.unlocked || []).forEach(u => { if (!unlocked.includes(u)) unlocked.push(u); });
   }
   if (made === 0) { showNotif('[SYSTEM] Could not forge — check materials, gold, and bag space.'); return; }
   if (soundEnabled && typeof playForgeHammer === 'function') { try { playForgeHammer(); } catch(e){} }
   renderAll();
-  showBatchForgeSummaryOverlay(recipe, made, tally, () => {
+  showBatchForgeSummaryOverlay(recipe, made, tally, totalWxp, () => {
     if (unlocked.length) setTimeout(() => showTierUnlockOverlay(unlocked[0]), 300);
   });
 }
@@ -13399,7 +13410,7 @@ function craftItemBatch(recipeId, count) {
 // ── Batch craft summary — shown once after an x5 (or partial) batch forge.
 // Reuses the tier-unlock-overlay shell so it reads as a proper recap instead of
 // a toast that's easy to miss, with a per-rarity breakdown of what came out.
-function showBatchForgeSummaryOverlay(recipe, made, tally, onDismiss) {
+function showBatchForgeSummaryOverlay(recipe, made, tally, totalWxp, onDismiss) {
   const item = ITEMS_DB[recipe.itemId]; if (!item) { if (onDismiss) onDismiss(); return; }
   const order = ['legendary','epic','rare','uncommon','common'];
   const rows = order.filter(q => tally[q]).map(q => {
@@ -13422,6 +13433,7 @@ function showBatchForgeSummaryOverlay(recipe, made, tally, onDismiss) {
     <div class="tu-title" style="font-size:18px">${made}× ${item.name}</div>
     <div class="tu-line"></div>
     <div class="tu-batch-list">${rows}</div>
+    ${totalWxp ? `<div class="fr-wxp">⚒ +${totalWxp} WXP</div>` : ''}
     <div class="tu-tap">TAP TO CONTINUE</div>`;
   document.body.appendChild(el);
   const dismiss = () => { el.classList.add('leaving'); setTimeout(() => { el.remove(); if (onDismiss) onDismiss(); }, 460); };
@@ -13460,6 +13472,7 @@ function showForgeRevealOverlay(entry, onCollect) {
   const _affHtml = (entry.affixes && entry.affixes.length)
     ? `<div class="fr-affixes">${entry.affixes.map(a => `<span class="fr-affix" style="color:${AFFIX_BY_STAT[a.stat]?.color||'#fff'}">${affixLabel(a)}</span>`).join('')}</div>`
     : '';
+  const _wxpHtml = entry.wxp ? `<div class="fr-wxp">⚒ +${entry.wxp} WXP</div>` : '';
   const ov = document.createElement('div'); ov.className = 'forge-reveal-overlay';
   ov.innerHTML = `
     <div class="fr-inner">
@@ -13469,6 +13482,7 @@ function showForgeRevealOverlay(entry, onCollect) {
         <div class="fr-quality-badge fr-q-${entry.quality||'common'}" style="color:${rar.color}">${rar.icon ? rar.icon+' ' : ''}${rar.label}</div>
         <div class="fr-item-name">${item.name}</div>
         ${_affHtml}
+        ${_wxpHtml}
         <div class="fr-tap">TAP TO COLLECT</div>
       </div>
     </div>`;
@@ -24599,12 +24613,12 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
       const _wxpDiffMul = _diffMult;
       applyWorkDrops(_drops, 1);
       _markCityActiveToday();   // completing any task counts as city activity (winter check)
+      const _wxpAmt = grantWorkXp(Math.round((_isCritWork ? _rw.wxp * 2 : _rw.wxp) * _wxpDiffMul));
       if (state.dungeon && state.dungeon.phase==='exploring') {
         state.dungeon.sessionTasks    = (state.dungeon.sessionTasks||0) + 1;
         state.dungeon.sessionTaskGold = (state.dungeon.sessionTaskGold||0) + (_drops.gold||0);
+        state.dungeon.sessionTaskWxp  = (state.dungeon.sessionTaskWxp||0) + _wxpAmt;
       }
-      const _wxpAmt = Math.round((_isCritWork ? _rw.wxp * 2 : _rw.wxp) * _wxpDiffMul);
-      grantWorkXp(_wxpAmt);
       task.done[periodKey] = { gains:{}, xp:0, drops:_drops, wxp:_wxpAmt, wasCrit:_isCritWork, inFlow:_inFlow };
       if (periodKey === todayKey() && state.workStreakCountedDay !== periodKey) {
         state.workStreak = (state.workStreakLastDay === yesterdayKey()) ? (state.workStreak||0)+1 : 1;
@@ -24633,8 +24647,9 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
       else         setTimeout(() => showNormalWorkFlash(task, _drops), 150);
       // Must-do bonus — scales with hunter grade so endgame must-dos still feel weighty.
       if (isMustDo(task.id)) {
-        const _fb = Math.round(25 * Math.sqrt(getWorkRewardScale()));  // √scale: 25 at E → 100 at S
-        grantWorkXp(_fb);
+        const _fbBase = Math.round(25 * Math.sqrt(getWorkRewardScale()));  // √scale: 25 at E → 100 at S
+        const _fb = grantWorkXp(_fbBase);
+        if (state.dungeon && state.dungeon.phase==='exploring') state.dungeon.sessionTaskWxp = (state.dungeon.sessionTaskWxp||0) + _fb;
         setTimeout(() => showNotif(`🎯 Must-do cleared · +${_fb} WXP — that's a priority off the list!`), 320);
       }
       // A cleared must-do may complete the daily ration → fire the "rest earned" moment.
@@ -25214,13 +25229,13 @@ function grantDailyLoginCache() {
   else                  { tier='common';   gold = 10 + Math.floor(Math.random()*11); matQty = 0; label='SYSTEM CACHE'; }
   const drops = { gold, matId, matEmoji: matDef?.emoji || '⚙️', matLabel: matDef?.label || '', matQty };
   applyWorkDrops(drops, 1);
-  grantWorkXp(10);
+  const _cacheWxp = grantWorkXp(10);
   saveState();
-  showCacheOverlay(tier, label, gold, matDef, matQty);
+  showCacheOverlay(tier, label, gold, matDef, matQty, _cacheWxp);
   setTimeout(flashGoldDisplay, 30);
 }
 
-function showCacheOverlay(tier, label, gold, matDef, matQty) {
+function showCacheOverlay(tier, label, gold, matDef, matQty, wxp) {
   if (soundEnabled) playWorkComplete();
   if (navigator.vibrate) navigator.vibrate(tier==='rare' ? [20,40,80,40,160] : [20,40,80]);
   const accent  = tier==='rare' ? '#ffd54f' : tier==='uncommon' ? '#80deea' : '#4dd0e1';
@@ -25236,6 +25251,7 @@ function showCacheOverlay(tier, label, gold, matDef, matQty) {
     <div class="cache-line"></div>
     <div class="cache-reward">${goldImg(18)} ${gold} GOLD</div>
     ${matLine}
+    ${wxp ? `<div class="fr-wxp">⚒ +${wxp} WXP</div>` : ''}
     <div class="cache-sub">First quest of the day cleared.</div>
     <div class="cache-tap">TAP TO CONTINUE</div>`;
   document.body.appendChild(el);
@@ -26664,8 +26680,9 @@ function tickDungeon() {
         const forgeDrop={gold:5,matId:fm?fm.id:null,matQty:fm?1:0,matEmoji:fm?fm.emoji:null,matLabel:null,xp:0};
         applyWorkDrops(forgeDrop,1);
         const fMatStr=fm?` · ${matIconHtml(fm.id, 14, 1)}×1`:'';
-        showNotif(`⚒ Session ${d.forgeTaskPomoCount} · +5g${fMatStr}`);
-        grantWorkXp(15);
+        const _fWxp = grantWorkXp(15);
+        d.sessionForgeWxp = (d.sessionForgeWxp||0) + _fWxp;
+        showNotif(`⚒ Session ${d.forgeTaskPomoCount} · +5g${fMatStr} · ⚒+${_fWxp}WXP`);
       }
       if (_mb) { _midBossTriggered=true; break; }
       // Queue up to 2 events for the break (non-blocking — break timer runs freely)
@@ -27190,7 +27207,7 @@ function startDungeon(diffId) {
     activeWorkTaskId:null, forgeTaskPomoCount:0,
     midBossesDefeated:0,
     nextFocusCheckAt:0, focusCheckPending:false, focusCheckShownAt:0, focusBonusTotal:0,
-    sessionTasks:0, sessionTaskGold:0, sessionCommissions:0, sessionRep:0,
+    sessionTasks:0, sessionTaskGold:0, sessionTaskWxp:0, sessionForgeWxp:0, sessionCommissions:0, sessionRep:0,
     eventHistory:[], activeOmens:[], pendingEndEvent:null, pendingMidEvent:null,
     midEventFired:false, nextMidEventAt:0,
     breakEvents:[],
@@ -27239,6 +27256,10 @@ function finishOutsideSessions(n) {
   if (!state.dungeon || state.dungeon.phase !== 'exploring') { showNotif('⚠ No active expedition to log into'); return; }
   if (state.dungeon.pausedAt) resumeDungeon();
   const startCount = state.dungeon.pomodoroCount || 0;
+  // Snapshot cumulative rewards before the loop so the recap at the end can show
+  // just THIS rush's contribution (delta), not the dungeon run's full history —
+  // matters if you rush the same dungeon more than once.
+  const _beforeSummary = _buildSessionSummary(state.dungeon);
   let stopped = false, allStagesCleared = false, midBossesRushed = 0;
   for (let i = 0; i < n; i++) {
     const d = state.dungeon;
@@ -27282,6 +27303,25 @@ function finishOutsideSessions(n) {
     showNotif(`⚡ Trusting you — logged ${completed} outside session${completed!==1?'s':''}${rushTag}${eventTag}`);
   }
   checkAchievements();
+  // Recap overlay — just this rush's contribution (delta since the snapshot above),
+  // so gold/mats/WXP earned during the rushed sessions is never silent.
+  if (completed > 0 && state.dungeon) {
+    const _afterSummary = _buildSessionSummary(state.dungeon);
+    const _rushSummary = {
+      dungeonName: _afterSummary.dungeonName,
+      focusStr: _afterSummary.focusStr,
+      pomodoroCount: _afterSummary.pomodoroCount - _beforeSummary.pomodoroCount,
+      sessionTasks: _afterSummary.sessionTasks - _beforeSummary.sessionTasks,
+      sessionCommissions: _afterSummary.sessionCommissions - _beforeSummary.sessionCommissions,
+      sessionRep: _afterSummary.sessionRep - _beforeSummary.sessionRep,
+      forgeSessions: _afterSummary.forgeSessions - _beforeSummary.forgeSessions,
+      eventCount: _afterSummary.eventCount - _beforeSummary.eventCount,
+      totalGold: _afterSummary.totalGold - _beforeSummary.totalGold,
+      totalWxp: _afterSummary.totalWxp - _beforeSummary.totalWxp,
+      hasActivity: true,
+    };
+    setTimeout(() => showSessionSummaryOverlay(_rushSummary), 350);
+  }
   saveState(); renderAll();
 }
 function showLogSessionModal() {
@@ -27339,6 +27379,7 @@ function _buildSessionSummary(d) {
   const taskGold   = d.sessionTaskGold||0;
   const eventGold  = d.sessionEventGold||0;
   const totalGold  = stageGold + forgeGold + focusGold + taskGold + eventGold;
+  const totalWxp   = (d.sessionForgeWxp||0) + (d.sessionTaskWxp||0);
   const endTs      = Date.now();
   const actMs      = Math.max(0, endTs - (d.startTime||endTs) - (d.totalPausedMs||0));
   const actSec     = Math.round(actMs/1000);
@@ -27355,6 +27396,7 @@ function _buildSessionSummary(d) {
     forgeSessions: d.forgeTaskPomoCount||0,
     eventCount:    (d.eventHistory||[]).length,
     totalGold,
+    totalWxp,
     hasActivity: (d.sessionTasks||0)>0 || (d.pomodoroCount||0)>0 || (d.forgeTaskPomoCount||0)>0 || (d.eventHistory||[]).length>0,
   };
 }
@@ -27368,6 +27410,8 @@ function showSessionSummaryOverlay(s) {
     rows.push(`<div class="sro-row"><span class="sro-row-icon">✓</span><span class="sro-row-label">Tasks completed</span><span class="sro-row-val">${s.sessionTasks}</span></div>`);
   if (s.totalGold > 0)
     rows.push(`<div class="sro-row"><span class="sro-row-icon"><img src="img/gold.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;display:inline-block"></span><span class="sro-row-label">Gold earned</span><span class="sro-row-val gold">${s.totalGold}g</span></div>`);
+  if (s.totalWxp > 0)
+    rows.push(`<div class="sro-row"><span class="sro-row-icon">⚒</span><span class="sro-row-label">Worker XP earned</span><span class="sro-row-val" style="color:#ffc107">+${s.totalWxp}</span></div>`);
   if (s.forgeSessions > 0)
     rows.push(`<div class="sro-row"><span class="sro-row-icon">⚒</span><span class="sro-row-label">Forge sessions</span><span class="sro-row-val">${s.forgeSessions}</span></div>`);
   if (s.sessionCommissions > 0)
@@ -27486,7 +27530,7 @@ function startWeeklyBoss() {
     pomodoroPhase:'work', pomodoroPhaseStart:Date.now(), pomodoroCount:0,
     stageRewardsLog:[], activeWorkTaskId:null, forgeTaskPomoCount:0,
     nextFocusCheckAt:0, focusCheckPending:false, focusCheckShownAt:0, focusBonusTotal:0,
-    sessionTasks:0, sessionTaskGold:0, sessionCommissions:0, sessionRep:0,
+    sessionTasks:0, sessionTaskGold:0, sessionTaskWxp:0, sessionForgeWxp:0, sessionCommissions:0, sessionRep:0,
     weeklyBossVariant:variant,
     combat:(()=>{
       const _archW=cs.archetype;
@@ -27618,7 +27662,7 @@ function startPracticeBoss(diffId) {
     pomodoroPhase: 'work', pomodoroPhaseStart: Date.now(), pomodoroCount: 0,
     stageRewardsLog: [], midBossesDefeated: 0,
     nextFocusCheckAt: 0, focusCheckPending: false, focusCheckShownAt: 0, focusBonusTotal: 0,
-    sessionTasks: 0, sessionTaskGold: 0, sessionCommissions: 0, sessionRep: 0,
+    sessionTasks: 0, sessionTaskGold: 0, sessionTaskWxp: 0, sessionForgeWxp: 0, sessionCommissions: 0, sessionRep: 0,
     activeWorkTaskId: null, forgeTaskPomoCount: 0,
     eventHistory: [], activeOmens: [], pendingEndEvent: null, pendingMidEvent: null,
     midEventFired: false, nextMidEventAt: 0, sessionCount: 0, pendingXpBonus: 0,
@@ -29225,6 +29269,7 @@ function renderDungeonReward() {
   const sessionComm   = d.sessionCommissions||0;
   const sessionRep    = d.sessionRep||0;
   const sessionTaskG  = d.sessionTaskGold||0;
+  const sessionWxpTotal = (d.sessionTaskWxp||0) + (d.sessionForgeWxp||0);
   let workSessionSection='';
   if (sessionTasks>0 || sessionComm>0) {
     let wsRows='';
@@ -29233,6 +29278,7 @@ function renderDungeonReward() {
       <span class="dsummary-row-text">Tasks completed</span>
       <span class="dsum-chip" style="color:var(--sao-cyan);border-color:rgba(77,208,225,0.3)">${sessionTasks}</span>
       ${sessionTaskG>0?`<span class="dsum-chip dsum-gold"><img src="img/gold.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;display:inline-block">${sessionTaskG}g</span>`:''}
+      ${sessionWxpTotal>0?`<span class="dsum-chip" style="color:#ffc107;border-color:rgba(255,193,7,0.3)">⚒+${sessionWxpTotal}WXP</span>`:''}
     </div>`;
     if (sessionComm>0) wsRows+=`<div class="dsummary-row">
       <span class="dsummary-row-icon">📋</span>
