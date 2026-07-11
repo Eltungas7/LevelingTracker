@@ -10129,7 +10129,8 @@ function loadState() {
       if (!s.monthlyStatSnapshots) s.monthlyStatSnapshots = {};
       if (typeof s.streak  !== 'number') s.streak  = 0;
       if (!s.lastActiveDay) s.lastActiveDay = todayKey();
-      if (!s.hasOwnProperty('streakCountedDay')) s.streakCountedDay = s.streak > 0 ? (s.lastActiveDay || null) : null;
+      if (!s.hasOwnProperty('streakGraceDays')) s.streakGraceDays = [];
+      if (!s.hasOwnProperty('streakBrokenDay')) s.streakBrokenDay = null;
       if (typeof s.col !== 'number') s.col = 0;
       if (typeof s.gold !== 'number') s.gold = 0;
       if (typeof s.totalGoldEarned !== 'number') s.totalGoldEarned = s.gold || 0;
@@ -14982,6 +14983,26 @@ function showAchievementRewardOverlay(ach, tierIndex, onDismiss) {
 function isVacationDay(dateKey) {
   return !!(state.vacationDays && state.vacationDays.includes(dateKey));
 }
+// Computes the streak purely from actual habit-completion history (state.habitos[].done),
+// the same data the History tab reads — so the menu streak can never drift from what
+// History reports. Vacation days and streak-grace days (granted by shields/repair) are
+// skipped without breaking the chain or adding to its length, mirroring getHabitStreak().
+function computeHistoryStreak() {
+  if (!state.habitos.length) return 0;
+  const todayInfo = getHabitPct(todayKey());
+  const todayCounts = !!(todayInfo && todayInfo.total > 0 && todayInfo.pct >= 70);
+  let streak = 0;
+  const d = new Date();
+  if (!todayCounts) d.setDate(d.getDate() - 1);
+  let safety = 3000;
+  while (safety-- > 0) {
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if (isVacationDay(key) || (state.streakGraceDays || []).includes(key)) { d.setDate(d.getDate() - 1); continue; }
+    const info = getHabitPct(key);
+    if (info && info.total > 0 && info.pct >= 70) { streak++; d.setDate(d.getDate() - 1); } else break;
+  }
+  return streak;
+}
 function getHabitStreak(habit) {
   const today = todayKey(); let streak=0; const d=new Date();
   if (!habit.done||!habit.done[today]) d.setDate(d.getDate()-1);
@@ -15638,18 +15659,26 @@ function updateStreakOnLoad() {
       if (!state.vacationDays) state.vacationDays = [];
       if (!state.vacationDays.includes(today)) state.vacationDays.push(today);
     }
-    // If yesterday wasn't counted toward the streak, the chain is broken (unless paused).
-    // No penalty quest, no HP drain — the streak simply resets. Shields (earned at
-    // 14-day milestones) are the deliberate mercy mechanic; missing a day is its own cost.
-    if (!state.habitsPaused && state.streakCountedDay !== y) {
-      if (state.streak > 0) state.lastStreakPeak = state.streak;
-      state.streakBrokenAt = today;
-      state.streak=0;
-      state.streakCountedDay=null;
+    // Streak is derived straight from actual habit-completion history (same data the
+    // History tab reads) — recompute it now so the menu number can never drift from what
+    // History shows. No penalty quest, no HP drain — a missed day simply drops out of the
+    // consecutive run. Shields (earned at 14-day milestones) are the deliberate mercy
+    // mechanic; missing a day is its own cost.
+    if (!state.habitsPaused) {
+      const _prevStreak = state.streak || 0;
+      const _newStreak = computeHistoryStreak();
+      if (_newStreak === 0 && _prevStreak > 0) {
+        state.lastStreakPeak = _prevStreak;
+        state.streakBrokenAt = today;
+        state.streakBrokenDay = y;
+      } else if (_newStreak > 0) {
+        state.streakBrokenAt = null;
+        state.streakBrokenDay = null;
+      }
+      state.streak = _newStreak;
     }
     // Clear any legacy penalty quest left over from before the penalty system was removed
     if (state.penaltyQuest) state.penaltyQuest = null;
-    // If streakCountedDay === y, streak carries over as-is (already includes yesterday)
     // Late check-in: if any habits were missed yesterday, let the user log them first.
     // Fires before the harvest briefing so the briefing reflects the final logged state.
     const _missedYest = state.habitos.filter(h => !h.done || !h.done[y]);
@@ -15669,22 +15698,15 @@ function updateStreakOnLoad() {
   }
 }
 
-// Checks today's habit completion and updates streak in real-time.
-// Call after any habit toggle or on app load.
+// Checks today's habit completion and re-syncs the streak from actual history in real-time.
+// Call after any habit toggle or on app load. Same-day toggling (checking/unchecking a habit
+// back and forth) just nudges today in/out of the run — it's not a "break", so no
+// lastStreakPeak/streakBrokenAt bookkeeping happens here (that's updateStreakOnLoad's job,
+// which only runs at the actual day boundary).
 function checkTodayStreak() {
   if (state.habitsPaused) return;
-  const today=todayKey();
-  const total=state.habitos.length;
-  if (!total) return;
-  const done=state.habitos.filter(h=>h.done[today]).length;
-  const pct=done/total;
-  if (pct>=0.7 && state.streakCountedDay!==today) {
-    state.streak+=1;
-    state.streakCountedDay=today;
-  } else if (pct<0.7 && state.streakCountedDay===today) {
-    state.streak=Math.max(0,state.streak-1);
-    state.streakCountedDay=null;
-  }
+  if (!state.habitos.length) return;
+  state.streak = computeHistoryStreak();
 }
 
 
@@ -15753,16 +15775,20 @@ function checkShieldEarning() {
   }
 }
 
-// Spend a shield to restore a broken streak.
+// Spend a shield to restore a broken streak. The failed day is marked as a "grace day" —
+// History still shows the real (sub-70%) completion for that date, but computeHistoryStreak
+// skips it like a vacation day so the chain isn't broken by it.
 function useStreakShield() {
   if (!(state.streakShields > 0)) return;
   state.streakShields--;
-  const restored = state.lastStreakPeak || 1;
-  state.streak = restored;
-  state.streakCountedDay = yesterdayKey(); // pretend yesterday was counted
+  const brokenDay = state.streakBrokenDay || yesterdayKey();
+  if (!state.streakGraceDays) state.streakGraceDays = [];
+  if (!state.streakGraceDays.includes(brokenDay)) state.streakGraceDays.push(brokenDay);
+  state.streak = computeHistoryStreak();
   state.streakBrokenAt = null;
+  state.streakBrokenDay = null;
   saveState(); renderAll();
-  setTimeout(() => showNotif(`[SYSTEM] Shield consumed. Streak restored: ${restored} days. ${state.streakShields}/2 remaining.`), 50);
+  setTimeout(() => showNotif(`[SYSTEM] Shield consumed. Streak restored: ${state.streak} days. ${state.streakShields}/2 remaining.`), 50);
 }
 
 // Shows an info toast explaining shields.
@@ -15886,15 +15912,15 @@ function closeLateCheckIn(yKey) {
   const total = state.habitos.length;
   const done  = state.habitos.filter(h => h.done && h.done[yKey]).length;
   const pct   = total > 0 ? done/total : 0;
-  // Restore streak if ≥70 % done retroactively and streak was broken this morning
+  // Restore streak if ≥70 % done retroactively and streak was broken this morning.
+  // yKey now genuinely qualifies in the real history, so just recompute — no grace day needed.
   if (pct >= 0.7 && state.streakBrokenAt === todayKey()) {
-    const restored = state.lastStreakPeak || 1;
-    state.streak = restored;
-    state.streakCountedDay = yKey;
     state.streakBrokenAt = null;
+    state.streakBrokenDay = null;
     state.lastStreakPeak = 0;
+    state.streak = computeHistoryStreak();
     saveState();
-    setTimeout(() => showNotif(`[SYSTEM] Late log accepted. Streak restored: ${restored} days.`), 350);
+    setTimeout(() => showNotif(`[SYSTEM] Late log accepted. Streak restored: ${state.streak} days.`), 350);
   } else if (done > 0) {
     saveState();
   }
@@ -19125,14 +19151,16 @@ function getActiveBoostMult(type) {
 function canRepairStreak() {
   return (state.streak || 0) === 0 && state.streakBrokenAt === todayKey() && (state.lastStreakPeak || 0) > 1;
 }
-// Restore a just-broken streak (paid mercy). Mirrors useStreakShield's restore.
+// Restore a just-broken streak (paid mercy). Mirrors useStreakShield's grace-day restore.
 function repairStreak() {
-  const restored = state.lastStreakPeak || 1;
-  state.streak = restored;
-  state.streakCountedDay = yesterdayKey(); // pretend yesterday was counted (mirrors useStreakShield)
+  const brokenDay = state.streakBrokenDay || yesterdayKey();
+  if (!state.streakGraceDays) state.streakGraceDays = [];
+  if (!state.streakGraceDays.includes(brokenDay)) state.streakGraceDays.push(brokenDay);
+  state.streak = computeHistoryStreak();
   state.streakBrokenAt = null;
+  state.streakBrokenDay = null;
   state.lastStreakPeak = 0;
-  setTimeout(() => showNotif(`[SYSTEM] ⚡ Streak repaired — ${restored} days restored.`), 50);
+  setTimeout(() => showNotif(`[SYSTEM] ⚡ Streak repaired — ${state.streak} days restored.`), 50);
   saveState(); renderAll();
 }
 
@@ -30275,6 +30303,7 @@ function showConfirmDialog(message, onConfirm, opts) {
 setDateLabel();
 updateStreakOnLoad();
 checkTodayStreak();
+checkShieldEarning();
 tickMasteryOnLoad();
 checkAchievements();
 _updateAchBadge();
