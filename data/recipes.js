@@ -230,36 +230,40 @@ const GRADE_LABELS = ['I', 'II', 'III', 'IV', 'V', 'VI'];
 const GRADE_COLORS = ['#9e9e9e', '#4dd0e1', '#82b1ff', '#ff8a65', '#ea80fc', '#ffd700'];
 
 // ── Guild Upgrades ─────────────────────────────────────────────────────────────
-// Cost formula: baseCost × 1.7^(level-1), rounded to nearest 5
+// Cost formula: baseCost × scaleMul^(level-1), rounded to nearest 5 (see calcGuildCost).
 // Upgrades with customLevelCosts[] use those values directly.
-// Total gold to max ALL upgrades ≈ 165,000g — roughly 7-9 months of heavy daily work.
-// Grand Guild Hall uses 2× baseCost (most expensive single upgrade, ~45,000g total).
+// Re-tuned 2026-07: WORK_REWARD_SCALE lets Hunter Grade push chest/task gold up to ×16,
+// which the old flat ×1.7 curve (total ≈148,000g) couldn't keep pace with — a handful of
+// D-rank dungeons was enough to buy nearly everything. scaleMul now ramps steeper
+// (×2.1-2.3) and late-game buildings gated behind higher minWorkerLevel (18-30, where
+// Hunter Grade — and gold income — is already much higher) got bigger baseCost too.
+// Total gold to max ALL upgrades ≈ 680,000g.
 // minWorkerLevel: Worker Level required to purchase first level.
 const GUILD_UPGRADES = [
   // ── GROWTH tier (habits, economy, XP) ─────────────────────────────────────
-  { id:'hall',         name:'Grand Guild Hall',   emoji:'🏛️', maxLevel:10, baseCost:400, minWorkerLevel:1,
+  { id:'hall',         name:'Grand Guild Hall',   emoji:'🏛️', maxLevel:10, baseCost:400, scaleMul:1.75, minWorkerLevel:1,
     effect:'habitAura',       perLevel:'+0.5% habit stat gains',
     desc:'Permanently boosts stat gains from all daily habits. Each level stacks.' },
-  { id:'trade',        name:'Trade Post',         emoji:'<img src="img/gold.png" style="height:1em;width:auto;object-fit:contain;vertical-align:middle;display:inline-block">', maxLevel:6,  baseCost:300, minWorkerLevel:5,
+  { id:'trade',        name:'Trade Post',         emoji:'<img src="img/gold.png" style="height:1em;width:auto;object-fit:contain;vertical-align:middle;display:inline-block">', maxLevel:6,  baseCost:350, scaleMul:2.2, minWorkerLevel:5,
     effect:'goldBonus',       perLevel:'+12% gold from work tasks',
     desc:'Increases gold earned from completing work tasks.' },
-  { id:'depot',        name:"Quartermaster's Depot", emoji:'🎒', maxLevel:5,  baseCost:300, minWorkerLevel:1,
+  { id:'depot',        name:"Quartermaster's Depot", emoji:'🎒', maxLevel:5,  baseCost:300, scaleMul:2.1, minWorkerLevel:1,
     effect:'dailyMatClaim',   perLevel:'+1 of each material/day (claim once daily)',
     desc:'Claim a small supply of every material once per day — keeps gearing moving even on slow work days. Higher levels increase the daily amount.' },
-  { id:'patron_vault', name:"Patron's Vault",     emoji:'⚗️', maxLevel:5,  baseCost:450, minWorkerLevel:20,
+  { id:'patron_vault', name:"Patron's Vault",     emoji:'⚗️', maxLevel:5,  baseCost:700, scaleMul:2.3, minWorkerLevel:20,
     effect:'wxpBonus',        perLevel:'+10% Work XP earned',
     desc:'Increases Work XP gained from completing tasks and crafting.' },
   // ── FORGE tier (crafting, timing, queue) ──────────────────────────────────
-  { id:'anvil',        name:'Forge Mastery',      emoji:'⚒️', maxLevel:7,  baseCost:225, minWorkerLevel:10,
+  { id:'anvil',        name:'Forge Mastery',      emoji:'⚒️', maxLevel:7,  baseCost:300, scaleMul:2.2, minWorkerLevel:10,
     effect:'craftDiscount',   perLevel:'-8% craft material cost',
     desc:'Reduces the material cost of all forge recipes.' },
-  { id:'warehouse',    name:'Material Cache',     emoji:'📦', maxLevel:5,  baseCost:240, minWorkerLevel:15,
+  { id:'warehouse',    name:'Material Cache',     emoji:'📦', maxLevel:5,  baseCost:280, scaleMul:2.1, minWorkerLevel:15,
     effect:'bonusMat',        perLevel:'+1 mat per dungeon stage',
     desc:'Adds bonus materials to every dungeon stage cleared.' },
-  { id:'refinery',     name:'Transmuter',         emoji:'♻️', maxLevel:3,  baseCost:300, minWorkerLevel:12,
+  { id:'refinery',     name:'Transmuter',         emoji:'♻️', maxLevel:3,  baseCost:350, scaleMul:2.1, minWorkerLevel:12,
     effect:'matRefine',       perLevel:'better material conversion ratio',
     desc:'Unlocks the Transmuter — convert surplus materials into the type you need. Higher levels improve the ratio (Lv1 3→1 · Lv2 2→1 · Lv3 3→2).' },
-  { id:'quality_forge', name:'Quality Forge',      emoji:'💠', maxLevel:5,  baseCost:600, minWorkerLevel:18,
+  { id:'quality_forge', name:'Quality Forge',      emoji:'💠', maxLevel:5,  baseCost:900, scaleMul:2.3, minWorkerLevel:18,
     effect:'qualityRoll',     perLevel:'+4% chance to forge one rarity tier higher',
     desc:'Tunes the forge to roll above its station — each level adds a chance for a craft to come out one rarity tier higher (the forge chase).' },
   // (Retired: Chronoforge / Grand Forge Hall — crafting is instant now, so forge-time and
@@ -268,13 +272,13 @@ const GUILD_UPGRADES = [
   // Three symmetric stat-pair auras, same rate/cap (+5%/level, max Lv7 = +35%),
   // one pair each so every stat gets exactly one dedicated source instead of
   // STR/CON getting double coverage while DEX/INT/VOL/CHA got none.
-  { id:'barracks',     name:'Barracks',           emoji:'⚔️', maxLevel:7,  baseCost:225, minWorkerLevel:20,
+  { id:'barracks',     name:'Barracks',           emoji:'⚔️', maxLevel:7,  baseCost:350, scaleMul:2.3, minWorkerLevel:20,
     effect:'strengthAura',    perLevel:'+5% STR & CON from gear',
     desc:'Increases STR and CON granted by equipped gear.' },
-  { id:'alchemy',      name:"Alchemist's Lab",    emoji:'🧪', maxLevel:7,  baseCost:225, minWorkerLevel:20,
+  { id:'alchemy',      name:"Alchemist's Lab",    emoji:'🧪', maxLevel:7,  baseCost:350, scaleMul:2.3, minWorkerLevel:20,
     effect:'intellectAura',   perLevel:'+5% INT & DEX from gear',
     desc:'Increases INT and DEX granted by equipped gear.' },
-  { id:'sanctum',      name:'Enchanting Sanctum', emoji:'✨', maxLevel:7,  baseCost:390, minWorkerLevel:30,
+  { id:'sanctum',      name:'Enchanting Sanctum', emoji:'✨', maxLevel:7,  baseCost:600, scaleMul:2.3, minWorkerLevel:30,
     effect:'spiritAura',      perLevel:'+5% CHA & VOL from gear',
     desc:'Increases CHA and VOL granted by equipped gear.' },
 ];
