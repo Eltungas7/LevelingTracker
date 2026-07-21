@@ -5648,6 +5648,32 @@ details[open] .devt-hist-summary::after { content:'▲'; }
   line-height:1; pointer-events:none;
 }
 .inv-slot-eqdot { position:absolute; top:2px; left:3px; font-size:8px; line-height:1; color:var(--sao-cyan); pointer-events:none; text-shadow:0 0 4px rgba(77,208,225,0.8); }
+.inv-slot-tier {
+  position:absolute; bottom:1px; left:3px;
+  font-family:'Cinzel',serif; font-size:7px; font-weight:700; letter-spacing:0.3px;
+  line-height:1; color:rgba(224,247,250,0.55); pointer-events:none; z-index:3;
+}
+/* ── Multi-select (bulk SELL / SALVAGE) ── */
+.inv-bag-slot.is-multisel {
+  border-color:var(--sao-cyan);
+  box-shadow:0 0 0 1px var(--sao-cyan), 0 0 8px rgba(77,208,225,0.35) inset;
+}
+.inv-slot-msel-check {
+  position:absolute; top:1px; right:2px; z-index:4;
+  font-size:10px; font-weight:700; line-height:1; color:var(--sao-cyan);
+  text-shadow:0 0 4px rgba(77,208,225,0.9); pointer-events:none;
+}
+.inv-msel-toggle { color:var(--sao-cyan); }
+.inv-bulk-bar {
+  display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+  margin-top:8px; padding:8px 10px; border-radius:6px;
+  border:1px solid rgba(77,208,225,0.35); background:rgba(77,208,225,0.06);
+}
+.inv-bulk-count {
+  font-family:'Cinzel',serif; font-size:9px; letter-spacing:1px; color:var(--sao-cyan);
+  margin-right:auto; white-space:nowrap;
+}
+.inv-bulk-btn { flex:0 1 auto; }
 .inv-bag-slot { position:relative; }
 .inv-inspect-grade {
   display:inline-block; font-family:'Cinzel',serif; font-size:8px; font-weight:700;
@@ -10003,20 +10029,23 @@ function defaultClassState() {
 // CLASS UNLOCK LOGIC  (Paso 2)
 // ============================================================
 
-// Level + minimum stat value required to access each tier
-// Each stat gate is set one rank above the level gate's implied rank so it
-// stays meaningful alongside the level + mastery prerequisite:
-//   NOVICE  → lv 1-19  / no stat req              — from the start
-//   ADEPT   → lv 20-39 / Rank C stats (600)        — ~6 weeks
-//   EXPERT  → lv 40-69 / Rank A stats (2800)       — ~6 months
-//   LEGEND  → lv 70-94 / Rank SS stats (7000)      — ~20+ months
-//   HERO    → lv 95-100/ Rank SSS stats (8750) + all Tier-4 mastered
+// Level + minimum stat value + mastery count required to access each tier.
+// REBALANCED (Jul 2026, 3-week real-use review): the old gates (lv20 / 600
+// stats for ADEPT) fell early — Tuni was about to unlock T2 with barely 1-2
+// Novice classes mastered. Each tier now ALSO requires `masteredPrev` classes
+// of the previous tier mastered (4 of 6), so a tier only opens once most of
+// the current tier's rotation has actually been lived through:
+//   NOVICE  → lv 1   / no stat req                          — from the start
+//   ADEPT   → lv 30  / Rank B stats (1500) + 4 Novice mastered  (~2-3 months)
+//   EXPERT  → lv 45  / Rank A stats (2800) + 4 Adept mastered
+//   LEGEND  → lv 75  / Rank S+ stats (6000) + 4 Expert mastered
+//   HERO    → lv 95  / beyond SSS (9999) + ALL Tier-4 mastered (hidden)
 const CLASS_TIER_REQ = {
-  1: { level: 1,  statMin: 0    },   // NOVICE  — disponible desde el inicio
-  2: { level: 20, statMin: 600  },   // ADEPT   — Rank C
-  3: { level: 40, statMin: 2000 },   // EXPERT
-  4: { level: 70, statMin: 5000 },   // LEGEND  — Rank S
-  5: { level: 95, statMin: 9999 },   // HERO    — beyond SSS (hidden)
+  1: { level: 1,  statMin: 0    },                     // NOVICE — from the start
+  2: { level: 30, statMin: 1500, masteredPrev: 4 },    // ADEPT  — Rank B
+  3: { level: 45, statMin: 2800, masteredPrev: 4 },    // EXPERT — Rank A
+  4: { level: 75, statMin: 6000, masteredPrev: 4 },    // LEGEND — Rank S+
+  5: { level: 95, statMin: 9999 },                     // HERO   — all T4 mastered (checked separately)
 };
 
 // Returns { available:bool, locked:bool, reasons:string[] }
@@ -10058,21 +10087,32 @@ function getClassUnlockStatus(classId, state) {
     });
   }
 
-  // ── Mastery prerequisite (Tier 2 needs mastered Tier-1 with shared stat, etc.) ──
+  // ── Mastery prerequisites ────────────────────────────────
+  // (a) a mastered previous-tier class sharing a stat (thematic lineage), and
+  // (b) `masteredPrev` classes of the previous tier mastered overall — the next
+  //     tier opens only after most of the current rotation has been lived through.
   if (cls.tier >= 2) {
     const mastered = state.classData ? state.classData.masteredClasses || {} : {};
+    const tierNames = { 1:'Novice', 2:'Adept', 3:'Expert', 4:'Legend' };
+    const prevName  = tierNames[cls.tier - 1] || 'previous';
     const hasMasteredPrereq = Object.values(CLASSES).some(c =>
       c.tier === cls.tier - 1 &&
       mastered[c.id] &&
       c.stats.some(s => cls.stats.includes(s))
     );
-    const tierNames = { 1:'Novice', 2:'Adept', 3:'Expert', 4:'Legend' };
-    const prevName  = tierNames[cls.tier - 1] || 'previous';
     const statsStr  = cls.stats.map(s => STAT_NAMES[s]).join('/');
     if (!hasMasteredPrereq) {
       reasons.push(`Master a ${prevName} class of ${statsStr} first`);
     } else {
       met.push(`${prevName} class of ${statsStr} ✓`);
+    }
+    if (req.masteredPrev) {
+      const prevCount = (CLASSES_BY_TIER[cls.tier - 1] || []).filter(id => mastered[id]).length;
+      if (prevCount < req.masteredPrev) {
+        reasons.push(`Master ${req.masteredPrev} ${prevName} classes (you: ${prevCount})`);
+      } else {
+        met.push(`${req.masteredPrev} ${prevName} classes mastered ✓`);
+      }
     }
   }
 
@@ -10635,6 +10675,7 @@ let openStatKey = null;
 let invSelected = null;
 let invFilter = 'all';
 let invSort = 'default'; // 'default' | 'rarity' | 'slot' | 'equipped'
+let invMultiSel = null;  // null = select-mode off · Set of bag indexes when active
 
 // ============================================================
 // DUNGEON SYSTEM — CONFIG
@@ -11862,6 +11903,17 @@ function calcPrimaryAtk(archetype, S) {
   }
 }
 
+// ── Class-NEUTRAL attack score — feeds calcPowerLevel ONLY ──────────────────
+// CP measures the adventurer, not the equipped class: all six stats feed one
+// shared formula with equal weight (total coefficient 3.3 ≈ the per-archetype
+// formulas above), so switching class no longer swings CP by thousands. Class
+// still shows in CP via the tier mastery multiplier (+5%/tier), and in COMBAT
+// via calcPrimaryAtk / Spell Power — those are meant to differ per class.
+function calcNeutralAtk(S) {
+  const q = k => Math.sqrt(S[k]||0);
+  return 10 + Math.round((q('STR')+q('DEX')+q('CON')+q('INT')+q('VOL')+q('CHA')) * 0.55);
+}
+
 // Affix dimension caps — total % a full loadout can stack per dimension.
 // Set to 35% so a full T9 G5 legendary 10-slot set naturally exceeds it, making the
 // 70% GEAR_CP_MAX_FRAC display cap binding for serious endgame gear. Individual affix
@@ -11962,6 +12014,7 @@ function calcPlayerCombatStats(includeGear) {
   const chaXpBonus   = Math.min(0.15, parseFloat((Math.sqrt(CHA)*0.0021).toFixed(4)));
 
   let primaryAtk = calcPrimaryAtk(archetype, Spool);
+  let neutralAtk = calcNeutralAtk(Spool);
   if (includeGear) {
     // Barracks/Alchemist's Lab/Sanctum auras already applied to the raw stat pool
     // (STR/CON, INT/DEX, CHA/VOL respectively) inside getEquippedStats() — Spool
@@ -11971,7 +12024,7 @@ function calcPlayerCombatStats(includeGear) {
     const atkPct = Math.min(AFFIX_ATK_CAP, aff.atkPct || 0);
     const hpPct  = Math.min(AFFIX_HP_CAP,  aff.hpPct  || 0);
     const mpPct  = Math.min(AFFIX_MP_CAP,  aff.mpPct  || 0);
-    if (atkPct) { const m = 1 + atkPct/100; primaryAtk = Math.round(primaryAtk*m); pAtk = Math.round(pAtk*m); magicAtk = Math.round(magicAtk*m); }
+    if (atkPct) { const m = 1 + atkPct/100; primaryAtk = Math.round(primaryAtk*m); neutralAtk = Math.round(neutralAtk*m); pAtk = Math.round(pAtk*m); magicAtk = Math.round(magicAtk*m); }
     if (hpPct)  pMaxHP = Math.round(pMaxHP * (1 + hpPct/100));
     if (mpPct)  pMaxMP = Math.round(pMaxMP * (1 + mpPct/100));
     // Chance/DR affixes: direct % addition with gear caps
@@ -11984,7 +12037,7 @@ function calcPlayerCombatStats(includeGear) {
   pDodge  = Math.min(20, pDodge);
   pDmgRed = Math.min(30, pDmgRed);
   pCrit = parseFloat(pCrit.toFixed(1)); pDodge = parseFloat(pDodge.toFixed(1)); pDmgRed = parseFloat(pDmgRed.toFixed(1));
-  return { pMaxHP, pMaxMP, pAtk, magicAtk, pCrit, pDodge, pDblAtk, pDmgRed, pSpellPower, pMpRegen, chaGoldBonus, chaXpBonus, archetype, primaryAtk };
+  return { pMaxHP, pMaxMP, pAtk, magicAtk, pCrit, pDodge, pDblAtk, pDmgRed, pSpellPower, pMpRegen, chaGoldBonus, chaXpBonus, archetype, primaryAtk, neutralAtk };
 }
 
 // ── POWER LEVEL (CP) — one roll-up of total combat capability ───────
@@ -12021,15 +12074,16 @@ function getClassTierMult() {
 function calcPowerLevel(cs) {
   // CP reflects WHO YOU ARE: base stats × class tier mastery.
   // Gear is for winning dungeon fights; this roll-up defaults to base-only.
+  // CLASS-NEUTRAL: uses calcNeutralAtk (equal weight on all six stats), NOT the
+  // per-archetype primaryAtk / Spell Power — those made CP swing by thousands
+  // just from switching class. Class identity stays in combat; the only class
+  // signal left in CP is the tier mastery multiplier, which is earned.
   cs = cs || calcPlayerCombatStats(false);
-  // Mages get Spell Power boost; warriors rely on raw stats + survival (VOL→DR improves effHP).
-  const archMult = cs.archetype === 'mage' ? (cs.pSpellPower || 1) : 1.0;
   const tierMult = getClassTierMult(); // T1→×1.0 … T5 True Hero→×1.20
   // Attack score — every offensive CHANCE folded in as an average bonus
-  const effAtk = cs.primaryAtk
+  const effAtk = (cs.neutralAtk || cs.primaryAtk)
     * (1 + (cs.pCrit  / 100) * 0.5)  // crit: chance × bonus damage
     * (1 +  cs.pDblAtk / 100)        // double strike: extra hits
-    * archMult                        // VOL/INT aura multiplier
     * tierMult;                       // class tier mastery bonus
   // Survival score — HP made "effective" by dodge + mitigation, small regen nudge
   const effHP = (cs.pMaxHP / ((1 - cs.pDmgRed / 100) * (1 - cs.pDodge / 100)))
@@ -12571,10 +12625,31 @@ function dropItem(bagIndex) {
   }, { title: 'DROP ITEM', okLabel: 'DROP' });
 }
 
+// ── SELL price — scales with what the item actually cost to make ────────────
+// Old SELL_PRICES was rarity-only and flat, so a fresh T1 and a T5 sword both
+// sold for pennies. Crafted gear now returns ~45% of its craft gold cost plus
+// ~40% of the refine gold sunk into its current grade, × a rarity premium
+// (lucky high-rarity rolls sell for more, mirroring _salvageMatQty's scaling).
+// Non-crafted items (dungeon drops, potions) keep the flat rarity table.
+const SELL_RARITY_MULT = { common:1.0, uncommon:1.15, rare:1.35, epic:1.6, legendary:2.0 };
+function getSellGold(entry, item) {
+  if (!item) return 2;
+  const rarity = (entry && entry.quality) || item.rarity || 'common';
+  if (item.crafted && item.tier) {
+    const base = CRAFT_GOLD_BY_TIER[item.tier] || CRAFT_GOLD_COST[item.rarity] || 15;
+    let refineBack = 0;
+    const grade = (entry && entry.grade) || 1;
+    for (let g = 1; g < grade; g++) refineBack += getRefineGoldCost(item.id, g);
+    const mult = SELL_RARITY_MULT[rarity] || 1;
+    return Math.max(2, Math.round((base * 0.45 + refineBack * 0.40) * mult));
+  }
+  return SELL_PRICES[rarity] || SELL_PRICES[item.rarity] || 2;
+}
+
 function sellItem(bagIndex) {
   const entry = state.inventory[bagIndex]; if (!entry) return;
   const item = ITEMS_DB[entry.itemId]; if (!item) return;
-  const price = SELL_PRICES[item.rarity] || 2;
+  const price = getSellGold(entry, item);
   const qty = entry.quantity || 1;
   const total = price * qty;
   const label = qty > 1 ? `${qty}× ${item.name}` : item.name;
@@ -12590,7 +12665,10 @@ function sellItem(bagIndex) {
 function sellEquipped(slot) {
   const id = state.equipment[slot]; if (!id) return;
   const item = ITEMS_DB[id]; if (!item) return;
-  const price = SELL_PRICES[item.rarity] || 2;
+  // Rebuild an entry-shaped view of the equipped instance (rarity + grade live
+  // in equipmentMods/equipmentGrades) so the sell price matches the bag's.
+  const _mods = (state.equipmentMods || {})[slot];
+  const price = getSellGold({ quality: _mods?.rarity, grade: (state.equipmentGrades || {})[slot] || 1 }, item);
   showConfirmDialog(`Sell <strong>${item.name}</strong> (equipped) for <span style="color:#ffc107"><img src="img/gold.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;display:inline-block">${price}g</span>?`, () => {
     state.equipment[slot] = null;
     state.gold = (state.gold||0) + price;
@@ -12661,6 +12739,51 @@ function salvageItem(bagIndex) {
     invSelected = null; saveState(); renderInventory();
     showNotif(`🔨 Salvaged → ${matIconHtml(matId, 14, 1)}×${qty} ${label}`);
   }, { title: 'SALVAGE', okLabel: 'SALVAGE' });
+}
+
+// ── BULK actions (multi-select mode in the GEAR bag) ────────────────────────
+// Both act on the current invMultiSel Set of bag indexes. Entries are removed
+// in DESCENDING index order so earlier splices don't shift later targets.
+function _bulkSelectedEntries() {
+  if (!invMultiSel) return [];
+  return [...invMultiSel]
+    .map(i => ({ i, entry: state.inventory[i], item: state.inventory[i] && ITEMS_DB[state.inventory[i].itemId] }))
+    .filter(x => x.entry && x.item);
+}
+
+function bulkSellSelected() {
+  const sel = _bulkSelectedEntries(); if (!sel.length) return;
+  const total = sel.reduce((s, x) => s + getSellGold(x.entry, x.item) * (x.entry.quantity || 1), 0);
+  const _g = `<img src="img/gold.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;display:inline-block">`;
+  showConfirmDialog(`Sell <strong>${sel.length} item${sel.length>1?'s':''}</strong> for <span style="color:#ffc107">${_g}${total.toLocaleString()}g</span>?`, () => {
+    sel.sort((a, b) => b.i - a.i).forEach(x => state.inventory.splice(x.i, 1));
+    state.gold = (state.gold||0) + total;
+    state.totalGoldEarned = (state.totalGoldEarned||0) + total;
+    invMultiSel = null; invSelected = null; saveState(); renderInventory();
+    showNotif(`${_g} Sold ${sel.length} items for ${total.toLocaleString()}g`);
+  }, { title: 'BULK SELL', okLabel: 'SELL ALL' });
+}
+
+function bulkSalvageSelected() {
+  const sel = _bulkSelectedEntries().filter(x => x.item.slot); if (!sel.length) return;
+  // Tally the material yield per family (salvage returns ONE unit's worth per
+  // entry — same as salvageItem, which decrements stacks one at a time).
+  const mats = {};
+  sel.forEach(x => {
+    const matId = SALVAGE_MAT[x.item.slot] || 'timber';
+    mats[matId] = (mats[matId]||0) + _salvageMatQty(x.entry, x.item);
+  });
+  const matsHtml = Object.entries(mats)
+    .map(([id, q]) => `${matIconHtml(id, 14, 1)}×${q}`).join(' · ');
+  showConfirmDialog(`Salvage <strong>${sel.length} item${sel.length>1?'s':''}</strong> for <span style="color:#80deea">${matsHtml}</span>?`, () => {
+    if (!state.shopMaterials) state.shopMaterials = {};
+    sel.sort((a, b) => b.i - a.i).forEach(x => {
+      if ((x.entry.quantity||1) > 1) x.entry.quantity--; else state.inventory.splice(x.i, 1);
+    });
+    Object.entries(mats).forEach(([id, q]) => { state.shopMaterials[id] = (state.shopMaterials[id]||0) + q; });
+    invMultiSel = null; invSelected = null; saveState(); renderInventory();
+    showNotif(`🔨 Salvaged ${sel.length} items → ${matsHtml}`);
+  }, { title: 'BULK SALVAGE', okLabel: 'SALVAGE ALL' });
 }
 
 // Average mats earned per day over the last 7 days — used for forge ETA display
@@ -13872,7 +13995,8 @@ function renderInventory() {
     if (eqItem) {
       const g = (state.equipmentGrades||{})[def.id] || 1;
       const gBadge = eqItem.crafted && g > 1 ? `<div class="inv-slot-grade" style="color:${GRADE_COLORS[g-1]}">G${GRADE_LABELS[g-1]}</div>` : '';
-      el.innerHTML = `<div class="inv-equip-slot-emoji">${itemImgHtml(eqItem, 22)}</div><div class="inv-equip-slot-label">${def.name}</div>${gBadge}`;
+      const tBadge = eqItem.tier ? `<div class="inv-slot-tier" title="Tier ${eqItem.tier}">T${eqItem.tier}</div>` : '';
+      el.innerHTML = `<div class="inv-equip-slot-emoji">${itemImgHtml(eqItem, 22)}</div><div class="inv-equip-slot-label">${def.name}</div>${gBadge}${tBadge}`;
     } else {
       el.innerHTML = `<div class="inv-equip-slot-emoji" style="opacity:0.16">${def.emoji}</div><div class="inv-equip-slot-label" style="opacity:0.5">${def.name}</div>`;
     }
@@ -13949,6 +14073,16 @@ function renderInventory() {
     btn.addEventListener('click', () => { invSort = s; renderInventory(); });
     sortBar.appendChild(btn);
   });
+  // Multi-select toggle — while active, tapping slots marks them for bulk SELL/SALVAGE
+  const mselBtn = document.createElement('button');
+  mselBtn.className = `inv-sort-btn inv-msel-toggle${invMultiSel?' active':''}`;
+  mselBtn.textContent = invMultiSel ? '✕ CANCEL' : '☑ SELECT';
+  mselBtn.addEventListener('click', () => {
+    invMultiSel = invMultiSel ? null : new Set();
+    invSelected = null;
+    renderInventory();
+  });
+  sortBar.appendChild(mselBtn);
   bagHead.appendChild(sortBar);
   bag.appendChild(bagHead);
 
@@ -14000,14 +14134,21 @@ function renderInventory() {
     const bagIdx = inv.indexOf(entry);
     const item = ITEMS_DB[entry.itemId]; if (!item) return;
     const isSel = invSelected?.source==='bag' && invSelected?.index===bagIdx;
+    const isMSel = !!(invMultiSel && invMultiSel.has(bagIdx));
     const el = document.createElement('div');
     const _bagInstR = entry.quality || item.rarity;
-    el.className = `inv-bag-slot${item?' r-'+_bagInstR:''}${isSel?' is-selected':''}`;
+    el.className = `inv-bag-slot${item?' r-'+_bagInstR:''}${isSel?' is-selected':''}${isMSel?' is-multisel':''}`;
     const _itemGrade = entry.grade||1;
     const _gradeBadge = item.crafted && _itemGrade > 1 ? `<div class="inv-slot-grade" style="color:${GRADE_COLORS[_itemGrade-1]}">G${GRADE_LABELS[_itemGrade-1]}</div>` : '';
+    const _tierBadge = item.slot && item.tier ? `<div class="inv-slot-tier" title="Tier ${item.tier}">T${item.tier}</div>` : '';
     const _equippedDot = Object.values(equip).includes(entry.itemId) ? `<div class="inv-slot-eqdot" title="Equipped">●</div>` : '';
-    el.innerHTML = `<div class="inv-slot-emoji">${itemImgHtml(item, 22)}</div>${(entry.quantity||1)>1?`<div class="inv-slot-qty">${entry.quantity}</div>`:''}${_gradeBadge}${_equippedDot}`;
+    el.innerHTML = `<div class="inv-slot-emoji">${itemImgHtml(item, 22)}</div>${(entry.quantity||1)>1?`<div class="inv-slot-qty">${entry.quantity}</div>`:''}${_gradeBadge}${_tierBadge}${_equippedDot}${isMSel?'<div class="inv-slot-msel-check">✓</div>':''}`;
     el.addEventListener('click', () => {
+      if (invMultiSel) {
+        if (invMultiSel.has(bagIdx)) invMultiSel.delete(bagIdx); else invMultiSel.add(bagIdx);
+        renderInventory();
+        return;
+      }
       invSelected = isSel ? null : {source:'bag', index:bagIdx};
       renderInventory();
     });
@@ -14018,6 +14159,28 @@ function renderInventory() {
     bagGrid.innerHTML = `<div class="inv-bag-empty">— EMPTY —</div>`;
   }
   bag.appendChild(bagGrid);
+
+  // ── Bulk action bar — visible while select-mode is on ──
+  if (invMultiSel) {
+    const sel = _bulkSelectedEntries();
+    const goldTotal = sel.reduce((s, x) => s + getSellGold(x.entry, x.item) * (x.entry.quantity || 1), 0);
+    const salvSel = sel.filter(x => x.item.slot);
+    const salvMats = {};
+    salvSel.forEach(x => {
+      const matId = SALVAGE_MAT[x.item.slot] || 'timber';
+      salvMats[matId] = (salvMats[matId]||0) + _salvageMatQty(x.entry, x.item);
+    });
+    const salvHtml = Object.entries(salvMats).map(([id, q]) => `${matIconHtml(id, 12, 1)}×${q}`).join(' ');
+    const _g = `<img src="img/gold.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;display:inline-block">`;
+    const bar = document.createElement('div');
+    bar.className = 'inv-bulk-bar';
+    bar.innerHTML = sel.length
+      ? `<span class="inv-bulk-count">${sel.length} SELECTED</span>
+         <button class="inv-act-btn sell-item inv-bulk-btn" onclick="bulkSellSelected()">SELL ${_g}${goldTotal.toLocaleString()}</button>
+         ${salvSel.length ? `<button class="inv-act-btn salvage inv-bulk-btn" onclick="bulkSalvageSelected()">SALVAGE ${salvHtml}</button>` : ''}`
+      : `<span class="inv-bulk-count" style="opacity:0.6">TAP ITEMS TO SELECT</span>`;
+    bag.appendChild(bar);
+  }
   win.appendChild(bag);
 
   // Currency bar — the two real currencies (matches the HUD).
@@ -14085,14 +14248,17 @@ function renderInventory() {
         if (d !== 0) diffs.push(`<span style="color:${d>0?'#69f0ae':'#ff5252'};font-size:8px;font-family:'Cinzel',serif">${d>0?'+':''}${d} ${k}</span>`);
       });
       const _curGradeLabel = curItem.crafted && _curGrade > 1 ? ` [G${GRADE_LABELS[_curGrade-1]}]` : '';
-      compareHtml = `<div class="inv-inspect-compare"><span class="inv-compare-label">vs equipped · </span><span class="inv-compare-name r-${curItem.rarity}">${curItem.name}${_curGradeLabel}</span>${diffs.length?`<div class="inv-compare-diffs">${diffs.join('')}</div>`:`<span style="font-size:8px;color:var(--sao-text-dim)"> — same stats</span>`}</div>`;
+      const _curTierLabel = curItem.tier ? ` [T${curItem.tier}]` : '';
+      compareHtml = `<div class="inv-inspect-compare"><span class="inv-compare-label">vs equipped · </span><span class="inv-compare-name r-${curItem.rarity}">${curItem.name}${_curTierLabel}${_curGradeLabel}</span>${diffs.length?`<div class="inv-compare-diffs">${diffs.join('')}</div>`:`<span style="font-size:8px;color:var(--sao-text-dim)"> — same stats</span>`}</div>`;
     } else {
       compareHtml = `<div class="inv-inspect-compare"><span class="inv-compare-label">slot empty — ready to equip</span></div>`;
     }
   }
 
   // Action buttons
-  const sellPrice = SELL_PRICES[selItem.rarity] || 2;
+  const sellPrice = getSellGold(
+    invSelected.source === 'bag' ? inv[selBagIdx] : { quality: _selMods?.rarity, grade: _selGrade },
+    selItem);
   const sellQty = selBagIdx !== null ? (inv[selBagIdx]?.quantity||1) : 1;
   const sellTotal = sellPrice * sellQty;
   let acts = '';
@@ -14129,6 +14295,9 @@ function renderInventory() {
   }
 
   const slotLabel = selItem.slot ? selItem.slot.toUpperCase() : (selItem.stackable ? 'CONSUMABLE' : 'MATERIAL');
+  const _tierDisplay = selItem.slot && selItem.tier
+    ? `<span class="inv-inspect-grade" style="color:#4dd0e1;border-color:#4dd0e155">TIER ${selItem.tier}</span>`
+    : '';
   const _gradeDisplay = selItem.crafted && _selGrade > 1
     ? `<span class="inv-inspect-grade" style="color:${GRADE_COLORS[_selGrade-1]};border-color:${GRADE_COLORS[_selGrade-1]}55">GRADE ${GRADE_LABELS[_selGrade-1]}</span>`
     : '';
@@ -14150,7 +14319,7 @@ function renderInventory() {
       <div class="inv-inspect-icon-wrap">${itemImgHtml(selItem, 32)}</div>
       <div class="inv-inspect-title">
         <div class="inv-inspect-name r-${r}">${selItem.name}</div>
-        <div class="inv-inspect-rarity r-${r}">${r.replace('_',' ')} ${_instBadge}${_gradeDisplay}</div>
+        <div class="inv-inspect-rarity r-${r}">${r.replace('_',' ')} ${_tierDisplay}${_instBadge}${_gradeDisplay}</div>
         <div class="inv-inspect-slot-label">${slotLabel}${selSlot ? ' · EQUIPPED' : ''}</div>
       </div>
     </div>
@@ -17208,6 +17377,33 @@ function renderHabitos() {
   // fires once per day from updateStreakOnLoad(); this is the persistent minimized form.
   if (isToday) panelContent.appendChild(renderYamiStrip());
 
+  // ── CLASS QUESTS (shown only when a class is equipped) ──
+  // Rendered FIRST: these rotate with the equipped class, so they need the
+  // top slot to stay visible — buried at the bottom they got forgotten.
+  const cqEl = renderClassQuests();
+  if (cqEl) panelContent.appendChild(cqEl);
+
+  // ── EVENING SOCIAL NUDGE — from 21:00, if nothing hit the Social Log today ──
+  if (isToday && !state.habitsPaused && new Date().getHours() >= 21) {
+    const _dayStart = new Date(); _dayStart.setHours(0,0,0,0);
+    const _socialLoggedToday = (state.socialActsRecent || []).some(a => a.t >= _dayStart.getTime());
+    if (!_socialLoggedToday) {
+      const sn = document.createElement('div');
+      sn.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;margin:10px 0;border:1px solid rgba(234,128,252,0.4);border-left:3px solid #ea80fc;border-radius:6px;background:linear-gradient(90deg,rgba(234,128,252,0.10),rgba(234,128,252,0.02));font-family:\'Rajdhani\',sans-serif;';
+      sn.innerHTML = `
+        <span style="font-size:18px">🌙</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11px;font-weight:600;color:#ea80fc;font-family:'Cinzel',serif">SOCIAL LOG · DAY REVIEW</div>
+          <div style="font-size:10px;color:var(--sao-text-dim);margin-top:2px">The day is closing. Did anything social happen — a real conversation, a brave moment, a kind act? Log it before midnight.</div>
+        </div>
+        <button style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.05em;padding:8px 12px;border-radius:4px;border:1px solid #ea80fc;background:rgba(234,128,252,0.12);color:#ea80fc;cursor:pointer;white-space:nowrap">REVIEW ↓</button>`;
+      sn.querySelector('button').addEventListener('click', () => {
+        document.getElementById('socialLogSection')?.scrollIntoView({ behavior:'smooth', block:'center' });
+      });
+      panelContent.appendChild(sn);
+    }
+  }
+
   // ── DAILY GROUP ──
   const dailyGroup=document.createElement('div'); dailyGroup.className='section-group daily-group';
   const dh=document.createElement('div'); dh.className='section-header';
@@ -17319,10 +17515,6 @@ function renderHabitos() {
   weeklyGroup.appendChild(renderQuestList(state.weekly,{listKey:'weekly',periodKey:week,isWeekly:true,allowEdit:true,allowDelete:true,allowReorder:true}));
   panelContent.appendChild(weeklyGroup);
 
-  // ── CLASS QUESTS (shown only when a class is equipped) ──
-  const cqEl = renderClassQuests();
-  if (cqEl) panelContent.appendChild(cqEl);
-
   // ── AVOID GROUP ──
   const avoidGroup=document.createElement('div'); avoidGroup.className='section-group avoid-group';
   const negs=state.negativos||[];
@@ -17345,6 +17537,7 @@ function renderHabitos() {
   // ── SOCIAL QUICK-LOG ──
   if (isToday) {
     const socialGroup = document.createElement('div'); socialGroup.className = 'section-group';
+    socialGroup.id = 'socialLogSection';
     const ssh = document.createElement('div'); ssh.className = 'section-header';
     ssh.innerHTML = `<span class="section-label" style="color:#ea80fc;opacity:0.85">⟦ SOCIAL LOG ⟧</span><div class="section-line" style="background:rgba(234,128,252,0.25)"></div>`;
     socialGroup.appendChild(ssh);
@@ -20227,6 +20420,10 @@ function renderLockedClassGallery() {
         cc.tier === c.tier - 1 && _mastered[cc.id] && cc.stats.some(s => c.stats.includes(s))
       );
       parts.push(hasPrereq ? 1 : 0);
+      if (req.masteredPrev) {
+        const prevCount = (CLASSES_BY_TIER[c.tier - 1] || []).filter(id => _mastered[id]).length;
+        parts.push(Math.min(prevCount / req.masteredPrev, 1));
+      }
     }
     const pct = parts.length ? Math.round((parts.reduce((a,b)=>a+b,0) / parts.length) * 100) : 0;
     return { cls: c, status, pct };
