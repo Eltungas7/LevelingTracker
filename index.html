@@ -5152,7 +5152,7 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .ct-node-claimed { opacity:0.7; border-style:dashed; }
 @keyframes ctPulse { 0%,100%{box-shadow:0 0 12px var(--ct-glow),inset 0 0 18px rgba(255,255,255,0.04);} 50%{box-shadow:0 0 22px var(--ct-glow),inset 0 0 18px rgba(255,255,255,0.08);} }
 .ct-node-top { display:flex; align-items:center; gap:6px; margin-bottom:4px; }
-.ct-node-emoji { font-size:18px; line-height:1; filter:drop-shadow(0 0 4px var(--ct-glow)); }
+.ct-node-emoji { font-size:24px; line-height:1; filter:drop-shadow(0 0 5px var(--ct-glow)); }
 .ct-node-meta { display:flex; flex-direction:column; flex:1; min-width:0; }
 .ct-node-title { font-family:'Cinzel',serif; font-size:9px; letter-spacing:1.2px; color:var(--ct-text); font-weight:700; }
 .ct-node-thresh { font-size:8px; color:rgba(255,255,255,0.45); letter-spacing:0.3px; }
@@ -5163,17 +5163,6 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .ct-node-sub { display:block; font-family:'Cinzel',serif; font-size:8px; letter-spacing:0.8px; color:rgba(255,255,255,0.4); text-align:center; padding-top:2px; }
 .ct-node-sub.ct-ready { color:#69f0ae; letter-spacing:1.5px; font-weight:700; }
 .ct-node-sub.ct-claimed { color:rgba(255,255,255,0.5); }
-.ct-md-row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px; position:relative; }
-.ct-md-label { font-family:'Cinzel',serif; font-size:9px; letter-spacing:1px; color:rgba(255,255,255,0.5); }
-.ct-md-count { font-family:'Rajdhani',sans-serif; font-weight:700; font-size:13px; color:#ffd54f; }
-.ct-md-count.all { color:#69f0ae; }
-.ct-md-empty { font-size:10px; color:var(--sao-text-dim); line-height:1.4; padding:4px 0 2px; position:relative; }
-.ct-md-list { display:flex; flex-direction:column; gap:3px; position:relative; }
-.ct-md-item { display:flex; align-items:center; gap:7px; font-size:11px; color:var(--sao-text); }
-.ct-md-item.done { color:var(--sao-text-dim); text-decoration:line-through; opacity:0.6; }
-.ct-md-box { color:#ffd54f; font-size:11px; width:12px; text-align:center; }
-.ct-md-item.done .ct-md-box { color:#69f0ae; }
-.ct-md-text { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
 /* ── 🏛 City status panel ──────────────────────────────── */
 .city-status { display:flex; align-items:center; gap:11px; padding:11px 14px; margin-bottom:10px; border-radius:11px; background:linear-gradient(135deg,rgba(38,28,12,0.92),rgba(20,15,8,0.95)); border:1px solid rgba(255,193,7,0.32); box-shadow:0 0 16px rgba(255,193,7,0.08), inset 0 0 26px rgba(255,193,7,0.04); position:relative; overflow:hidden; transition:border-color 0.2s, box-shadow 0.2s; }
@@ -5521,9 +5510,6 @@ details[open] .devt-hist-summary::after { content:'▲'; }
   cursor: pointer; user-select: none;
 }
 .work-cat-header:hover { opacity: 0.85; }
-.work-mustdo-header { cursor: default; border-bottom-color: rgba(255,213,79,0.5); margin-top: 2px; }
-.work-mustdo-header .wch-label { color: #ffd54f; font-weight: 700; }
-.work-mustdo-header .wch-emoji { filter: drop-shadow(0 0 5px rgba(255,213,79,0.6)); }
 .wch-toggle { font-size: 8px; color: rgba(255,255,255,0.3); width: 10px; flex-shrink: 0; }
 .wch-emoji  { font-size: 13px; }
 .wch-label  {
@@ -7964,8 +7950,23 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 }
 .dlog-grade {
   font-family: 'Cinzel', serif; font-size: 22px; font-weight: 700;
-  min-width: 28px; text-align: center; flex-shrink: 0; line-height: 1;
+  min-width: 34px; text-align: center; flex-shrink: 0; line-height: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
 }
+.dlog-grade-path {
+  font-family: 'Rajdhani', sans-serif; font-size: 8px; font-weight: 600;
+  letter-spacing: 1px; opacity: 0.75;
+}
+.dlog-path-tag { font-family: 'Rajdhani', sans-serif; font-size: 9px; letter-spacing: 1px; font-weight: 600; }
+.dlog-day-hdr {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+  margin: 14px 0 7px; padding: 6px 10px;
+  border-left: 3px solid var(--sao-cyan); border-radius: 4px;
+  background: linear-gradient(90deg, rgba(77,208,225,0.10), rgba(77,208,225,0.02));
+}
+.dlog-day-hdr:first-of-type { margin-top: 2px; }
+.dlog-day-name { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px; color: var(--sao-cyan); }
+.dlog-day-totals { font-family: 'Rajdhani', sans-serif; font-size: 11px; color: var(--sao-text-dim); }
 .dlog-body { flex: 1; min-width: 0; }
 .dlog-name {
   font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1px;
@@ -9765,13 +9766,16 @@ function matIconHtml(matId, sz, tier) {
   return (typeof SHOP_MAT_META !== 'undefined' && SHOP_MAT_META[matId] && SHOP_MAT_META[matId].emoji) || '';
 }
 function goldImg(sz) { sz = sz||20; return `<img src="img/gold.png" style="width:${sz}px;height:${sz}px;object-fit:contain;vertical-align:middle;image-rendering:auto">`; }
-// Work tasks have NO self-rated difficulty. Every completion pays a single BASE
-// reward; completing a task INSIDE one focus session pays the IN-FLOW reward (the
-// highest — it rewards small tasks and breaking big ones into session-sized steps).
+// Every completion pays a single BASE reward; completing a task INSIDE one focus
+// session pays the IN-FLOW reward (the highest — it rewards small tasks and
+// breaking big ones into session-sized steps).
 // Tasks give Worker XP + gold + RANDOM materials — never character XP, never shards.
+// BUFFED Jul 2026 (3-week review): old base 12g/15wxp felt like pennies next to
+// dungeon-stage income even on Legendary tasks. Gold ~2×, WXP ~1.7× — both still
+// multiply by difficulty (0.7×–2.8×), grade scale (gold), and in-flow.
 const WORK_TASK_REWARD = {
-  base:   { gold:12, wxp:15, mats:1 },
-  inflow: { gold:45, wxp:50, mats:3 },
+  base:   { gold:25, wxp:25, mats:1 },
+  inflow: { gold:90, wxp:85, mats:3 },
 };
 // Difficulty tiers — user-selected on inscribe. Easiest sits on top of the task list (lowest
 // friction → start there → ride momentum into the hard ones). Multipliers cap at 2.8× for
@@ -9864,20 +9868,20 @@ const DIFF_RANK = { easy: 0, normal: 1, hard: 2, legendary: 3 };
 
 // ── Commission board pool — CADENCE DIRECTIVES ────────────────
 // Bonus-only daily missions that track the behaviours the Daily Ration is built on
-// (clear tasks, run focus sessions, clear must-dos, hit the floor). They auto-complete
+// (clear tasks, run focus sessions, hit the floor). They auto-complete
 // just by working your normal day — pure extra reward, never a competing demand.
-//   metric: 'tasks' | 'sessions' | 'mustdos' | 'floor' | 'inflow'
+//   metric: 'tasks' | 'sessions' | 'floor' | 'inflow'
 const COMMISSION_POOL = [
   // ── BRONZE — quick, always reachable ──────────────────────
   { tier:'bronze', metric:'tasks',    count:1, title:'Morning Dispatch',  flavor:'Clear one task to open the day’s ledger.',                       bonusGold:25,  bonusXp:12, bonusMat:null },
   { tier:'bronze', metric:'tasks',    count:2, title:"Courier’s Errand",  flavor:'Two tasks cleared before the gates close.',                      bonusGold:40,  bonusXp:20, bonusMat:{id:'gear',   qty:2} },
   { tier:'bronze', metric:'sessions', count:2, title:'Field Survey',      flavor:'Run 2 focus sessions — explore the work, don’t just plan it.',   bonusGold:45,  bonusXp:22, bonusMat:{id:'scroll', qty:2} },
-  { tier:'bronze', metric:'mustdos',  count:1, title:'Honor the Pledge',  flavor:'Clear one of today’s must-dos.',                                 bonusGold:40,  bonusXp:20, bonusMat:null },
+  { tier:'bronze', metric:'sessions', count:1, title:'First Light',       flavor:'Run your first focus session of the day.',                       bonusGold:40,  bonusXp:20, bonusMat:null },
   // ── SILVER — a solid working day ──────────────────────────
   { tier:'silver', metric:'tasks',    count:3, title:'Steady Hands',      flavor:'Three tasks off the backlog. Momentum builds.',                  bonusGold:70,  bonusXp:38, bonusMat:{id:'timber', qty:3} },
   { tier:'silver', metric:'sessions', count:3, title:'Deep Expedition',   flavor:'Three focus sessions today — find your flow.',                   bonusGold:80,  bonusXp:42, bonusMat:{id:'crystal',qty:3} },
   { tier:'silver', metric:'inflow',   count:1, title:'In the Zone',       flavor:'Finish a task during a focus session — the in-flow bonus.',      bonusGold:75,  bonusXp:40, bonusMat:{id:'scroll', qty:2} },
-  { tier:'silver', metric:'mustdos',  count:2, title:'Priorities First',  flavor:'Clear two of today’s must-dos.',                                 bonusGold:85,  bonusXp:45, bonusMat:null },
+  { tier:'silver', metric:'tasks',    count:4, title:'Priorities First',  flavor:'Four tasks cleared — the backlog fears you.',                    bonusGold:85,  bonusXp:45, bonusMat:null },
   // ── GOLD — a strong, full day ─────────────────────────────
   { tier:'gold',   metric:'tasks',    count:5, title:'Productive Day',    flavor:'Five tasks cleared. Real progress on the backlog.',              bonusGold:130, bonusXp:70, bonusMat:{id:'gear',   qty:4} },
   { tier:'gold',   metric:'sessions', count:4, title:'Marathon Focus',    flavor:'Four focus sessions — a true deep-work day.',                    bonusGold:140, bonusXp:75, bonusMat:{id:'crystal',qty:4} },
@@ -10335,7 +10339,6 @@ function loadState() {
       // ── Daily Ration system (work cadence) ─────────────────────
       if (typeof s.workCapacityHours !== 'number') s.workCapacityHours = 4;   // daily focus floor (hours)
       if (!s.workDay || typeof s.workDay !== 'object') s.workDay = { dateKey:'', focusMs:0, sessions:0 };
-      if (!s.workMustDos || typeof s.workMustDos !== 'object') s.workMustDos = { dateKey:'', ids:[] };
       if (!s.workDayDone || typeof s.workDayDone !== 'object') s.workDayDone = { dateKey:'', done:false };
       if (!s.workChests || typeof s.workChests !== 'object') s.workChests = { dateKey:'', bronze:'locked', silver:'locked', gold:'locked' };
       // Migrate: seed lastCityActiveDay so existing users don't get instant winter on first load.
@@ -10348,10 +10351,7 @@ function loadState() {
       if (typeof s.steadyDays !== 'number') s.steadyDays = 0;
       if (!s.hasOwnProperty('lastSteadyDay')) s.lastSteadyDay = null;
       if (!Array.isArray(s.rationDays)) s.rationDays = [];   // dateKeys the daily ration was met (for weekly cadence)
-      // Migrate the old single focus-pledge → seed today's must-dos
-      if (s.focusTask && s.focusTask.id && !s.workMustDos.ids.length) {
-        s.workMustDos = { dateKey: todayKey(), ids: [s.focusTask.id] };
-      }
+      // (Must-dos removed Jul 2026 — any leftover s.workMustDos in old saves is simply ignored.)
       // Migrate old dungeon difficulty keys (easy/medium/hard/xhard → null)
       if (s.dungeon && ['easy','medium','hard','xhard'].includes(s.dungeon.difficulty)) s.dungeon = null;
       // Add missing idle fields to in-progress dungeons
@@ -15478,7 +15478,7 @@ function _commissionMetricValue(metric, periodKey) {
   switch (metric) {
     case 'sessions': return (state.workDay && state.workDay.dateKey === periodKey) ? (state.workDay.sessions || 0) : 0;
     case 'inflow':   return (state.workDay && state.workDay.dateKey === periodKey) ? (state.workDay.inflow   || 0) : 0;
-    case 'mustdos':  return isToday ? mustDosClearedCount() : 0;
+    case 'mustdos':  return 0; // retired metric — must-dos were removed; stale saved commissions just idle out
     case 'floor':    return (isToday && getWorkFocusMinToday() >= getWorkCapacityMin()) ? 1 : 0;
     case 'tasks':
     default:         return state.trabajo.filter(t => !!t.done[periodKey]).length;
@@ -16948,7 +16948,7 @@ function renderQuestItem(task, opts) {
       <div class="forge-mini-bar"><div class="forge-mini-fill${isBreak?' break':''}" style="width:${pct}%"></div></div>`;
     el.appendChild(forgeBar);
   }
-  // One-tap focus + must-do row — undone work tasks
+  // One-tap focus row — undone work tasks
   if (opts.listKey==='trabajo' && !done && opts.periodKey===todayKey()) {
     const row = document.createElement('div'); row.className = 'quest-focus-row';
     // ▶ FOCUS — start (or bind) a focus session on this task in one tap
@@ -16959,13 +16959,6 @@ function renderQuestItem(task, opts) {
     focusBtn.title = _isFocusing ? 'This task is your active focus session' : 'Start a focus session on this task';
     focusBtn.addEventListener('click',(e)=>{ e.stopPropagation(); focusOnTask(task.id); });
     row.appendChild(focusBtn);
-    // 🎯 must-do toggle
-    const _isMD = isMustDo(task.id);
-    const fBtn=document.createElement('button'); fBtn.className='quest-focus-btn'+(_isMD?' focused':'');
-    fBtn.innerHTML = _isMD ? '🎯 MUST-DO · +15 XP' : '🎯 Make must-do';
-    fBtn.title = _isMD ? 'Remove from today\'s must-dos' : 'Commit to clearing this today (max 3)';
-    fBtn.addEventListener('click',(e)=>{ e.stopPropagation(); focusTaskToggle(task.id); });
-    row.appendChild(fBtn);
     el.appendChild(row);
   }
 
@@ -17190,22 +17183,8 @@ function renderWorkTasksByCat(activeTasks, opts) {
   const wrap = document.createElement('div');
   const today = opts.periodKey;
 
-  // ── Pinned "TODAY'S MUST-DOS" group — the day's ration on top ──
-  const mustIds = (opts.listKey === 'trabajo' && today === todayKey()) ? (state.workMustDos?.ids || []) : [];
-  if (mustIds.length) {
-    const mustTasks = mustIds.map(id => activeTasks.find(t => t.id === id)).filter(Boolean);
-    if (mustTasks.length) {
-      const mdDone = mustTasks.filter(t => !!t.done[today]).length;
-      const mh = document.createElement('div'); mh.className = 'work-cat-header work-mustdo-header';
-      mh.innerHTML = `<span class="wch-emoji">🎯</span><span class="wch-label">TODAY'S MUST-DOS</span><span class="wch-count">${mdDone}/${mustTasks.length}</span>${mdDone===mustTasks.length?'<span class="wch-check">✓</span>':''}`;
-      wrap.appendChild(mh);
-      mustTasks.filter(t => !t.done[today]).forEach(t => wrap.appendChild(renderQuestItem(t, opts)));
-      mustTasks.filter(t =>  !!t.done[today]).forEach(t => wrap.appendChild(renderQuestItem(t, opts)));
-    }
-  }
-
-  // Single flat list — categories retired; clean QUESTS look.
-  const rest = activeTasks.filter(t => !mustIds.includes(t.id));
+  // Single flat list — categories and must-dos retired; clean QUESTS look.
+  const rest = activeTasks;
   // Sort easiest → hardest within pending: low friction first, ride momentum into the heavy ones.
   // Overdue tasks float to the top of their tier so the city doesn't forget old debts.
   const _diffIdx = (t) => (TASK_DIFFICULTY[t.difficulty] || TASK_DIFFICULTY.medium).sortIdx;
@@ -19142,7 +19121,7 @@ function renderCommissionBoard() {
     }
 
     // Metric label — what this cadence mission tracks
-    const _METRIC_LABEL = { tasks:'tasks cleared', sessions:'focus sessions', mustdos:'must-dos', floor:'focus floor', inflow:'in-flow finish' };
+    const _METRIC_LABEL = { tasks:'tasks cleared', sessions:'focus sessions', mustdos:'must-dos (retired)', floor:'focus floor', inflow:'in-flow finish' };
     const qualifyHint = !isDone
       ? `<span class="cc-qualify-hint">${_METRIC_LABEL[comm.metric] || 'tasks cleared'}</span>` : '';
 
@@ -19659,8 +19638,8 @@ function renderTrabajo() {
     const qtys = _MAT_DEF.map(m => bucket[m.id] || 0);
     const total = qtys.reduce((a,b)=>a+b,0);
     const avg = total / qtys.length;
-    // Skip empty T2/T3 rows for fresh players (avoid clutter); always show T1.
-    if (tier > 1 && total === 0 && getWorkerRankIdx() < 2) return '';
+    // Skip empty T2/T3 rows entirely (mobile declutter); always show T1.
+    if (tier > 1 && total === 0) return '';
     const items = _MAT_DEF.map(m => {
       const q = bucket[m.id] || 0;
       const meta = getMatTierMeta(m.id, tier);
@@ -19709,7 +19688,7 @@ function renderTrabajo() {
 
   // ── WORKBENCH view ───────────────────────────────────────
   panelContent.appendChild(renderWorkStrip());
-  // Daily Ration command center — focus floor + must-dos + cadence (or REST EARNED).
+  // Daily work command center — chest track cadence (or REST EARNED).
   panelContent.appendChild(renderWorkdayStatus());
 
   // Consolidated status strip — the single home for worker rank + next unlock +
@@ -23069,7 +23048,6 @@ function renderAll() {
 function renderDungeonLog() {
   panelTitle.textContent = 'LOG'; panelSubtitle.textContent = 'Expedition records';
   panelContent.innerHTML = '';
-  const GRADE_COLORS = { S:'#ffd700', A:'#82b1ff', B:'#4dd0e1', C:'rgba(255,255,255,0.45)', D:'rgba(255,82,82,0.7)' };
   const logs = (state.dungeonLog || []).slice().reverse();
   const title = document.createElement('div'); title.className = 'dlog-section-title';
   title.textContent = `⟦ EXPEDITION RECORDS ⟧  ·  ${logs.length} run${logs.length !== 1 ? 's' : ''}`;
@@ -23080,24 +23058,62 @@ function renderDungeonLog() {
     panelContent.appendChild(empty);
     return;
   }
-  logs.forEach(entry => {
-    const el = document.createElement('div'); el.className = 'dlog-entry';
-    const gc = GRADE_COLORS[entry.grade] || '#9e9e9e';
-    const fs = entry.focusSec || 0;
-    const focusStr = fs >= 3600 ? `${Math.floor(fs/3600)}h ${Math.floor((fs%3600)/60)}m` : fs >= 60 ? `${Math.floor(fs/60)}m` : `${fs}s`;
-    const [, m, d] = (entry.date || '').split('-');
-    const dateStr = m && d ? `${parseInt(m)}/${parseInt(d)}` : (entry.date || '');
-    const bossChip = entry.bossKill ? `<span class="dlog-chip" style="color:#ffd700;border-color:rgba(255,215,0,0.3)">⚔ BOSS</span>` : '';
-    const goldChip = entry.gold > 0 ? `<span class="dlog-chip" style="color:#ffc107;border-color:rgba(255,193,7,0.3)"><img src="img/gold.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;display:inline-block">${entry.gold}g</span>` : '';
-    const wbChip = entry.isWeeklyBoss ? `<span class="dlog-chip" style="color:#ce93d8;border-color:rgba(206,147,216,0.3)">★ CHAMPION</span>` : '';
-    el.innerHTML = `
-      <div class="dlog-grade" style="color:${gc};text-shadow:0 0 10px ${gc}66">${entry.isWeeklyBoss ? '★' : (entry.grade || '?')}</div>
-      <div class="dlog-body">
-        <div class="dlog-name">${entry.emoji || ''} ${(entry.name || 'Dungeon').toUpperCase()}</div>
-        <div class="dlog-meta">${dateStr} · ⏱ ${focusStr} · ${entry.pomosDone || 0}/${entry.totalStages || 2} stages</div>
-        <div class="dlog-chips">${wbChip}${bossChip}${goldChip}</div>
-      </div>`;
-    panelContent.appendChild(el);
+  const _fmtFocus = (fs) => fs >= 3600 ? `${Math.floor(fs/3600)}h ${Math.floor((fs%3600)/60)}m` : fs >= 60 ? `${Math.floor(fs/60)}m` : `${fs}s`;
+  // Resolve rank + path for old entries missing the fields (dungeonId → config).
+  const _entryRank = (e) => e.rank || (DUNGEON_CONFIG[e.dungeonId] || {}).rank || null;
+  const _entryPath = (e) => e.path || (DUNGEON_CONFIG[e.dungeonId] || {}).dungeonClass || null;
+  const PATH_LABEL = { warrior:'WARRIOR', rogue:'ROGUE', mage:'MAGE', engineer:'ENGINEER' };
+
+  // ── Group by day, newest day first (entries within a day stay newest-first) ──
+  const byDay = new Map();
+  logs.forEach(e => {
+    const dk = e.date || '???';
+    if (!byDay.has(dk)) byDay.set(dk, []);
+    byDay.get(dk).push(e);
+  });
+  const DAYS_EN = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+  const MONTHS_SHORT = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const _chestsByDay = {};
+  (state.chestLog || []).forEach(c => { (_chestsByDay[c.date] = _chestsByDay[c.date] || []).push(c); });
+  const CHEST_MEDAL = { bronze:'🥉', silver:'🥈', gold:'🥇' };
+
+  byDay.forEach((entries, dk) => {
+    // Day totals
+    const totFocus = entries.reduce((s,e)=>s+(e.focusSec||0),0);
+    const totGold  = entries.reduce((s,e)=>s+(e.gold||0),0);
+    const totMats  = entries.reduce((s,e)=>s+(e.mats||0),0);
+    const cleared  = entries.filter(e=>e.bossKill).length;
+    const dayChests = _chestsByDay[dk] || [];
+    const chestGold = dayChests.reduce((s,c)=>s+(c.gold||0),0);
+    const chestStr  = dayChests.length ? ` · ${dayChests.map(c=>CHEST_MEDAL[c.tier]||'🧰').join('')}🧰` : '';
+    const d = new Date(dk + 'T12:00:00');
+    const dayName = isNaN(d) ? dk : (dk === todayKey() ? 'TODAY' : `${DAYS_EN[d.getDay()]} · ${MONTHS_SHORT[d.getMonth()]} ${d.getDate()}`);
+    const hdr = document.createElement('div'); hdr.className = 'dlog-day-hdr';
+    hdr.innerHTML = `
+      <div class="dlog-day-name">⟦ ${dayName} ⟧</div>
+      <div class="dlog-day-totals">⏱ ${_fmtFocus(totFocus)} · ⚔ ${cleared}/${entries.length} cleared · <img src="img/gold.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;display:inline-block">${(totGold + chestGold).toLocaleString()}g${totMats ? ` · 📦${totMats}` : ''}${chestStr}</div>`;
+    panelContent.appendChild(hdr);
+
+    entries.forEach(entry => {
+      const el = document.createElement('div'); el.className = 'dlog-entry';
+      const rank = _entryRank(entry);
+      const path = _entryPath(entry);
+      const rc = entry.isWeeklyBoss ? '#ce93d8' : (TIER_COLORS[rank] || '#9e9e9e');
+      const badge = entry.isWeeklyBoss ? '★' : (rank || '?');
+      const pathStr = entry.isWeeklyBoss ? 'WEEKLY BOSS' : (PATH_LABEL[path] || '');
+      const bossChip = entry.bossKill ? `<span class="dlog-chip" style="color:#ffd700;border-color:rgba(255,215,0,0.3)">⚔ BOSS</span>`
+                                      : `<span class="dlog-chip" style="color:rgba(255,255,255,0.4);border-color:rgba(255,255,255,0.15)">◌ PARTIAL</span>`;
+      const goldChip = entry.gold > 0 ? `<span class="dlog-chip" style="color:#ffc107;border-color:rgba(255,193,7,0.3)"><img src="img/gold.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;display:inline-block">${entry.gold}g</span>` : '';
+      const matChip = entry.mats > 0 ? `<span class="dlog-chip" style="color:#80deea;border-color:rgba(128,222,234,0.3)">📦×${entry.mats}</span>` : '';
+      el.innerHTML = `
+        <div class="dlog-grade" style="color:${rc};text-shadow:0 0 10px ${rc}66">${badge}<span class="dlog-grade-path">${pathStr ? pathStr.slice(0,3) : ''}</span></div>
+        <div class="dlog-body">
+          <div class="dlog-name">${entry.emoji || ''} ${(entry.name || 'Dungeon').toUpperCase()}${pathStr ? ` <span class="dlog-path-tag" style="color:${rc}">${entry.isWeeklyBoss ? '★ WEEKLY' : `${rank} ${pathStr}`}</span>` : ''}</div>
+          <div class="dlog-meta">⏱ ${_fmtFocus(entry.focusSec || 0)} · ${entry.pomosDone || 0}/${entry.totalStages || 2} stages</div>
+          <div class="dlog-chips">${bossChip}${goldChip}${matChip}</div>
+        </div>`;
+      panelContent.appendChild(el);
+    });
   });
 }
 
@@ -24005,19 +24021,16 @@ function showXpFloat(xp, gains, anchorY) {
 }
 
 // ════════════════════════════════════════════════════════════
-// DAILY RATION — work cadence: a 4h(default) focus floor + up to 3 must-dos.
-// "DONE" (rest earned) fires only when BOTH are met. A steady-days streak
-// rewards showing up daily instead of cramming into weekly binges.
+// DAILY WORK — chest track cadence. A steady-days streak rewards showing up
+// daily instead of cramming into weekly binges. (Must-dos removed Jul 2026.)
 // ════════════════════════════════════════════════════════════
-const MUST_DO_MAX = 3;
-const MUST_DO_BONUS_XP = 15;
 // ── Chest track ───────────────────────────────────────────────
 // 3h/5h/7h tiers (6/10/14 sessions) replace the old single 4h "floor".
 // Each tier mints a chest the user CLAIMS — closure is an action, not a passive trigger.
 const CHEST_THRESHOLDS = [
-  { tier:'bronze', sessions:6,  hours:3, emoji:'🥉', glow:'rgba(205,127,50,0.55)',  border:'rgba(205,127,50,0.45)',  text:'#cd7f32' },
-  { tier:'silver', sessions:10, hours:5, emoji:'🥈', glow:'rgba(192,192,192,0.55)', border:'rgba(192,192,192,0.45)', text:'#e0e0e0' },
-  { tier:'gold',   sessions:14, hours:7, emoji:'🥇', glow:'rgba(255,193,7,0.6)',    border:'rgba(255,193,7,0.55)',   text:'#ffc107' },
+  { tier:'bronze', name:'BRONZE CHEST', sessions:6,  hours:3, emoji:'🥉', chest:'🧰', glow:'rgba(205,127,50,0.55)',  border:'rgba(205,127,50,0.45)',  text:'#cd7f32' },
+  { tier:'silver', name:'SILVER CHEST', sessions:10, hours:5, emoji:'🥈', chest:'🧰', glow:'rgba(192,192,192,0.55)', border:'rgba(192,192,192,0.45)', text:'#e0e0e0' },
+  { tier:'gold',   name:'GOLDEN CHEST', sessions:14, hours:7, emoji:'🥇', chest:'🧰', glow:'rgba(255,193,7,0.6)',    border:'rgba(255,193,7,0.55)',   text:'#ffc107' },
 ];
 const CHEST_REWARDS = {
   bronze: { gold:80,  mats:3,  shards:0, heat:false },
@@ -24035,7 +24048,6 @@ function getWorkRewardScale() {
 function _rollWorkDay() { // ensure today's containers exist & reset on a new day
   const tk = todayKey();
   if (!state.workDay || state.workDay.dateKey !== tk) state.workDay = { dateKey: tk, focusMs: 0, sessions: 0 };
-  if (!state.workMustDos || state.workMustDos.dateKey !== tk) state.workMustDos = { dateKey: tk, ids: [] };
   if (!state.workDayDone || state.workDayDone.dateKey !== tk) state.workDayDone = { dateKey: tk, done: false };
   if (!state.workChests || state.workChests.dateKey !== tk) state.workChests = { dateKey: tk, bronze:'locked', silver:'locked', gold:'locked' };
   // Re-evaluate readiness in case sessions accrued before this call.
@@ -24045,23 +24057,6 @@ function _rollWorkDay() { // ensure today's containers exist & reset on a new da
 function getWorkCapacityMin() { return Math.max(30, (state.workCapacityHours || 4) * 60); }
 function getWorkFocusMinToday() { _rollWorkDay(); return Math.round((state.workDay.focusMs || 0) / 60000); }
 function getWorkSessionsToday() { _rollWorkDay(); return state.workDay.sessions || 0; }
-function getMustDoTasks() {
-  _rollWorkDay();
-  return state.workMustDos.ids
-    .map(id => state.trabajo.find(t => t.id === id))
-    .filter(Boolean);
-}
-function isMustDo(taskId) { _rollWorkDay(); return state.workMustDos.ids.includes(taskId); }
-function mustDosClearedCount() {
-  const tk = todayKey();
-  return getMustDoTasks().filter(t => !!t.done[tk]).length;
-}
-function isWorkDayComplete() {
-  const md = getMustDoTasks();
-  const floorMet = getWorkFocusMinToday() >= getWorkCapacityMin();
-  const mustDosMet = md.length >= 1 && md.every(t => !!t.done[todayKey()]);
-  return floorMet && mustDosMet;
-}
 // Rank index helper — reuses the file-scope RANK_ORDER from earlier in mobile.html.
 function _chestRankIdx(r) { const i = RANK_ORDER.indexOf(r||'E'); return i < 0 ? 1 : i; }
 // Accrue focus time + sessions (called when a work session completes).
@@ -24578,21 +24573,14 @@ function claimChest(tier) {
   const matChips = matIds.filter(id => dist[id] > 0)
     .map(id => `${matIconHtml(id, 14, 1)}×${dist[id]}`).join(' ');
   const shardChip = r.shards ? ` · ✦+${r.shards}` : '';
-  showNotif(`${cfg.emoji} ${tier.toUpperCase()} CHEST · <img src="img/gold.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;display:inline-block">+${goldAmt}g · ${matChips}${shardChip}`);
+  // Chest history — feeds the day-grouped dungeon log (LOG → Dungeons).
+  if (!Array.isArray(state.chestLog)) state.chestLog = [];
+  state.chestLog.push({ date: todayKey(), tier, gold: goldAmt, mats: matAmt });
+  if (state.chestLog.length > 90) state.chestLog = state.chestLog.slice(-90);
+  showNotif(`${cfg.emoji} ${cfg.name} ${cfg.chest} · <img src="img/gold.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;display:inline-block">+${goldAmt}g · ${matChips}${shardChip}`);
   if (navigator.vibrate) navigator.vibrate([20, 30, 40]);
   saveState(); renderAll();
 }
-// Toggle a task as one of today's must-dos (max 3).
-function focusTaskToggle(taskId) {
-  _rollWorkDay();
-  const ids = state.workMustDos.ids;
-  const i = ids.indexOf(taskId);
-  if (i >= 0) { ids.splice(i, 1); showNotif('🎯 Removed from today\'s must-dos.'); }
-  else if (ids.length >= MUST_DO_MAX) { showNotif(`🎯 Max ${MUST_DO_MAX} must-dos today — clear one first.`); return; }
-  else { ids.push(taskId); showNotif(`🎯 Must-do set — clear it today (+${MUST_DO_BONUS_XP} XP).`); }
-  saveState(); renderAll();
-}
-
 // One-tap focus: start (or re-point) a focus session bound to this task, skipping the
 // dungeon-select screen for the common case. "I want to focus on X" → one tap → focusing.
 function focusOnTask(taskId) {
@@ -24622,15 +24610,13 @@ function focusOnTask(taskId) {
   }
 }
 
-// The Workday command center — chest track (3h/5h/7h) + must-dos.
+// The Workday command center — chest track (3h/5h/7h).
 // Each chest is CLAIMED, not auto-fired; the gold claim is the day's closure signal.
 function renderWorkdayStatus() {
   _rollWorkDay();
   const sessions = getWorkSessionsToday();
   const focusMin = getWorkFocusMinToday();
   const hrsStr   = (m) => (m % 60 === 0 ? (m/60) + 'h' : (m/60).toFixed(1).replace(/\.0$/,'') + 'h');
-  const md       = getMustDoTasks();
-  const mdCleared = mustDosClearedCount();
   const streak   = state.steadyDays || 0;
   const scale    = getChestRewardScale();
   const grade    = (typeof getHunterGrade === 'function' ? (getHunterGrade()||{}).tier : '') || 'F';
@@ -24675,9 +24661,9 @@ function renderWorkdayStatus() {
     return `
       <div class="ct-node ct-node-${status}" data-tier="${c.tier}" style="--ct-glow:${c.glow};--ct-border:${c.border};--ct-text:${c.text}" ${clickAttr}>
         <div class="ct-node-top">
-          <span class="ct-node-emoji">${c.emoji}</span>
+          <span class="ct-node-emoji">${c.chest}</span>
           <div class="ct-node-meta">
-            <span class="ct-node-title">${c.tier.toUpperCase()}</span>
+            <span class="ct-node-title">${c.emoji} ${c.name}</span>
             <span class="ct-node-thresh">${c.hours}h · ${c.sessions} sessions</span>
           </div>
         </div>
@@ -24685,17 +24671,6 @@ function renderWorkdayStatus() {
         ${subText}
       </div>`;
   }).join('');
-
-  // ── Must-dos block (kept — orthogonal "what matters" signal) ──
-  let mdHtml = '';
-  if (md.length === 0) {
-    mdHtml = `<div class="ct-md-empty">🎯 Pick today's 1–${MUST_DO_MAX} must-dos — tap "Make must-do" on a task below.</div>`;
-  } else {
-    mdHtml = `<div class="ct-md-list">` + md.map(t => {
-      const cdone = !!t.done[tk];
-      return `<div class="ct-md-item${cdone?' done':''}"><span class="ct-md-box">${cdone?'✓':'○'}</span><span class="ct-md-text">${t.text}</span></div>`;
-    }).join('') + `</div>`;
-  }
 
   el.innerHTML = `
     ${goldClaimed ? '<div class="ct-glow"></div>' : ''}
@@ -24715,12 +24690,7 @@ function renderWorkdayStatus() {
         return `<div class="ct-progress-marker" style="left:${pct}%;--ct-marker:${c.text}"></div>`;
       }).join('')}
     </div>
-    <div class="ct-nodes">${nodesHtml}</div>
-    <div class="ct-md-row">
-      <span class="ct-md-label">🎯 MUST-DOS</span>
-      <span class="ct-md-count${md.length&&mdCleared>=md.length?' all':''}">${mdCleared} / ${md.length||0}</span>
-    </div>
-    ${mdHtml}`;
+    <div class="ct-nodes">${nodesHtml}</div>`;
   return el;
 }
 
@@ -24739,8 +24709,8 @@ function showBronzeChestOverlay(rewards) {
   ov.innerHTML = `
     <div class="bco-stage">
       <div class="bco-flash"></div>
-      <div class="bco-chest">🥉</div>
-      <div class="bco-title">BRONZE CHEST CLAIMED</div>
+      <div class="bco-chest">🧰</div>
+      <div class="bco-title">🥉 BRONZE CHEST CLAIMED</div>
       <div class="bco-rewards">${rewardChips}</div>
       <div class="bco-tap">tap to continue</div>
     </div>`;
@@ -24763,10 +24733,10 @@ function showSilverChestOverlay(rewards) {
   ov.innerHTML = `
     <div class="sco-stage">
       <div class="sco-flash"></div>
-      <div class="sco-chest">🥈</div>
+      <div class="sco-chest">🧰</div>
       <div class="sco-embers">${embers}</div>
       <div class="sco-text">
-        <div class="sco-eyebrow">⟦ SILVER CHEST CLAIMED ⟧</div>
+        <div class="sco-eyebrow">⟦ 🥈 SILVER CHEST CLAIMED ⟧</div>
         <div class="sco-title">STEADY PROGRESS</div>
         <div class="sco-sub">5 hours of focus, banked</div>
         <div class="sco-rewards">${rewardChips}</div>
@@ -24798,12 +24768,12 @@ function showGoldChestOverlay(rewards) {
     <div class="gco-rays"></div>
     <div class="gco-stage">
       <div class="gco-act1">
-        <div class="gco-chest">🥇</div>
+        <div class="gco-chest">🧰</div>
         <div class="gco-flash"></div>
       </div>
       <div class="gco-embers">${embers}</div>
       <div class="gco-act3">
-        <div class="gco-eyebrow">⟦ GOLD CHEST CLAIMED ⟧</div>
+        <div class="gco-eyebrow">⟦ 🥇 GOLDEN CHEST CLAIMED ⟧</div>
         <div class="gco-title">THE FORGE IS<br>READY FOR WORK</div>
         <div class="gco-sub">7 hours of focus · -30% craft cost for 24h</div>
         <div class="gco-rewards">${rewardChips}</div>
@@ -24833,7 +24803,7 @@ function showWorkDayDoneOverlay() {
       <div class="wdo-check">✓</div>
       <div class="wdo-eyebrow">⟦ DAY'S WORK COMPLETE ⟧</div>
       <div class="wdo-title">REST EARNED</div>
-      <div class="wdo-body">You showed up, hit your focus floor, and cleared your must-dos.<br>Whatever's left can wait. <strong>Close the laptop guilt-free.</strong></div>
+      <div class="wdo-body">You showed up and put in a full day of focus.<br>Whatever's left can wait. <strong>Close the laptop guilt-free.</strong></div>
       <div class="wdo-streak">🔥 ${streak} STEADY DAY${streak===1?'':'S'} IN A ROW</div>
       <div class="wdo-tap">tap to continue</div>
     </div>`;
@@ -25031,15 +25001,6 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
       else showWorkerXpFloat(_wxpAmt, anchorY);
       if (_inFlow) setTimeout(() => showLegendaryWorkOverlay(task, _drops, _isCritWork), 250);
       else         setTimeout(() => showNormalWorkFlash(task, _drops), 150);
-      // Must-do bonus — scales with hunter grade so endgame must-dos still feel weighty.
-      if (isMustDo(task.id)) {
-        const _fbBase = Math.round(25 * Math.sqrt(getWorkRewardScale()));  // √scale: 25 at E → 100 at S
-        const _fb = grantWorkXp(_fbBase);
-        if (state.dungeon && state.dungeon.phase==='exploring') state.dungeon.sessionTaskWxp = (state.dungeon.sessionTaskWxp||0) + _fb;
-        setTimeout(() => showNotif(`🎯 Must-do cleared · +${_fb} WXP — that's a priority off the list!`), 320);
-      }
-      // A cleared must-do may complete the daily ration → fire the "rest earned" moment.
-      checkWorkDayComplete();
     } else {
       const _isPhoenix = listKey==='habitos' && periodKey===todayKey() && !task.done[yesterdayKey()] && Object.keys(task.done).length > 0;
       const _phoenixMult = _isPhoenix ? 1.5 : 1.0;
@@ -28214,8 +28175,8 @@ function claimRewards() {
     }
     const _wv2 = state.dungeon.weeklyBossVariant || cfg.boss || {};
     if (!state.dungeonLog) state.dungeonLog = [];
-    state.dungeonLog.push({ ts: Date.now(), date: todayKey(), dungeonId: state.dungeon.difficulty, name: _wv2.name || cfg.name, emoji: _wv2.emoji || cfg.emoji || '⚔', grade: bossKill ? 'S' : 'D', pomosDone: state.dungeon.pomodoroCount || 0, totalStages: cfg.stages || 2, bossKill, gold: 0, focusSec: Math.round(Math.max(0, (state.dungeon.endTime || Date.now()) - state.dungeon.startTime - (state.dungeon.totalPausedMs || 0)) / 1000), isWeeklyBoss: true });
-    if (state.dungeonLog.length > 20) state.dungeonLog = state.dungeonLog.slice(-20);
+    state.dungeonLog.push({ ts: Date.now(), date: todayKey(), dungeonId: state.dungeon.difficulty, name: _wv2.name || cfg.name, emoji: _wv2.emoji || cfg.emoji || '⚔', grade: bossKill ? 'S' : 'D', rank: cfg.rank || null, path: cfg.dungeonClass || null, mats: 0, pomosDone: state.dungeon.pomodoroCount || 0, totalStages: cfg.stages || 2, bossKill, gold: 0, focusSec: Math.round(Math.max(0, (state.dungeon.endTime || Date.now()) - state.dungeon.startTime - (state.dungeon.totalPausedMs || 0)) / 1000), isWeeklyBoss: true });
+    if (state.dungeonLog.length > 60) state.dungeonLog = state.dungeonLog.slice(-60);
     stopDungeonTimer(); stopCombatTimer(); state.dungeon=null; saveState(); renderAll(); return;
   }
   // Gold + mats are now paid per-stage (per Pomodoro) — see getStageDrop / tickDungeon.
@@ -28294,8 +28255,9 @@ function claimRewards() {
   const _dLogFocusSec = Math.round(Math.max(0, (state.dungeon.endTime || Date.now()) - state.dungeon.startTime - (state.dungeon.totalPausedMs || 0)) / 1000);
   const _dLogStageGold = (state.dungeon.stageRewardsLog||[]).reduce((s,r)=>s+(r.gold||0),0);
   if (!state.dungeonLog) state.dungeonLog = [];
-  state.dungeonLog.push({ ts: Date.now(), date: todayKey(), dungeonId: state.dungeon.difficulty, name: cfg.name, emoji: cfg.emoji || '⚔', grade: _dLogGrade, pomosDone: _dLogPomos, totalStages: _dLogStages, bossKill, gold: _dLogStageGold, focusSec: _dLogFocusSec, isWeeklyBoss: false });
-  if (state.dungeonLog.length > 20) state.dungeonLog = state.dungeonLog.slice(-20);
+  const _dLogStageMats = (state.dungeon.stageRewardsLog||[]).reduce((s,r)=>s+(r.matQty||0),0);
+  state.dungeonLog.push({ ts: Date.now(), date: todayKey(), dungeonId: state.dungeon.difficulty, name: cfg.name, emoji: cfg.emoji || '⚔', grade: _dLogGrade, rank: cfg.rank || null, path: cfg.dungeonClass || null, mats: _dLogStageMats, pomosDone: _dLogPomos, totalStages: _dLogStages, bossKill, gold: _dLogStageGold, focusSec: _dLogFocusSec, isWeeklyBoss: false });
+  if (state.dungeonLog.length > 60) state.dungeonLog = state.dungeonLog.slice(-60);
   if (bossKill) {
     state.totalBossKills = (state.totalBossKills || 0) + 1;
     if (!state.dungeonsClearedSet) state.dungeonsClearedSet = {};
@@ -29068,14 +29030,7 @@ function renderDungeonSelect() {
     w.appendChild(lockInfo);
   }
 
-  // Session format label (fixed 25+5)
-  const pomoRow=document.createElement('div');
-  pomoRow.style.cssText='display:flex;align-items:center;justify-content:flex-end;padding:0 0 8px;';
-  const pomoLbl=document.createElement('span');
-  pomoLbl.style.cssText='font-family:Cinzel,serif;font-size:8px;letter-spacing:2px;color:var(--sao-text-dim);opacity:0.5';
-  pomoLbl.textContent='⏱ 25 MIN WORK · 5 MIN BREAK';
-  pomoRow.appendChild(pomoLbl);
-  w.appendChild(pomoRow);
+  // (25+5 session-format label removed — mobile declutter; the format never changes.)
 
   // 3-column class grid
   const grid=document.createElement('div'); grid.className='dungeon-class-grid';
@@ -29088,20 +29043,31 @@ function renderDungeonSelect() {
     const hdr=document.createElement('div'); hdr.className='dungeon-class-header';
     const _clsIcon = cls.matId ? matIconHtml(cls.matId, 28, 1) : cls.emoji;
     // Path label + dungeon name + mastery bar + current title.
+    // The bar fills by FIRST CLEARS of each rank (E→S = 6 segments, ~17% each);
+    // repeat clears of the same rank don't add. Tiers at 1/3/5/6 ranks cleared
+    // grant permanent perks — the tooltip spells this out per path.
+    const _pCleared = getPathRanksCleared(cls.key);
     const _pPct   = Math.round(getPathMasteryPct(cls.key) * 100);
     const _pTier  = getPathMasteryTier(cls.key);
     const _pTitle = getPathTitle(cls.key);
     const _pColor = PATH_TIER_COLORS[_pTier] || 'rgba(255,255,255,0.25)';
-    const _pTierName = _pTier > 0 ? (PATH_TIER_NAMES[_pTier] || '') : 'UNRANKED';
+    const _pDef   = PATH_MASTERY[cls.key];
+    const _PERK_LABEL = { gold:'gold from all sources', crit:'work-task crit chance', reward_mul:'task rewards (gold+mats+WXP)', mats:'material drops from all sources' };
+    const _pNextRank = PATH_RANKS.find(r => !(state.pathMastery?.[cls.key]||{})[r]) || null;
+    const _pTipPerks = _pDef ? _pDef.perkScale.map((s,i) => `${PATH_TIER_RANK_THRESHOLDS[i]} rank${PATH_TIER_RANK_THRESHOLDS[i]>1?'s':''}: +${Math.round(s*100)}% ${_PERK_LABEL[_pDef.perkType]||''}`).join('  ·  ') : '';
+    hdr.title = `${_pDef ? _pDef.label : ''} — fills on the FIRST boss-kill clear of each rank (E→S). ${_pCleared}/6 ranks cleared${_pNextRank ? ` · next: clear ${_pNextRank}-rank` : ' · COMPLETE'}. Perks: ${_pTipPerks}`;
     hdr.innerHTML = `
       ${_clsIcon}
       <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.2px;color:rgba(255,255,255,0.85);margin-top:4px;line-height:1.1">${cls.label.toUpperCase()}</div>
       <div style="font-family:'Cinzel',serif;font-size:8px;font-style:italic;letter-spacing:0.5px;color:rgba(255,255,255,0.55);margin-top:2px;line-height:1.1">${cls.dungeonName}</div>
-      <div style="margin-top:6px;height:4px;background:rgba(0,0,0,0.35);border-radius:2px;overflow:hidden;border:1px solid rgba(255,255,255,0.08)">
-        <div style="width:${_pPct}%;height:100%;background:${_pColor};box-shadow:0 0 4px ${_pColor}"></div>
+      <div style="margin-top:6px;display:flex;gap:2px">
+        ${PATH_RANKS.map(r => {
+          const _hit = !!(state.pathMastery?.[cls.key]||{})[r];
+          return `<div style="flex:1;height:4px;border-radius:2px;background:${_hit ? _pColor : 'rgba(0,0,0,0.35)'};border:1px solid rgba(255,255,255,0.08);${_hit ? `box-shadow:0 0 4px ${_pColor}` : ''}" title="${r}-rank ${_hit ? 'cleared' : 'not yet cleared'}"></div>`;
+        }).join('')}
       </div>
       <div style="display:flex;justify-content:space-between;font-family:'Rajdhani',sans-serif;font-size:8px;letter-spacing:1px;color:${_pColor};margin-top:3px;line-height:1.1">
-        <span>${_pTitle}</span><span>${_pPct}%</span>
+        <span>${_pTitle}</span><span>${_pCleared}/6 RANKS</span>
       </div>`;
     col.appendChild(hdr);
 
