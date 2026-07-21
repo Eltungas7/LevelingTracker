@@ -5213,30 +5213,23 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .work-strip { padding:4px 2px 10px; margin-bottom:6px; border-bottom:1px solid rgba(179,136,255,0.18); text-align:center; }
 .work-strip-text { font-family:'Rajdhani',sans-serif; font-size:11.5px; font-style:italic; color:#bfaee0; letter-spacing:0.2px; }
 /* ── LEAH MILESTONE BANNER — full-screen modal, reused shell for city-tier/streak milestones ── */
-.leah-intimate-banner { position:fixed; inset:0; background:radial-gradient(ellipse at center, rgba(28,18,48,0.85), rgba(8,4,16,0.96)); display:flex; align-items:center; justify-content:center; z-index:9999; cursor:pointer; animation:libFadeIn 0.55s ease-out forwards; }
-@keyframes libFadeIn { from { opacity:0; } to { opacity:1; } }
-.lib-inner { max-width:92vw; max-height:92vh; display:flex; flex-direction:column; align-items:center; gap:18px; animation:libRise 0.85s cubic-bezier(0.2,0.7,0.3,1) forwards; }
-@keyframes libRise { from { transform:translateY(24px); opacity:0; } to { transform:translateY(0); opacity:1; } }
-.lib-img-wrap { position:relative; border-radius:14px; overflow:hidden; border:2px solid rgba(179,136,255,0.5); animation:libGlow 3.2s ease-in-out infinite; }
-@keyframes libGlow {
-  0%,100% { box-shadow:0 0 60px rgba(179,136,255,0.4), 0 0 120px rgba(255,193,7,0.18); }
-  50%     { box-shadow:0 0 90px rgba(179,136,255,0.6),  0 0 170px rgba(255,193,7,0.32); }
+/* ── MILESTONE BANNER — full-screen SYSTEM congratulation (city tier-ups +
+   streak milestones). Character-free: gold celebratory glow, big icon, System
+   voice. Replaced the old Leah portrait banner when all NPC art was removed. */
+.milestone-banner { position:fixed; inset:0; background:radial-gradient(ellipse at center, rgba(48,40,16,0.88), rgba(20,16,4,0.96)); display:flex; align-items:center; justify-content:center; z-index:9999; cursor:pointer; animation:msbFadeIn 0.55s ease-out forwards; }
+@keyframes msbFadeIn { from { opacity:0; } to { opacity:1; } }
+.msb-inner { max-width:92vw; display:flex; flex-direction:column; align-items:center; gap:18px; animation:msbRise 0.85s cubic-bezier(0.2,0.7,0.3,1) forwards; }
+@keyframes msbRise { from { transform:translateY(24px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+.msb-icon { font-size:64px; line-height:1; animation:msbGlow 2.4s ease-in-out infinite; border-radius:50%; }
+@keyframes msbGlow {
+  0%,100% { text-shadow:0 0 40px rgba(255,215,0,0.55), 0 0 90px rgba(255,193,7,0.3); transform:scale(1); }
+  50%     { text-shadow:0 0 70px rgba(255,215,0,0.9),  0 0 140px rgba(255,193,7,0.55); transform:scale(1.05); }
 }
-/* Milestone mood — gold/white celebratory glow. */
-.leah-intimate-banner[data-mood="milestone"] { background:radial-gradient(ellipse at center, rgba(48,40,16,0.88), rgba(20,16,4,0.96)); }
-.leah-intimate-banner[data-mood="milestone"] .lib-img-wrap { border-color:rgba(255,215,0,0.75); animation:libGlowMilestone 2.4s ease-in-out infinite; }
-@keyframes libGlowMilestone {
-  0%,100% { box-shadow:0 0 80px rgba(255,215,0,0.42), 0 0 160px rgba(255,193,7,0.25); }
-  50%     { box-shadow:0 0 130px rgba(255,215,0,0.75), 0 0 230px rgba(255,193,7,0.5); }
-}
-.leah-intimate-banner[data-mood="milestone"] .lib-bubble { border-color:rgba(255,215,0,0.7); box-shadow:0 0 35px rgba(255,215,0,0.25); }
-.leah-intimate-banner[data-mood="milestone"] .lib-name { color:#ffd700; }
-.lib-img { max-width:420px; width:100%; height:auto; display:block; animation:libBreathe 4.4s ease-in-out infinite; }
-@keyframes libBreathe { 0%,100% { transform:scale(1); } 50% { transform:scale(1.015); } }
-.lib-bubble { background:linear-gradient(135deg,rgba(28,18,48,0.95),rgba(14,10,28,0.98)); border:1px solid rgba(179,136,255,0.55); border-radius:12px; padding:16px 24px; max-width:480px; text-align:center; box-shadow:0 0 30px rgba(179,136,255,0.15); }
-.lib-name { font-family:'Cinzel',serif; font-size:10px; letter-spacing:2.5px; color:var(--sao-shard-bright,#d1b3ff); margin-bottom:8px; }
-.lib-text { font-family:'Rajdhani',sans-serif; font-size:16px; color:#f0e8ff; line-height:1.42; font-style:italic; }
-.lib-hint { margin-top:12px; font-family:'Rajdhani',sans-serif; font-size:10px; color:rgba(255,255,255,0.4); letter-spacing:1.5px; }
+.msb-card { background:linear-gradient(135deg,rgba(48,38,10,0.95),rgba(24,18,4,0.98)); border:1px solid rgba(255,215,0,0.7); border-radius:12px; padding:16px 24px; max-width:480px; text-align:center; box-shadow:0 0 35px rgba(255,215,0,0.25); }
+.msb-eyebrow { font-family:'Cinzel',serif; font-size:10px; letter-spacing:2.5px; color:#ffd700; margin-bottom:8px; }
+.msb-title { font-family:'Cinzel',serif; font-size:20px; font-weight:700; letter-spacing:1px; color:#fff8e1; margin-bottom:8px; text-shadow:0 0 14px rgba(255,215,0,0.4); }
+.msb-text { font-family:'Rajdhani',sans-serif; font-size:15px; color:#f5ecd0; line-height:1.42; }
+.msb-hint { margin-top:12px; font-family:'Rajdhani',sans-serif; font-size:10px; color:rgba(255,255,255,0.4); letter-spacing:1.5px; }
 /* ── YAMI — single stoic daily line, minimal strip (no box, no portrait). ── */
 .yami-strip { padding:4px 2px 10px; margin-bottom:6px; border-bottom:1px solid rgba(255,82,82,0.18); text-align:center; }
 .yami-strip-text { font-family:'Rajdhani',sans-serif; font-size:11.5px; font-style:italic; color:#c9a8a0; letter-spacing:0.2px; }
@@ -23041,8 +23034,8 @@ function renderHistory() {
 function renderAll() {
   checkBackupNudge();
   // Detect milestones (city tier-up / streak threshold) globally — independent of which tab is active.
-  // If a milestone fired, queue the Leah congratulation banner.
-  if (typeof _leahCheckMilestones === 'function') { _leahCheckMilestones(); _firePendingMilestoneBannerIfAny(); }
+  // If a milestone fired, queue the System congratulation banner.
+  if (typeof _checkMilestoneBanners === 'function') { _checkMilestoneBanners(); _firePendingMilestoneBannerIfAny(); }
   const _ha=document.getElementById('panelHeaderActions'); if(_ha&&currentTab!=='habits') _ha.innerHTML='';
   if (currentTab!=='habits') panelContent.classList.remove('habits-paused');
   renderHeader();
@@ -24228,9 +24221,9 @@ function renderWinterBanner() {
 // ── LEAH's old contextual dialogue system was removed — replaced by a single
 // day-of-month work/productivity quote (WORK_QUOTES in data/content.js), shown
 // as a small strip at the top of both WORK (workbench) and CITY. No popup, no
-// box, no portrait — same treatment as Yami/Manin. Her milestone-banner system
-// (city tier-up / streak milestones — _leahCheckMilestones, showLeahMilestoneBanner)
-// is untouched, that's a rare celebratory event, not ambient chatter.
+// box, no portrait — same treatment as Yami/Manin. Her milestone banner became
+// the character-free SYSTEM milestone banner (_checkMilestoneBanners /
+// showMilestoneBanner) when all NPC art was deleted.
 function renderWorkStrip() {
   const q = _getWorkQuote();
   const el = document.createElement('div');
@@ -24261,19 +24254,10 @@ function renderManinStrip() {
   return el;
 }
 
-// ── LEAH OUTFIT SYSTEM — 5-outfit set, changes by day-of-week, time, and special states.
-// Priority: Crisis (Black Mage on freeze) > Banner/milestone/Phoenix (White Mage)
-// > Weekend (Casual) > Weekday (Everyday).
-const LEAH_OUTFIT_VARIANTS = {
-  black_mage: { angry:1, crying:1, embarrassed:1, neutral:1, sad:1, smiling:1, smug:1, surprised:1 },
-  casual:     { angry:1, crying:1, embarrassed:1, neutral:1, sad:1, smiling:1, smug:1, surprised:1 },
-  everyday:   { angry:2, crying:2, embarrassed:2, neutral:2, sad:2, smiling:2, smug:2, surprised:2 },
-  white_mage: { angry:1, crying:1, embarrassed:1, neutral:1, sad:1, smiling:1, smug:1, surprised:1 },
-};
-// Auto-instrument true-milestone days so the white_mage outfit fires for banners/events.
+// ── MILESTONE DETECTION — instruments true-milestone days for the banner.
 // City tier-up: detected by comparing current tier to last-seen.
 // Streak milestones: only fires on specific thresholds (14, 30, 60, 100, 200, 365).
-function _leahCheckMilestones() {
+function _checkMilestoneBanners() {
   const tk = todayKey();
   // City tier-up — first run initializes without marking the day.
   const curTierId = getCityTier().id;
@@ -24293,31 +24277,25 @@ function _leahCheckMilestones() {
     _queueMilestoneBanner('streak', streak);
   }
 }
-function getLeahImagePath(outfit, expression) {
-  const variants = (LEAH_OUTFIT_VARIANTS[outfit] || {})[expression] || 1;
-  const n = Math.floor(Math.random() * variants) + 1;
-  return `img/Leah/Outfits/${outfit}/${expression}_${n}.jpg`;
-}
-
 // ── MILESTONE BANNER — fires on city tier-up day OR high streak milestone day.
-// Unique congratulatory line per milestone. White-dress outfit. Gold celebratory glow.
-// Gina Linetti mechanism: the hype is real, but it's framed as her own reflected glory.
-const LEAH_MILESTONE_BANNERS = {
+// SYSTEM congratulation: no character, no portrait — a title, an icon, and a
+// short line from the System. Unique per milestone. Gold celebratory glow.
+const SYSTEM_MILESTONE_BANNERS = {
   city_tier: {
-    hamlet:  "Hamlet status. We left the tents behind. Actual roofs. I take full credit, obviously.",
-    village: "Village! People are calling themselves citizens now. Unprompted. That's the effect I have on places.",
-    town:    "TOWN! We have a town. Manin's apprentice is the only one not crying about it. For now.",
-    city:    "City status. Three kingdoms know our name. The map-makers are panicking. As they should.",
-    capital: "Capital! Banners on every wall. Nobles kneel when they visit. I taught them that, probably.",
-    citadel: "Citadel. The apex. They'll write chapters about your name. I'm in white because nothing else fits a legend.",
+    hamlet:  { icon:'🏚', title:'HAMLET',   line:'The outpost has grown into a hamlet. First roofs raised — the tents are history.' },
+    village: { icon:'🏘', title:'VILLAGE',  line:'Your settlement is now a village. Its people call themselves citizens — of something you built.' },
+    town:    { icon:'🏰', title:'TOWN',     line:'Town status reached. Walls, a market, and a forge that never cools.' },
+    city:    { icon:'🏯', title:'CITY',     line:'A true city stands where an outpost once was. Three kingdoms know its name.' },
+    capital: { icon:'🏛', title:'CAPITAL',  line:'Capital status. Banners on every wall — the seat of a growing legend.' },
+    citadel: { icon:'🌟', title:'CITADEL',  line:'The apex of civilization. The world will remember what was built here.' },
   },
   streak: {
-    14:  "Fourteen days. The first real streak. Most people break at three. I don't guide 'most people.'",
-    30:  "Thirty days. A month unbroken. This is when habits become identity. I called it, obviously.",
-    60:  "Sixty days. I'd say I'm impressed but I've been right about you for weeks.",
-    100: "ONE HUNDRED DAYS. Different stratosphere. I'm framing this, and not modestly.",
-    200: "Two hundred days. Past the point of doubt. I never doubted, for the record.",
-    365: "A FULL YEAR. A year of showing up. I'd cry but crying isn't a good look on me. Just know I'm affected.",
+    14:  { icon:'🔥', title:'14-DAY STREAK',  line:'Two weeks unbroken. The first true streak — most break at three. You are not most.' },
+    30:  { icon:'🥇', title:'30-DAY STREAK',  line:'A full month of showing up. This is where habit becomes identity.' },
+    60:  { icon:'💎', title:'60-DAY STREAK',  line:'Sixty days. Discipline is no longer an effort — it is your default state.' },
+    100: { icon:'🏆', title:'100-DAY STREAK', line:'Triple digits. You now operate in a different stratosphere.' },
+    200: { icon:'⭐', title:'200-DAY STREAK', line:'Two hundred days. Far past the point of doubt.' },
+    365: { icon:'👑', title:'ONE FULL YEAR',  line:'365 days, unbroken. This is the stuff of legend.' },
   },
 };
 function _queueMilestoneBanner(type, key) {
@@ -24329,28 +24307,25 @@ function _firePendingMilestoneBannerIfAny() {
   const { type, key } = state.pendingMilestoneBanner;
   state.pendingMilestoneBanner = null;
   if (typeof saveState === 'function') saveState();
-  setTimeout(() => showLeahMilestoneBanner(type, key), 250);
+  setTimeout(() => showMilestoneBanner(type, key), 250);
 }
-function showLeahMilestoneBanner(type, key) {
-  const pool = LEAH_MILESTONE_BANNERS[type] || {};
-  const line = pool[key] || `Milestone reached. ${key}. I dressed for the occasion, obviously.`;
-  const imgSrc = getLeahImagePath('white_mage', Math.random() < 0.6 ? 'smiling' : 'smug');
+function showMilestoneBanner(type, key) {
+  const pool = SYSTEM_MILESTONE_BANNERS[type] || {};
+  const m = pool[key] || { icon:'✦', title:String(key).toUpperCase(), line:'Milestone reached.' };
   const eyebrowMap = {
-    city_tier: '⟦ LEAH · CITY MILESTONE ⟧',
-    streak:    '⟦ LEAH · STREAK MILESTONE ⟧',
+    city_tier: '⟦ SYSTEM · CITY MILESTONE ⟧',
+    streak:    '⟦ SYSTEM · STREAK MILESTONE ⟧',
   };
   const banner = document.createElement('div');
-  banner.className = 'leah-intimate-banner';
-  banner.setAttribute('data-mood', 'milestone');
+  banner.className = 'milestone-banner';
   banner.innerHTML = `
-    <div class="lib-inner">
-      <div class="lib-img-wrap">
-        <img class="lib-img" src="${imgSrc}" alt="Leah" onerror="this.style.opacity='0'">
-      </div>
-      <div class="lib-bubble">
-        <div class="lib-name">${eyebrowMap[type] || '⟦ LEAH · MILESTONE ⟧'}</div>
-        <div class="lib-text">${line}</div>
-        <div class="lib-hint">click anywhere to close</div>
+    <div class="msb-inner">
+      <div class="msb-icon">${m.icon}</div>
+      <div class="msb-card">
+        <div class="msb-eyebrow">${eyebrowMap[type] || '⟦ SYSTEM · MILESTONE ⟧'}</div>
+        <div class="msb-title">${m.title}</div>
+        <div class="msb-text">${m.line}</div>
+        <div class="msb-hint">click anywhere to close</div>
       </div>
     </div>`;
   banner.addEventListener('click', () => banner.remove());

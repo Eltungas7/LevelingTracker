@@ -31,8 +31,7 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   const isAppFile = FILES_TO_CACHE.some(f => url.pathname.endsWith(f.replace('./', '/')));
-  const isLeahImg = url.pathname.includes('/img/Leah/');
-  if (e.request.mode === 'navigate' || isAppFile || isLeahImg) {
+  if (e.request.mode === 'navigate' || isAppFile) {
     e.respondWith(
       fetch(e.request)
         .then(r => {
