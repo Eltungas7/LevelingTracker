@@ -10354,6 +10354,11 @@ function loadState() {
       // (Must-dos removed Jul 2026 — any leftover s.workMustDos in old saves is simply ignored.)
       // Migrate old dungeon difficulty keys (easy/medium/hard/xhard → null)
       if (s.dungeon && ['easy','medium','hard','xhard'].includes(s.dungeon.difficulty)) s.dungeon = null;
+      // Mid-bosses removed Jul 2026 — an in-flight save frozen mid-fight resumes exploring on a fresh break.
+      if (s.dungeon && s.dungeon.phase === 'mid_boss') {
+        s.dungeon.phase = 'exploring'; s.dungeon.combat = null;
+        s.dungeon.pomodoroPhase = 'break'; s.dungeon.pomodoroPhaseStart = Date.now();
+      }
       // Add missing idle fields to in-progress dungeons
       if (s.dungeon && s.dungeon.phase==='exploring' && s.dungeon.idleEnemyHP===undefined) {
         const _cfg = DUNGEON_CONFIG[s.dungeon.difficulty];
@@ -24593,7 +24598,7 @@ function focusOnTask(taskId) {
     setTimeout(() => document.querySelector('.dungeon-explore, .dungeon-section')?.scrollIntoView({ behavior:'smooth', block:'start' }), 60);
     return;
   }
-  // Mid-boss / reward phase → just link it for the next session.
+  // Reward phase → just link it for the next session.
   if (state.dungeon) { setForgeTask(taskId); return; }
   // No session → start one using the last dungeon, else a sensible default E-rank.
   let did = (state.lastDungeonId && DUNGEON_CONFIG[state.lastDungeonId]) ? state.lastDungeonId : null;
@@ -26891,22 +26896,17 @@ function getPomodoroProgress() {
   const elapsed=Date.now()-d.pomodoroPhaseStart;
   return {elapsed:Math.max(0,elapsed), total:phaseMs, remaining:Math.max(0,phaseMs-elapsed)};
 }
-function showStageClearBanner(stageNum, drop, cfg, isMidBoss=false, midBossVictory=false) {
+function showStageClearBanner(stageNum, drop, cfg) {
   const prev=document.querySelector('.stage-clear-banner');
   if (prev) prev.remove();
   const b=document.createElement('div');
   b.className='stage-clear-banner';
-  b.style.setProperty('--dcolor', midBossVictory?'#ffd700':cfg.color);
-  b.style.setProperty('--dglow',  midBossVictory?'rgba(255,215,0,0.55)':cfg.glow);
+  b.style.setProperty('--dcolor', cfg.color);
+  b.style.setProperty('--dglow',  cfg.glow);
   const xpChip  =drop&&drop.xp  ?`<span class="scb-chip scb-xp">+${drop.xp} XP</span>`:'';
   const goldChip=drop            ?`<span class="scb-chip scb-gold"><img src="img/gold.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;display:inline-block">${drop.gold}g</span>`:'';
   const matChip =drop&&drop.matId?`<span class="scb-chip scb-mat">${matIconHtml(drop.matId, 14, drop.matTier||1) || drop.matEmoji}×${drop.matQty}</span>`:'';
-  const mbLine  = midBossVictory
-    ?`<div class="scb-title" style="font-size:11px;color:#ffd700;margin-top:3px">🏆 MID-BOSS DEFEATED!</div>`
-    : isMidBoss
-      ?`<div class="scb-title" style="font-size:11px;color:#ffc107;margin-top:3px">⚔ MID-BOSS INCOMING!</div>`
-      :'';
-  b.innerHTML=`<div class="scb-title">⟦ STAGE ${stageNum} CLEAR ⟧</div>${mbLine}<div class="scb-chips">${xpChip}${goldChip}${matChip}</div>`;
+  b.innerHTML=`<div class="scb-title">⟦ STAGE ${stageNum} CLEAR ⟧</div><div class="scb-chips">${xpChip}${goldChip}${matChip}</div>`;
   document.body.appendChild(b);
   setTimeout(()=>b.classList.add('scb-out'),2200);
   setTimeout(()=>b.remove(),2700);
@@ -26982,7 +26982,6 @@ function tickDungeon() {
   if (!state.dungeon||state.dungeon.phase!=='exploring'||state.dungeon.pausedAt) return;
   const d=state.dungeon, cfg=DUNGEON_CONFIG[d.difficulty];
   let advanced=false;
-  let _midBossTriggered=false;
 
   // ── Pomodoro phase advance (stage-completion model) ───────────
   let limit=50;
@@ -26998,8 +26997,7 @@ function tickDungeon() {
       state.lifetimePomos=(state.lifetimePomos||0)+1;
       // Daily Ration: a completed work session counts toward today's focus floor.
       accrueWorkFocus(getPomoWorkMs(), cfg && cfg.rank);
-      // Mid-boss trigger: every 2nd completed pomo that isn't the final stage
-      const _mb=cfg && d.pomodoroCount%2===0 && d.pomodoroCount<cfg.stages;
+      // (Mid-bosses removed Jul 2026 — stages flow straight through to the final boss.)
       // Award stage drop (+ Material Cache bonus mats) + XP
       if (cfg) {
         const drop=getStageDrop(cfg);
@@ -27028,7 +27026,7 @@ function tickDungeon() {
         const tierStr=(drop.matTier||1)>1?` [T${drop.matTier}]`:'';
         showNotif(`⟦ STAGE ${d.pomodoroCount} CLEAR ⟧ · +${drop.xp}XP · <img src="img/gold.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;display:inline-block">${drop.gold}g${matStr}${tierStr}${shardStr}`);
         if (navigator.vibrate) navigator.vibrate([100, 50, 200, 50, 100]);
-        showStageClearBanner(d.pomodoroCount, drop, cfg, _mb);
+        showStageClearBanner(d.pomodoroCount, drop, cfg);
       }
       // Forge task: partial gold + 1 category mat per session
       if (d.activeWorkTaskId) {
@@ -27046,7 +27044,6 @@ function tickDungeon() {
         d.sessionForgeWxp = (d.sessionForgeWxp||0) + _fWxp;
         showNotif(`⚒ Session ${d.forgeTaskPomoCount} · +5g${fMatStr} · ⚒+${_fWxp}WXP`);
       }
-      if (_mb) { _midBossTriggered=true; break; }
       // Queue up to 2 events for the break (non-blocking — break timer runs freely)
       if (!d.breakEvents) d.breakEvents=[];
       const _evt1=pickDungeonEvent('end', d, cfg);
@@ -27069,7 +27066,6 @@ function tickDungeon() {
       if (cfg && d.pomodoroCount===cfg.stages-1) showFinalStageBanner(cfg);
     }
   }
-  if (_midBossTriggered) { initMidBoss(); return; }
   saveState();
   if (currentTab==='work') { if(advanced) renderTrabajo(); else updateExploreDisplay(); }
 }
@@ -27567,7 +27563,6 @@ function startDungeon(diffId) {
     pomodoroPhase:'work', pomodoroPhaseStart:now, pomodoroCount:0,
     stageRewardsLog:[], combat:null,
     activeWorkTaskId:null, forgeTaskPomoCount:0,
-    midBossesDefeated:0,
     nextFocusCheckAt:0, focusCheckPending:false, focusCheckShownAt:0, focusBonusTotal:0,
     sessionTasks:0, sessionTaskGold:0, sessionTaskWxp:0, sessionForgeWxp:0, sessionCommissions:0, sessionRep:0,
     eventHistory:[], activeOmens:[], pendingEndEvent:null, pendingMidEvent:null,
@@ -27587,27 +27582,12 @@ function setForgeTask(taskId) {
   saveState(); renderAll();
 }
 
-// Honor-system credit for focused work done off-app (phone, pen & paper, etc.)
-// without ever starting/live-running the dungeon timer. Fast-forwards the
-// pomodoro clock and replays it through the normal tickDungeon() catch-up loop,
-// so stage drops, forge-task bonuses, and mid-boss/boss triggers all fire exactly
-// as they would have if the timer had been running the whole time.
-// Same CP-vs-rank check the dungeon-select screen shows as READY/PERILOUS/DEADLY — READY
-// (ratio >= 1) means you're strong enough that the fight isn't really in question.
-function _isRushCpReady(d) {
-  const cfg = DUNGEON_CONFIG[d.difficulty]; if (!cfg) return false;
-  const cpGear = calcPowerLevel(calcPlayerCombatStats(true)).cp;
-  const cpNow = Math.round(cpGear * Math.pow(getHabitCompoundMultiplier(), CP_SNOWBALL));
-  return cpReadiness(cpNow, cfg.rank).ratio >= 1;
-}
 // Honor-system credit for focused work done off-app, one full session (work + break) at a
 // time so mid-session dungeon events actually fire — instead of being silently discarded
 // like a single big time-jump would do. Break events are never auto-picked: they pile up in
 // state.dungeon.breakEvents across every rushed session and are left for the player to
 // resolve by hand, one at a time, through the normal break-event UI once the rush is done.
-// If a mid-boss checkpoint comes up, an over-CP player (READY on the dungeon-select gauge)
-// auto-clears it instantly — no ticket cost, the only requirement is the CP you actually
-// earned. Under-CP players still stop there and have to fight it live, same as normal exploring.
+// (Mid-bosses removed Jul 2026 — a rush now flows uninterrupted to the final boss.)
 function finishOutsideSessions(n) {
   n = Math.max(1, Math.min(20, Math.round(Number(n)) || 1));
   if (!state.dungeon) {
@@ -27622,18 +27602,14 @@ function finishOutsideSessions(n) {
   // just THIS rush's contribution (delta), not the dungeon run's full history —
   // matters if you rush the same dungeon more than once.
   const _beforeSummary = _buildSessionSummary(state.dungeon);
-  let stopped = false, allStagesCleared = false, midBossesRushed = 0;
+  let stopped = false, allStagesCleared = false;
   for (let i = 0; i < n; i++) {
     const d = state.dungeon;
     if (!d || d.phase !== 'exploring' || d.pomodoroPhase !== 'work') { stopped = true; break; }
     const cfg = DUNGEON_CONFIG[d.difficulty];
     if (cfg && (d.pomodoroCount||0) >= cfg.stages) { stopped = true; allStagesCleared = true; break; }
     d.pomodoroPhaseStart -= getPomoWorkMs() + 1000;
-    tickDungeon(); // completes exactly this one work stage — may trigger a mid-boss
-    if (state.dungeon && state.dungeon.phase === 'mid_boss' && state.dungeon.combat?.isMidBoss && _isRushCpReady(state.dungeon)) {
-      claimMidBossRewards();
-      midBossesRushed++;
-    }
+    tickDungeon(); // completes exactly this one work stage
     if (!state.dungeon || state.dungeon.phase !== 'exploring') { stopped = true; break; }
     // Leave any break events queued — don't auto-pick or discard them. On every session but
     // the last, hand-advance just the phase/timer fields tickDungeon()'s break→work branch
@@ -27655,14 +27631,13 @@ function finishOutsideSessions(n) {
   // before it's been resolved by hand.
   const pendingEvents = state.dungeon ? (state.dungeon.breakEvents||[]).length : 0;
   if (pendingEvents > 0) state.dungeon.pomodoroPhaseStart = Date.now();
-  const rushTag = midBossesRushed > 0 ? ` · ⚡ ${midBossesRushed} mid-boss${midBossesRushed!==1?'es':''} RUSHED` : '';
   const eventTag = pendingEvents > 0 ? ` · ${pendingEvents} event${pendingEvents!==1?'s':''} to resolve` : '';
   if (allStagesCleared) {
-    showNotif(`⚡ Logged ${completed}/${n} — all stages cleared. Fight the boss to close out the run.${rushTag}${eventTag}`);
+    showNotif(`⚡ Logged ${completed}/${n} — all stages cleared. Fight the boss to close out the run.${eventTag}`);
   } else if (stopped) {
-    showNotif(`⚡ Logged ${completed}/${n} — a mid-boss appeared. Fight it to keep going.${rushTag}${eventTag}`);
+    showNotif(`⚡ Logged ${completed}/${n} — the expedition needs your attention.${eventTag}`);
   } else {
-    showNotif(`⚡ Trusting you — logged ${completed} outside session${completed!==1?'s':''}${rushTag}${eventTag}`);
+    showNotif(`⚡ Trusting you — logged ${completed} outside session${completed!==1?'s':''}${eventTag}`);
   }
   checkAchievements();
   // Recap overlay — just this rush's contribution (delta since the snapshot above),
@@ -27693,7 +27668,7 @@ function showLogSessionModal() {
   const ov = document.createElement('div'); ov.className = 'confirm-overlay';
   ov.innerHTML = `<div class="confirm-box" style="border-top-color:var(--sao-shard)">
     <div class="confirm-badge" style="color:var(--sao-shard)">⚡ RUSH</div>
-    <div class="confirm-msg">Already put in focused work off-app? Rush it here — no timer, no catch-up guilt, no ticket cost. Just the work you actually did.<br>Over-CP mid-bosses clear instantly.<br><br>${cfg.emoji} ${cfg.name}</div>
+    <div class="confirm-msg">Already put in focused work off-app? Rush it here — no timer, no catch-up guilt, no ticket cost. Just the work you actually did.<br><br>${cfg.emoji} ${cfg.name}</div>
     <div class="stat-sel-amt">
       <button class="stat-sel-btn" id="lsMinus">-</button>
       <input id="lsCount" class="stat-sel-num" type="number" min="1" max="20" value="1" style="width:36px">
@@ -28008,7 +27983,7 @@ function challengeBoss() {
 function startPracticeBoss(diffId) {
   const cfg = DUNGEON_CONFIG[diffId || 'e_warrior'];
   if (!cfg) return;
-  if (state.dungeon && state.dungeon.phase !== 'boss_fight' && state.dungeon.phase !== 'mid_boss') {
+  if (state.dungeon && state.dungeon.phase !== 'boss_fight') {
     showNotif('⚔ End your current dungeon session first'); return;
   }
   stopDungeonTimer();
@@ -28022,7 +27997,7 @@ function startPracticeBoss(diffId) {
     difficulty: diffId || 'e_warrior', phase: 'boss_fight', isPractice: true,
     startTime: Date.now(), totalPausedMs: 0, pausedAt: null,
     pomodoroPhase: 'work', pomodoroPhaseStart: Date.now(), pomodoroCount: 0,
-    stageRewardsLog: [], midBossesDefeated: 0,
+    stageRewardsLog: [],
     nextFocusCheckAt: 0, focusCheckPending: false, focusCheckShownAt: 0, focusBonusTotal: 0,
     sessionTasks: 0, sessionTaskGold: 0, sessionTaskWxp: 0, sessionForgeWxp: 0, sessionCommissions: 0, sessionRep: 0,
     activeWorkTaskId: null, forgeTaskPomoCount: 0,
@@ -28071,88 +28046,8 @@ function endPractice() {
   state.dungeon = null; saveState(); renderAll();
 }
 
-// ── Mid-boss (spawns every 2 pomodoros except the final stage) ──
-function initMidBoss() {
-  if (!state.dungeon) return;
-  stopDungeonTimer();
-  const d=state.dungeon, cfg=DUNGEON_CONFIG[d.difficulty];
-  if (!cfg) return;
-  const cs=calcPlayerCombatStats();
-  const _arch=cs.archetype;
-  const _aura=getHabitCompoundMultiplier();
-  const _auraAtk=Math.round(cs.primaryAtk*_aura);
-  const scaledHP =Math.round(getScaledBossHP(cfg,_auraAtk)*0.4);
-  const scaledATK=Math.round(getScaledBossATK(cfg,cs.pMaxHP)*0.6);
-  const _firstIntent=drawBossIntent(cfg.boss,null,0);
-  const _firstTell=drawBossTell(_firstIntent?.type);
-  const statLine=`HP:${cs.pMaxHP} · ATK:${_auraAtk}${_aura>1?` (⚡×${_aura})`:''}`;
-  const _mbDbf=getDungeonClassDebuff(cfg);
-  const _mbAtkD=_mbDbf?Math.round(cs.pAtk*_mbDbf.dmgMul):cs.pAtk;
-  const _mbMagD=_mbDbf?Math.round((cs.magicAtk||0)*_mbDbf.dmgMul):(cs.magicAtk||0);
-  const _mbPrimD=_mbDbf?Math.round(_auraAtk*_mbDbf.dmgMul):_auraAtk;
-  d.phase='mid_boss';
-  d.combat={
-    playerHP:cs.pMaxHP, playerMaxHP:cs.pMaxHP,
-    playerMP:cs.pMaxMP, playerMaxMP:cs.pMaxMP,
-    playerAtk:_mbAtkD, magicAtk:_mbMagD,
-    critChance:cs.pCrit, dodgeChance:cs.pDodge, dblAtkChance:cs.pDblAtk,
-    dmgReduction:cs.pDmgRed, mpRegen:cs.pMpRegen,
-    spellPower:cs.pSpellPower,
-    atkBonus:0, atkBonusTurns:0, blocking:false,
-    enemyHP:scaledHP, enemyMaxHP:scaledHP, enemyAtk:scaledATK,
-    dungeonClassDebuff:!!_mbDbf, dungeonRecvMul:_mbDbf?_mbDbf.recvMul:1.0,
-    turnCount:0,
-    log:[
-      `⟦ MID-BOSS ENCOUNTER ⟧`,
-      `${cfg.boss.emoji} ${cfg.boss.name} — weakened form!`,
-      `HP:${scaledHP} · ATK:${scaledATK}`,
-      statLine,
-      _aura>1?`⚡ Aura ×${_aura} active — ATK boosted!`:null,
-      _mbDbf?`⚠ CLASS MISMATCH — DMG ×0.75 · RECV ×1.25`:null,
-      _firstTell?`👁 ${_firstTell}`:null,
-    ].filter(Boolean),
-    outcome:null,
-    playerArchetype:_arch, primaryAtk:_mbPrimD,
-    playerResource:initPlayerResource(_arch),
-    newSkillCooldowns:initArchetypeCooldowns(_arch),
-    bossCurrentIntent:_firstIntent,
-    bossCurrentTell:_firstTell,
-    bossWrath:0,
-    playerActiveEffects:[], bossActiveEffects:[],
-    actedThisRound:false,
-    activeMitigationPct:0, activeEvade:false, activeReflect:0,
-    transcendent:false, mageEmpowered:false,
-    isMidBoss:true,
-  };
-  saveState(); renderAll();
-}
-
-function claimMidBossRewards() {
-  if (!state.dungeon||!state.dungeon.combat?.isMidBoss) return;
-  const d=state.dungeon, cfg=DUNGEON_CONFIG[d.difficulty];
-  const mbGold={E:9,D:14,C:22,B:35,A:50,S:80}[cfg.rank]||9;
-  const baseDrop=getStageDrop(cfg,true);
-  state.gold=(state.gold||0)+mbGold;
-  state.totalGoldEarned=(state.totalGoldEarned||0)+mbGold;
-  if (baseDrop.matId) {
-    if (!state.shopMaterials) state.shopMaterials={timber:0,scroll:0,crystal:0,gear:0};
-    state.shopMaterials[baseDrop.matId]=(state.shopMaterials[baseDrop.matId]||0)+1;
-  }
-  d.midBossesDefeated=(d.midBossesDefeated||0)+1;
-  const matStr=baseDrop.matId?` · ${baseDrop.matEmoji}×1`:'';
-  showNotif(`⟦ MID-BOSS SLAIN ⟧ · +${mbGold}g${matStr}`);
-  if (navigator.vibrate) navigator.vibrate([80,30,150,30,80]);
-  d.phase='exploring'; d.pomodoroPhase='break'; d.pomodoroPhaseStart=Date.now(); d.combat=null;
-  saveState(); startDungeonTimer(); renderAll();
-}
-
-function retreatFromMidBoss() {
-  if (!state.dungeon||!state.dungeon.combat?.isMidBoss) return;
-  const d=state.dungeon;
-  showNotif('⟦ MID-BOSS EVADED ⟧ — Continuing expedition...');
-  d.phase='exploring'; d.pomodoroPhase='break'; d.pomodoroPhaseStart=Date.now(); d.combat=null;
-  saveState(); startDungeonTimer(); renderAll();
-}
+// (Mid-boss system removed Jul 2026 — it interrupted the RUSH flow every 2nd
+// stage. Dungeons now run stages → final boss only.)
 
 function claimRewards() {
   if (!state.dungeon) return;
@@ -28929,25 +28824,16 @@ function processPlayerAction(skillId){
   // Win check
   if(c.enemyHP<=0){
     c.outcome='win';
-    if(c.isMidBoss){
-      c.log.push(`✨ ${boss.name}'s weakened form shatters!`);
-      c.log.push('⟦ MID-BOSS DEFEATED ⟧ — Path cleared!');
-      if(navigator.vibrate)navigator.vibrate([100,40,150,40,250,60,350,80,500]);
-      saveState();renderAll();
-      const _mbCfg=DUNGEON_CONFIG[d.difficulty];
-      if(_mbCfg){ const _mbGold={E:9,D:14,C:22,B:35,A:50,S:80}[_mbCfg.rank]||9; setTimeout(()=>showStageClearBanner(d.pomodoroCount,{gold:_mbGold,matId:null,matQty:0,xp:0},_mbCfg,false,true),350); }
-    } else {
-      c.log.push(`✨ ${boss.name} has fallen!`);
-      c.log.push(d.isPractice?'⟦ PRACTICE COMPLETE ⟧':'⟦ VICTORY ⟧ — Claim the treasure!');
-      if(!d.isPractice){d.endTime=Date.now();d.phase='reward';previewItemDrop(d.difficulty);}
-      if(navigator.vibrate)navigator.vibrate([80,40,80,40,200,80,300]);
-      saveState();renderAll();
-      if(!d.isPractice){
-        playBossVictory();
-        const _ovCfg=DUNGEON_CONFIG[d.difficulty];
-        const _ovBoss=_ovCfg?.isWeeklyBoss?(d.weeklyBossVariant||_ovCfg.boss):_ovCfg?.boss;
-        if(_ovCfg&&_ovBoss) showBossVictoryOverlay(_ovCfg,_ovBoss);
-      }
+    c.log.push(`✨ ${boss.name} has fallen!`);
+    c.log.push(d.isPractice?'⟦ PRACTICE COMPLETE ⟧':'⟦ VICTORY ⟧ — Claim the treasure!');
+    if(!d.isPractice){d.endTime=Date.now();d.phase='reward';previewItemDrop(d.difficulty);}
+    if(navigator.vibrate)navigator.vibrate([80,40,80,40,200,80,300]);
+    saveState();renderAll();
+    if(!d.isPractice){
+      playBossVictory();
+      const _ovCfg=DUNGEON_CONFIG[d.difficulty];
+      const _ovBoss=_ovCfg?.isWeeklyBoss?(d.weeklyBossVariant||_ovCfg.boss):_ovCfg?.boss;
+      if(_ovCfg&&_ovBoss) showBossVictoryOverlay(_ovCfg,_ovBoss);
     }
     return;
   }
@@ -28988,7 +28874,7 @@ function renderDungeon() {
   const d=state.dungeon;
   if (!d) return renderDungeonSelect();
   if (d.phase==='exploring'||d.phase==='paused') return renderDungeonExplore();
-  if (d.phase==='boss_fight'||d.phase==='mid_boss') return renderDungeonBoss();
+  if (d.phase==='boss_fight') return renderDungeonBoss();
   if (d.phase==='reward')     return renderDungeonReward();
   return renderDungeonSelect();
 }
@@ -29460,11 +29346,10 @@ function renderDungeonBoss() {
   w.style.cssText=`--dcolor:${bossColor};--dglow:${bossGlow}`;
   w.innerHTML=`
     <div class="dboss-header">
-      <span>${c.isMidBoss?'⚔ MID-BOSS · ':''}${cfg.emoji} ${boss.name}${d.isPractice?'<span class="practice-badge">PRACTICE</span>':''}</span>
+      <span>${cfg.emoji} ${boss.name}${d.isPractice?'<span class="practice-badge">PRACTICE</span>':''}</span>
       <span class="dboss-turn">TURN ${c.turnCount}</span>
     </div>
     ${d.isPractice?`<div class="dboss-practice-bar">⚔ PRACTICE ARENA — No XP · No rewards · Pure combat</div>`:''}
-    ${c.isMidBoss?`<div class="dboss-practice-bar" style="border-color:rgba(255,193,7,0.4);color:#ffc107">⚔ MID-BOSS — Weakened form · HP×0.4 · ATK×0.6</div>`:''}
     ${c.dungeonClassDebuff?`<div class="dboss-practice-bar" style="border-color:rgba(255,82,82,0.6);color:#ff5252;font-weight:700">⚠ CLASS MISMATCH — YOUR DMG ×0.75 · INCOMING ×1.25</div>`:''}
 
     ${wrathHtml}
@@ -29507,12 +29392,9 @@ function renderDungeonBoss() {
     <div class="dboss-log" id="d-combat-log">${c.log.slice(-12).map(l=>`<div class="d-log-line">${l}</div>`).join('')}</div>
 
     ${c.outcome?`
-      <div class="dboss-outcome ${c.outcome}">${c.isMidBoss?(c.outcome==='win'?'⟦ MID-BOSS DEFEATED ⟧':'⟦ ESCAPED ⟧'):(c.outcome==='win'?(d.isPractice?'⟦ BOSS DEFEATED ⟧':'⟦ VICTORY ⟧'):'⟦ DEFEAT ⟧')}</div>
+      <div class="dboss-outcome ${c.outcome}">${c.outcome==='win'?(d.isPractice?'⟦ BOSS DEFEATED ⟧':'⟦ VICTORY ⟧'):'⟦ DEFEAT ⟧'}</div>
       <div style="display:flex;gap:8px;margin:8px 0">
-        ${c.isMidBoss?`
-          ${c.outcome==='win'?`<button class="dexp-btn dexp-btn-boss" style="flex:2" onclick="claimMidBossRewards()">⚔  CONTINUE EXPEDITION</button>`:''}
-          <button class="dexp-btn dexp-btn-abandon" style="flex:1" onclick="retreatFromMidBoss()">← ${c.outcome==='win'?'SKIP':'RETREAT'}</button>
-        `:d.isPractice?`
+        ${d.isPractice?`
           <button class="dexp-btn dexp-btn-boss" style="flex:2" onclick="startPractice('${d.difficulty}')">↩  RETRY</button>
           <button class="dexp-btn dexp-btn-abandon" style="flex:1" onclick="endPractice()">✗  END</button>
         `:`
@@ -30656,7 +30538,7 @@ initAvatar();
 setInterval(()=>{ tickHpMp(); renderHeader(); _updateAchBadge(); saveState(); }, 60000);
 // Restore dungeon timers if app was refreshed mid-session
 if (state.dungeon?.phase==='exploring' && !state.dungeon.pausedAt) startDungeonTimer();
-if ((state.dungeon?.phase==='boss_fight'||state.dungeon?.phase==='mid_boss') && state.dungeon.combat && !state.dungeon.combat.outcome) startCombatTimer();
+if (state.dungeon?.phase==='boss_fight' && state.dungeon.combat && !state.dungeon.combat.outcome) startCombatTimer();
 
 </script>
 </body>
