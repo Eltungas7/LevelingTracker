@@ -5230,6 +5230,11 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .msb-title { font-family:'Cinzel',serif; font-size:20px; font-weight:700; letter-spacing:1px; color:#fff8e1; margin-bottom:8px; text-shadow:0 0 14px rgba(255,215,0,0.4); }
 .msb-text { font-family:'Rajdhani',sans-serif; font-size:15px; color:#f5ecd0; line-height:1.42; }
 .msb-hint { margin-top:12px; font-family:'Rajdhani',sans-serif; font-size:10px; color:rgba(255,255,255,0.4); letter-spacing:1.5px; }
+.msb-stat-rows { display:flex; flex-direction:column; gap:5px; margin:10px 0 12px; text-align:left; }
+.msb-stat-row { display:flex; align-items:center; gap:8px; padding:4px 8px; border-radius:5px; background:rgba(255,215,0,0.06); border:1px solid rgba(255,215,0,0.18); }
+.msb-stat-ic { width:18px; text-align:center; font-size:13px; flex-shrink:0; }
+.msb-stat-lbl { flex:1; font-family:'Rajdhani',sans-serif; font-size:12px; color:#e8dcb8; letter-spacing:0.4px; }
+.msb-stat-val { font-family:'Cinzel',serif; font-size:13px; font-weight:700; color:#ffd700; }
 /* ── YAMI — single stoic daily line, minimal strip (no box, no portrait). ── */
 .yami-strip { padding:4px 2px 10px; margin-bottom:6px; border-bottom:1px solid rgba(255,82,82,0.18); text-align:center; }
 .yami-strip-text { font-family:'Rajdhani',sans-serif; font-size:11.5px; font-style:italic; color:#c9a8a0; letter-spacing:0.2px; }
@@ -13427,7 +13432,13 @@ function craftItem(recipeId, silent) {
   const _affixes = rollAffixes(recipe.tier, qRoll.quality, 1, ITEMS_DB[recipe.itemId]?.slot);
   // Tracking + progression prerequisites
   state.totalItemsCrafted = (state.totalItemsCrafted||0) + 1;
-  if (qRoll.quality === 'legendary') state.legendaryCraftCount = (state.legendaryCraftCount||0) + 1;
+  if (qRoll.quality === 'legendary') {
+    state.legendaryCraftCount = (state.legendaryCraftCount||0) + 1;
+    // ALWAYS celebrate a legendary roll (2%) with a full-screen System stopper.
+    // Queued, not fired directly: the pending-banner pump waits until the forge
+    // reveal / batch summary is closed, so it lands right after the reveal.
+    _queueMilestoneBanner('legendary_craft', { name: ITEMS_DB[recipe.itemId]?.name || 'Legendary item', count: state.legendaryCraftCount });
+  }
   if ((recipe.tier||0) > (state.maxTierCrafted||0)) state.maxTierCrafted = recipe.tier;
   if (!state.forgeCraftCounts) state.forgeCraftCounts = {};
   state.forgeCraftCounts[recipe.itemId] = (state.forgeCraftCounts[recipe.itemId] || 0) + 1;
@@ -24255,8 +24266,13 @@ function renderManinStrip() {
 }
 
 // ── MILESTONE DETECTION — instruments true-milestone days for the banner.
-// City tier-up: detected by comparing current tier to last-seen.
-// Streak milestones: only fires on specific thresholds (14, 30, 60, 100, 200, 365).
+// Runs on every renderAll (cheap scans only). Each check follows the same
+// pattern: first run initializes its watermark WITHOUT firing (so nobody gets
+// spammed retroactively on migration); after that, crossing the watermark
+// queues exactly one banner.
+const POPULATION_MILESTONES = [500, 1000, 2500, 5000, 10000];
+const ANNIVERSARY_MILESTONES = [100, 365, 730, 1095];
+const CENTURION_MILESTONES = [100, 365];
 function _checkMilestoneBanners() {
   const tk = todayKey();
   // City tier-up — first run initializes without marking the day.
@@ -24276,10 +24292,72 @@ function _checkMilestoneBanners() {
     state.lastStreakMilestoneRecorded = streak;
     _queueMilestoneBanner('streak', streak);
   }
+  // NEW RECORD — fires ONCE per run, the day the current streak surpasses the
+  // best of all PREVIOUS runs (not every day it keeps extending the record).
+  if (state.streakRecordPrev === undefined) {
+    state.streakRecordPrev = Math.max(streak, state.lastStreakPeak || 0); // init: today's standing is the record to beat
+    state.recordFiredThisRun = false;
+  }
+  if (streak === 0) {
+    if ((state.lastStreakPeak || 0) > state.streakRecordPrev) state.streakRecordPrev = state.lastStreakPeak;
+    state.recordFiredThisRun = false;
+  } else if (!state.recordFiredThisRun && state.streakRecordPrev >= 7 && streak > state.streakRecordPrev) {
+    state.recordFiredThisRun = true;
+    _queueMilestoneBanner('record', { days: streak, prev: state.streakRecordPrev });
+  }
+  // BALANCED ADVENTURER — the FLOOR rank (weakest stat) rises to a new high.
+  const _floorIdx = Math.min(...STAT_KEYS.map(k => TIERS.findIndex(t => t.t === tierFor(state.stats[k] || 0).tier)));
+  if (state.balancedFloorSeen === undefined) {
+    state.balancedFloorSeen = _floorIdx;
+  } else if (_floorIdx > state.balancedFloorSeen) {
+    state.balancedFloorSeen = _floorIdx;
+    if (_floorIdx >= 1) _queueMilestoneBanner('balanced', TIERS[_floorIdx].t);
+  }
+  // POPULATION — city population crosses a threshold.
+  const _pop = getCityPopulation();
+  if (state.popMilestoneSeen === undefined) {
+    state.popMilestoneSeen = POPULATION_MILESTONES.filter(m => _pop >= m).pop() || 0;
+  } else {
+    const _nextPop = POPULATION_MILESTONES.find(m => m > state.popMilestoneSeen && _pop >= m);
+    if (_nextPop) { state.popMilestoneSeen = _nextPop; _queueMilestoneBanner('population', _nextPop); }
+  }
+  // SYSTEM ANNIVERSARY — days since the earliest recorded activity.
+  if (!state.systemStartDay) {
+    let _earliest = tk;
+    [...(state.habitos || []), ...(state.trabajo || [])].forEach(h => {
+      Object.keys(h.done || {}).forEach(k => { if (/^\d{4}-\d{2}-\d{2}$/.test(k) && k < _earliest) _earliest = k; });
+    });
+    state.systemStartDay = _earliest;
+  }
+  const _sysDays = Math.floor((new Date(tk + 'T12:00:00') - new Date(state.systemStartDay + 'T12:00:00')) / 86400000);
+  const _nextAnniv = ANNIVERSARY_MILESTONES.find(a => a > (state.anniversarySeen || 0) && _sysDays >= a);
+  if (_nextAnniv) { state.anniversarySeen = _nextAnniv; _queueMilestoneBanner('anniversary', _nextAnniv); }
+  // HABIT CENTURION — a single habit's lifetime completion count crosses a threshold.
+  (state.habitos || []).forEach(h => {
+    const _n = Object.keys(h.done || {}).filter(k => h.done[k]).length;
+    if (!h.centurionShown) h.centurionShown = {};
+    CENTURION_MILESTONES.forEach(t => {
+      if (_n >= t && !h.centurionShown[t]) {
+        h.centurionShown[t] = true;
+        _queueMilestoneBanner('centurion', { text: h.text, n: t });
+      }
+    });
+  });
+  // MONTHLY CHRONICLE — first open of a new month recaps the month just closed.
+  const _curMonth = tk.slice(0, 7);
+  if (state.lastChronicleMonth === undefined) {
+    state.lastChronicleMonth = _curMonth; // init: never recap a month the System only half-witnessed
+  } else if (state.lastChronicleMonth !== _curMonth) {
+    const _target = state.lastChronicleMonth;
+    state.lastChronicleMonth = _curMonth;
+    const _mc = _buildMonthlyChronicle(_target);
+    if (_mc && _mc.activeDays >= 5) _queueMilestoneBanner('chronicle', _target);
+  }
 }
-// ── MILESTONE BANNER — fires on city tier-up day OR high streak milestone day.
-// SYSTEM congratulation: no character, no portrait — a title, an icon, and a
-// short line from the System. Unique per milestone. Gold celebratory glow.
+// ── MILESTONE BANNER — SYSTEM congratulation: no character, no portrait — a
+// title, an icon, and a short line from the System. Unique per milestone.
+// Pools are either keyed objects or functions of the queued key (for dynamic
+// milestones like records and centurions).
 const SYSTEM_MILESTONE_BANNERS = {
   city_tier: {
     hamlet:  { icon:'🏚', title:'HAMLET',   line:'The outpost has grown into a hamlet. First roofs raised — the tents are history.' },
@@ -24297,24 +24375,73 @@ const SYSTEM_MILESTONE_BANNERS = {
     200: { icon:'⭐', title:'200-DAY STREAK', line:'Two hundred days. Far past the point of doubt.' },
     365: { icon:'👑', title:'ONE FULL YEAR',  line:'365 days, unbroken. This is the stuff of legend.' },
   },
+  record: k => ({ icon:'🚀', title:'NEW RECORD', line:`${k.days} days — the longest run of your life. Your old record of ${k.prev} is history.` }),
+  legendary_craft: k => ({ icon:'👑', title:'LEGENDARY FORGED', line:`${k.name} — the 2% roll, landed${k.count > 1 ? ` (${k.count} lifetime)` : ''}. The forge will remember this one.` }),
+  perfect_month: k => k === 1
+    ? ({ icon:'🌕', title:'PERFECT MONTH', line:'30 consecutive days at 100%. Not a single habit missed in a month. Flawless.' })
+    : ({ icon:'🌕', title:`${k} PERFECT MONTHS`, line:`${k * 30} consecutive flawless days. The System is running out of superlatives.` }),
+  balanced: k => ({ icon:'⚖️', title:`ALL STATS RANK ${k}`, line:({
+    E:   'No stat left behind. All six disciplines now stand at Rank E or above.',
+    D:   'All six stats at Rank D or above. The foundation is level.',
+    C:   'All six stats at Rank C or above. No weak front remains.',
+    B:   'A Rank B floor. Your weakest discipline would be another adventurer\'s best.',
+    A:   'Every stat at Rank A or higher. Complete, dangerous, undeniable.',
+    S:   'An S-rank floor across all six stats. Balance at the summit.',
+    SS:  'All stats at SS or above. The System has no category for this.',
+    SSS: 'Perfect balance at the absolute apex. All six stats: SSS.',
+  })[k] || 'Your weakest stat just reached a new height. Balance is its own kind of power.' }),
+  population: {
+    500:   { icon:'🏘', title:'500 CITIZENS',    line:'Five hundred souls now call your settlement home. Word is spreading.' },
+    1000:  { icon:'🏰', title:'1,000 CITIZENS',  line:'A thousand citizens. What began as tents is now a name on the map.' },
+    2500:  { icon:'🏯', title:'2,500 CITIZENS',  line:'Two and a half thousand people, drawn by what you built one day at a time.' },
+    5000:  { icon:'🏛', title:'5,000 CITIZENS',  line:'Five thousand citizens. Caravans reroute to pass through your gates.' },
+    10000: { icon:'🌟', title:'10,000 CITIZENS', line:'Ten thousand souls. A true metropolis, built on habits kept.' },
+  },
+  anniversary: k => ({
+    100:  { icon:'🕯️', title:'100 DAYS',   line:'One hundred days since the System came online. Still here. Still climbing.' },
+    365:  { icon:'🎂', title:'ONE YEAR',    line:'A full year with the System. The person who started this would not recognize you.' },
+    730:  { icon:'🎂', title:'TWO YEARS',   line:'Two years. This stopped being an experiment a long time ago.' },
+    1095: { icon:'🎂', title:'THREE YEARS', line:'Three years with the System. A way of life, chronicled.' },
+  })[k] || ({ icon:'🎂', title:`${k} DAYS`, line:'Another year with the System.' }),
+  centurion: k => k.n === 100
+    ? ({ icon:'💯', title:'HABIT CENTURION', line:`"${k.text}" — completed 100 times. That is not a habit anymore. That is who you are.` })
+    : ({ icon:'♾️', title:'HABIT IMMORTAL', line:`"${k.text}" — completed 365 times. A year's worth of one single promise, kept.` }),
 };
+// Pending banners persist in state as a QUEUE — multiple milestones landing on
+// the same day fire one at a time (one per pump), never stacked.
 function _queueMilestoneBanner(type, key) {
-  state.pendingMilestoneBanner = { type, key };
+  if (!Array.isArray(state.pendingMilestoneBanners)) state.pendingMilestoneBanners = [];
+  state.pendingMilestoneBanners.push({ type, key });
   if (typeof saveState === 'function') saveState();
 }
 function _firePendingMilestoneBannerIfAny() {
-  if (!state.pendingMilestoneBanner) return;
-  const { type, key } = state.pendingMilestoneBanner;
-  state.pendingMilestoneBanner = null;
+  // Legacy single-slot field → migrate into the queue
+  if (state.pendingMilestoneBanner) {
+    _queueMilestoneBanner(state.pendingMilestoneBanner.type, state.pendingMilestoneBanner.key);
+    state.pendingMilestoneBanner = null;
+  }
+  if (!Array.isArray(state.pendingMilestoneBanners) || !state.pendingMilestoneBanners.length) return;
+  // Wait until no other full-screen celebration is up — the queue survives in
+  // state, so the banner fires on a later pump instead of stacking.
+  if (document.querySelector('.milestone-banner, .forge-reveal-overlay, .tier-unlock-overlay, .lvup-overlay, .perfect-day-overlay')) return;
+  const { type, key } = state.pendingMilestoneBanners.shift();
   if (typeof saveState === 'function') saveState();
-  setTimeout(() => showMilestoneBanner(type, key), 250);
+  setTimeout(() => type === 'chronicle' ? showMonthlyChronicleOverlay(key) : showMilestoneBanner(type, key), 250);
 }
 function showMilestoneBanner(type, key) {
   const pool = SYSTEM_MILESTONE_BANNERS[type] || {};
-  const m = pool[key] || { icon:'✦', title:String(key).toUpperCase(), line:'Milestone reached.' };
+  const m = (typeof pool === 'function' ? pool(key) : pool[key])
+    || { icon:'✦', title:String(key).toUpperCase(), line:'Milestone reached.' };
   const eyebrowMap = {
-    city_tier: '⟦ SYSTEM · CITY MILESTONE ⟧',
-    streak:    '⟦ SYSTEM · STREAK MILESTONE ⟧',
+    city_tier:       '⟦ SYSTEM · CITY MILESTONE ⟧',
+    streak:          '⟦ SYSTEM · STREAK MILESTONE ⟧',
+    record:          '⟦ SYSTEM · STREAK RECORD ⟧',
+    legendary_craft: '⟦ SYSTEM · FORGE MILESTONE ⟧',
+    perfect_month:   '⟦ SYSTEM · PERFECT MONTH ⟧',
+    balanced:        '⟦ SYSTEM · RANK MILESTONE ⟧',
+    population:      '⟦ SYSTEM · CITY MILESTONE ⟧',
+    anniversary:     '⟦ SYSTEM · ANNIVERSARY ⟧',
+    centurion:       '⟦ SYSTEM · HABIT MILESTONE ⟧',
   };
   const banner = document.createElement('div');
   banner.className = 'milestone-banner';
@@ -24325,6 +24452,64 @@ function showMilestoneBanner(type, key) {
         <div class="msb-eyebrow">${eyebrowMap[type] || '⟦ SYSTEM · MILESTONE ⟧'}</div>
         <div class="msb-title">${m.title}</div>
         <div class="msb-text">${m.line}</div>
+        <div class="msb-hint">click anywhere to close</div>
+      </div>
+    </div>`;
+  banner.addEventListener('click', () => banner.remove());
+  const onKey = (e) => { if (e.key === 'Escape') { banner.remove(); document.removeEventListener('keydown', onKey); } };
+  document.addEventListener('keydown', onKey);
+  document.body.appendChild(banner);
+}
+
+// ── MONTHLY CHRONICLE — recap of a closed month, fired on the first open of a
+// new month (queued through the milestone-banner queue, type 'chronicle').
+function _buildMonthlyChronicle(monthKey) {
+  const parts = monthKey.split('-').map(Number);
+  if (parts.length !== 2 || !parts[0] || !parts[1]) return null;
+  const [y, m] = parts;
+  const daysIn = new Date(y, m, 0).getDate();
+  let perfect = 0, activeDays = 0, pctSum = 0, pctDays = 0, checks = 0, gold = 0, bestRun = 0, run = 0;
+  for (let d = 1; d <= daysIn; d++) {
+    const dk = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    const inf = getHabitPct(dk);
+    if (inf && inf.total > 0) {
+      pctSum += inf.pct; pctDays++;
+      checks += inf.done;
+      if (inf.done > 0) activeDays++;
+      if (inf.pct === 100) { perfect++; run++; bestRun = Math.max(bestRun, run); } else run = 0;
+    }
+    (state.trabajo || []).forEach(t => {
+      const c = t.done && t.done[dk];
+      if (c && c.drops) gold += c.drops.gold || 0;
+    });
+  }
+  const fullWorkDays = (state.rationDays || []).filter(dk => dk.startsWith(monthKey)).length;
+  return { monthKey, perfect, activeDays, avgPct: pctDays ? Math.round(pctSum / pctDays) : 0, checks, gold, bestRun, fullWorkDays };
+}
+function showMonthlyChronicleOverlay(monthKey) {
+  const s = _buildMonthlyChronicle(monthKey);
+  if (!s) return;
+  const MN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const [y, m] = monthKey.split('-').map(Number);
+  const _g = `<img src="img/gold.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;display:inline-block">`;
+  const rows = [
+    ['🌟', 'Perfect days',        `${s.perfect}`],
+    ['⚡', 'Best perfect run',    `${s.bestRun}d`],
+    ['📊', 'Avg completion',      `${s.avgPct}%`],
+    ['✅', 'Habit quests cleared', s.checks.toLocaleString()],
+    ['📦', 'Full work days',      `${s.fullWorkDays}`],
+    [_g,  'Gold from work',       `${s.gold.toLocaleString()}g`],
+  ].map(([ic, lbl, val]) => `<div class="msb-stat-row"><span class="msb-stat-ic">${ic}</span><span class="msb-stat-lbl">${lbl}</span><span class="msb-stat-val">${val}</span></div>`).join('');
+  const banner = document.createElement('div');
+  banner.className = 'milestone-banner';
+  banner.innerHTML = `
+    <div class="msb-inner">
+      <div class="msb-icon">📜</div>
+      <div class="msb-card">
+        <div class="msb-eyebrow">⟦ SYSTEM · MONTHLY CHRONICLE ⟧</div>
+        <div class="msb-title">${(MN[m - 1] || monthKey).toUpperCase()} ${y}</div>
+        <div class="msb-stat-rows">${rows}</div>
+        <div class="msb-text">The chronicle is written. New month, blank pages.</div>
         <div class="msb-hint">click anywhere to close</div>
       </div>
     </div>`;
@@ -26222,6 +26407,21 @@ function checkAllDone(listKey, periodKey) {
             state.logros.lastPerfectWeekOverlay = periodKey;
             saveState();
             setTimeout(()=>{ showPerfectWeekOverlay(); }, pdDelay + 5200);
+          }
+        }
+        // Perfect Month — 30 consecutive 100% days ending today. Queued through
+        // the milestone-banner queue so it fires after the PD/PW chain clears.
+        if (state.logros.lastPerfectMonthOverlay !== periodKey) {
+          let _pmRun = 0;
+          const _pmD = new Date();
+          for (let i = 0; i < 400; i++) {
+            const dk = `${_pmD.getFullYear()}-${String(_pmD.getMonth()+1).padStart(2,'0')}-${String(_pmD.getDate()).padStart(2,'0')}`;
+            const inf = getHabitPct(dk);
+            if (inf && inf.total > 0 && inf.pct === 100) { _pmRun++; _pmD.setDate(_pmD.getDate() - 1); } else break;
+          }
+          if (_pmRun >= 30 && _pmRun % 30 === 0) {
+            state.logros.lastPerfectMonthOverlay = periodKey;
+            _queueMilestoneBanner('perfect_month', _pmRun / 30);
           }
         }
       }
