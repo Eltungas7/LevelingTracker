@@ -12628,13 +12628,13 @@ function dropItem(bagIndex) {
   }, { title: 'DROP ITEM', okLabel: 'DROP' });
 }
 
-// ── SELL price — scales with what the item actually cost to make ────────────
-// Old SELL_PRICES was rarity-only and flat, so a fresh T1 and a T5 sword both
-// sold for pennies. Crafted gear now returns ~45% of its craft gold cost plus
-// ~40% of the refine gold sunk into its current grade, × a rarity premium
-// (lucky high-rarity rolls sell for more, mirroring _salvageMatQty's scaling).
+// ── SELL price — a FRACTION of the gold actually sunk into the item ─────────
+// Same rule as salvage: rarity sets the fraction, common 20% up to a HARD MAX
+// of 70% for legendary. Selling is always a gold loss vs. what was invested —
+// never a profit loop (the old 45% × up-to-2.0 rarity premium let legendaries
+// return ~90% and stack with cheap crafting).
 // Non-crafted items (dungeon drops, potions) keep the flat rarity table.
-const SELL_RARITY_MULT = { common:1.0, uncommon:1.15, rare:1.35, epic:1.6, legendary:2.0 };
+const SELL_RARITY_PCT = { common:0.20, uncommon:0.30, rare:0.40, epic:0.55, legendary:0.70 };
 function getSellGold(entry, item) {
   if (!item) return 2;
   const rarity = (entry && entry.quality) || item.rarity || 'common';
@@ -12643,8 +12643,8 @@ function getSellGold(entry, item) {
     let refineBack = 0;
     const grade = (entry && entry.grade) || 1;
     for (let g = 1; g < grade; g++) refineBack += getRefineGoldCost(item.id, g);
-    const mult = SELL_RARITY_MULT[rarity] || 1;
-    return Math.max(2, Math.round((base * 0.45 + refineBack * 0.40) * mult));
+    const pct = SELL_RARITY_PCT[rarity] || 0.20;
+    return Math.max(2, Math.floor((base + refineBack) * pct));
   }
   return SELL_PRICES[rarity] || SELL_PRICES[item.rarity] || 2;
 }
@@ -12697,10 +12697,24 @@ const SALVAGE_MAT = {
 // Fallback for non-crafted (dungeon-drop) gear — no recipe cost to scale from,
 // so rarity alone is the only signal available for those.
 const SALVAGE_QTY = { common:3, uncommon:5, rare:8, epic:14, legendary:22 };
-// Salvage returns a FRACTION of what an item actually cost to build — never the
-// full amount back (you can't salvage a 20-iron item for 50), and rarity sets
-// that fraction: best case (legendary) ~80%, decreasing per tier below that.
-const SALVAGE_RARITY_PCT = { common:0.20, uncommon:0.35, rare:0.50, epic:0.65, legendary:0.80 };
+// Salvage returns a FRACTION of what an item ACTUALLY cost to build — never the
+// full amount back, never a profit engine. Rarity sets the fraction: common 20%
+// up to a HARD MAX of 70% for legendary.
+// FIXED Jul 2026 (exploit): the old version refunded a % of the UNDISCOUNTED
+// recipe cost, but crafting pays the anvil+mastery-discounted cost — with deep
+// discounts the refund exceeded what was paid (Tuni: 100 mats in → 215 out).
+// The build cost is now valued at the same permanent discounts crafting enjoys.
+const SALVAGE_RARITY_PCT = { common:0.20, uncommon:0.30, rare:0.40, epic:0.55, legendary:0.70 };
+// Permanent craft-cost discount (anvil + recipe mastery ONLY). Temporary states
+// (forge token, forge heat, winter ×2) are deliberately excluded from salvage
+// valuation so they can't be timed to game the refund in either direction.
+function _permCraftDiscount(itemId) {
+  const lvl = (state.guildUpgrades || {}).anvil || 0;
+  let d = Math.max(0.44, 1 - lvl * 0.08);
+  const md = getMasteryDiscount(itemId);
+  if (md > 0) d *= (1 - md);
+  return d;
+}
 // Sum of every refine step's material cost from Grade 1 up to (not including)
 // `currentGrade` — i.e. the actual resources already spent grading the item up,
 // using the same per-step formula refineItem() charges (getRefineCostFull).
@@ -12720,9 +12734,12 @@ function _salvageMatQty(entry, item) {
     const recipe = CRAFT_RECIPES.find(r => r.itemId === item.id);
     if (recipe) {
       const sum = o => o ? Object.values(o).reduce((a,b) => a+b, 0) : 0;
-      const baseCost   = sum(recipe.cost) + sum(recipe.costT2) + sum(recipe.costT3);
+      // Craft mats are valued at the PERMANENTLY-DISCOUNTED cost (what crafting
+      // actually charges); refine mats are charged at full price, so they count
+      // full. Refund = pct × real spend — floor'd, so it can never round into profit.
+      const baseCost   = (sum(recipe.cost) + sum(recipe.costT2) + sum(recipe.costT3)) * _permCraftDiscount(item.id);
       const refineCost = _totalRefineMatsSpent(recipe, entry.grade || 1);
-      return Math.max(1, Math.round((baseCost + refineCost) * pct));
+      return Math.max(1, Math.floor((baseCost + refineCost) * pct));
     }
   }
   return SALVAGE_QTY[rarity] || 3;
