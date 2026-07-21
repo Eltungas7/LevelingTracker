@@ -10664,7 +10664,8 @@ let forgeFilterMode = 'all'; // 'all' | 'craftable'
 let forgeTree = 'swrd';       // selected equipment tree (slot picker)
 let forgeMode = 'forge';      // 'forge' | 'refine'
 // Transmuter (unified Refinery UI) — controls which operation is currently in view.
-let transmuterMode = 'cross'; // 'cross' | 'upgrade' | 'downgrade'
+let transmuterMode = 'cross'; // 'cross' | 'upgrade' | 'downgrade' | 'sell'
+let transmuterSellTier = 1;   // for 'sell': which tier's stock to dump for gold
 let transmuterTier = 1;       // for 'cross': 1 / 2 / 3 — which tier we're balancing across families
 let transmuterUpgradeTier = 2;   // for 'upgrade': 2 = T1→T2, 3 = T2→T3
 let transmuterDowngradeTier = 2; // for 'downgrade': 2 = T2→T1, 3 = T3→T2
@@ -18148,6 +18149,7 @@ function renderForge() {
         ['cross',     '⇄ CROSS'],
         ['upgrade',   '⬆ UPGRADE'],
         ['downgrade', '⬇ DOWNGRADE'],
+        ['sell',      '💰 SELL'],
       ].map(([m,l]) =>
         `<button class="rf-mode-btn${transmuterMode===m?' active':''}" onclick="transmuterMode='${m}';renderAll()">${l}</button>`
       ).join('');
@@ -18236,6 +18238,31 @@ function renderForge() {
         }).join('');
         bodyHtml = `<div class="rf-tier-chips">${tierChips}</div>${rows}
           <div class="rf-meta">Lossy by design (1→2) — only use when you've over-refined.</div>`;
+      }
+      // ── MODE 4 — SELL FOR GOLD ──
+      else if (transmuterMode === 'sell') {
+        // Tier chips gate by refinery level the same way UPGRADE does (you can
+        // only hold T2/T3 once the Transmuter is high enough to make them).
+        const tierChips = [1,2,3].map(t => {
+          const need = t === 1 ? 1 : t;
+          const locked = rfLvl < need;
+          const sel = (transmuterSellTier === t) && !locked;
+          return `<button class="rf-tier-chip${sel?' active':''}" ${locked?'disabled title="Transmuter Lv'+need+' required"':`onclick="transmuterSellTier=${t};renderAll()"`}>T${t}</button>`;
+        }).join('');
+        const visibleTier = (transmuterSellTier === 1 || (transmuterSellTier === 2 && rfLvl >= 2) || (transmuterSellTier === 3 && rfLvl >= 3)) ? transmuterSellTier : 1;
+        if (visibleTier !== transmuterSellTier) transmuterSellTier = visibleTier;
+        const price = SELL_MAT_PRICES[visibleTier] || 0;
+        const rows = matDefs.map(m => {
+          const meta = getMatTierMeta(m.id, visibleTier);
+          const hold = getMatBucket(visibleTier)[m.id] || 0;
+          const total = hold * price;
+          return `<div class="rf-row" style="margin-top:4px">
+            <span class="rf-meta" style="flex:1;margin:0">${matIconHtml(m.id, 20, visibleTier)} <strong style="color:${meta.color}">${meta.label}</strong> · hold ${hold} · ${goldImg(13)} ${total.toLocaleString()}g</span>
+            <button class="rf-btn" onclick="sellMat(${visibleTier},'${m.id}')" ${hold<1?'disabled':''}>SELL</button>
+          </div>`;
+        }).join('');
+        bodyHtml = `<div class="rf-tier-chips">${tierChips}<span class="rf-ratio">${price}g each</span></div>${rows}
+          <div class="rf-meta">A last resort for excess mats — you always lose value vs. using them.</div>`;
       }
 
       // ── Auto-balance row (P3 + P6) ──
@@ -19482,6 +19509,31 @@ const TIER_DOWNGRADE_RULES = {
   2: { fromTier: 2, toTier: 1, give: 1, get: 2 },
   3: { fromTier: 3, toTier: 2, give: 1, get: 2 },
 };
+// ── SELL materials for gold ─────────────────────────────────────────────────
+// A pressure valve for "excess mats, low gold" — always a clear LOSS vs. what a
+// mat is worth to acquire or refine, so it never beats doing work tasks for
+// gold. T1 5g · T2 30g (refine cost ~65g) · T3 150g (inputs worth ~470g).
+// No discounts apply and gold from selling is NOT counted as totalGoldEarned
+// (that drives shop level — selling your own mats shouldn't inflate progress).
+const SELL_MAT_PRICES = { 1: 5, 2: 30, 3: 150 };
+function sellMat(tier, matId) {
+  const price = SELL_MAT_PRICES[tier]; if (!price) return;
+  const held = getMatBucket(tier)[matId] || 0;
+  const meta = getMatTierMeta(matId, tier);
+  if (held < 1) { showNotif(`⚠ No ${meta.emoji} ${meta.label} to sell.`); return; }
+  const total = held * price;
+  showConfirmDialog(
+    `Sell all <strong>${meta.emoji} ${meta.label} ×${held}</strong> for <span style="color:#ffc107"><img src="img/gold.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;display:inline-block">${total.toLocaleString()}g</span>?<br><span style="font-size:11px;color:var(--sao-text-dim)">Materials are worth far more used than sold — only dump a true surplus.</span>`,
+    () => {
+      applyMatDrop(tier, matId, held, -1);
+      state.gold = (state.gold || 0) + total; // NOT totalGoldEarned — selling mats shouldn't raise shop level
+      saveState(); renderAll();
+      showNotif(`<img src="img/gold.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;display:inline-block"> Sold ${meta.emoji}×${held} for ${total.toLocaleString()}g`);
+    },
+    { title: 'SELL MATERIALS', okLabel: 'SELL ALL' }
+  );
+}
+
 function downgradeMat(fromTier, matId) {
   const rule = TIER_DOWNGRADE_RULES[fromTier];
   if (!rule) return;
