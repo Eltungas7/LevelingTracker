@@ -12705,15 +12705,19 @@ const SALVAGE_QTY = { common:3, uncommon:5, rare:8, epic:14, legendary:22 };
 // discounts the refund exceeded what was paid (Tuni: 100 mats in → 215 out).
 // The build cost is now valued at the same permanent discounts crafting enjoys.
 const SALVAGE_RARITY_PCT = { common:0.20, uncommon:0.30, rare:0.40, epic:0.55, legendary:0.70 };
-// Permanent craft-cost discount (anvil + recipe mastery ONLY). Temporary states
-// (forge token, forge heat, winter ×2) are deliberately excluded from salvage
-// valuation so they can't be timed to game the refund in either direction.
+// Salvage valuation discount: anvil + recipe mastery (permanent) AND the
+// assumed Forge Heat -30% — a committed player crafts after the Golden Chest,
+// so the refund base is the CHEAPEST realistic build cost. Crafting without
+// heat just means salvage returns relatively less (conservative, never profit).
+// Forge Token (×0.5) is a scarce one-shot consumable and winter (×2) is a
+// penalty state — both excluded so neither can be timed for arbitrage.
+const SALVAGE_ASSUMED_HEAT = 0.7;
 function _permCraftDiscount(itemId) {
   const lvl = (state.guildUpgrades || {}).anvil || 0;
   let d = Math.max(0.44, 1 - lvl * 0.08);
   const md = getMasteryDiscount(itemId);
   if (md > 0) d *= (1 - md);
-  return d;
+  return d * SALVAGE_ASSUMED_HEAT;
 }
 // Sum of every refine step's material cost from Grade 1 up to (not including)
 // `currentGrade` — i.e. the actual resources already spent grading the item up,
