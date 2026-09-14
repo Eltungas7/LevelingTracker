@@ -1,4 +1,4 @@
-const CACHE = 'sao-quests-v12';
+const CACHE = 'sao-quests-v13';
 
 const FILES_TO_CACHE = [
   './index.html',
