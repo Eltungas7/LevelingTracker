@@ -8317,6 +8317,53 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 @media (prefers-reduced-motion:reduce){.work-current,.work-current .wc-stars,.work-current .wc-eyebrow,.work-current .wc-finish{animation:none}}
 
 .work-add-top{margin:10px 0 4px}
+/* ── Solo Leveling battle system (Hunts / Gates / Red Gates) ── */
+.work-rest-banner{margin:10px 0 6px;padding:13px 16px;border-radius:10px;
+  background:linear-gradient(135deg,rgba(105,240,174,0.14),rgba(105,240,174,0.05));
+  border:1px solid rgba(105,240,174,0.4);text-align:center}
+.work-rest-banner .wrb-title{font-family:'Cinzel',serif;font-size:16px;color:#8affc0;letter-spacing:0.5px;margin-bottom:3px}
+.work-rest-banner .wrb-sub{font-family:'Rajdhani',sans-serif;font-size:12.5px;color:rgba(224,247,250,0.8);line-height:1.4}
+.hunt-row .wt-body{flex:1 1 auto}
+.hunt-row.hunt-dormant{opacity:0.42}
+.hunt-note{font-size:10px;color:var(--sao-text-dim);font-style:italic;white-space:nowrap}
+.redgate-divider span{color:#ff8a80!important}
+.gate-divider span{color:#ffd54f!important}
+.gate-card{margin:9px 0;border:1px solid rgba(255,255,255,0.1);border-left:3px solid var(--gate-accent,#ffc107);
+  border-radius:9px;background:rgba(255,255,255,0.025);overflow:hidden;transition:background 0.15s}
+.gate-card.red-gate{border-left-color:#ff5252}
+.gate-card.status-cleared{opacity:0.62}
+.gate-card.status-collapsed{opacity:0.55;filter:grayscale(0.5)}
+.gate-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;cursor:pointer}
+.gate-head:hover{background:rgba(255,255,255,0.03)}
+.gate-head-l{display:flex;align-items:center;gap:11px;min-width:0}
+.gate-rank{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;padding:0 7px;
+  border:1.5px solid #ffc107;border-radius:7px;font-family:'Cinzel',serif;font-weight:700;font-size:14px;line-height:1}
+.gate-rank.red{border:none;min-width:0;height:auto;color:#ff8a80;font-family:'Rajdhani',sans-serif;font-size:11.5px;font-weight:600;letter-spacing:0.5px}
+.gate-titles{min-width:0}
+.gate-title{font-family:'Cinzel',serif;font-size:15px;color:var(--sao-text);letter-spacing:0.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gate-sub{font-family:'Rajdhani',sans-serif;font-size:11.5px;color:var(--sao-text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gate-head-r{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.gate-pct{font-family:'Cinzel',serif;font-size:15px;font-weight:700}
+.gate-caret{color:var(--sao-text-dim);font-size:10px}
+.gate-cleared{font-family:'Rajdhani',sans-serif;font-size:10.5px;font-weight:600;color:#8affc0;letter-spacing:0.5px}
+.gate-collapsed{font-family:'Rajdhani',sans-serif;font-size:10.5px;font-weight:600;color:#ff8a80;letter-spacing:0.5px}
+.gate-bar{height:4px;background:rgba(255,255,255,0.08)}
+.gate-fill{height:100%;transition:width 0.35s ease;box-shadow:0 0 8px currentColor}
+.gate-steps{padding:4px 13px 10px;display:flex;flex-direction:column;gap:2px}
+.gate-step{display:flex;align-items:flex-start;gap:9px;padding:8px 6px;border-radius:6px;cursor:pointer;
+  font-family:'Rajdhani',sans-serif;font-size:13.5px;color:rgba(224,247,250,0.9);transition:background 0.12s}
+.gate-step:hover{background:rgba(255,255,255,0.05)}
+.gate-step .gs-box{flex:0 0 auto;font-size:16px;line-height:1.2;color:var(--gate-accent,#ffc107)}
+.gate-step.done{color:var(--sao-text-dim)}
+.gate-step.done .gs-text{text-decoration:line-through}
+.status-cleared .gate-step,.status-collapsed .gate-step{cursor:default}
+.gate-reopen{margin:0 13px 11px;padding:8px 12px;width:calc(100% - 26px);border:1px solid rgba(255,138,128,0.4);
+  border-radius:7px;background:rgba(255,82,82,0.08);color:#ff8a80;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
+.gate-reopen:hover{background:rgba(255,82,82,0.16)}
+.wc-steps-meta{font-family:'Rajdhani',sans-serif;font-size:12px;color:rgba(224,247,250,0.65);margin:2px 0 10px;letter-spacing:0.5px}
+.arise-pop .arise-card{text-align:center}
+.arise-word{font-family:'Cinzel',serif;font-size:30px;font-weight:700;color:#ffd700;letter-spacing:3px;
+  text-shadow:0 0 20px rgba(255,215,0,0.7);margin-bottom:6px}
 .work-task-list{display:flex;flex-direction:column;gap:7px;margin:8px 0}
 .work-task-row{display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid rgba(255,255,255,0.09);
   border-radius:7px;background:rgba(255,255,255,0.02);font-family:'Rajdhani',sans-serif;transition:background 0.15s;touch-action:pan-y}
@@ -20542,9 +20589,326 @@ function renderWorkCurrentTask(){
   return card;
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// WORK — SOLO LEVELING BATTLE SYSTEM (2026-09-14)
+// Three tiers: ⚔️ Hunts (recurring: daily/weekly/monthly-window) · 🚪 Gates
+// (multi-session boss objectives, step-based %) · 🔴 Red Gates (time-limited
+// events with a hard countdown + collapse rule). See memory
+// project-work-solo-leveling-battle-system. Points funnel into state.workXp so
+// the existing worker level + TODAY'S PROGRESS hero keep working.
+// ════════════════════════════════════════════════════════════════════════════
+const HUNT_POOL = 20;                 // pts for a hunt at 100%, paid proportionally
+const GATE_STEP = 15, GATE_CLEAR_BONUS = 40;
+const REDGATE_STEP = 20, REDGATE_CLEAR_BONUS = 60;
+let _wgSkips = new Set();             // session skips for the CURRENT-action hero
+
+const HUNTS_SEED = [
+  { id:'h_pack',   text:'Pack orders & dispatch',            cadence:'daily' },
+  { id:'h_msg',    text:'Answer messages (incl. IG DMs)',    cadence:'daily' },
+  { id:'h_orders', text:'Write down new orders & money flow',cadence:'daily' },
+  { id:'h_stock',  text:'Update stock',                      cadence:'daily' },
+  { id:'h_meta',   text:'Analyze & adjust META campaigns',   cadence:'weekly' },
+  { id:'h_fact',   text:'Facturar / invoicing',              cadence:'monthly', window:'monthEnd' },
+];
+function _dropSteps(){ return [
+  { id:'s1', text:'Finalize the drop’s designs',      done:false },
+  { id:'s2', text:'Produce the stock (print / embroider)', done:false },
+  { id:'s3', text:'Photograph the pieces',                 done:false },
+  { id:'s4', text:'Prep content — batch stories & posts',  done:false },
+  { id:'s5', text:'List online + set up physical display', done:false },
+  { id:'s6', text:'Launch & announce',                     done:false },
+]; }
+const GATES_SEED = [
+  { id:'g_knight', rank:'C', codename:'The Damned Knight', goal:'Improve the online shop', steps:[
+    {id:'k1',text:'Audit the shop — screenshot pass, list what looks off',done:false},
+    {id:'k2',text:'Standardize all product images (same size / res / background)',done:false},
+    {id:'k3',text:'CSS pass on the home / landing',done:false},
+    {id:'k4',text:'Clean up product-page layout + a reusable description template',done:false},
+    {id:'k5',text:'Add trust signals (reviews, shipping/returns, About)',done:false},
+    {id:'k6',text:'Mobile check on a phone',done:false},
+    {id:'k7',text:'Note conversion before → after',done:false},
+  ]},
+  { id:'g_dragon', rank:'B', codename:'The Dragon', goal:'Add an asian-streetwear line', steps:[
+    {id:'d1',text:'Define the line concept + moodboard',done:false},
+    {id:'d2',text:'Decide the first product range (garments + how many designs)',done:false},
+    {id:'d3',text:'Design / commission the first designs',done:false},
+    {id:'d4',text:'Source blanks / materials for the new garments',done:false},
+    {id:'d5',text:'Produce first samples',done:false},
+    {id:'d6',text:'Photograph the pieces',done:false},
+    {id:'d7',text:'Create the product pages online',done:false},
+    {id:'d8',text:'Set up the physical-store display for casual public',done:false},
+    {id:'d9',text:'Launch & announce',done:false},
+  ]},
+  { id:'g_demon', rank:'A', codename:'The Demon', goal:'Add MercadoLibre as a channel', steps:[
+    {id:'m1',text:'Create & verify the MercadoLibre seller account',done:false},
+    {id:'m2',text:'Pick which embroidered designs + stock to list',done:false},
+    {id:'m3',text:'Prepare listings (photos, titles, descriptions, prices)',done:false},
+    {id:'m4',text:'Configure shipping & payment',done:false},
+    {id:'m5',text:'Publish the listings',done:false},
+    {id:'m6',text:'Add a funnel back to your own shop',done:false},
+    {id:'m7',text:'Test a full sale end-to-end',done:false},
+  ]},
+  { id:'g_vampire', rank:'S', codename:'The Vampire', goal:'Own international shop + Etsy + IG', steps:[
+    {id:'v1',text:'Define the international embroidery catalog',done:false},
+    {id:'v2',text:'Choose the platform + register the shop',done:false},
+    {id:'v3',text:'Create the international Instagram',done:false},
+    {id:'v4',text:'Set up the Etsy shop',done:false},
+    {id:'v5',text:'Photograph the embroidery pieces',done:false},
+    {id:'v6',text:'Write listings (English, intl pricing / shipping)',done:false},
+    {id:'v7',text:'Set up international shipping logistics',done:false},
+    {id:'v8',text:'Launch IG + first posts',done:false},
+    {id:'v9',text:'Publish listings (Etsy + own intl shop)',done:false},
+    {id:'v10',text:'First marketing push',done:false},
+  ]},
+];
+const REDGATES_SEED = [
+  { id:'rg_night',    codename:'Night City',    drop:'Cyberpunk drop',    deadline:'2026-09-15', steps:_dropSteps() },
+  { id:'rg_psycho',   codename:'100% Psycho',   drop:'Mob Psycho drop',   deadline:'2026-09-22', steps:_dropSteps() },
+  { id:'rg_hero',     codename:'My Hero',       drop:'My Hero Academia drop', deadline:'2026-09-28', steps:_dropSteps() },
+  { id:'rg_clover',   codename:'5 Leaf Clover', drop:'Black Clover drop', deadline:'2026-09-30', steps:_dropSteps() },
+  { id:'rg_festival', codename:'The Festival',  drop:'10 designs → designer before Christmas', deadline:'2026-09-30', steps:[
+    {id:'f1',text:'Pick 6 anime designs for serigraphy',done:false},
+    {id:'f2',text:'Pick 4 asian-streetwear designs',done:false},
+    {id:'f3',text:'Compile references / specs for each',done:false},
+    {id:'f4',text:'Send all 10 to the designer',done:false},
+    {id:'f5',text:'Confirm she received them + agree a timeline',done:false},
+  ]},
+  { id:'rg_poke',     codename:'Poke Cafe',     drop:'Pokémon drop',   deadline:'2026-10-31', steps:_dropSteps() },
+  { id:'rg_berserk',  codename:'Going Crazy',   drop:'Berserk drop',      deadline:'2026-10-31', steps:_dropSteps() },
+];
+function _ensureWorkBattle(){
+  if(!state.hunts)    state.hunts    = HUNTS_SEED.map(h => ({...h}));
+  if(!state.gates)    state.gates    = GATES_SEED.map(g => ({...g, steps:g.steps.map(s=>({...s}))}));
+  if(!state.redGates) state.redGates = REDGATES_SEED.map(g => ({...g, steps:g.steps.map(s=>({...s}))}));
+  if(!state.huntState) state.huntState = {};
+}
+
+// ── period + reward plumbing ────────────────────────────────────────────────
+function _monthKey(d){ d = d || new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); }
+function _huntPeriodKey(cad){ if(cad==='weekly') return isoWeekKey(); if(cad==='monthly') return _monthKey(); return todayKey(); }
+function _factWindowOpen(){ const d=new Date(), day=d.getDate(), last=new Date(d.getFullYear(), d.getMonth()+1, 0).getDate(); return day<=3 || day>=last; }
+function _huntActive(h){ if(h.cadence==='monthly' && h.window==='monthEnd') return _factWindowOpen(); return true; }
+function _huntEntry(h){
+  if(!state.huntState) state.huntState = {};
+  const pk = _huntPeriodKey(h.cadence);
+  let e = state.huntState[h.id];
+  if(!e || e.periodKey !== pk){ e = { periodKey:pk, pct:0, awarded:0 }; state.huntState[h.id] = e; }
+  return e;
+}
+function _awardWork(delta){
+  const before = calcWorkerLevel(state.workXp||0).level;
+  if(delta){ state.workXp = Math.max(0, (state.workXp||0) + delta); if(delta>0){ const wt=_ensureWorkToday(); wt.pts += delta; } }
+  return { before, after: calcWorkerLevel(state.workXp||0).level };
+}
+function _daysLeft(deadline){ const d=new Date(deadline+'T00:00:00'); d.setHours(0,0,0,0); const now=new Date(); now.setHours(0,0,0,0); return Math.round((d - now)/86400000); }
+function _redGateStatus(rg){ if(rg.clearedAt) return 'cleared'; if(_daysLeft(rg.deadline) < 0) return 'collapsed'; return 'active'; }
+function _deadlineLabel(rg){ const n=_daysLeft(rg.deadline); if(n<0) return 'COLLAPSED'; if(n===0) return 'DUE TODAY'; if(n===1) return '1 day left'; return n+' days left'; }
+function _workStepsToday(){ const tk=todayKey(); return (state.workToday && state.workToday.dateKey===tk) ? (state.workToday.stepsToday||0) : 0; }
+
+// ── actions ─────────────────────────────────────────────────────────────────
+function setHuntProgress(h, pct){
+  pct = Math.max(0, Math.min(100, Math.round(pct)));
+  const e = _huntEntry(h);
+  const wasDone = e.pct >= 100;
+  const newAward = Math.round(HUNT_POOL * pct / 100);
+  const delta = newAward - (e.awarded||0);
+  e.pct = pct; e.awarded = newAward;
+  const lv = _awardWork(delta);
+  if(delta > 0){ const wt=_ensureWorkToday(); if(!wt.touched.includes(h.id)) wt.touched.push(h.id); }
+  const justDone = pct >= 100 && !wasDone;
+  if(justDone){ const wt=_ensureWorkToday(); wt.finished = (wt.finished||0) + 1; }
+  saveState(); renderAll();
+  if(justDone) showWorkFinishCelebration(h.text, lv.after>lv.before ? lv.after : null, 0, 0);
+  else if(lv.after > lv.before) showNotif(`⚒ WORK LEVEL ${lv.after}`);
+}
+function toggleGateStep(gate, stepId, isRed){
+  if(gate.clearedAt) return;
+  if(isRed && _redGateStatus(gate)==='collapsed') return;   // collapsed = locked until re-opened
+  const st = gate.steps.find(s => s.id === stepId); if(!st) return;
+  const per = isRed ? REDGATE_STEP : GATE_STEP;
+  st.done = !st.done;
+  const lv = _awardWork(st.done ? per : -per);
+  if(st.done){ const wt=_ensureWorkToday(); wt.stepsToday = (wt.stepsToday||0) + 1; }
+  let cleared = false;
+  if(gate.steps.every(s => s.done) && !gate.clearedAt){
+    gate.clearedAt = todayKey();
+    _awardWork(isRed ? REDGATE_CLEAR_BONUS : GATE_CLEAR_BONUS);
+    cleared = true;
+  }
+  saveState(); renderAll();
+  if(cleared) showAriseCelebration(gate, isRed);
+  else if(lv.after > lv.before) showNotif(`⚒ WORK LEVEL ${lv.after}`);
+}
+function reopenRedGate(rg){
+  const d=new Date(), nm=new Date(d.getFullYear(), d.getMonth()+2, 0);   // last day of next month
+  rg.deadline = nm.getFullYear()+'-'+String(nm.getMonth()+1).padStart(2,'0')+'-'+String(nm.getDate()).padStart(2,'0');
+  saveState(); renderAll();
+}
+
+// ── the ONE next action the WORK tab hands you (Solo Leveling "current quest") ─
+function getWorkNextAction(){
+  const active = state.redGates.filter(rg => _redGateStatus(rg)==='active');
+  const byDeadline = arr => [...arr].sort((a,b)=>_daysLeft(a.deadline)-_daysLeft(b.deadline));
+  // 1) a Red Gate collapsing within 3 days
+  for(const rg of byDeadline(active.filter(rg => _daysLeft(rg.deadline)<=3 && !_wgSkips.has(rg.id)))){
+    const s = rg.steps.find(x => !x.done); if(s) return { type:'redgate', gate:rg, step:s };
+  }
+  // 2) an undone daily hunt (clearing dailies earns the rest)
+  const daily = state.hunts.filter(h => h.cadence==='daily' && _huntEntry(h).pct<100 && !_wgSkips.has(h.id));
+  if(daily[0]) return { type:'hunt', hunt:daily[0] };
+  // 3) any active Red Gate
+  for(const rg of byDeadline(active.filter(rg => !_wgSkips.has(rg.id)))){
+    const s = rg.steps.find(x => !x.done); if(s) return { type:'redgate', gate:rg, step:s };
+  }
+  // 4) weekly / monthly hunt in its active window
+  const other = state.hunts.filter(h => h.cadence!=='daily' && _huntActive(h) && _huntEntry(h).pct<100 && !_wgSkips.has(h.id));
+  if(other[0]) return { type:'hunt', hunt:other[0] };
+  // 5) lowest-rank unclearned Gate
+  const order = {C:0,B:1,A:2,S:3};
+  for(const g of [...state.gates].sort((a,b)=>(order[a.rank]??9)-(order[b.rank]??9))){
+    if(_wgSkips.has(g.id)) continue;
+    const s = g.steps.find(x => !x.done); if(s) return { type:'gate', gate:g, step:s };
+  }
+  return null;
+}
+function renderWorkHero(){
+  const a = getWorkNextAction(); if(!a) return null;
+  const card = document.createElement('div'); card.className = 'work-current';
+  if(a.type === 'hunt'){
+    const h = a.hunt, e = _huntEntry(h), prog = e.pct;
+    const cad = h.cadence==='weekly' ? 'WEEKLY HUNT' : h.cadence==='monthly' ? 'MONTHLY HUNT' : 'DAILY HUNT';
+    let cells=''; for(let k=1;k<=4;k++) cells += `<button class="wt-cell${prog>=k*25?' on':''}" data-v="${k*25}"></button>`;
+    card.innerHTML = `<div class="wc-stars"></div><div class="wc-inner">`
+      + `<div class="wc-eyebrow">▶ NEXT · ${cad}</div>`
+      + `<div class="wc-title">${_escWork(h.text)}</div>`
+      + `<div class="wc-prog"><div class="wt-cells">${cells}</div><span class="wc-pct">${prog}%</span></div>`
+      + `<button class="wc-finish">${prog>=75?'✓ FINISH IT':'✓ MARK DONE'}</button>`
+      + `<div class="wc-secondary">${prog<100?`<button class="wc-bump">▷ +25%</button>`:''}<button class="wc-skip">→ different one</button></div>`
+      + `</div>`;
+    card.querySelectorAll('.wt-cell').forEach(c => c.addEventListener('click', () => { const v=+c.dataset.v; setHuntProgress(h, v===prog ? v-25 : v); }));
+    card.querySelector('.wc-finish').addEventListener('click', () => setHuntProgress(h, 100));
+    const b = card.querySelector('.wc-bump'); if(b) b.addEventListener('click', () => setHuntProgress(h, Math.min(100, prog+25)));
+    card.querySelector('.wc-skip').addEventListener('click', () => { _wgSkips.add(h.id); renderAll(); });
+  } else {
+    const g = a.gate, s = a.step, isRed = a.type==='redgate';
+    const total = g.steps.length, done = g.steps.filter(x=>x.done).length, pct = Math.round(done/total*100);
+    const badge = isRed ? `🔴 ${_escWork(g.codename)} · ${_deadlineLabel(g)}` : `🚪 ${g.rank}-RANK · ${_escWork(g.codename)}`;
+    card.innerHTML = `<div class="wc-stars"></div><div class="wc-inner">`
+      + `<div class="wc-eyebrow">▶ NEXT STEP · ${badge}</div>`
+      + `<div class="wc-title">${_escWork(s.text)}</div>`
+      + `<div class="wc-steps-meta">${done}/${total} steps · ${pct}%</div>`
+      + `<button class="wc-finish">✓ STEP DONE</button>`
+      + `<div class="wc-secondary"><button class="wc-skip">→ different one</button></div>`
+      + `</div>`;
+    card.querySelector('.wc-finish').addEventListener('click', () => toggleGateStep(g, s.id, isRed));
+    card.querySelector('.wc-skip').addEventListener('click', () => { _wgSkips.add(g.id); renderAll(); });
+  }
+  return card;
+}
+
+// ── the "you've earned your rest" state (Tuni's north-star loop) ─────────────
+function _workRestEarned(){
+  const daily = state.hunts.filter(h => h.cadence==='daily');
+  const allDaily = daily.length>0 && daily.every(h => _huntEntry(h).pct>=100);
+  return allDaily || _workStepsToday() > 0;
+}
+function renderWorkRestBanner(){
+  const daily = state.hunts.filter(h => h.cadence==='daily');
+  const allDaily = daily.length>0 && daily.every(h => _huntEntry(h).pct>=100);
+  const steps = _workStepsToday();
+  let sub;
+  if(allDaily && steps>0) sub = 'Dailies cleared and you pushed a Gate. Big day.';
+  else if(allDaily)       sub = 'All your daily hunts are done — nothing hanging over you.';
+  else                    sub = `You moved a Gate forward today${steps>1?` (${steps} steps)`:''}. That counts.`;
+  const el = document.createElement('div'); el.className = 'work-rest-banner';
+  el.innerHTML = `<div class="wrb-title">✓ You've done enough today</div><div class="wrb-sub">${sub} Enjoy your evening — the rest keeps.</div>`;
+  return el;
+}
+function showAriseCelebration(g, isRed){
+  const el = document.createElement('div'); el.className = 'work-finish-pop arise-pop';
+  const label = isRed ? 'RED GATE CLEARED' : `${g.rank}-RANK GATE CLEARED`;
+  el.innerHTML = `<div class="wfp-card arise-card"><div class="arise-word">✦ ARISE ✦</div><div class="wfp-body"><div class="wfp-title">${label}</div><div class="wfp-task">${_escWork(g.codename)}</div></div></div>`;
+  document.body.appendChild(el);
+  if(soundEnabled && typeof playStellarComplete==='function') playStellarComplete(isRed ? 'supernova' : 'stellar');
+  if(navigator.vibrate) navigator.vibrate([40,50,140,50,240]);
+  if(typeof showStellarBurst==='function') showStellarBurst();
+  const kill = () => { el.classList.add('wfp-out'); setTimeout(()=>el.remove(), 400); };
+  el.addEventListener('click', kill); setTimeout(kill, 2600);
+}
+
+// ── section renderers ────────────────────────────────────────────────────────
+function renderHuntRow(h){
+  const e = _huntEntry(h), prog = e.pct, active = _huntActive(h);
+  const row = document.createElement('div'); row.className = 'work-task-row hunt-row' + (prog>=100?' done':'') + (active?'':' hunt-dormant');
+  let cells=''; for(let k=1;k<=4;k++) cells += `<button class="wt-cell${prog>=k*25?' on':''}" data-v="${k*25}"${active?'':' disabled'}></button>`;
+  const note = (!active && h.window==='monthEnd') ? ` <span class="hunt-note">opens last day + 1st–3rd</span>` : '';
+  row.innerHTML = `<div class="wt-body"><span class="wt-text">${_escWork(h.text)}${note}</span>`
+    + `<div class="wt-prog"><div class="wt-cells">${cells}</div><span class="wt-prog-pct">${prog}%</span></div></div>`;
+  if(active) row.querySelectorAll('.wt-cell').forEach(c => c.addEventListener('click', ev => { ev.stopPropagation(); const v=+c.dataset.v; setHuntProgress(h, v===prog ? v-25 : v); }));
+  return row;
+}
+function renderHuntsSection(){
+  const frag = document.createDocumentFragment();
+  [['daily','⚔️ DAILY HUNTS'],['weekly','📅 WEEKLY HUNT'],['monthly','🗓️ MONTHLY']].forEach(([cad,label]) => {
+    const list = state.hunts.filter(h => h.cadence===cad); if(!list.length) return;
+    const hdr = document.createElement('div'); hdr.className = 'dungeon-divider'; hdr.innerHTML = `<span>${label}</span>`; frag.appendChild(hdr);
+    list.forEach(h => frag.appendChild(renderHuntRow(h)));
+  });
+  return frag;
+}
+function renderGateCard(g, isRed){
+  const total = g.steps.length, done = g.steps.filter(s=>s.done).length, pct = total?Math.round(done/total*100):0;
+  const status = isRed ? _redGateStatus(g) : (g.clearedAt ? 'cleared' : 'active');
+  const key = (isRed?'rg-':'gate-') + g.id;
+  const isOpen = (completedExpanded[key] !== undefined) ? completedExpanded[key] : (status==='active');
+  const RANK_CLR = { C:'#69f0ae', B:'#ffc107', A:'#ffa726', S:'#ffd700' };
+  const accent = isRed ? '#ff5252' : (RANK_CLR[g.rank] || '#ffc107');
+  const card = document.createElement('div'); card.className = 'gate-card ' + (isRed?'red-gate':'gate') + ' status-' + status;
+  card.style.setProperty('--gate-accent', accent);
+  const badge = isRed
+    ? `<span class="gate-rank red">🔴 ${_deadlineLabel(g)}</span>`
+    : `<span class="gate-rank" style="color:${accent};border-color:${accent}">${g.rank}</span>`;
+  const statusTag = status==='cleared' ? `<span class="gate-cleared">✦ CLEARED</span>`
+                  : status==='collapsed' ? `<span class="gate-collapsed">✕ COLLAPSED</span>` : '';
+  card.innerHTML = `<div class="gate-head">`
+    + `<div class="gate-head-l">${badge}<div class="gate-titles"><div class="gate-title">${_escWork(g.codename)}</div><div class="gate-sub">${_escWork(isRed?g.drop:g.goal)}</div></div></div>`
+    + `<div class="gate-head-r">${statusTag}<span class="gate-pct" style="color:${accent}">${pct}%</span><span class="gate-caret">${isOpen?'▲':'▼'}</span></div>`
+    + `</div>`
+    + `<div class="gate-bar"><div class="gate-fill" style="width:${pct}%;background:${accent}"></div></div>`
+    + `<div class="gate-steps"${isOpen?'':' hidden'}></div>`
+    + (status==='collapsed' ? `<button class="gate-reopen">⟳ Re-open next month</button>` : '');
+  const stepsWrap = card.querySelector('.gate-steps');
+  g.steps.forEach(s => {
+    const r = document.createElement('div'); r.className = 'gate-step' + (s.done?' done':'');
+    r.innerHTML = `<span class="gs-box">${s.done?'☑':'☐'}</span><span class="gs-text">${_escWork(s.text)}</span>`;
+    if(status==='active') r.addEventListener('click', () => toggleGateStep(g, s.id, isRed));
+    stepsWrap.appendChild(r);
+  });
+  card.querySelector('.gate-head').addEventListener('click', () => { completedExpanded[key] = !isOpen; renderAll(); });
+  const ro = card.querySelector('.gate-reopen'); if(ro) ro.addEventListener('click', e => { e.stopPropagation(); reopenRedGate(g); });
+  return card;
+}
+function renderRedGatesSection(){
+  const frag = document.createDocumentFragment();
+  const rankOf = { active:0, collapsed:1, cleared:2 };
+  const list = [...state.redGates].sort((a,b) => {
+    const sa=_redGateStatus(a), sb=_redGateStatus(b);
+    return rankOf[sa]!==rankOf[sb] ? rankOf[sa]-rankOf[sb] : _daysLeft(a.deadline)-_daysLeft(b.deadline);
+  });
+  list.forEach(rg => frag.appendChild(renderGateCard(rg, true)));
+  return frag;
+}
+function renderGatesSection(){
+  const frag = document.createDocumentFragment();
+  const order = { C:0, B:1, A:2, S:3 };
+  [...state.gates].sort((a,b)=>(order[a.rank]??9)-(order[b.rank]??9)).forEach(g => frag.appendChild(renderGateCard(g, false)));
+  return frag;
+}
+
 function renderTrabajo(){
+  _ensureWorkBattle();
   panelTitle.textContent = 'WORK';
-  panelSubtitle.textContent = 'Add what you need to do. Chip at it — every % counts.';
+  panelSubtitle.textContent = 'Clear your hunts, push a Gate — then rest.';
   panelContent.innerHTML = '';
   const hdr = document.getElementById('panelHeaderActions');
   if(hdr) hdr.innerHTML = '';
@@ -20554,82 +20918,56 @@ function renderTrabajo(){
   const RANK_CLR = { F:'#9e9e9e', E:'#80deea', D:'#82b1ff', C:'#69f0ae', B:'#ffc107', A:'#ffa726', S:'#ffd700', SS:'#ea80fc', SSS:'#ffffff' };
   const rc = RANK_CLR[wlv.rank] || '#ffc107';
   const xpPct = wlv.level < 99 ? Math.round((wlv.xpProgress / wlv.xpPerLevel) * 100) : 100;
-  const openTasks = state.trabajo.filter(t => !t.completed);          // manual/drag order preserved
-  const doneToday = state.trabajo.filter(t => t.completed && t.completedDate === today);
-  // The 80% wall: tasks already ≥75% get pulled into a "one push to finish" band so
-  // they can't rot at 90%. Closing them is the hardest, highest-value moment.
-  const almostDone = openTasks.filter(t => workTaskProgress(t) >= 75);
-  const todoTasks  = openTasks.filter(t => workTaskProgress(t) < 75);
 
-  // ── CURRENT TASK — the default trigger: ONE task handed to you, first thing, so
-  // there's no list to scan-and-bounce. The full list still sits below it. ──
-  if(openTasks.length){ const ct = renderWorkCurrentTask(); if(ct) panelContent.appendChild(ct); }
+  // ── "you've earned your rest" — the north-star reward: permission to stop ──
+  if(_workRestEarned()) panelContent.appendChild(renderWorkRestBanner());
 
-  // ── Progress hero — leads with TODAY'S PROGRESS (the aggregate that makes a
-  // scattered/bursty day read as real motion), level/all-time as the quiet footer. ──
+  // ── NEXT ACTION — one thing handed to you (urgent Red Gate → daily hunt → …) ──
+  const hero = renderWorkHero(); if(hero) panelContent.appendChild(hero);
+
+  // ── Progress hero — TODAY'S PROGRESS aggregate + worker level ──
   const wt = _workTodayData();
   const flow = _workFlowActive();
   const frontsWord = wt.fronts === 1 ? 'front' : 'fronts';
-  const hero = document.createElement('div'); hero.className = 'work-hero';
-  hero.innerHTML =
-    `<div class="wh-today-block">`
-    +   `<div class="wh-today-row">`
-    +     `<div><span class="wh-today-lbl">TODAY'S PROGRESS</span><div class="wh-today-main">+${wt.pts}<span class="wh-today-unit"> pts</span></div></div>`
-    +     `<div class="wh-today-stats"><span class="wh-today-fin">✓ ${wt.finished} finished</span><span class="wh-today-fronts">${wt.fronts} ${frontsWord} moved</span></div>`
+  const ph = document.createElement('div'); ph.className = 'work-hero';
+  ph.innerHTML =
+    `<div class="wh-today-block"><div class="wh-today-row">`
+    +   `<div><span class="wh-today-lbl">TODAY'S PROGRESS</span><div class="wh-today-main">+${wt.pts}<span class="wh-today-unit"> pts</span></div></div>`
+    +   `<div class="wh-today-stats"><span class="wh-today-fin">✓ ${wt.finished} finished</span><span class="wh-today-fronts">${wt.fronts} ${frontsWord} moved</span></div>`
     +   `</div>`
     +   (flow >= 2 ? `<div class="wh-flow">🔥 FLOW ×${flow} · you're on a roll</div>` : '')
     + `</div>`
     + `<div class="wh-bar"><div class="wh-fill" style="width:${xpPct}%;background:${rc};color:${rc}"></div></div>`
     + `<div class="wh-sub"><span>RANK ${wlv.rank} · WORK LV.${wlv.level}${wlv.level < 99 ? ` · ${wlv.xpProgress}/${wlv.xpPerLevel}` : ' · MAX'}</span><span class="wh-total">${(state.workXp||0).toLocaleString()} all-time</span></div>`;
-  panelContent.appendChild(hero);
-
-  // Motivational quote (system voice, no NPC)
+  panelContent.appendChild(ph);
   panelContent.appendChild(renderWorkStrip());
 
-  // (Old opt-in "🎯 One thing now" full-screen focus toggle removed 2026-09 — the
-  // CURRENT TASK hero above is now the always-on default trigger.)
+  // ── ⚔️ HUNTS (daily / weekly / monthly) ──
+  panelContent.appendChild(renderHuntsSection());
 
-  // ── ADD TASK — top of the list so it's the first thing, zero decisions ──
+  // ── 🔴 RED GATES (time-limited events) ──
+  const rgHdr = document.createElement('div'); rgHdr.className = 'dungeon-divider redgate-divider';
+  rgHdr.innerHTML = `<span>🔴 RED GATES · limited time</span>`; panelContent.appendChild(rgHdr);
+  panelContent.appendChild(renderRedGatesSection());
+
+  // ── 🚪 GATES (your bosses) ──
+  const gHdr = document.createElement('div'); gHdr.className = 'dungeon-divider gate-divider';
+  gHdr.innerHTML = `<span>🚪 GATES · your bosses</span>`; panelContent.appendChild(gHdr);
+  panelContent.appendChild(renderGatesSection());
+
+  // ── ⚡ SIDE QUESTS (ad-hoc one-offs; the old task list + quick-capture) ──
+  const openTasks = state.trabajo.filter(t => !t.completed);
+  const doneToday = state.trabajo.filter(t => t.completed && t.completedDate === today);
+  const sqHdr = document.createElement('div'); sqHdr.className = 'dungeon-divider';
+  sqHdr.innerHTML = `<span>⚡ SIDE QUESTS${openTasks.length ? ` · ${openTasks.length}` : ''}</span>`;
+  panelContent.appendChild(sqHdr);
   const form = document.createElement('div'); form.className = 'add-task-form inscribe-form work-add-top';
-  const inputRow = document.createElement('div'); inputRow.className = 'task-input-row';
-  inputRow.innerHTML = `<input type="text" class="add-task-input inscribe-input" id="taskInput" placeholder="What do you need to do?" maxlength="90"><button class="add-btn inscribe-btn" id="addBtn">+ ADD</button>`;
-  form.appendChild(inputRow);
+  form.innerHTML = `<div class="task-input-row"><input type="text" class="add-task-input inscribe-input" id="taskInput" placeholder="One-off task…" maxlength="90"><button class="add-btn inscribe-btn" id="addBtn">+ ADD</button></div>`;
   panelContent.appendChild(form);
   document.getElementById('addBtn').addEventListener('click', addTask);
   document.getElementById('taskInput').addEventListener('keydown', e => { if(e.key === 'Enter') addTask(); });
+  if(openTasks.length) panelContent.appendChild(renderWorkTaskList(openTasks, false));
 
-  // ── ONE PUSH TO FINISH — tasks already ≥75%, with a big FINISH button ──
-  if(almostDone.length){
-    const finHdr = document.createElement('div'); finHdr.className = 'dungeon-divider almost-divider';
-    finHdr.innerHTML = `<span>🏁 ONE PUSH TO FINISH · ${almostDone.length}</span>`;
-    panelContent.appendChild(finHdr);
-    panelContent.appendChild(renderWorkTaskList(almostDone, false, {almostDone:true}));
-  }
-
-  // ── TO DO ──
-  const openHdr = document.createElement('div'); openHdr.className = 'dungeon-divider';
-  openHdr.innerHTML = `<span>⟦ TO DO${todoTasks.length ? ` · ${todoTasks.length}` : ''} ⟧</span>`;
-  panelContent.appendChild(openHdr);
-
-  if(!openTasks.length){
-    const empty = document.createElement('div'); empty.className = 'empty-state';
-    empty.innerHTML = doneToday.length
-      ? `<div class="empty-icon">✓</div><div class="empty-text">ALL CLEAR</div><div class="empty-sub">Nothing left on the list. Add what's next, or rest — you earned it.</div>`
-      : `<div class="empty-icon">⚒</div><div class="empty-text">NOTHING HERE YET</div><div class="empty-sub">Add one thing above. Then just move it 25%. That's the whole trick.</div>`;
-    panelContent.appendChild(empty);
-  } else if(!todoTasks.length){
-    // everything open is already in the finish band
-    const note = document.createElement('div'); note.className = 'work-drag-hint';
-    note.textContent = 'Everything left is a push away. Close them out above.';
-    panelContent.appendChild(note);
-  } else {
-    panelContent.appendChild(renderWorkTaskList(todoTasks, false));
-    const hint = document.createElement('div'); hint.className = 'work-drag-hint';
-    hint.textContent = 'Tap the bar to set progress · drag ⠿ to reorder by priority';
-    panelContent.appendChild(hint);
-  }
-
-  // ── DONE TODAY (collapsible; tap the bar to reopen) ──
   if(doneToday.length){
     const isOpen = !!completedExpanded['trabajo-done'];
     const sep = document.createElement('div'); sep.className = 'work-archived-sep'; sep.style.cursor = 'pointer';
