@@ -137,36 +137,15 @@ const CQ_TARGETS = {
 // onetime (claimed once forever). All are manual self-report checkoffs.
 const CLASS_QUESTS = {
   // ── TIER 1 — NOVICE ──────────────────────────────────────────────────────
-  knight: {
-    daily:   { title:'Iron Ignition',           desc:'Complete 15 push-ups before your first meal of the day. No warm-up excuses — cold start, every day.', stats:{ STR:3 } },
-    weekly:  { title:'The Proving Ground',      desc:'Complete 3 strength-based training sessions this week. Any format counts: gym, bodyweight, sport.', stats:{ STR:12 } },
-    onetime: { title:'The First Oath',          desc:'Do a single continuous push-up set to absolute muscular failure. Record your rep count — this is your baseline.', stats:{ STR:20 } },
-  },
-  rogue: {
-    daily:   { title:'Phantom Footwork',        desc:'Spend 5 minutes on a coordination or balance drill: jump rope, single-leg holds, lateral shuffles, or any footwork pattern.', stats:{ DEX:3 } },
-    weekly:  { title:'The Precision Circuit',   desc:'Practice any sport, skill, or technique requiring hand-eye coordination or body control at least 4 times this week.', stats:{ DEX:12 } },
-    onetime: { title:"Apprentice's Mark",       desc:'Learn a physical trick or technique you\'ve never done before. Execute it successfully 5 times in a row to claim this quest.', stats:{ DEX:20 } },
-  },
-  guardian: {
-    daily:   { title:'Cold Initiation',         desc:'End today\'s shower with 30 seconds of cold water. No ramp — switch directly to cold. Brief, uncomfortable, non-negotiable.', stats:{ CON:3 } },
-    weekly:  { title:'Endurance Ledger',         desc:'Complete 3 cardio sessions of at least 20 continuous minutes each this week. Running, cycling, swimming, rowing — any sustained aerobic effort counts.',  stats:{ CON:12 } },
-    onetime: { title:'The Unbroken Mile',       desc:'Run (or row, or cycle) for 20 continuous minutes without stopping or walking. Pace is irrelevant — only the unbroken effort counts.', stats:{ CON:20 } },
-  },
-  mage: {
-    daily:   { title:'Arcane Intake',           desc:'Read at least 10 pages of a book or spend 15 minutes actively studying a concept. Audiobooks only count if you take notes.', stats:{ INT:3 } },
-    weekly:  { title:'The Knowledge Circuit',   desc:'Log 5 focused learning sessions this week (15 minutes minimum each). Passive consumption doesn\'t count — active engagement only.', stats:{ INT:12 } },
-    onetime: { title:'First Tome Sealed',       desc:'Finish one complete book — non-fiction preferred, but any work that genuinely challenged your thinking counts.', stats:{ INT:20 } },
-  },
-  monk: {
-    daily:   { title:'Zero Hour',               desc:'Do not touch your phone or open any app for the first 30 minutes after waking. Use that time for anything analog: stretch, breathe, eat, think.', stats:{ VOL:3 } },
-    weekly:  { title:'The Quiet Siege',         desc:'On at least 4 days this week, do not open social media or video platforms before noon. Morning hours are fortified territory.', stats:{ VOL:12 } },
-    onetime: { title:'The Iron Fast',           desc:'Spend one full waking day — from the moment you open your eyes to the moment you sleep — with zero social media or entertainment apps.', stats:{ VOL:20 } },
-  },
-  bard: {
-    daily:   { title:'The Open Question',       desc:'Ask one person in your life a genuine question about something meaningful to them — their work, a goal, a feeling. Actually listen to the answer.', stats:{ CHA:3 } },
-    weekly:  { title:'Social Cartography',      desc:'Have 3 real conversations this week — voice or face-to-face, not text threads. Each must last at least 10 minutes and go beyond surface small talk.', stats:{ CHA:12 } },
-    onetime: { title:'The Stage Debut',         desc:'Speak in front of a group of at least 5 people. A toast, a class comment, a team check-in, a short presentation — anything where your voice carries the room.', stats:{ CHA:20 } },
-  },
+  // Starter classes are "sauce" (2026-09): ONE daily each, themed to the class's stat.
+  // A real but doable daily ritual, not a punishing challenge. Mastering a starter =
+  // 7 days of doing its daily (one full week). Higher tiers get revamped later.
+  knight:   { daily: { title:'Iron Sets',        desc:'Do 30 push-ups today. Break them into sets if you need to.',                 stats:{ STR:3 } } },
+  rogue:    { daily: { title:'Quick Feet',        desc:'Spend 5 minutes on a coordination or balance drill — jump rope, footwork, single-leg holds.', stats:{ DEX:3 } } },
+  guardian: { daily: { title:'Steady Engine',     desc:'Get 15 minutes of continuous cardio — brisk walk, run, cycle, anything sustained.', stats:{ CON:3 } } },
+  mage:     { daily: { title:'Daily Pages',       desc:'Read 10 pages, or study something for 15 focused minutes.',                  stats:{ INT:3 } } },
+  monk:     { daily: { title:'Zero Hour',         desc:'No phone for the first 30 minutes after you wake up. Anything analog instead.', stats:{ VOL:3 } } },
+  bard:     { daily: { title:'Real Talk',         desc:'Have one real 10-minute conversation — voice or face-to-face, not texting.', stats:{ CHA:3 } } },
   // ── TIER 2 — ADEPT ───────────────────────────────────────────────────────
   paladin: {
     daily:   { title:'The Righteous Rep',       desc:'During your strength session today, identify the one set you want to skip — and do it anyway. Log only if you finished without cutting reps, reducing weight mid-set, or checking your phone between sets.', stats:{ STR:4, VOL:3 } },

@@ -1219,6 +1219,9 @@ body {
 .time-subheader.morning::after { background: rgba(240,160,48,0.25); }
 .time-subheader.night { color: #8878d0; }
 .time-subheader.night::after { background: rgba(136,120,208,0.25); }
+.time-subheader.anytime { color: #4dd0e1; }
+.time-subheader.anytime::after { background: rgba(77,208,225,0.25); }
+.time-subheader.anytime .time-subheader-count { color: #4dd0e1; }
 .time-subheader-count { font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 600; margin-left: 2px; opacity: 0.7; }
 .time-subheader.morning .time-subheader-count { color: #f0a030; }
 .time-subheader.night   .time-subheader-count { color: #8878d0; }
@@ -1230,6 +1233,7 @@ body {
 
 .m-toggle.morning-active { background: rgba(240,160,48,0.15); border-color: #f0a030; color: #f0a030; }
 .m-toggle.night-active { background: rgba(136,120,208,0.15); border-color: #8878d0; color: #8878d0; }
+.m-toggle.anytime-active { background: rgba(77,208,225,0.15); border-color: #4dd0e1; color: #4dd0e1; }
 
 /* ── SECTION HEADERS ── */
 .section-header {
@@ -8253,6 +8257,284 @@ details[open] .devt-hist-summary::after { content:'▲'; }
     scroll-behavior: auto !important;
   }
 }
+
+/* ═══ WORK TAB REDESIGN (2026) — simple, guilt-free task tracker ═══ */
+.work-hero{
+  border:1px solid rgba(255,193,7,0.35);border-left:3px solid #ffc107;border-radius:8px;
+  background:linear-gradient(135deg,rgba(255,193,7,0.10),rgba(255,193,7,0.02));
+  padding:14px 16px;margin:6px 0 12px;font-family:'Rajdhani',sans-serif;
+}
+.work-hero .wh-today-block{margin-bottom:10px}
+.work-hero .wh-today-row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.work-hero .wh-today-lbl{font-family:'IBM Plex Mono','Rajdhani',monospace;font-size:9.5px;letter-spacing:0.12em;color:var(--sao-text-dim)}
+.work-hero .wh-today-main{font-family:'Cinzel',serif;font-size:30px;font-weight:700;color:#ffc107;line-height:1;text-shadow:0 0 14px rgba(255,193,7,0.4)}
+.work-hero .wh-today-unit{font-size:13px;color:var(--sao-text-dim);font-weight:400}
+.work-hero .wh-today-stats{display:flex;flex-direction:column;align-items:flex-end;gap:3px;text-align:right}
+.work-hero .wh-today-fin{font-size:13px;font-weight:700;color:#69f0ae}
+.work-hero .wh-today-fronts{font-size:11px;color:var(--sao-text-dim)}
+.work-hero .wh-flow{margin-top:8px;font-family:'Cinzel',serif;font-size:12px;font-weight:700;letter-spacing:0.04em;color:#ff8a65;
+  text-shadow:0 0 10px rgba(255,138,101,0.5);animation:cqBlink 1.4s ease-in-out infinite}
+.work-hero .wh-bar{height:9px;border-radius:5px;background:rgba(255,255,255,0.08);overflow:hidden}
+.work-hero .wh-fill{height:100%;border-radius:5px;transition:width 0.5s cubic-bezier(.22,1,.36,1);box-shadow:0 0 8px currentColor}
+.work-hero .wh-sub{display:flex;justify-content:space-between;gap:10px;margin-top:7px;font-size:11px;color:var(--sao-text-dim)}
+.work-hero .wh-total{color:#ffd54f;font-weight:600}
+
+/* ═══ WORK CURRENT TASK — the always-on default trigger (mirrors CURRENT QUEST) ═══ */
+.work-current{position:relative;overflow:hidden;border-radius:16px;padding:22px;margin:6px 0 12px;
+  background:radial-gradient(ellipse at 30% -10%, #3a2c0e 0%, #241a06 45%, #120d02 100%);
+  border:1px solid rgba(255,193,7,0.45);
+  box-shadow:0 0 0 1px rgba(255,193,7,0.12), 0 0 30px rgba(255,193,7,0.26), inset 0 0 44px rgba(255,193,7,0.06);
+  animation:cqAura 2.8s ease-in-out infinite}
+.work-current .wc-stars{position:absolute;inset:0;pointer-events:none;opacity:0.7;
+  background-image:radial-gradient(1.5px 1.5px at 16% 26%, #fff, transparent),radial-gradient(1px 1px at 78% 20%, #ffe08a, transparent),
+    radial-gradient(1.5px 1.5px at 64% 74%, #fff, transparent),radial-gradient(1px 1px at 30% 82%, #ffd54f, transparent),
+    radial-gradient(1px 1px at 90% 58%, #fff, transparent);animation:cqTwinkle 3.4s ease-in-out infinite}
+.work-current .wc-inner{position:relative;z-index:1;text-align:center;font-family:'Rajdhani',sans-serif}
+.work-current .wc-eyebrow{font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:0.2em;color:#ffc107;
+  text-shadow:0 0 10px rgba(255,193,7,0.7);animation:cqBlink 1.8s ease-in-out infinite}
+.work-current .wc-title{font-family:'Cinzel',serif;font-size:23px;font-weight:700;color:#fff;line-height:1.2;margin:9px 0 14px;
+  text-shadow:0 0 16px rgba(255,193,7,0.5);word-break:break-word}
+.work-current .wc-prog{display:flex;align-items:center;gap:10px;max-width:340px;margin:0 auto 16px}
+.work-current .wt-cells{display:flex;gap:4px;flex:1}
+.work-current .wt-cell{flex:1;height:15px;border:1px solid rgba(255,193,7,0.4);border-radius:3px;background:rgba(255,255,255,0.04);cursor:pointer;padding:0;transition:background 0.15s}
+.work-current .wt-cell.on{background:#ffc107;border-color:#ffc107;box-shadow:0 0 6px rgba(255,193,7,0.5)}
+.work-current .wc-pct{font-size:13px;font-weight:700;color:#ffc107;width:38px;text-align:right}
+.work-current .wc-finish{display:block;width:100%;font-family:'Cinzel',serif;font-size:15px;font-weight:700;letter-spacing:0.05em;
+  color:#0a0a0a;background:linear-gradient(135deg,#ffd54f,#ffc107);border:none;border-radius:11px;padding:15px;cursor:pointer;
+  box-shadow:0 0 20px rgba(255,193,7,0.45);animation:cqBtn 2.2s ease-in-out infinite;transition:transform 0.12s}
+.work-current .wc-finish:hover{transform:scale(1.03)}
+.work-current .wc-secondary{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:12px;flex-wrap:wrap}
+.work-current .wc-bump{background:rgba(255,193,7,0.12);border:1px solid rgba(255,193,7,0.4);color:#ffd54f;
+  font-family:'Rajdhani',sans-serif;font-weight:600;font-size:12px;border-radius:999px;padding:7px 14px;cursor:pointer;transition:background 0.15s}
+.work-current .wc-bump:hover{background:rgba(255,193,7,0.22)}
+.work-current .wc-skip{background:none;border:none;color:rgba(224,247,250,0.55);font-family:'Rajdhani',sans-serif;font-size:12px;cursor:pointer;letter-spacing:0.03em}
+.work-current .wc-skip:hover{color:rgba(224,247,250,0.85)}
+@media (prefers-reduced-motion:reduce){.work-current,.work-current .wc-stars,.work-current .wc-eyebrow,.work-current .wc-finish{animation:none}}
+
+.work-add-top{margin:10px 0 4px}
+.work-task-list{display:flex;flex-direction:column;gap:7px;margin:8px 0}
+.work-task-row{display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid rgba(255,255,255,0.09);
+  border-radius:7px;background:rgba(255,255,255,0.02);font-family:'Rajdhani',sans-serif;transition:background 0.15s;touch-action:pan-y}
+.work-task-row:hover{background:rgba(255,255,255,0.045)}
+.work-task-row.done{opacity:0.6}
+.work-task-row.done .wt-text{text-decoration:line-through}
+.work-task-row.wt-dragging{background:rgba(255,193,7,0.12);border-color:#ffc10788;box-shadow:0 4px 16px rgba(0,0,0,0.4);opacity:0.97}
+.work-task-row .wt-grip{flex:0 0 auto;width:20px;color:var(--sao-text-dim);font-size:16px;line-height:1;cursor:grab;
+  text-align:center;opacity:0.5;touch-action:none;user-select:none}
+.work-task-row .wt-grip:active{cursor:grabbing}
+.work-task-row .wt-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.work-task-row .wt-text{font-size:14.5px;color:var(--sao-text);word-break:break-word;line-height:1.25}
+.work-task-row .wt-prog{display:flex;align-items:center;gap:9px}
+.work-task-row .wt-cells{display:flex;gap:3px;flex:1;min-width:0}
+.work-task-row .wt-cell{flex:1;height:14px;min-width:0;border:1px solid rgba(255,193,7,0.35);border-radius:3px;
+  background:rgba(255,255,255,0.03);cursor:pointer;padding:0;transition:background 0.15s,box-shadow 0.15s}
+.work-task-row .wt-cell:hover{border-color:rgba(255,193,7,0.7)}
+.work-task-row .wt-cell.on{background:#ffc107;border-color:#ffc107;box-shadow:0 0 6px rgba(255,193,7,0.5)}
+.work-task-row.done .wt-cell.on{background:#69f0ae;border-color:#69f0ae;box-shadow:0 0 6px rgba(105,240,174,0.5)}
+.work-task-row .wt-prog-pct{flex:0 0 auto;font-size:11px;font-weight:700;color:#ffd54f;width:34px;text-align:right}
+.work-task-row.done .wt-prog-pct{color:#69f0ae}
+.work-task-row .wt-del{flex:0 0 auto;background:none;border:none;color:var(--sao-text-dim);font-size:14px;
+  cursor:pointer;opacity:0.4;padding:4px 6px;transition:opacity 0.15s,color 0.15s;align-self:flex-start}
+.work-task-row .wt-del:hover{opacity:1;color:#ef5350}
+.work-drag-hint{text-align:center;font-size:10px;color:var(--sao-text-dim);opacity:0.6;margin:2px 0 4px;font-family:'Rajdhani',sans-serif}
+
+/* ═══ 80% WALL — "one push to finish" band + finish button + celebration ═══ */
+.dungeon-divider.almost-divider span{color:#69f0ae}
+.work-task-row.almost{border-color:rgba(105,240,174,0.4);background:linear-gradient(90deg,rgba(105,240,174,0.09),rgba(105,240,174,0.02))}
+.work-task-row.almost .wt-cell.on{background:#69f0ae;border-color:#69f0ae;box-shadow:0 0 6px rgba(105,240,174,0.5)}
+.work-task-row .wt-finish{flex:0 0 auto;align-self:center;font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:0.05em;
+  color:#08130d;background:#69f0ae;border:none;border-radius:6px;padding:8px 12px;cursor:pointer;white-space:nowrap;
+  box-shadow:0 0 10px rgba(105,240,174,0.4);transition:transform 0.12s,box-shadow 0.15s}
+.work-task-row .wt-finish:hover{transform:scale(1.05);box-shadow:0 0 16px rgba(105,240,174,0.6)}
+.work-finish-pop{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:9998;pointer-events:auto;
+  background:radial-gradient(ellipse at center,rgba(10,40,26,0.55),rgba(6,20,12,0.15) 60%,transparent);
+  animation:wfpIn 0.3s ease-out forwards;cursor:pointer}
+.work-finish-pop.wfp-out{animation:wfpOut 0.3s ease forwards}
+.work-finish-pop .wfp-card{display:flex;align-items:center;gap:16px;padding:20px 26px;border-radius:14px;
+  background:rgba(16,28,20,0.96);border:1px solid rgba(105,240,174,0.5);box-shadow:0 8px 40px rgba(0,0,0,0.5),0 0 30px rgba(105,240,174,0.25);
+  font-family:'Rajdhani',sans-serif}
+.work-finish-pop .wfp-check{font-size:40px;color:#69f0ae;line-height:1;filter:drop-shadow(0 0 10px rgba(105,240,174,0.7));animation:wfpCheck 0.5s cubic-bezier(.34,1.56,.64,1) both}
+.work-finish-pop .wfp-title{font-family:'Cinzel',serif;font-size:19px;font-weight:700;color:#69f0ae;letter-spacing:0.06em}
+.work-finish-pop .wfp-task{font-size:13px;color:var(--sao-text);opacity:0.85;margin-top:2px;max-width:230px}
+.work-finish-pop .wfp-lv{font-size:11px;color:#ffd54f;margin-top:5px;font-weight:600}
+.work-finish-pop .wfp-flow{font-family:'Cinzel',serif;font-size:12px;color:#ff8a65;margin-top:5px;font-weight:700;text-shadow:0 0 8px rgba(255,138,101,0.5)}
+@keyframes wfpIn{from{opacity:0}to{opacity:1}}
+@keyframes wfpOut{to{opacity:0}}
+@keyframes wfpCheck{0%{transform:scale(0) rotate(-20deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+@media (prefers-reduced-motion:reduce){.work-finish-pop,.work-finish-pop .wfp-check{animation:none}}
+
+/* ═══ QUICK CAPTURE — global brain-dump FAB + overlay ═══ */
+.qc-fab{position:fixed;right:16px;bottom:74px;width:52px;height:52px;border-radius:50%;z-index:9000;
+  border:1px solid rgba(77,208,225,0.5);background:linear-gradient(145deg,#12333a,#0c2228);color:#4dd0e1;
+  font-size:26px;line-height:1;font-weight:300;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.45),0 0 14px rgba(77,208,225,0.25);
+  display:flex;align-items:center;justify-content:center;transition:transform 0.14s,box-shadow 0.18s}
+.qc-fab:hover{transform:scale(1.08);box-shadow:0 6px 22px rgba(0,0,0,0.5),0 0 22px rgba(77,208,225,0.45)}
+.qc-fab:active{transform:scale(0.96)}
+.qc-overlay{position:fixed;inset:0;z-index:9500;background:rgba(4,8,11,0.72);backdrop-filter:blur(3px);
+  display:flex;align-items:flex-start;justify-content:center;padding:16vh 18px 0;animation:wfpIn 0.2s ease-out forwards}
+.qc-overlay[hidden]{display:none}
+.qc-overlay .qc-card{width:100%;max-width:440px;background:rgba(16,24,30,0.98);border:1px solid rgba(77,208,225,0.35);
+  border-radius:14px;padding:20px 22px;box-shadow:0 12px 44px rgba(0,0,0,0.55);font-family:'Rajdhani',sans-serif}
+.qc-overlay .qc-title{font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:#4dd0e1}
+.qc-overlay .qc-sub{font-size:12.5px;color:var(--sao-text-dim);margin:5px 0 14px;line-height:1.4}
+.qc-overlay .qc-input{width:100%;box-sizing:border-box;font-family:'Rajdhani',sans-serif;font-size:16px;color:var(--sao-text);
+  background:rgba(255,255,255,0.04);border:1px solid rgba(77,208,225,0.4);border-radius:8px;padding:12px 14px;outline:none}
+.qc-overlay .qc-input:focus{border-color:#4dd0e1;box-shadow:0 0 0 2px rgba(77,208,225,0.18)}
+.qc-overlay .qc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px}
+.qc-overlay .qc-count{font-size:11px;color:#69f0ae;font-weight:600}
+.qc-overlay .qc-actions{display:flex;gap:8px;margin-left:auto}
+.qc-overlay .qc-btn{font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:0.04em;color:#08222a;
+  background:#4dd0e1;border:none;border-radius:7px;padding:9px 15px;cursor:pointer;transition:transform 0.12s}
+.qc-overlay .qc-btn:hover{transform:scale(1.04)}
+.qc-overlay .qc-btn-ghost{font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.04em;color:var(--sao-text-dim);
+  background:transparent;border:1px solid var(--sao-line,rgba(255,255,255,0.15));border-radius:7px;padding:9px 15px;cursor:pointer}
+.qc-overlay .qc-btn-ghost:hover{color:var(--sao-text)}
+.qc-overlay .qc-recent{margin-top:14px;display:flex;flex-direction:column;gap:6px;max-height:34vh;overflow-y:auto}
+.qc-overlay .qc-recent-item{font-size:13px;color:#69f0ae;background:rgba(105,240,174,0.08);border-radius:6px;padding:7px 10px;
+  animation:wfpIn 0.25s ease-out}
+
+/* ═══ ONE THING NOW — focus spotlight + toggle ═══ */
+.work-focus-toggle{display:block;margin:10px auto 2px;font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:0.05em;
+  color:#4dd0e1;background:rgba(77,208,225,0.08);border:1px solid rgba(77,208,225,0.35);border-radius:999px;padding:8px 18px;cursor:pointer;
+  transition:background 0.15s,transform 0.12s}
+.work-focus-toggle:hover{background:rgba(77,208,225,0.16);transform:scale(1.03)}
+.work-spotlight{margin:18px 0 8px;padding:26px 22px;border:1px solid rgba(77,208,225,0.4);border-radius:14px;text-align:center;
+  background:linear-gradient(160deg,rgba(77,208,225,0.10),rgba(77,208,225,0.02));font-family:'Rajdhani',sans-serif;box-shadow:var(--shadow,0 8px 30px rgba(0,0,0,0.35))}
+.work-spotlight .ws-eyebrow{font-family:'IBM Plex Mono','Rajdhani',monospace;font-size:11px;letter-spacing:0.18em;color:#4dd0e1;margin-bottom:12px}
+.work-spotlight .ws-task{font-family:'Cinzel',serif;font-size:22px;font-weight:600;color:var(--sao-text);line-height:1.25;margin-bottom:18px;word-break:break-word}
+.work-spotlight .ws-prog{display:flex;align-items:center;gap:10px;max-width:340px;margin:0 auto 20px}
+.work-spotlight .wt-cells{display:flex;gap:4px;flex:1}
+.work-spotlight .wt-cell{flex:1;height:16px;border:1px solid rgba(77,208,225,0.35);border-radius:3px;background:rgba(255,255,255,0.03);cursor:pointer;padding:0;transition:background 0.15s}
+.work-spotlight .wt-cell.on{background:#4dd0e1;border-color:#4dd0e1;box-shadow:0 0 6px rgba(77,208,225,0.5)}
+.work-spotlight .ws-pct{font-size:13px;font-weight:700;color:#4dd0e1;width:38px;text-align:right}
+.work-spotlight .ws-actions{display:flex;gap:10px;justify-content:center;margin-bottom:14px}
+.work-spotlight .ws-finish{font-family:'Cinzel',serif;font-size:12px;font-weight:700;letter-spacing:0.05em;color:#08130d;background:#69f0ae;
+  border:none;border-radius:8px;padding:12px 24px;cursor:pointer;box-shadow:0 0 12px rgba(105,240,174,0.4);transition:transform 0.12s}
+.work-spotlight .ws-finish:hover{transform:scale(1.05)}
+.work-spotlight .ws-skip{font-family:'Cinzel',serif;font-size:12px;font-weight:600;letter-spacing:0.05em;color:var(--sao-text-dim);
+  background:transparent;border:1px solid rgba(255,255,255,0.18);border-radius:8px;padding:12px 20px;cursor:pointer}
+.work-spotlight .ws-skip:hover{color:var(--sao-text)}
+.work-spotlight .ws-exit{background:none;border:none;color:var(--sao-text-dim);font-family:'Rajdhani',sans-serif;font-size:12px;cursor:pointer;opacity:0.7}
+.work-spotlight .ws-exit:hover{opacity:1;color:#4dd0e1}
+
+/* ═══ HABIT PROGRESS BARS — weekly / monthly / potential (never punish) ═══ */
+.habit-bars-card{border:1px solid rgba(255,255,255,0.08);border-radius:8px;background:rgba(255,255,255,0.02);
+  padding:12px 14px;margin:8px 0 12px;display:flex;flex-direction:column;gap:11px;font-family:'Rajdhani',sans-serif}
+.habit-bars-card .hbar{display:flex;flex-direction:column;gap:5px}
+.habit-bars-card .hbar-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.habit-bars-card .hbar-label{font-family:'Cinzel',serif;font-size:10.5px;font-weight:700;letter-spacing:0.08em}
+.habit-bars-card .hbar-val{font-size:12.5px;font-weight:700;color:var(--sao-text)}
+.habit-bars-card .hbar-cap{font-size:10px;font-weight:500;color:var(--sao-text-dim)}
+.habit-bars-card .hbar-track{height:8px;border-radius:5px;background:rgba(255,255,255,0.07);overflow:hidden}
+.habit-bars-card .hbar-fill{height:100%;border-radius:5px;transition:width 0.5s cubic-bezier(.22,1,.36,1)}
+.habit-bars-card .hbar-potential{border-top:1px solid rgba(255,255,255,0.07);padding-top:11px;margin-top:1px}
+.habit-bars-card .hbar-note{font-size:9.5px;line-height:1.35;color:var(--sao-text-dim);opacity:0.75;margin-top:2px}
+.habit-bars-card .hbar-award{margin-left:6px;font-size:13px;filter:drop-shadow(0 0 4px rgba(255,215,0,0.6))}
+
+/* ═══ CURRENT QUEST — the glowing trigger card (2026-09) ═══ */
+.current-quest{position:relative;overflow:hidden;border-radius:16px;padding:24px 22px;margin:6px 0 16px;
+  background:radial-gradient(ellipse at 30% -10%, #241653 0%, #150c34 45%, #0a0618 100%);
+  border:1px solid rgba(179,136,255,0.45);
+  box-shadow:0 0 0 1px rgba(179,136,255,0.12), 0 0 34px rgba(179,136,255,0.28), inset 0 0 46px rgba(77,208,225,0.10);
+  animation:cqAura 2.8s ease-in-out infinite}
+@keyframes cqAura{
+  0%,100%{box-shadow:0 0 0 1px rgba(179,136,255,0.12), 0 0 28px rgba(179,136,255,0.22), inset 0 0 40px rgba(77,208,225,0.08)}
+  50%{box-shadow:0 0 0 1px rgba(179,136,255,0.28), 0 0 46px rgba(179,136,255,0.45), inset 0 0 56px rgba(77,208,225,0.16)}}
+.current-quest .cq-stars{position:absolute;inset:0;pointer-events:none;opacity:0.85;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 24%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 82% 16%, #d1b3ff, transparent),
+    radial-gradient(1px 1px at 46% 62%, #b3e5fc, transparent),
+    radial-gradient(1.5px 1.5px at 68% 78%, #fff, transparent),
+    radial-gradient(1px 1px at 28% 84%, #d1b3ff, transparent),
+    radial-gradient(1px 1px at 92% 54%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 6% 66%, #b3e5fc, transparent),
+    radial-gradient(1px 1px at 58% 8%, #fff, transparent);
+  animation:cqTwinkle 3.4s ease-in-out infinite}
+@keyframes cqTwinkle{0%,100%{opacity:0.5}50%{opacity:1}}
+.current-quest .cq-inner{position:relative;z-index:1;text-align:center;font-family:'Rajdhani',sans-serif}
+.current-quest .cq-eyebrow{font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:0.22em;color:#b388ff;
+  text-shadow:0 0 10px rgba(179,136,255,0.7);animation:cqBlink 1.8s ease-in-out infinite}
+@keyframes cqBlink{0%,100%{opacity:0.8}50%{opacity:1}}
+.current-quest .cq-evening{font-family:'Rajdhani',sans-serif;font-size:12px;color:#ffd54f;margin-top:8px;opacity:0.9;letter-spacing:0.02em}
+.current-quest .cq-title{font-family:'Cinzel',serif;font-size:26px;font-weight:700;color:#fff;line-height:1.2;margin:8px 0 12px;
+  text-shadow:0 0 18px rgba(179,136,255,0.55), 0 0 6px rgba(255,255,255,0.4);word-break:break-word}
+.current-quest .cq-gains{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:18px;font-size:12px;font-weight:600}
+.current-quest .cq-gain{padding:2px 8px;border-radius:5px;background:rgba(255,255,255,0.06)}
+.current-quest .cq-xp{padding:2px 8px;border-radius:5px;background:rgba(255,193,7,0.14);color:#ffd54f}
+.current-quest .cq-complete{display:block;width:100%;font-family:'Cinzel',serif;font-size:16px;font-weight:700;letter-spacing:0.06em;
+  color:#0a0618;background:linear-gradient(135deg,#d1b3ff,#4dd0e1);border:none;border-radius:11px;padding:16px;cursor:pointer;
+  box-shadow:0 0 22px rgba(179,136,255,0.5);animation:cqBtn 2.2s ease-in-out infinite;transition:transform 0.12s}
+.current-quest .cq-complete:hover{transform:scale(1.03)}
+.current-quest .cq-complete:active{transform:scale(0.98)}
+@keyframes cqBtn{0%,100%{box-shadow:0 0 18px rgba(179,136,255,0.4)}50%{box-shadow:0 0 34px rgba(179,136,255,0.75), 0 0 12px rgba(77,208,225,0.5)}}
+.current-quest .cq-secondary{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:12px;flex-wrap:wrap}
+.current-quest .cq-start{background:rgba(77,208,225,0.10);border:1px solid rgba(77,208,225,0.4);color:#4dd0e1;
+  font-family:'Rajdhani',sans-serif;font-weight:600;font-size:12px;border-radius:999px;padding:7px 14px;cursor:pointer;letter-spacing:0.03em;transition:background 0.15s}
+.current-quest .cq-start:hover{background:rgba(77,208,225,0.2)}
+.current-quest .cq-skip{background:none;border:none;color:rgba(224,247,250,0.55);
+  font-family:'Rajdhani',sans-serif;font-size:12px;cursor:pointer;letter-spacing:0.03em}
+.current-quest .cq-skip:hover{color:rgba(224,247,250,0.85)}
+/* 2-minute start timer pill (floats above the nav) */
+.start-timer-pill{position:fixed;left:50%;bottom:78px;transform:translateX(-50%);z-index:9200;width:min(420px,calc(100vw - 24px));
+  background:rgba(12,22,28,0.97);border:1px solid rgba(77,208,225,0.45);border-radius:12px;padding:12px 16px;
+  box-shadow:0 6px 26px rgba(0,0,0,0.5),0 0 18px rgba(77,208,225,0.2);font-family:'Rajdhani',sans-serif;animation:wfpIn 0.25s ease-out}
+.start-timer-pill.stp-ready{border-color:rgba(105,240,174,0.6);box-shadow:0 6px 26px rgba(0,0,0,0.5),0 0 22px rgba(105,240,174,0.35)}
+.start-timer-pill .stp-label{font-size:12px;color:var(--sao-text-dim);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.start-timer-pill.stp-ready .stp-label{color:#69f0ae}
+.start-timer-pill .stp-mid{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.start-timer-pill .stp-time{font-family:'Cinzel',serif;font-size:26px;font-weight:700;color:#4dd0e1;font-variant-numeric:tabular-nums}
+.start-timer-pill.stp-ready .stp-time{color:#69f0ae}
+.start-timer-pill .stp-actions{display:flex;gap:8px}
+.start-timer-pill .stp-done{font-family:'Cinzel',serif;font-size:11px;font-weight:700;color:#08130d;background:#69f0ae;border:none;border-radius:7px;padding:9px 14px;cursor:pointer}
+.start-timer-pill .stp-stop{font-family:'Rajdhani',sans-serif;font-size:12px;color:var(--sao-text-dim);background:transparent;border:1px solid rgba(255,255,255,0.18);border-radius:7px;padding:9px 12px;cursor:pointer}
+.start-timer-pill .stp-stop:hover{color:var(--sao-text)}
+.current-quest.cq-cleared{animation:none;border-color:rgba(105,240,174,0.4);
+  background:radial-gradient(ellipse at 50% -10%, #123528 0%, #0b1f18 50%, #0a0f10 100%);box-shadow:0 0 30px rgba(105,240,174,0.25)}
+.current-quest .cq-title-done{font-size:22px;color:#69f0ae;text-shadow:0 0 16px rgba(105,240,174,0.5)}
+.current-quest .cq-cleared-sub{font-size:13px;color:var(--sao-text-dim);margin-top:4px}
+@media (prefers-reduced-motion:reduce){
+  .current-quest,.current-quest .cq-stars,.current-quest .cq-eyebrow,.current-quest .cq-complete{animation:none}}
+/* variable-reward tier banners */
+.stellar-banner{position:fixed;top:34%;left:50%;transform:translate(-50%,-50%) scale(0.7);z-index:9998;pointer-events:none;
+  font-family:'Cinzel',serif;font-weight:700;letter-spacing:0.14em;white-space:nowrap;text-align:center;
+  animation:sbPop 0.45s cubic-bezier(.34,1.56,.64,1) forwards}
+.stellar-banner-stellar{font-size:26px;color:#d1b3ff;text-shadow:0 0 18px rgba(179,136,255,0.9),0 0 6px #fff}
+.stellar-banner-supernova{font-size:32px;color:#ffe08a;text-shadow:0 0 24px rgba(255,215,0,0.95),0 0 8px #fff;
+  animation:sbPop 0.45s cubic-bezier(.34,1.56,.64,1) forwards, sbShimmer 1.1s ease-in-out 0.45s infinite}
+.stellar-banner.sb-out{animation:sbOut 0.4s ease forwards}
+@keyframes sbPop{to{transform:translate(-50%,-50%) scale(1)}}
+@keyframes sbOut{to{opacity:0;transform:translate(-50%,-50%) scale(1.15)}}
+@keyframes sbShimmer{0%,100%{filter:brightness(1)}50%{filter:brightness(1.4)}}
+@media (prefers-reduced-motion:reduce){.stellar-banner{animation:none}}
+
+/* ═══ COMEBACK RITUAL overlay — warm, shame-free re-entry ═══ */
+.comeback-overlay{position:fixed;inset:0;z-index:9990;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:radial-gradient(ellipse at 50% 30%, rgba(36,22,83,0.96), rgba(10,6,24,0.98));animation:wfpIn 0.4s ease-out forwards;cursor:pointer}
+.comeback-overlay.cb-out{animation:sbOut 0.36s ease forwards}
+.comeback-overlay .cb-stars{position:absolute;inset:0;pointer-events:none;opacity:0.7;
+  background-image:radial-gradient(1.5px 1.5px at 18% 22%, #fff, transparent),radial-gradient(1px 1px at 74% 30%, #d1b3ff, transparent),
+    radial-gradient(1.5px 1.5px at 40% 74%, #b3e5fc, transparent),radial-gradient(1px 1px at 86% 66%, #fff, transparent),
+    radial-gradient(1px 1px at 26% 56%, #d1b3ff, transparent),radial-gradient(1.5px 1.5px at 62% 14%, #fff, transparent);
+  animation:cqTwinkle 3.6s ease-in-out infinite}
+.comeback-overlay .cb-card{position:relative;z-index:1;max-width:400px;width:100%;text-align:center;font-family:'Rajdhani',sans-serif;
+  background:rgba(16,12,36,0.7);border:1px solid rgba(179,136,255,0.4);border-radius:18px;padding:30px 26px;
+  box-shadow:0 0 40px rgba(179,136,255,0.3), inset 0 0 40px rgba(77,208,225,0.06)}
+.comeback-overlay .cb-eyebrow{font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:0.22em;color:#b388ff;text-shadow:0 0 10px rgba(179,136,255,0.7)}
+.comeback-overlay .cb-title{font-family:'Cinzel',serif;font-size:34px;font-weight:700;color:#fff;margin:8px 0 12px;text-shadow:0 0 18px rgba(179,136,255,0.5)}
+.comeback-overlay .cb-msg{font-size:15px;color:var(--sao-text);line-height:1.5;margin-bottom:22px}
+.comeback-overlay .cb-msg b{color:#69f0ae}
+.comeback-overlay .cb-stats{display:flex;justify-content:center;gap:14px;margin-bottom:20px}
+.comeback-overlay .cb-stat{flex:1;max-width:110px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px 6px}
+.comeback-overlay .cb-stat-num{font-family:'Cinzel',serif;font-size:26px;font-weight:700;color:#4dd0e1;line-height:1}
+.comeback-overlay .cb-stat-lbl{font-size:9px;letter-spacing:0.1em;color:var(--sao-text-dim);margin-top:5px}
+.comeback-overlay .cb-sub{font-size:13px;color:var(--sao-text-dim);margin-bottom:20px;font-style:italic}
+.comeback-overlay .cb-btn{width:100%;font-family:'Cinzel',serif;font-size:14px;font-weight:700;letter-spacing:0.05em;color:#0a0618;
+  background:linear-gradient(135deg,#d1b3ff,#4dd0e1);border:none;border-radius:11px;padding:15px;cursor:pointer;
+  box-shadow:0 0 20px rgba(179,136,255,0.45);transition:transform 0.12s}
+.comeback-overlay .cb-btn:hover{transform:scale(1.03)}
+@media (prefers-reduced-motion:reduce){.comeback-overlay,.comeback-overlay .cb-stars{animation:none}}
+.habit-bars-card .hbar-maxed .hbar-track{box-shadow:0 0 8px rgba(255,215,0,0.35)}
 </style>
 </head>
 <body>
@@ -8300,11 +8582,11 @@ details[open] .devt-hist-summary::after { content:'▲'; }
         </div>
       </div>
       <div class="micro-stats">
-        <div class="micro"><div class="micro-label">STREAK</div><div class="micro-value gold" id="statStreak">0</div></div>
+        <div class="micro"><div class="micro-label">PERFECT</div><div class="micro-value gold" id="statStreak">0</div></div>
         <div class="micro"><div class="micro-label">DAY</div><div class="micro-value" id="statQuests">0/0</div></div>
         <div class="micro"><div class="micro-label">WEEK</div><div class="micro-value weekly-val" id="statWeek">0/0</div></div>
       </div>
-      <div class="hud-currency" id="hudCurrency">
+      <div class="hud-currency" id="hudCurrency" style="display:none">
         <span class="hud-cur hud-gold" title="Gold — earn from Work tasks"><img src="img/gold.png" class="hud-gold-icon" alt="gold"><span class="hud-cur-val" id="hudGoldVal">0</span></span>
         <span class="hud-cur-sep">·</span>
         <span class="hud-cur hud-shard" title="Shards — premium currency from discipline milestones">✦<span class="hud-cur-val" id="hudShardVal">0</span></span>
@@ -8319,6 +8601,25 @@ details[open] .devt-hist-summary::after { content:'▲'; }
     <div class="tab" data-tab="work"><span class="tab-icon">⚒</span>WORK</div>
     <div class="tab" data-tab="log"><span class="tab-icon">📋</span>LOG</div>
   </nav>
+
+  <!-- Quick capture (2026-09) — object-blindness / fear-of-forgetting tool: dump a
+       thought into the WORK backlog from anywhere, in one tap, before it evaporates. -->
+  <button id="quickCaptureFab" class="qc-fab" title="Quick capture — dump a task before you forget it" aria-label="Quick capture">＋</button>
+  <div id="quickCaptureOverlay" class="qc-overlay" hidden>
+    <div class="qc-card">
+      <div class="qc-title">⚡ Quick capture</div>
+      <div class="qc-sub">Dump it before it's gone. Enter to save — keep going, add as many as you want.</div>
+      <input id="qcInput" class="qc-input" type="text" placeholder="What's on your mind?" maxlength="120" autocomplete="off">
+      <div class="qc-row">
+        <span id="qcCount" class="qc-count"></span>
+        <div class="qc-actions">
+          <button id="qcClose" class="qc-btn-ghost" type="button">Done</button>
+          <button id="qcSave" class="qc-btn" type="button">Capture →</button>
+        </div>
+      </div>
+      <div id="qcRecent" class="qc-recent"></div>
+    </div>
+  </div>
 
   <div id="backupNudge">
     <span class="nudge-msg">⚠ Never backed up — data lives in this browser only</span>
@@ -9656,19 +9957,22 @@ function tierFor(pts) {
 // ============================================================
 // DEFAULT DATA
 // ============================================================
+// Ordered to match a real day (2026-09): morning-anchored → flexible "anytime" →
+// night wind-down. This array order IS the CURRENT QUEST order.
 const DEFAULT_HABITOS = [
-  // ── Morning (4) ──
+  // ── Morning — the first 20 minutes ──
   { id:'h1',  text:'Wake up early 🕐',      xp:40,  gains:{VOL:3,CON:1},              timeOfDay:'morning' },
   { id:'h2',  text:'Make your bed 🛏️',      xp:30,  gains:{VOL:1,CHA:2},              timeOfDay:'morning' },
   { id:'h4',  text:'Stretching 🤸',         xp:60,  gains:{DEX:5,CON:1},              timeOfDay:'morning' },
-  { id:'h10', text:'Read 📖',               xp:50,  gains:{INT:5},                    timeOfDay:'morning' },
-  // ── Night (6) ──
+  // ── Anytime — day or night, your call ──
+  { id:'h0',  text:'Training 🏋️',          xp:190, gains:{STR:9,DEX:4,CON:4,VOL:2}, timeOfDay:'anytime' },
+  { id:'h10', text:'Read 📖',               xp:50,  gains:{INT:5},                    timeOfDay:'anytime' },
+  { id:'h7',  text:'Drink water 💧',        xp:20,  gains:{CON:2},                    timeOfDay:'anytime' },
+  // ── Night — wind-down, in order (meditation last, right before sleep) ──
   { id:'h6',  text:'Be grateful for 3 things today 🙏', xp:50, gains:{CHA:3,INT:2},   timeOfDay:'night' },
-  { id:'h0',  text:'Training 🏋️',          xp:190, gains:{STR:9,DEX:4,CON:4,VOL:2}, timeOfDay:'night' },
-  { id:'h7',  text:'Drink 2L water 💧',     xp:20,  gains:{CON:2},                    timeOfDay:'night' },
   { id:'h8',  text:'Dishes / clean room 🍽️',xp:20,  gains:{VOL:1,CHA:1},              timeOfDay:'night' },
-  { id:'h9',  text:'Meditation 🧘',         xp:40,  gains:{INT:3,VOL:1},              timeOfDay:'night' },
   { id:'h11', text:'Brush teeth 🦷',        xp:20,  gains:{CON:1,CHA:1},              timeOfDay:'night' },
+  { id:'h9',  text:'Meditation 🧘',         xp:40,  gains:{INT:3,VOL:1},              timeOfDay:'night' },
 ];
 // Shared milestone definitions — reused for migration of old saves
 const DEFAULT_NEG_MILESTONES = [
@@ -9717,16 +10021,11 @@ const yesterdayKey = () => { const d=new Date(); d.setDate(d.getDate()-1); retur
 // ── Phase 1: Compound Buff Engine ─────────────────────────────
 // Returns a multiplier (1.0–1.75) based on yesterday's habit completion + streak.
 // Applied to idle DPS and dungeon XP rewards.
+// AURA SYSTEM KILLED (2026-09) — the yesterday-based compound multiplier was
+// unconscious pressure (a reward that silently shrank on lower days). Gains are
+// now flat and predictable: every habit is always worth exactly its face value.
 function getHabitCompoundMultiplier() {
-  const total = state.habitos.length;
-  if (!total) return 1;
-  const yest = yesterdayKey();
-  const done = state.habitos.filter(h => h.done && h.done[yest]).length;
-  const rate = done / total; // 0.0–1.0
-  // streak bonus: +0.005 per consecutive day, capped at +0.25
-  const streakBonus = Math.min(0.25, (state.streak || 0) * 0.005);
-  // 0% habits → ×1.0 | 50% → ×1.25 | 100% → ×1.5 | 100%+max streak → ×1.75
-  return Math.round((1 + rate * 0.5 + streakBonus) * 100) / 100;
+  return 1;
 }
 
 // ── Phase 3: Task Category & Difficulty Config ─────────────────
@@ -10626,6 +10925,17 @@ function loadState() {
         const w = s.weekly.find(w => w.id === 'w0') || s.weekly.find(w => _nr3(w.text).includes('futbol'));
         if (w) { w.text = 'Running 🏃'; w.gains = {STR:8,DEX:8,CON:16,VOL:6}; w.xp = 380; }
       }
+      // ── Habit time-of-day rework (2026-09) — retag + reorder existing habits to
+      // the real-day rhythm, add the flexible "anytime" block, de-vague "Drink 2L".
+      if (!s._habitReorder2026 && Array.isArray(s.habitos)) {
+        s._habitReorder2026 = true;
+        const TIME_MAP = { h1:'morning', h2:'morning', h4:'morning', h0:'anytime', h10:'anytime', h7:'anytime', h6:'night', h8:'night', h11:'night', h9:'night' };
+        const ORDER = ['h1','h2','h4','h0','h10','h7','h6','h8','h11','h9'];
+        s.habitos.forEach(h => { if (TIME_MAP[h.id]) h.timeOfDay = TIME_MAP[h.id]; });
+        const water = s.habitos.find(h => h.id === 'h7');
+        if (water && /2\s*l\b|drink 2l/i.test(water.text || '')) water.text = 'Drink water 💧';
+        s.habitos.sort((a,b) => { const ia = ORDER.indexOf(a.id), ib = ORDER.indexOf(b.id); return (ia < 0 ? 999 : ia) - (ib < 0 ? 999 : ib); });
+      }
       return s;
     }
     // Migrate from v3
@@ -10672,6 +10982,19 @@ let transmuterDowngradeTier = 2; // for 'downgrade': 2 = T2→T1, 3 = T3→T2
 let forgeShowCrafted = {};    // per-tree: expand the collapsed "already forged" tiers
 let activeDate = todayKey();
 let completedExpanded = {};
+// Per-time-of-day collapse state for the HABITS daily list (2026-09). Undefined =
+// use the smart default (current block open, other collapsed) — a tap overrides.
+let habitTimeCollapse = {};
+// "One thing now" focus mode for WORK (legacy toggle — superseded by the always-on
+// CURRENT TASK hero, kept declared for compat).
+let workFocusMode = false;
+// CURRENT TASK (2026-09) — WORK now hands you ONE task by default (like habit CURRENT
+// QUEST). "→ different one" defers a task this session so the next surfaces.
+let _workTaskSkips = new Set();
+// CURRENT QUEST (2026-09) — the HABITS tab as a TRIGGER not a scoreboard: the app
+// picks ONE habit and shoves it, glowing, in your face to kill decision paralysis.
+let _questSkips = new Set();   // habit ids deferred this session via "not now"
+let _cqCompleting = false;     // suppresses toggleQuest's generic tap sound so the galactic one is the star
 let combatStatsExpanded = false;
 let cqCollapsed = false;
 let radarChart = null;
@@ -14371,18 +14694,24 @@ function renderInventory() {
 let _achFilter = localStorage.getItem('achFilter') || 'all';
 let _achTierFilter = localStorage.getItem('achTierFilter') || 'all';
 
+// Achievements tied to the removed RPG systems (forge / dungeon / guild / gold /
+// commission / craft / work-streak) are dead — hidden from the LOG so the list
+// stops implying homework that can't be done. Still-reachable work achievements
+// (quest_runner, master_worker) are kept.
+const DEAD_ACH = new Set(['gold_earner','commission_ace','master_forger','pomo_warrior','guild_patron','work_streak','lucky_strike','refined_steel','tier_climber','full_set','reforged_fortune','guild_maxed','dungeon_conqueror','cartographer']);
 function renderLogros() {
   panelTitle.textContent = 'ACHIEVEMENTS'; panelSubtitle.textContent = 'Milestones & rewards';
   panelContent.innerHTML = '';
+  const _ACT = ACHIEVEMENTS.filter(a => !DEAD_ACH.has(a.id));
 
   // ── Step 7: Arc summary header ─────────────────────────────
-  const totalTiers = ACHIEVEMENTS.reduce((s,a) => s + a.tiers.length, 0);
+  const totalTiers = _ACT.reduce((s,a) => s + a.tiers.length, 0);
 
   // Count earned tiers (claimed OR claimable) + fractional progress toward next
   let earnedTiers = 0;   // integer: for the "X / Y" counter
   let arcProgress = 0;   // fractional: drives the arc smoothly
 
-  ACHIEVEMENTS.forEach(ach => {
+  _ACT.forEach(ach => {
     const entry  = _getAchEntry(ach.id);
     const count  = getAchievementCount(ach);
     // How many tiers fully earned (claimed + claimable not yet claimed)
@@ -14426,7 +14755,7 @@ function renderLogros() {
         <div class="logros-summary-label">⟦ ACHIEVEMENT PROGRESS ⟧</div>
         <div class="logros-summary-val">${unlockedTiers}<span class="logros-summary-sub"> / ${totalTiers}</span></div>
         <div style="font-size:9px;color:var(--sao-text-dim);letter-spacing:1px;margin-top:2px">TIERS UNLOCKED</div>
-        <div class="logro-lifetime-stat">${(()=>{ let pts=0; ACHIEVEMENTS.forEach(a=>{ const e=_getAchEntry(a.id); for(let i=0;i<=e.awarded;i++){ const t=a.tiers[i]; if(!t) continue; pts+=t.reward*(a.statAll?6:1); } }); return pts; })()} stat pts earned from achievements</div>
+        <div class="logro-lifetime-stat">${(()=>{ let pts=0; _ACT.forEach(a=>{ const e=_getAchEntry(a.id); for(let i=0;i<=e.awarded;i++){ const t=a.tiers[i]; if(!t) continue; pts+=t.reward*(a.statAll?6:1); } }); return pts; })()} stat pts earned from achievements</div>
         ${(()=>{
           const lcd = state.logros.lastClaimDate, lcc = state.logros.lastClaimCount;
           if (!lcd || !lcc) return '';
@@ -14517,6 +14846,7 @@ function renderLogros() {
 
 function buildAchievementFeed(wrap) {
   wrap.innerHTML = '';
+  const _ACT = ACHIEVEMENTS.filter(a => !DEAD_ACH.has(a.id));  // hide dead-system achievements here too
   const CAT_DEFS = [
     { key:'progresion',   label:'⟦ PROGRESSION ⟧'  },
     { key:'hitos',        label:'⟦ MILESTONES ⟧'    },
@@ -14543,7 +14873,7 @@ function buildAchievementFeed(wrap) {
   };
 
   // ── READY TO CLAIM section (always at the very top) ──────────────
-  const allClaimable = ACHIEVEMENTS.filter(a => {
+  const allClaimable = _ACT.filter(a => {
     const e = _getAchEntry(a.id);
     return e.claimable !== null && e.claimable > e.awarded;
   }).filter(_matchesTierFilter);
@@ -14603,7 +14933,7 @@ function buildAchievementFeed(wrap) {
   }
 
   // ── CLOSE TO UNLOCK (top 3 by % toward next tier, ≥70%) ──────────────
-  const closeToUnlock = ACHIEVEMENTS
+  const closeToUnlock = _ACT
     .filter(_matchesTierFilter)
     .filter(a => {
       const e = _getAchEntry(a.id);
@@ -14652,7 +14982,7 @@ function buildAchievementFeed(wrap) {
   }
 
   visibleCats.forEach(cat => {
-    const achs = ACHIEVEMENTS.filter(a => a.category === cat.key).filter(_matchesTierFilter);
+    const achs = _ACT.filter(a => a.category === cat.key).filter(_matchesTierFilter);
     if (!achs.length) return;
 
     // ── Sort: claimable first → in-progress (by % desc) → maxed → locked ─
@@ -15880,6 +16210,18 @@ function updateStreakOnLoad() {
     }
     // Clear any legacy penalty quest left over from before the penalty system was removed
     if (state.penaltyQuest) state.penaltyQuest = null;
+    // ── COMEBACK RITUAL (2026-09) — a real return after ≥3 days away gets a warm,
+    // shame-free welcome (nothing lost) INSTEAD of the daily harvest/quote chain. For
+    // an RSD brain, the re-entry deciding blip-vs-relapse is worth its own moment.
+    {
+      const _dA = new Date(state.lastActiveDay + 'T12:00:00'), _dB = new Date(today + 'T12:00:00');
+      const _gapDays = Math.round((_dB - _dA) / 86400000);
+      if (_gapDays >= 3) {
+        _pendingAnims.push(() => showComebackOverlay(_gapDays));
+        state.lastActiveDay = today; saveState();
+        return;
+      }
+    }
     // Late check-in: if any habits were missed yesterday, let the user log them first.
     // Fires before the harvest briefing so the briefing reflects the final logged state.
     const _missedYest = state.habitos.filter(h => !h.done || !h.done[y]);
@@ -16151,13 +16493,10 @@ function showHarvestOverlay(info) {
   // ── TODAY section ──
   const _streak = state.streak || 0;
   const _todayFocus = (state.dayReflections && state.dayReflections[info.dateKey] && state.dayReflections[info.dateKey].tomorrow) || '';
-  const _cacheOpen = !(state.dailyCache && state.dailyCache.dateKey === todayKey());
   const todayHtml = `
     <div class="briefing-divider"></div>
     <div class="briefing-today-label">⟦ TODAY ⟧</div>
-    <div class="briefing-today-row">${_streak > 0 ? `🔥 ${_streak}-day streak — keep it alive` : '⚔ Start a new streak today'}</div>
-    ${_todayFocus ? `<div class="briefing-focus">🎯 #1 FOCUS · ${_rflEsc(_todayFocus)}</div>` : ''}
-    ${_cacheOpen ? `<div class="briefing-cache-hint">📦 Complete your first quest to open today's cache</div>` : ''}`;
+    ${_todayFocus ? `<div class="briefing-focus">🎯 #1 FOCUS · ${_rflEsc(_todayFocus)}</div>` : ''}`;
   const ov = document.createElement('div');
   ov.className = 'harvest-overlay';
   ov.innerHTML = `
@@ -16183,13 +16522,32 @@ function showHarvestOverlay(info) {
   }, 12000);
 }
 
+// A starter/"sauce" class is daily-only (no weekly/onetime). It masters purely by
+// DAYS — do its daily `masteryDays` times (a full week for T1), shown as %.
+function _classIsDaily(classId){ const d = CLASS_QUESTS[classId]; return !!(d && d.daily && !d.weekly && !d.onetime); }
+function getClassMasteryDays(classId){ return Object.keys(((state.classData.classQuests||{})[classId]||{}).dailyDone || {}).length; }
+function getClassMasteryPct(classId){
+  const cls = CLASSES[classId]; if(!cls) return 0;
+  if(_classIsDaily(classId)) return Math.min(100, Math.round(getClassMasteryDays(classId) / (cls.masteryDays||7) * 100));
+  const pts = (state.classData.masteryPoints || {})[classId] || 0;
+  const thr = CLASS_MASTERY_THRESHOLD[classId] || 100;
+  return Math.min(100, Math.round(pts/thr*100));
+}
 function checkMasteryByPoints(classId) {
   if (state.classData.masteredClasses[classId]) return;
+  const cls = CLASSES[classId];
+  if (_classIsDaily(classId)) {
+    // Day-based: 7 days of the daily (not necessarily consecutive — no streak pressure).
+    if (getClassMasteryDays(classId) >= ((cls && cls.masteryDays) || 7)) applyMasteryReward(classId);
+    return;
+  }
   const threshold = CLASS_MASTERY_THRESHOLD[classId] || 100;
   const pts = (state.classData.masteryPoints || {})[classId] || 0;
-  // One-time quest (The Trial) must be completed before mastery is granted
+  // One-time quest (The Trial) must be completed before mastery — but classes that
+  // define no onetime quest just master on hitting the threshold.
+  const hasTrial  = !!(CLASS_QUESTS[classId] && CLASS_QUESTS[classId].onetime);
   const trialDone = !!(state.classData.classQuests?.[classId]?.onetimeDone);
-  if (pts >= threshold && trialDone) applyMasteryReward(classId);
+  if (pts >= threshold && (trialDone || !hasTrial)) applyMasteryReward(classId);
 }
 
 function tickMasteryOnLoad() {
@@ -16544,17 +16902,20 @@ function renderHeader() {
   // HUD currency
   const _hgv=document.getElementById('hudGoldVal'); if(_hgv) _hgv.textContent=(state.gold||0).toLocaleString();
   const _hsv=document.getElementById('hudShardVal'); if(_hsv) _hsv.textContent=(state.shards||0).toLocaleString();
-  statStreak.textContent=state.streak;
+  // PERFECT micro (was STREAK, 2026-09) — lifetime count of perfect days; only ever
+  // climbs, so it can never signal failure. Streak is still computed elsewhere for
+  // the aura/achievements, just not shown as a headline.
+  const _pd = (state.logros && state.logros.perfectDayCount) || 0;
+  statStreak.textContent = _pd;
   const _todayDone=state.habitos.filter(h=>h.done[today]).length;
   const _todayPct=state.habitos.length ? _todayDone/state.habitos.length : 0;
   const _streakMicro = statStreak.closest('.micro');
   if (_streakMicro) {
-    // Streak tier: 0(0-13)→1(14-29)→2(30-59)→3(60-99)→4(100-199)→5(200-364)→6(365+)
-    const _s = state.streak || 0;
-    const _tier = _s >= 365 ? 6 : _s >= 200 ? 5 : _s >= 100 ? 4 : _s >= 60 ? 3 : _s >= 30 ? 2 : _s >= 14 ? 1 : 0;
+    // Milestone tint by lifetime perfect-day count (trophy colour, not pressure).
+    const _tier = _pd >= 365 ? 6 : _pd >= 200 ? 5 : _pd >= 100 ? 4 : _pd >= 60 ? 3 : _pd >= 30 ? 2 : _pd >= 14 ? 1 : 0;
     for (let i = 0; i <= 6; i++) _streakMicro.classList.remove('streak-tier-' + i);
     _streakMicro.classList.add('streak-tier-' + _tier);
-    _streakMicro.classList.toggle('streak-secured', _todayPct >= 0.7);
+    _streakMicro.classList.toggle('streak-secured', _todayPct >= 1);
   }
   statQuests.textContent=`${state.habitos.filter(h=>h.done[today]).length}/${state.habitos.length}`;
   statWeek.textContent=`${state.weekly.filter(w=>w.done[week]).length}/${state.weekly.length}`;
@@ -17175,9 +17536,8 @@ function renderNegativeItem(task, periodKey) {
     if (task.xp) { const xc=document.createElement('span'); xc.className='gain-chip xp-chip'; xc.textContent=`+${task.xp} EXP`; gains.appendChild(xc); }
   }
 
-  // ── HP penalty chip ──
-  const pen = document.createElement('div'); pen.className = 'neg-penalty';
-  pen.textContent = `-${task.hp||30} HP`;
+  // HP penalty chip REMOVED (2026-09) — HP is hidden/vestigial, so "-30 HP" was a
+  // meaningless, mildly punitive number. The relapse tracking itself stays.
 
   // ── Actions ──
   const actions = document.createElement('div'); actions.className = 'quest-actions';
@@ -17199,7 +17559,7 @@ function renderNegativeItem(task, periodKey) {
   // ── Bottom row: gains · HP penalty · actions ──
   const botRow = document.createElement('div'); botRow.className = 'neg-bottom-row';
   if (gains.children.length) botRow.appendChild(gains);
-  botRow.appendChild(pen); botRow.appendChild(actions);
+  botRow.appendChild(actions);
   el.appendChild(botRow);
 
   wrap.appendChild(el);
@@ -17282,24 +17642,275 @@ function isWeekMastered() {
   return dailyDone && weeklyDone && avoidClean;
 }
 
+// ── HABIT PROGRESS BARS (2026-09) — replace the streak headline with three
+// always-filling, never-punishing bars. Missing a day never empties them; they
+// just fill more the more you do. No streak, no clock, no penalty.
+//  · THIS WEEK / THIS MONTH  = habit completions vs the period's capacity (a "limit bar")
+//  · POTENTIAL               = lifetime PERFECT days (all habits done in a day) toward 365,
+//                              reached whenever you reach it — 365 days or 600, doesn't matter.
+function _habitBarsData(){
+  const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const now = new Date();
+  // Current week, Monday→Sunday
+  const monday = new Date(now); const dow = (now.getDay()+6)%7; monday.setDate(now.getDate()-dow); monday.setHours(0,0,0,0);
+  let wDone=0, wCap=0;
+  for(let i=0;i<7;i++){ const d=new Date(monday); d.setDate(monday.getDate()+i); const inf=getHabitPct(fmt(d)); if(inf){ wDone+=inf.done; wCap+=inf.total; } }
+  // Current month
+  const y=now.getFullYear(), m=now.getMonth(), dim=new Date(y,m+1,0).getDate();
+  let mDone=0, mCap=0;
+  for(let d=1; d<=dim; d++){ const inf=getHabitPct(`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`); if(inf){ mDone+=inf.done; mCap+=inf.total; } }
+  const perfect = (state.logros && state.logros.perfectDayCount) || 0;
+  return { wDone, wCap, mDone, mCap, perfect };
+}
+function renderHabitBars(){
+  const s = _habitBarsData();
+  const card = document.createElement('div'); card.className = 'habit-bars-card';
+  const bar = (label, val, cap, color) => {
+    const pct = cap>0 ? Math.min(100, Math.round(val/cap*100)) : 0;
+    const maxed = pct >= 100;
+    // Filling the bar to 100% is the ONLY place a 👑 award shows (this is where the
+    // old "Week Mastered" banner moved to) — the reward lives with the progress.
+    const award = maxed ? `<span class="hbar-award" title="Filled — mastered!">👑</span>` : '';
+    return `<div class="hbar${maxed?' hbar-maxed':''}">`
+      + `<div class="hbar-top"><span class="hbar-label" style="color:${color}">${label}${award}</span><span class="hbar-val" style="color:${color}">${pct}%</span></div>`
+      + `<div class="hbar-track"><div class="hbar-fill" style="width:${pct}%;background:${color};box-shadow:0 0 6px ${color}"></div></div>`
+      + `</div>`;
+  };
+  const pPct = Math.min(100, Math.round(s.perfect/365*100));
+  card.innerHTML =
+    bar('THIS WEEK', s.wDone, s.wCap, '#4dd0e1')
+    + bar('THIS MONTH', s.mDone, s.mCap, '#82b1ff')
+    + `<div class="hbar hbar-potential">`
+    +   `<div class="hbar-top"><span class="hbar-label" style="color:#b388ff">✦ POTENTIAL</span><span class="hbar-val" style="color:#b388ff">${pPct}%</span></div>`
+    +   `<div class="hbar-track"><div class="hbar-fill" style="width:${pPct}%;background:linear-gradient(90deg,#b388ff,#ffd54f);box-shadow:0 0 8px rgba(179,136,255,0.6)"></div></div>`
+    +   `<div class="hbar-note">Every day you complete ALL your habits fills this a little. At your pace — reaching 365 is reaching it, whether it takes 365 days or 600.</div>`
+    + `</div>`;
+  return card;
+}
+
+// ── CURRENT QUEST — the trigger. Pick the first undone habit in list order, which
+// now flows morning → anytime → night (the real-day rhythm). App decides, not you. ──
+function getCurrentQuestHabit(){
+  const today = todayKey();
+  let undone = state.habitos.filter(h => !h.done[today] && !_questSkips.has(h.id));
+  if(!undone.length) undone = state.habitos.filter(h => !h.done[today]); // all deferred → ignore skips
+  return undone[0] || null;
+}
+// Variable reward (2026-09) — most completions are a normal burst, but sometimes a
+// bigger STELLAR one and rarely a SUPERNOVA jackpot. Unpredictable payoff keeps the
+// dopamine alive past the habituation that kills same-every-time rewards.
+function _rollStellarTier(){
+  const r = Math.random();
+  if(r < 0.045) return 'supernova';   // ~4.5%
+  if(r < 0.22)  return 'stellar';      // ~17.5%
+  return 'normal';                     // ~78%
+}
+function completeCurrentQuest(id){
+  const tier = _rollStellarTier();
+  _cqCompleting = true;
+  toggleQuest('habitos', todayKey(), id); // awards XP/stats, perfect-day, streaks + re-renders
+  _cqCompleting = false;
+  playStellarComplete(tier);
+  showStellarBurst(tier);
+  if(navigator.vibrate) navigator.vibrate(tier==='supernova'?[40,50,170,50,340]:tier==='stellar'?[35,45,150,45,290]:[30,40,130,40,260]);
+  if(tier !== 'normal'){
+    showStellarBanner(tier);
+    const bonus = tier==='supernova' ? (30 + Math.floor(Math.random()*40)) : (10 + Math.floor(Math.random()*14));
+    const prevLv = calcLevel(state.totalXp).level;
+    state.totalXp += bonus; state.col += bonus;
+    const newLv = calcLevel(state.totalXp).level;
+    saveState();
+    setTimeout(()=>showNotif(`✦ ${tier==='supernova'?'SUPERNOVA':'STELLAR'} BONUS · +${bonus} EXP`), 420);
+    if(newLv > prevLv) setTimeout(()=>renderAll(), 30);
+  }
+}
+// ── 2-MINUTE "JUST START" — the anti-activation-wall tool. Permission to do only
+// two minutes; starting is the hard part, finishing takes care of itself. ──
+let _startTimer = null;
+function stopTwoMinTimer(){
+  if(_startTimer){ clearInterval(_startTimer.tick); if(_startTimer.el) _startTimer.el.remove(); _startTimer = null; }
+}
+function _playTimerChime(){
+  if(!soundEnabled || !_ACtx) return;
+  try{ const ctx=_getCtx(), t=ctx.currentTime;
+    [880,1174.66].forEach((f,i)=>{ const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
+      const st=t+i*0.14; g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(0.12,st+0.01); g.gain.exponentialRampToValueAtTime(0.001,st+0.5);
+      o.connect(g); g.connect(ctx.destination); o.start(st); o.stop(st+0.55); });
+  }catch(e){}
+}
+function startTwoMinTimer(habitId){
+  stopTwoMinTimer();
+  const h = state.habitos.find(x => x.id === habitId); if(!h) return;
+  const endTs = Date.now() + 120*1000; let chimed = false;
+  const pill = document.createElement('div'); pill.className = 'start-timer-pill'; document.body.appendChild(pill);
+  _startTimer = { habitId, endTs, el:pill, tick:null };
+  function draw(){
+    const rem = Math.max(0, Math.round((endTs - Date.now())/1000));
+    const ready = rem <= 0;
+    const mm = Math.floor(rem/60), ss = String(rem%60).padStart(2,'0');
+    pill.classList.toggle('stp-ready', ready);
+    pill.innerHTML =
+      `<div class="stp-label">${ready ? '✦ You started — that was the hard part.' : '▷ JUST START · ' + _escWork(h.text)}</div>`
+      + `<div class="stp-mid"><span class="stp-time">${mm}:${ss}</span><div class="stp-actions">`
+      +   `<button class="stp-done">✓ DONE</button>`
+      +   `<button class="stp-stop">${ready ? 'keep going' : 'stop'}</button>`
+      + `</div></div>`;
+    pill.querySelector('.stp-done').onclick = () => { const id = _startTimer && _startTimer.habitId; stopTwoMinTimer(); if(id) completeCurrentQuest(id); };
+    pill.querySelector('.stp-stop').onclick = () => stopTwoMinTimer();
+    if(ready && !chimed){ chimed = true; _playTimerChime(); if(navigator.vibrate) navigator.vibrate([30,60,120]); }
+  }
+  draw();
+  _startTimer.tick = setInterval(draw, 1000);
+}
+// Brief centered flash for the rarer reward tiers.
+function showStellarBanner(tier){
+  const el = document.createElement('div'); el.className = 'stellar-banner stellar-banner-' + tier;
+  el.textContent = tier==='supernova' ? '✦✦ SUPERNOVA ✦✦' : '✦ STELLAR ✦';
+  document.body.appendChild(el);
+  setTimeout(()=>{ el.classList.add('sb-out'); setTimeout(()=>el.remove(), 400); }, tier==='supernova'?1500:1100);
+}
+// COMEBACK RITUAL overlay — warm, shame-free re-entry after a gap. Reassures that
+// nothing was lost and hands over a single "continue" action.
+function showComebackOverlay(gapDays){
+  const lv = calcLevel(state.totalXp).level;
+  const grade = (typeof getHunterGrade === 'function' ? (getHunterGrade()||{}).tier : null) || state.hunterGrade || 'F';
+  const perfect = (state.logros && state.logros.perfectDayCount) || 0;
+  const away = gapDays >= 60 ? `about ${Math.round(gapDays/30)} months` : gapDays >= 14 ? `about ${Math.round(gapDays/7)} weeks` : `${gapDays} days`;
+  const ov = document.createElement('div'); ov.className = 'comeback-overlay';
+  ov.innerHTML =
+    `<div class="cb-stars"></div>`
+    + `<div class="cb-card">`
+    +   `<div class="cb-eyebrow">▶ WELCOME BACK</div>`
+    +   `<div class="cb-title">You're back.</div>`
+    +   `<div class="cb-msg">You were away ${away} — and <b>nothing was lost</b>. Your climb was here the whole time, waiting.</div>`
+    +   `<div class="cb-stats">`
+    +     `<div class="cb-stat"><div class="cb-stat-num">${lv}</div><div class="cb-stat-lbl">LEVEL</div></div>`
+    +     `<div class="cb-stat"><div class="cb-stat-num">${grade}</div><div class="cb-stat-lbl">GRADE</div></div>`
+    +     `<div class="cb-stat"><div class="cb-stat-num">${perfect}</div><div class="cb-stat-lbl">PERFECT DAYS</div></div>`
+    +   `</div>`
+    +   `<div class="cb-sub">Don't restart. Just continue — one quest is all it takes.</div>`
+    +   `<button class="cb-btn" id="cbGo">Pick up where you left off →</button>`
+    + `</div>`;
+  document.body.appendChild(ov);
+  const go = () => { ov.classList.add('cb-out'); setTimeout(()=>ov.remove(), 360); };
+  ov.querySelector('#cbGo').addEventListener('click', go);
+  ov.addEventListener('click', e => { if(e.target === ov) go(); });
+  if(navigator.vibrate) navigator.vibrate([20,40,70]);
+}
+
+function renderCurrentQuest(){
+  const h = getCurrentQuestHabit();
+  const card = document.createElement('div'); card.className = 'current-quest';
+  if(!h){
+    card.classList.add('cq-cleared');
+    card.innerHTML = `<div class="cq-stars"></div><div class="cq-inner"><div class="cq-eyebrow">✦ ALL QUESTS CLEARED ✦</div><div class="cq-title cq-title-done">Today is done.</div><div class="cq-cleared-sub">Every habit complete. Rest — you earned it.</div></div>`;
+    return card;
+  }
+  const gains = Object.entries(h.gains||{}).map(([k,v]) => `<span class="cq-gain" style="color:${(typeof STAT_COLORS!=='undefined'&&STAT_COLORS[k])||'#4dd0e1'}">${k}+${v}</span>`).join('');
+  const moreLeft = state.habitos.filter(x=>!x.done[todayKey()]).length - 1;
+  // Evening cue (2026-09) — at the couch-vs-habit hours, reinforce the trigger.
+  const _hr = new Date().getHours();
+  const eveningCue = _hr >= 20 ? `<div class="cq-evening">🌙 Evening — before the couch wins, just do this one.</div>` : '';
+  card.innerHTML =
+    `<div class="cq-stars"></div>`
+    + `<div class="cq-inner">`
+    +   `<div class="cq-eyebrow">▶ CURRENT QUEST</div>`
+    +   eveningCue
+    +   `<div class="cq-title">${_escWork(h.text)}</div>`
+    +   `<div class="cq-gains">${gains}<span class="cq-xp">+${h.xp||0} EXP</span></div>`
+    +   `<button class="cq-complete">✓ DO IT NOW</button>`
+    +   `<div class="cq-secondary"><button class="cq-start">▷ just start · 2 min</button><button class="cq-skip">not right now${moreLeft>0?` · ${moreLeft} more after`:''}</button></div>`
+    + `</div>`;
+  card.querySelector('.cq-complete').addEventListener('click', () => completeCurrentQuest(h.id));
+  card.querySelector('.cq-start').addEventListener('click', () => startTwoMinTimer(h.id));
+  card.querySelector('.cq-skip').addEventListener('click', () => { _questSkips.add(h.id); renderAll(); });
+  return card;
+}
+// Galactic / stellar completion cue — a rising sweep + shimmering bright chord +
+// cascading sparkle bells. Web Audio, same house style as playDailyComplete.
+function playStellarComplete(tier){
+  if(!soundEnabled || !_ACtx) return;
+  const big = tier === 'stellar' || tier === 'supernova';
+  const huge = tier === 'supernova';
+  const boost = huge ? 1.35 : big ? 1.15 : 1;
+  try{
+    const ctx = _getCtx(), t = ctx.currentTime;
+    const comp = ctx.createDynamicsCompressor(); comp.threshold.value=-8; comp.knee.value=6; comp.ratio.value=3; comp.attack.value=0.001; comp.release.value=0.18; comp.connect(ctx.destination);
+    // deep power swell
+    const sub=ctx.createOscillator(), sg=ctx.createGain(); sub.type='sine';
+    sub.frequency.setValueAtTime(70,t); sub.frequency.exponentialRampToValueAtTime(170,t+0.5);
+    sg.gain.setValueAtTime(0,t); sg.gain.linearRampToValueAtTime(0.22,t+0.05); sg.gain.exponentialRampToValueAtTime(0.001,t+0.95);
+    sub.connect(sg); sg.connect(comp); sub.start(t); sub.stop(t+1.0);
+    // rising filtered sweep — whoosh into the stars
+    const sweep=ctx.createOscillator(), swg=ctx.createGain(), swf=ctx.createBiquadFilter();
+    sweep.type='sawtooth'; sweep.frequency.setValueAtTime(200,t); sweep.frequency.exponentialRampToValueAtTime(1500,t+0.55);
+    swf.type='lowpass'; swf.frequency.setValueAtTime(350,t); swf.frequency.exponentialRampToValueAtTime(7000,t+0.55); swf.Q.value=7;
+    swg.gain.setValueAtTime(0,t); swg.gain.linearRampToValueAtTime(0.10,t+0.05); swg.gain.exponentialRampToValueAtTime(0.001,t+0.72);
+    sweep.connect(swf); swf.connect(swg); swg.connect(comp); sweep.start(t); sweep.stop(t+0.78);
+    // shimmering bright major chord (detuned sines)
+    [523.25,659.25,783.99,1046.50].forEach((f,i)=>{ [0,4,-4].forEach(det=>{
+      const o=ctx.createOscillator(), g=ctx.createGain(); o.type='sine'; o.frequency.value=f; o.detune.value=det;
+      const st=t+0.28+i*0.05; g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime((0.085-i*0.013)*boost,st+0.03); g.gain.exponentialRampToValueAtTime(0.001,st+1.4);
+      o.connect(g); g.connect(comp); o.start(st); o.stop(st+1.5);
+    }); });
+    // cascading sparkle bells (a longer, higher cascade on the rarer tiers)
+    const sparkles = big ? [1567.98,2093.00,2637.02,3135.96,4186.01,5274.04] : [1567.98,2093.00,2637.02,3135.96];
+    sparkles.forEach((f,i)=>{
+      const o=ctx.createOscillator(), g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
+      const st=t+0.48+i*0.07; g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(Math.max(0.012,(0.05-i*0.007)*boost),st+0.008); g.gain.exponentialRampToValueAtTime(0.001,st+0.7);
+      o.connect(g); g.connect(comp); o.start(st); o.stop(st+0.75);
+    });
+    // SUPERNOVA — a final rising shimmer octave sweep on top
+    if(huge){
+      const o=ctx.createOscillator(), g=ctx.createGain(); o.type='triangle';
+      o.frequency.setValueAtTime(1046.50,t+0.6); o.frequency.exponentialRampToValueAtTime(4186.01,t+1.2);
+      g.gain.setValueAtTime(0,t+0.6); g.gain.linearRampToValueAtTime(0.08,t+0.7); g.gain.exponentialRampToValueAtTime(0.001,t+1.5);
+      o.connect(g); g.connect(comp); o.start(t+0.6); o.stop(t+1.55);
+    }
+  }catch(e){}
+}
+// Full-screen supernova burst (canvas particles + expanding ring). Scales with tier.
+function showStellarBurst(tier){
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const big = tier === 'stellar', huge = tier === 'supernova';
+  const cv = document.createElement('canvas'); cv.style.cssText = 'position:fixed;inset:0;z-index:9997;pointer-events:none';
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const W = window.innerWidth, H = window.innerHeight;
+  cv.width = W*dpr; cv.height = H*dpr; document.body.appendChild(cv);
+  const g = cv.getContext('2d'); g.scale(dpr, dpr);
+  const cx = W/2, cy = H*0.40;
+  const parts = [];
+  const baseN = huge ? 220 : big ? 150 : 90;
+  const N = reduce ? Math.round(baseN*0.3) : baseN;
+  const spMax = (reduce?4:8) * (huge?1.5:big?1.25:1);
+  // supernova skews gold/white; stellar leans violet-cyan; normal blue-violet
+  const hueBase = huge ? 40 : big ? 250 : 200;
+  const hueRange = huge ? 30 : big ? 90 : 130;
+  for(let i=0;i<N;i++){ const a=Math.random()*Math.PI*2, sp=2+Math.random()*spMax; parts.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,hue:hueBase+Math.random()*hueRange,size:1+Math.random()*(huge?3.4:2.6)}); }
+  const start = performance.now(); const dur = reduce ? 650 : (huge?1450:big?1300:1150);
+  function frame(now){
+    const el = now - start; g.clearRect(0,0,W,H);
+    const ring = el*0.62; g.beginPath(); g.arc(cx,cy,ring,0,Math.PI*2);
+    g.strokeStyle = `rgba(179,136,255,${Math.max(0,0.55-el/700)})`; g.lineWidth = 3; g.stroke();
+    parts.forEach(p=>{ if(p.life<=0) return; p.x+=p.vx; p.y+=p.vy; p.vy+=0.045; p.life-=0.011;
+      g.globalAlpha = Math.max(0,p.life); g.fillStyle = `hsl(${p.hue},90%,72%)`; g.shadowBlur = 8; g.shadowColor = `hsl(${p.hue},90%,72%)`;
+      g.beginPath(); g.arc(p.x,p.y,p.size,0,Math.PI*2); g.fill(); });
+    g.globalAlpha = 1; g.shadowBlur = 0;
+    if(el < dur) requestAnimationFrame(frame); else cv.remove();
+  }
+  requestAnimationFrame(frame);
+}
+
 function renderHabitos() {
   panelTitle.textContent='';
   panelContent.innerHTML='';
   const today=todayKey();
   const isToday=activeDate===today;
   panelSubtitle.textContent=isToday?"Today's Missions":`Viewing: ${activeDate}`;
+  // Streak-shield badge REMOVED (2026-09) — vestigial streak apparatus, gone with
+  // the streak demotion. Header stays clean.
   const headerActions=document.getElementById('panelHeaderActions');
-  if (headerActions) {
-    headerActions.innerHTML='';
-    // Shield badge
-    const _shields = state.streakShields || 0;
-    const shieldBadge = document.createElement('button');
-    shieldBadge.className = 'shield-badge-btn' + (_shields > 0 ? ' has-shields' : ' empty');
-    shieldBadge.title = 'Streak Shields';
-    shieldBadge.innerHTML = `<span class="sb-icon">🛡️</span><span class="sb-count">${_shields}/2</span>`;
-    shieldBadge.addEventListener('click', () => showShieldInfo());
-    headerActions.appendChild(shieldBadge);
-  }
+  if (headerActions) headerActions.innerHTML='';
 
   // Date banner when viewing a past/future day
   if(!isToday){
@@ -17314,29 +17925,9 @@ function renderHabitos() {
     panelContent.appendChild(banner);
   }
 
-  // Streak Repair prompt — only visible right after a break (mirrors the
-  // SHOP-tab gating that's been removed). Costs 25✦ and restores the prior peak.
-  if (isToday && typeof canRepairStreak === 'function' && canRepairStreak()) {
-    const _SR_COST = 25;
-    const banner = document.createElement('div'); banner.className='streak-repair-banner';
-    banner.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;margin:10px 0;border:1px solid rgba(255,112,67,0.45);border-left:3px solid #ff7043;border-radius:6px;background:linear-gradient(90deg,rgba(255,112,67,0.10),rgba(255,112,67,0.02));font-family:\'Rajdhani\',sans-serif;';
-    const _peak = state.lastStreakPeak || 0;
-    const _canPay = (state.shards||0) >= _SR_COST;
-    banner.innerHTML = `
-      <span style="font-size:18px">⚡</span>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:11px;font-weight:600;color:#ff7043;font-family:\'Cinzel\',serif">STREAK BROKEN</div>
-        <div style="font-size:10px;color:var(--sao-text-dim);margin-top:2px">Restore your ${_peak}-day streak for ✦${_SR_COST}. Available only right after a break.</div>
-      </div>
-      <button class="sr-do-btn" ${_canPay?'':'disabled'} style="font-family:\'Cinzel\',serif;font-size:10px;letter-spacing:0.05em;padding:8px 12px;border-radius:4px;border:1px solid #ff7043;background:${_canPay?'#ff7043':'rgba(255,112,67,0.15)'};color:${_canPay?'#1a0e0a':'#ff7043'};cursor:${_canPay?'pointer':'not-allowed'};white-space:nowrap">RESTORE ✦${_SR_COST}</button>`;
-    banner.querySelector('.sr-do-btn').addEventListener('click', () => {
-      if (!_canPay) { showNotif(`[SYSTEM] Need ✦${_SR_COST} — you have ${state.shards||0}.`); return; }
-      if (!canRepairStreak()) { showNotif('⚡ Streak Repair only works right after a break.'); return; }
-      state.shards = (state.shards || 0) - _SR_COST;
-      repairStreak();
-    });
-    panelContent.appendChild(banner);
-  }
+  // Streak Repair prompt REMOVED (2026-09) — streak demoted, no "STREAK BROKEN"
+  // guilt prompt. Progress is now tracked by the always-filling weekly/monthly/
+  // potential bars (renderHabitBars), which can never break or shame.
 
   // Vacation / pause mode banner
   if (state.habitsPaused) {
@@ -17352,40 +17943,28 @@ function renderHabitos() {
     panelContent.classList.remove('habits-paused');
   }
 
-  // Comeback banner: first day back after losing a streak
-  if (isToday && state.streak === 0 && state.streakBrokenAt === today && (state.lastStreakPeak || 0) > 1) {
-    const cb = document.createElement('div'); cb.className = 'comeback-banner';
-    const _shieldsAvail = state.streakShields || 0;
-    const _shieldBtnHtml = _shieldsAvail > 0
-      ? `<button class="comeback-shield-btn" id="cbShieldBtn">🛡️ USE SHIELD · ${_shieldsAvail}/2 AVAILABLE</button>`
-      : '';
-    cb.innerHTML = `<div class="comeback-icon">⚡</div><div style="flex:1"><div class="comeback-title">LAST STREAK LOST · ${state.lastStreakPeak} DAYS</div><div class="comeback-sub">The System remembers. Rise again.</div>${_shieldBtnHtml}</div>`;
-    panelContent.appendChild(cb);
-    if (_shieldsAvail > 0) {
-      setTimeout(() => {
-        const btn = document.getElementById('cbShieldBtn');
-        if (btn) btn.addEventListener('click', e => { e.stopPropagation(); useStreakShield(); });
-      }, 0);
-    }
-  }
+  // Comeback banner REMOVED (2026-09) — no "LAST STREAK LOST" reminder. Coming
+  // back after a break should feel like resuming, not like facing a failure notice.
 
   // Penalty Quest banner removed — the streak now simply resets on a miss (no
   // exercise-based redemption). Shields remain the mercy mechanic.
 
-  // Week Mastered banner — persistent once all habits fulfilled across the week
-  if (isWeekMastered()) {
-    const wm = document.createElement('div'); wm.className = 'week-mastered-banner';
-    wm.innerHTML = `<div class="week-mastered-icon">👑</div><div class="week-mastered-text"><div class="week-mastered-title">⟦ WEEK MASTERED ⟧</div><div class="week-mastered-sub">ALL HABITS COMPLETED THIS WEEK</div></div><div class="week-mastered-icon">👑</div>`;
-    panelContent.appendChild(wm);
-  }
-
-  // Aura info is now embedded in the daily progress bar row below
+  // Week-Mastered banner MOVED (2026-09) — no longer a persistent banner. It now
+  // shows as a 👑 award ON the THIS WEEK bar when that bar reaches 100%
+  // (renderHabitBars), so the celebration lives with the progress it celebrates.
 
   const week=isoWeekKey(new Date(activeDate+'T12:00:00'));
 
   // Yami's daily line — small strip, today's day-of-month quote. Full overlay version
   // fires once per day from updateStreakOnLoad(); this is the persistent minimized form.
+  // ── CURRENT QUEST — the hero/trigger: one app-chosen habit, glowing, first thing. ──
+  if (isToday && !state.habitsPaused && state.habitos.length > 0) panelContent.appendChild(renderCurrentQuest());
+
   if (isToday) panelContent.appendChild(renderYamiStrip());
+
+  // Progress bars (weekly / monthly / potential) — the non-punishing replacement
+  // for the streak headline. Shown on the live day only.
+  if (isToday && !state.habitsPaused && state.habitos.length > 0) panelContent.appendChild(renderHabitBars());
 
   // ── CLASS QUESTS (shown only when a class is equipped) ──
   // Rendered FIRST: these rotate with the equipped class, so they need the
@@ -17431,37 +18010,9 @@ function renderHabitos() {
   dFill.style.width=dPct+'%'; dTrack.appendChild(dFill);
   const dPctTxt=document.createElement('span'); dPctTxt.className='progress-bar-pct-inline'+(dPct===100?' complete':''); dPctTxt.textContent=dPct+'%';
   dRow.appendChild(dTrack); dRow.appendChild(dPctTxt);
-  if (isToday) {
-    const _mult = getHabitCompoundMultiplier();
-    const _auraColor = _mult >= 1.5 ? '#ffd54f' : _mult > 1 ? 'var(--sao-gold)' : 'rgba(255,193,7,0.35)';
-    const _chip = document.createElement('span');
-    _chip.className = 'aura-inline-chip'; _chip.style.color = _auraColor;
-    _chip.textContent = '⚡×' + _mult;
-    _chip.title = `Aura — today's EXP & stat multiplier, built from yesterday's completion rate and your streak. Higher completion → stronger aura tomorrow.`;
-    dRow.appendChild(_chip);
-  }
+  // Aura chip + "tomorrow aura ↑/↓" preview REMOVED (2026-09) — killed the whole
+  // aura mechanic; the daily bar is now a clean, pressure-free % of today's habits.
   dBar.appendChild(dRow);
-  if (isToday) {
-    const _streakBonus = Math.min(0.25, (state.streak||0) * 0.005);
-    const _prevMult = dTotal ? Math.round((1 + (dDone/dTotal)*0.5 + _streakBonus)*100)/100 : 1;
-    const _curMult = getHabitCompoundMultiplier();
-    const _pc = _prevMult > _curMult ? '#69f0ae' : _prevMult < _curMult ? '#ff5252' : 'var(--sao-text-dim)';
-    const _prevEl = document.createElement('div'); _prevEl.className = 'aura-preview-line';
-    _prevEl.title = `Projected aura multiplier for tomorrow based on today's progress so far.`;
-    _prevEl.innerHTML = `Tomorrow aura: <span style="color:${_pc};font-weight:600">×${_prevMult}${_prevMult>_curMult?' ↑':_prevMult<_curMult?' ↓':''}</span>`;
-    dBar.appendChild(_prevEl);
-    if (dTotal > 0 && dPct < 70) {
-      const _needed = Math.ceil(dTotal * 0.7);
-      const _remaining = Math.max(0, _needed - dDone);
-      if (_remaining > 0) {
-        const _threshEl = document.createElement('div'); _threshEl.className = 'streak-threshold-hint';
-        _threshEl.textContent = state.streak > 0
-          ? `⚠ ${_remaining} more habit${_remaining > 1 ? 's' : ''} to secure streak`
-          : `⚔ ${_remaining} more to start a streak`;
-        dBar.appendChild(_threshEl);
-      }
-    }
-  }
   const dBanner=document.createElement('div'); dBanner.className='quests-complete-banner'+(dPct===100?' active':'');
   if(dPct===100) dBanner.textContent='⟦ ALL QUESTS COMPLETE ⟧';
   dBar.appendChild(dBanner); dailyGroup.appendChild(dBar);
@@ -17469,10 +18020,30 @@ function renderHabitos() {
     dailyGroup.appendChild(_emptyQuestCard('☀', 'NO DAILY QUESTS', 'Tap + to add your first daily habit and begin the climb.', 'var(--sao-cyan)'));
   }
   const _morning=state.habitos.filter(h=>(h.timeOfDay||'morning')==='morning');
+  const _anytime=state.habitos.filter(h=>h.timeOfDay==='anytime');
   const _night=state.habitos.filter(h=>h.timeOfDay==='night');
-  function _timeHdr(t, list, pk) { const d=document.createElement('div'); d.className=`time-subheader ${t}`; const done=list.filter(h=>!!h.done[pk]).length; d.innerHTML=`<span>${t==='morning'?'🌅 MORNING':'🌙 NIGHT'}</span><span class="time-subheader-count">${done}/${list.length}</span>`; return d; }
-  if(_morning.length){ dailyGroup.appendChild(_timeHdr('morning',_morning,activeDate)); dailyGroup.appendChild(renderQuestList(_morning,{listKey:'habitos',expandKey:'habitos-morning',periodKey:activeDate,isWeekly:false,allowEdit:true,allowDelete:true,allowReorder:true})); }
-  if(_night.length){ dailyGroup.appendChild(_timeHdr('night',_night,activeDate)); dailyGroup.appendChild(renderQuestList(_night,{listKey:'habitos',expandKey:'habitos-night',periodKey:activeDate,isWeekly:false,allowEdit:true,allowDelete:true,allowReorder:true})); }
+  // Three blocks now: morning / anytime / night. Default-collapse the ANCHORED block
+  // that isn't "now" (morning before 18:00, night after) when both anchored blocks
+  // exist; ANYTIME is flexible so it stays open. Tap a header to override.
+  const _curBlock = new Date().getHours() < 18 ? 'morning' : 'night';
+  const _bothAnchored = _morning.length > 0 && _night.length > 0;
+  const _LBL = { morning:'🌅 MORNING', anytime:'⭐ ANYTIME', night:'🌙 NIGHT' };
+  function _timeSection(t, list) {
+    if (!list.length) return;
+    let collapsed;
+    if (habitTimeCollapse[t] !== undefined) collapsed = habitTimeCollapse[t];
+    else if (t === 'anytime') collapsed = false;
+    else collapsed = isToday && _bothAnchored ? (t !== _curBlock) : false;
+    const done = list.filter(h=>!!h.done[activeDate]).length;
+    const hdr = document.createElement('div'); hdr.className = `time-subheader ${t}`; hdr.style.cursor = 'pointer';
+    hdr.innerHTML = `<span>${collapsed?'▸':'▾'} ${_LBL[t]}</span><span class="time-subheader-count">${done}/${list.length}</span>`;
+    hdr.addEventListener('click', () => { habitTimeCollapse[t] = !collapsed; renderAll(); });
+    dailyGroup.appendChild(hdr);
+    if (!collapsed) dailyGroup.appendChild(renderQuestList(list,{listKey:'habitos',expandKey:'habitos-'+t,periodKey:activeDate,isWeekly:false,allowEdit:true,allowDelete:true,allowReorder:true}));
+  }
+  _timeSection('morning', _morning);
+  _timeSection('anytime', _anytime);
+  _timeSection('night', _night);
 
   if (isToday && !state.habitsPaused && state.habitos.length > 0) {
     const _sug = getSystemSuggestion();
@@ -17534,23 +18105,34 @@ function renderHabitos() {
   const nBroken = negs.filter(n=>n.lastBreakDate===activeDate).length;
   const bestStreak = negs.length ? Math.max(...negs.map(n=>getAvoidStreak(n))) : 0;
   const streakMeta = nBroken > 0 ? `⚠ ${nBroken} relapse today` : (bestStreak > 0 ? `🛡️ ${bestStreak}d clean` : 'no relapses');
-  nh.innerHTML=`<span class="section-label neg">⟦ AVOID ⟧</span><div class="section-line neg"></div><span class="section-meta">${streakMeta}</span>`;
-  nh.appendChild(nAddBtn); avoidGroup.appendChild(nh);
-  const negList=document.createElement('div'); negList.className='quest-list';
-  negs.forEach(task=>negList.appendChild(renderNegativeItem(task,activeDate)));
-  if (negs.length === 0) {
-    negList.appendChild(_emptyQuestCard('🚫', 'NOTHING TO AVOID', 'Tap + to track a habit you’re working to break.', 'var(--sao-red)'));
+  // Collapsible + default-collapsed (2026-09) to cut scroll; the header keeps the
+  // clean/relapse status visible so nothing important is hidden.
+  const _avoidOpen = !!completedExpanded['avoid-open'];
+  nh.style.cursor = 'pointer';
+  nh.innerHTML=`<span class="section-label neg">${_avoidOpen?'▾':'▸'} ⟦ AVOID ⟧</span><div class="section-line neg"></div><span class="section-meta">${streakMeta}</span>`;
+  nh.appendChild(nAddBtn);
+  nh.addEventListener('click', e => { if(nAddBtn.contains(e.target)) return; completedExpanded['avoid-open'] = !_avoidOpen; renderAll(); });
+  avoidGroup.appendChild(nh);
+  if (_avoidOpen) {
+    const negList=document.createElement('div'); negList.className='quest-list';
+    negs.forEach(task=>negList.appendChild(renderNegativeItem(task,activeDate)));
+    if (negs.length === 0) {
+      negList.appendChild(_emptyQuestCard('🚫', 'NOTHING TO AVOID', 'Tap + to track a habit you’re working to break.', 'var(--sao-red)'));
+    }
+    avoidGroup.appendChild(negList);
   }
-  avoidGroup.appendChild(negList);
   panelContent.appendChild(avoidGroup);
 
   // ── SOCIAL QUICK-LOG ──
   if (isToday) {
     const socialGroup = document.createElement('div'); socialGroup.className = 'section-group';
     socialGroup.id = 'socialLogSection';
-    const ssh = document.createElement('div'); ssh.className = 'section-header';
-    ssh.innerHTML = `<span class="section-label" style="color:#ea80fc;opacity:0.85">⟦ SOCIAL LOG ⟧</span><div class="section-line" style="background:rgba(234,128,252,0.25)"></div>`;
+    const _socialOpen = !!completedExpanded['social-open'];
+    const ssh = document.createElement('div'); ssh.className = 'section-header'; ssh.style.cursor = 'pointer';
+    ssh.innerHTML = `<span class="section-label" style="color:#ea80fc;opacity:0.85">${_socialOpen?'▾':'▸'} ⟦ SOCIAL LOG ⟧</span><div class="section-line" style="background:rgba(234,128,252,0.25)"></div>`;
+    ssh.addEventListener('click', () => { completedExpanded['social-open'] = !_socialOpen; renderAll(); });
     socialGroup.appendChild(ssh);
+    if (_socialOpen) {
     const qlWrap = document.createElement('div');
     const chipsRow = document.createElement('div'); chipsRow.className = 'social-quicklog-chips';
     SOCIAL_STATS.forEach(def => {
@@ -17579,6 +18161,7 @@ function renderHabitos() {
       }
     }
     socialGroup.appendChild(qlWrap);
+    }
     panelContent.appendChild(socialGroup);
   }
 
@@ -19654,318 +20237,379 @@ function renderMerchantPanel() {
   return wrap;
 }
 
-function renderTrabajo() {
-  // City branding (name + tier) belongs to the CITY sub-tab only — other views just say WORK,
-  // so QUESTS/FORGE/WORKSHOP aren't cluttered with a title that isn't about them.
-  const _city = getCityTier();
-  panelTitle.textContent = workShopView === 'guild'
-    ? `${getCityName().toUpperCase()} · ${_city.name.toUpperCase()}`
-    : 'WORK';
-  panelSubtitle.textContent = getDistrictSubtitle(workShopView);
-  // Monthly work report — fires once on first WORK tab visit of a new month
-  const _curMonthKey = `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`;
-  if (!state.lastWorkMonthReport) {
-    state.lastWorkMonthReport = _curMonthKey; saveState();
-  } else if (state.lastWorkMonthReport !== _curMonthKey) {
-    state.lastWorkMonthReport = _curMonthKey; saveState();
-    const _mStats = computeLastMonthWorkStats();
-    if (_mStats.tasksCompleted > 0) setTimeout(() => showMonthlyWorkReport(_mStats), 700);
-  }
-  panelContent.innerHTML='';
-  // Gold display in header
-  const _hdrActions = document.getElementById('panelHeaderActions');
-  if (_hdrActions) {
-    _hdrActions.innerHTML = '';
-    const _gd = document.createElement('div');
-    _gd.className = 'work-gold-header'; _gd.id = 'workGoldDisplay';
-    _gd.innerHTML = `${goldImg(22)}<span class="wgh-val">${(state.gold||0).toLocaleString()}g</span>`;
-    _hdrActions.appendChild(_gd);
-  }
+// ═══════════════════════════════════════════════════════════════════
+// WORK TAB — rebuilt 2026 as a simple, guilt-free task tracker.
+// Old RPG machinery (forge / city / dungeons / materials / gold / worker
+// grind / commissions / 4-way toggle) is intentionally NOT rendered here.
+// Those functions still exist dormant for save-data compatibility, but the
+// WORK tab now shows only: cumulative points that ONLY go up, a level bar,
+// a "done today" count, and the task list. No streak, no economy.
+// ═══════════════════════════════════════════════════════════════════
 
-  // ── View toggle ──────────────────────────────────────────
-  const toggleBar = document.createElement('div'); toggleBar.className = 'work-view-toggle';
-  [['workbench','⚒ QUESTS'],['forge','🔥 FORGE'],['workshop','🛠 WORKSHOP'],['guild','🏛 CITY']].forEach(([v,label]) => {
-    const btn = document.createElement('button');
-    btn.className = 'work-view-btn' + (workShopView===v?' active':'');
-    btn.textContent = label;
-    btn.addEventListener('click', () => { workShopView=v; renderAll(); });
-    toggleBar.appendChild(btn);
-  });
-  panelContent.appendChild(toggleBar);
+// tiny HTML escaper for user-entered task text
+function _escWork(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-  // ── Material bar — pinned across all three views ─────────
-  // Shows T1 / T2 / T3 stockpiles in stacked rows. Each row gets its OWN health
-  // pip computation (tier-local avg) so a tier doesn't read "red" just because
-  // its absolute counts are low — what matters is balance WITHIN the tier.
-  const _matBar = document.createElement('div'); _matBar.className = 'work-mat-bar work-mat-bar-multi';
-  const _MAT_DEF = [
-    { id:'timber',  color:'#a5d6a7' },
-    { id:'scroll',  color:'#82b1ff' },
-    { id:'crystal', color:'#ea80fc' },
-    { id:'gear',    color:'#80deea' },
-  ];
-  function _pipColorFor(q, avg) {
-    if (avg < 5) return null; // tier-local threshold — skip pip when stockpile is too small to matter
-    const ratio = q / Math.max(1, avg);
-    if (ratio < 0.4) return '#ef5350';
-    if (ratio < 0.7) return '#ffd54f';
-    return '#69f0ae';
-  }
-  function _renderMatTierRow(tier, label, tierAccent) {
-    const bucket = getMatBucket(tier);
-    const qtys = _MAT_DEF.map(m => bucket[m.id] || 0);
-    const total = qtys.reduce((a,b)=>a+b,0);
-    const avg = total / qtys.length;
-    // Skip empty T2/T3 rows entirely (mobile declutter); always show T1.
-    if (tier > 1 && total === 0) return '';
-    const items = _MAT_DEF.map(m => {
-      const q = bucket[m.id] || 0;
-      const meta = getMatTierMeta(m.id, tier);
-      const pc = _pipColorFor(q, avg);
-      const pip = pc ? `<span class="wmb-pip" style="background:${pc};box-shadow:0 0 4px ${pc}"></span>` : '';
-      const dim = q === 0 ? ' wmb-empty' : '';
-      return `<span class="wmb-item${dim}"><span class="wmb-emoji">${matIconHtml(m.id, 16, tier)}</span><span class="wmb-qty" style="color:${m.color}">${q}</span>${pip}</span>`;
-    }).join('<span class="wmb-sep">·</span>');
-    return `<div class="wmb-row"><span class="wmb-tier" style="color:${tierAccent}">${label}</span>${items}</div>`;
-  }
-  _matBar.innerHTML =
-    _renderMatTierRow(1, 'T1', '#9aa0a6') +
-    _renderMatTierRow(2, 'T2', '#b388ff') +
-    _renderMatTierRow(3, 'T3', '#ffd700');
-  // 🏛 City status (name, mood, next-tier progress) — CITY tab only, so QUESTS/FORGE/WORKSHOP
-  // aren't cluttered with city flavor that isn't about them.
-  if (workShopView === 'guild') panelContent.appendChild(renderCityStatus());
+// Every task pays out the SAME point pool at 100% — no difficulty tiers to pick.
+// The reward comes from PROGRESS, not from classifying the task up front.
+function workTaskPool(){ return WORK_TASK_REWARD.base.wxp; } // 25
+function workTaskProgress(task){ return Math.max(0, Math.min(100, Math.round(task && task.progress || 0))); }
 
-  // The FORGE view renders its own full ⟦ MATERIALS ⟧ panel, so the slim pinned bar
-  // would only duplicate it there. Show the pinned bar on workbench & guild only.
-  if (workShopView !== 'forge') panelContent.appendChild(_matBar);
+// Set a task's completion %. Points are awarded proportionally and IMMEDIATELY,
+// so moving a big task 25% at a time pays out 25% at a time — the anti-avoidance
+// trick. Pulling the % back down cleanly refunds. 100% files it under Done today.
+// ── TODAY'S PROGRESS (2026-09) — aggregate every % you move across every task today
+// into one visible number, so a scattered/bursty day reads as REAL progress instead
+// of "0 done". Resets daily; all-time points/level climb forever, separately. ──
+function _ensureWorkToday(){
+  const tk = todayKey();
+  if(!state.workToday || state.workToday.dateKey !== tk) state.workToday = { dateKey: tk, pts:0, touched:[], finished:0 };
+  return state.workToday;
+}
+function _workTodayData(){
+  const tk = todayKey();
+  if(!state.workToday || state.workToday.dateKey !== tk) return { pts:0, fronts:0, finished:0 };
+  return { pts: state.workToday.pts||0, fronts:(state.workToday.touched||[]).length, finished: state.workToday.finished||0 };
+}
+// Flow / burst — completing several tasks close together (your productive mode) builds
+// momentum + a small bonus. Rewards the burst instead of fighting it.
+const _WORK_FLOW_WINDOW = 25*60*1000;
+function _workFlowActive(){
+  if(state.workFlow && (Date.now() - (state.workFlow.lastTs||0)) <= _WORK_FLOW_WINDOW) return state.workFlow.count||0;
+  return 0;
+}
+function _bumpWorkFlow(){
+  const now = Date.now();
+  if(!state.workFlow || (now - (state.workFlow.lastTs||0)) > _WORK_FLOW_WINDOW) state.workFlow = { count:0, lastTs:now };
+  state.workFlow.count = (state.workFlow.count||0) + 1; state.workFlow.lastTs = now;
+  return state.workFlow.count;
+}
 
-  // ❄ Winter banner — frozen-city warning + relight prompt. Shown above every sub-view.
-  const _wb = renderWinterBanner();
-  if (_wb) panelContent.appendChild(_wb);
-
-  // ── FORGE view ───────────────────────────────────────────
-  if (workShopView === 'forge') {
-    panelContent.appendChild(renderManinStrip());
-    panelContent.appendChild(renderForge());
-    return;
-  }
-
-  // ── GEAR WORKSHOP view ───────────────────────────────────
-  if (workShopView === 'workshop') {
-    panelContent.appendChild(renderManinStrip());
-    panelContent.appendChild(renderGearWorkshop());
-    return;
-  }
-
-  // ── GUILD view ───────────────────────────────────────────
-  if (workShopView === 'guild') {
-    panelContent.appendChild(renderGuild());
-    return;
-  }
-
-  // ── WORKBENCH view ───────────────────────────────────────
-  panelContent.appendChild(renderWorkStrip());
-  // Daily work command center — chest track cadence (or REST EARNED).
-  panelContent.appendChild(renderWorkdayStatus());
-
-  // Consolidated status strip — the single home for worker rank + next unlock +
-  // specialization (replaces the old slim bar AND the duplicate post-divider badge).
-  {
-    const wlv = calcWorkerLevel(state.workXp || 0);
-    const RANK_CLR = { F:'#9e9e9e', E:'#80deea', D:'#82b1ff', C:'#69f0ae', B:'#ffc107', A:'#ffa726', S:'#ffd700', SS:'#ea80fc', SSS:'#ffffff' };
-    const wCol = RANK_CLR[wlv.rank] || '#ffc107';
-    const xpPct = wlv.level < 99 ? Math.round((wlv.xpProgress / wlv.xpPerLevel) * 100) : 100;
-    let nextUnlock = null;
-    CRAFT_RECIPES.forEach(r => {
-      if (r.legacy || !r.reqWorkerLevel || r.reqWorkerLevel <= wlv.level) return;
-      if (!nextUnlock || r.reqWorkerLevel < nextUnlock.lvl) nextUnlock = { lvl: r.reqWorkerLevel, name: ITEMS_DB[r.itemId]?.name || r.itemId };
-    });
-    const _spec = getWorkSpecialization();
-    const specChip = _spec ? `<span class="qwb-spec" style="--spec-color:${_spec.color}">${_spec.icon} ${_spec.title} · ${_spec.pct}%</span>` : '';
-    const wBar = document.createElement('div'); wBar.className = 'quests-worker-bar';
-    wBar.style.cursor = 'pointer'; wBar.title = 'Tap for worker milestones';
-    wBar.addEventListener('click', showWorkerMilestoneOverlay);
-    wBar.innerHTML = `
-      <div class="qwb-top">
-        <span class="qwb-rank" style="color:${wCol}">⚒ WORKER ${wlv.rank} · LV.${wlv.level}</span>
-        ${specChip}
-        <span class="qwb-next">${nextUnlock ? `🔓 ${nextUnlock.name} @ Lv.${nextUnlock.lvl}` : '✦ all unlocked'}</span>
-      </div>
-      <div class="qwb-track"><div class="qwb-fill" style="width:${xpPct}%;background:${wCol}"></div></div>`;
-    panelContent.appendChild(wBar);
-  }
-
-  // Dungeon section
-  const dungeonWrap=document.createElement('div'); dungeonWrap.className='dungeon-section';
-  dungeonWrap.appendChild(renderDungeon());
-  panelContent.appendChild(dungeonWrap);
-  // One-tap focus session shortcut — only when dungeon is inactive but was used before
-  if (!state.dungeon && state.lastDungeonId && DUNGEON_CONFIG[state.lastDungeonId]) {
-    const _ldc = DUNGEON_CONFIG[state.lastDungeonId];
-    const _fsBtn = document.createElement('button'); _fsBtn.className = 'focus-session-btn';
-    _fsBtn.innerHTML = `<span class="fsb-icon">⚒</span><span>RESUME FOCUS · ${_ldc.emoji} ${_ldc.name.toUpperCase()}</span>`;
-    _fsBtn.addEventListener('click', () => startDungeon(state.lastDungeonId));
-    panelContent.appendChild(_fsBtn);
-  }
-  // Practice boss — dev/test utility, hidden unless devTools flag is set
-  if ((localStorage.getItem('devTools') === '1') && (!state.dungeon || state.dungeon.isPractice)) {
-    const _pbWrap = document.createElement('div'); _pbWrap.style.cssText='display:flex;justify-content:flex-end;padding:2px 0 4px';
-    const _pbBtn = document.createElement('button'); _pbBtn.className='practice-boss-btn';
-    _pbBtn.textContent = '⚔ Practice Boss';
-    _pbBtn.addEventListener('click', () => {
-      const ids = ['e_warrior','d_warrior','c_warrior','b_warrior','a_warrior'];
-      const _sel = document.createElement('select'); _sel.style.cssText='background:#111;color:#eee;border:1px solid #555;border-radius:4px;padding:2px 4px;font-size:11px;margin-right:6px';
-      ids.forEach(id => { const o=document.createElement('option'); o.value=id; o.textContent=id.replace('_',' ').toUpperCase(); _sel.appendChild(o); });
-      _pbWrap.insertBefore(_sel, _pbBtn);
-      _pbBtn.textContent = '▶ GO';
-      _pbBtn.onclick = () => startPracticeBoss(_sel.value);
-    });
-    _pbWrap.appendChild(_pbBtn);
-    panelContent.appendChild(_pbWrap);
-  }
-  // Primary section header for the task list (worker status now lives in the top strip)
-  const div=document.createElement('div'); div.className='dungeon-divider';
-  div.innerHTML='<span>⟦ YOUR QUESTS ⟧</span>'; panelContent.appendChild(div);
-  // Flow state combo widget — upgraded visuals at higher combos
-  if ((state.workCombo || 0) >= 2 && state.workComboLastTs) {
-    const _COMBO_WINDOW = 8 * 60 * 60 * 1000;
-    const _comboRemMs = Math.max(0, _COMBO_WINDOW - (Date.now() - state.workComboLastTs));
-    if (_comboRemMs > 0) {
-      const _hh  = Math.floor(_comboRemMs / 3600000);
-      const _mm  = Math.floor((_comboRemMs % 3600000) / 60000);
-      const _timerStr = _hh > 0 ? `${_hh}h ${_mm}m` : `${_mm}m`;
-      const _pct = (_comboRemMs / _COMBO_WINDOW) * 100;
-      const _combo = state.workCombo;
-      const _comboCls = _combo >= 5 ? ' combo-ultra' : _combo >= 3 ? ' combo-high' : '';
-      const _flameStr = _combo >= 5 ? '🔥🔥🔥' : _combo >= 3 ? '🔥🔥' : '🔥';
-      const _bonusPct = _combo >= 4 ? '+50%' : _combo === 3 ? '+25%' : _combo === 2 ? '+10%' : '';
-      const _bonusStr = _bonusPct ? ` <span style="color:#ffd54f;font-size:10px">${_bonusPct} gold</span>` : '';
-      const _comboEl = document.createElement('div'); _comboEl.className = 'work-combo-widget' + _comboCls;
-      _comboEl.innerHTML = `<div class="wcw-inner">
-        <span class="wcw-flame">${_flameStr}</span>
-        <div class="wcw-info">
-          <span class="wcw-label">FLOW STATE · <strong>×${_combo} COMBO${_combo >= 5 ? ' · MAX BURN' : _combo >= 3 ? ' · ON FIRE' : ''}</strong>${_bonusStr}</span>
-          <div class="wcw-bar-wrap"><div class="wcw-bar-fill" style="width:${_pct.toFixed(1)}%"></div></div>
-        </div>
-        <span class="wcw-timer">${_timerStr}</span>
-      </div>`;
-      panelContent.appendChild(_comboEl);
-    }
-  }
-  // (Specialization moved into the top status strip; commission board, merchant,
-  //  and next-craft moved BELOW the task list into the Job Board — see end of view.)
-  const today=todayKey();
-  // Today's earnings chip — only visible once something has been completed
-  const _teb = renderTodayEarningsChip();
-  if (_teb) panelContent.appendChild(_teb);
-  // One-off backlog: OPEN = not finished; DONE TODAY = finished today (kept for undo/satisfaction);
-  // tasks finished on earlier days simply leave the backlog (and 30d-archive as before).
-  const _openTasks      = state.trabajo.filter(t => !isArchivedTask(t) && !t.completed);
-  const _completedTasks = state.trabajo.filter(t => t.completed && t.completedDate === today && !isArchivedTask(t));
-  const _archivedTasks  = state.trabajo.filter(t =>  isArchivedTask(t));
-
-  // ── Backlog burndown — "X open · ~Y days to caught up" ──
-  panelContent.appendChild(renderBacklogBurndown(_openTasks.length));
-
-  if (_openTasks.length===0) {
-    const empty=document.createElement('div'); empty.className='empty-state';
-    empty.innerHTML = _completedTasks.length
-      ? `<div class="empty-icon">✓</div><div class="empty-text">⟦ BACKLOG CLEAR ⟧</div><div class="empty-sub">Nothing open. You're caught up — add what's next, or rest.</div>`
-      : `<div class="empty-icon">⚔</div><div class="empty-text">⟦ NO OPEN QUESTS ⟧</div><div class="empty-sub">Brain-dump everything you're behind on below — then chip at it.</div>`;
-    panelContent.appendChild(empty);
+function setWorkProgress(id, pct){
+  const task = state.trabajo.find(t => t.id === id); if(!task) return;
+  const today = todayKey();
+  const wasComplete = !!task.completed;
+  pct = Math.max(0, Math.min(100, Math.round(pct)));
+  const newAwarded = Math.round(workTaskPool() * pct / 100);
+  const oldAwarded = task.awardedPts || 0;
+  const delta = newAwarded - oldAwarded;
+  const before = calcWorkerLevel(state.workXp||0).level;
+  state.workXp = Math.max(0, (state.workXp||0) + delta);
+  task.awardedPts = newAwarded;
+  task.progress = pct;
+  // Forward motion counts toward today's aggregate (positive deltas only — pulling a
+  // task back never erases the fact that you did the work).
+  if(delta > 0){ const wt=_ensureWorkToday(); wt.pts += delta; if(!wt.touched.includes(id)) wt.touched.push(id); }
+  if(pct >= 100){
+    task.completed = true; task.completedDate = today;
+    if(!task.done) task.done = {}; task.done[today] = { wxp: newAwarded };
   } else {
-    panelContent.appendChild(renderWorkTasksByCat(_openTasks,{listKey:'trabajo',periodKey:today,isWeekly:false,allowDelete:true,recommendedTaskId:getRecommendedTaskId()}));
+    task.completed = false; delete task.completedDate;
+    if(task.done) delete task.done[today];
   }
-  // Completed (this period) — collapsed; uncheck to reopen
-  if (_completedTasks.length > 0) {
-    const isCompOpen = !!completedExpanded['trabajo-completed'];
-    const compSep = document.createElement('div'); compSep.className = 'work-archived-sep'; compSep.style.cursor='pointer';
-    compSep.innerHTML = `<div class="work-archived-line"></div><span>${isCompOpen?'▲':'▼'} ✓ ${_completedTasks.length} DONE</span><div class="work-archived-line"></div>`;
-    compSep.addEventListener('click', () => { completedExpanded['trabajo-completed'] = !completedExpanded['trabajo-completed']; renderAll(); });
-    panelContent.appendChild(compSep);
-    if (isCompOpen) panelContent.appendChild(renderQuestList(_completedTasks,{listKey:'trabajo',periodKey:today,isWeekly:false,allowDelete:true,expandKey:'trabajo-completed-inner'}));
+  const justFinished = (pct >= 100 && !wasComplete);
+  let flow = 0, flowBonus = 0;
+  if(justFinished){
+    const wt=_ensureWorkToday(); wt.finished += 1;
+    flow = _bumpWorkFlow();
+    if(flow >= 2){ flowBonus = 5*(flow-1); state.workXp += flowBonus; wt.pts += flowBonus; }
   }
-  if (_archivedTasks.length > 0) {
-    const isArchOpen = !!completedExpanded['trabajo-archived'];
-    const archSep = document.createElement('div'); archSep.className = 'work-archived-sep';
-    archSep.innerHTML = `<div class="work-archived-line"></div><span>${isArchOpen?'▲':'▼'} ${_archivedTasks.length} ARCHIVED (30d+)</span><div class="work-archived-line"></div>`;
-    archSep.addEventListener('click', () => { completedExpanded['trabajo-archived'] = !completedExpanded['trabajo-archived']; renderAll(); });
-    panelContent.appendChild(archSep);
-    if (isArchOpen) panelContent.appendChild(renderQuestList(_archivedTasks,{listKey:'trabajo',periodKey:today,isWeekly:false,allowDelete:true}));
-  }
-  // ── Epic add-task form — ⟦ INSCRIBE QUEST ⟧ ────────────────
-  // Header divider matching the rest of the SAO aesthetic.
-  const inscribeHdr = document.createElement('div'); inscribeHdr.className = 'dungeon-divider inscribe-divider';
-  inscribeHdr.innerHTML = '<span>⟦ INSCRIBE QUEST ⟧</span>';
-  panelContent.appendChild(inscribeHdr);
+  const after = calcWorkerLevel(state.workXp).level;
+  saveState(); renderAll();
+  // Finishing is the hardest, most-rewarded moment (closure aversion) — give it a
+  // real celebration, bigger than intermediate progress.
+  if(justFinished) showWorkFinishCelebration(task.text, after > before ? after : null, flow, flowBonus);
+  else if(after > before) showNotif(`⚒ WORK LEVEL ${after} — you leveled up.`);
+}
 
-  const form=document.createElement('div'); form.className='add-task-form inscribe-form';
+// A brief, satisfying full-width flash when a task is closed out. Deliberately more
+// than a toast — closing the last 20% is the thing that's hardest for this brain,
+// so it gets the biggest dopamine hit.
+function showWorkFinishCelebration(text, levelUp, flow, flowBonus){
+  const el = document.createElement('div'); el.className = 'work-finish-pop';
+  const short = text.length > 42 ? text.slice(0,42) + '…' : text;
+  const flowLine = (flow && flow >= 2) ? `<div class="wfp-flow">🔥 FLOW ×${flow}${flowBonus?` · +${flowBonus}`:''}</div>` : '';
+  el.innerHTML = `<div class="wfp-card"><div class="wfp-check">✓</div><div class="wfp-body"><div class="wfp-title">FINISHED</div><div class="wfp-task">${_escWork(short)}</div>${flowLine}${levelUp ? `<div class="wfp-lv">⚒ WORK LEVEL ${levelUp}</div>` : ''}</div></div>`;
+  document.body.appendChild(el);
+  if(soundEnabled && typeof playStellarComplete === 'function') playStellarComplete(flow >= 3 ? 'stellar' : 'normal');
+  if(navigator.vibrate) navigator.vibrate(flow >= 2 ? [30,40,120,40,200] : [30,50,120]);
+  const kill = () => { el.classList.add('wfp-out'); setTimeout(() => el.remove(), 350); };
+  el.addEventListener('click', kill);
+  setTimeout(kill, flow >= 2 ? 2000 : 1700);
+}
 
-  // ── Difficulty selector ─────────────────────────────────────
-  // User picks Easy / Medium / Hard / Legendary; sort order + reward multiplier flow from this.
-  const diffRow = document.createElement('div'); diffRow.className = 'inscribe-diff-row';
-  diffRow.innerHTML = `<span class="inscribe-diff-label">⟦ DIFFICULTY ⟧</span>`;
-  const diffBtns = document.createElement('div'); diffBtns.className = 'inscribe-diff-btns';
-  TASK_DIFFICULTY_ORDER.forEach(id => {
-    const d = TASK_DIFFICULTY[id];
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'inscribe-diff-btn diff-' + id + (selectedTaskDifficulty === id ? ' active' : '');
-    btn.style.setProperty('--diff-color', d.color);
-    btn.innerHTML = `<span class="idb-emoji">${d.emoji}</span><span class="idb-label">${d.label}</span><span class="idb-mult">×${d.mult.toFixed(1)}</span>`;
-    btn.addEventListener('click', () => { selectedTaskDifficulty = id; renderAll(); });
-    diffBtns.appendChild(btn);
+// Deleting keeps whatever points you already earned for the work you did — no
+// punishment for cleaning up the list.
+function deleteWorkTask(id){
+  const task = state.trabajo.find(t => t.id === id); if(!task) return;
+  showConfirmDialog(`Delete "<b>${_escWork(task.text)}</b>"?`, () => {
+    state.trabajo = state.trabajo.filter(t => t.id !== id);
+    saveState(); renderAll();
+  }, { title:'DELETE TASK', okLabel:'DELETE' });
+}
+
+// Commit a new open-task order (from a drag) into state.trabajo. Open tasks take
+// the dragged order; everything else (done tasks) is preserved after them.
+function _commitWorkOrder(ids){
+  const open = ids.map(id => state.trabajo.find(t => t.id === id)).filter(Boolean);
+  const openSet = new Set(ids);
+  const rest = state.trabajo.filter(t => !openSet.has(t.id));
+  state.trabajo = [...open, ...rest];
+  saveState(); renderAll();
+}
+
+// Pointer-based drag reorder (works on touch + mouse). Snap-to-position: the
+// dragged row jumps to where it will land as you move, so there's no jitter math.
+function _enableWorkDragReorder(container){
+  let dragEl = null;
+  const onMove = (ev) => {
+    if(!dragEl) return;
+    ev.preventDefault();
+    const y = ev.clientY != null ? ev.clientY : (ev.touches && ev.touches[0] ? ev.touches[0].clientY : 0);
+    const sibs = [...container.querySelectorAll('.work-task-row')].filter(r => r !== dragEl);
+    let placed = false;
+    for(const s of sibs){ const r = s.getBoundingClientRect(); if(y < r.top + r.height/2){ container.insertBefore(dragEl, s); placed = true; break; } }
+    if(!placed) container.appendChild(dragEl);
+  };
+  const onUp = () => {
+    if(!dragEl) return;
+    dragEl.classList.remove('wt-dragging');
+    const ids = [...container.querySelectorAll('.work-task-row')].map(r => r.dataset.id);
+    dragEl = null;
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+    _commitWorkOrder(ids);
+  };
+  container.querySelectorAll('.wt-grip').forEach(grip => {
+    grip.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      dragEl = grip.closest('.work-task-row'); if(!dragEl) return;
+      dragEl.classList.add('wt-dragging');
+      window.addEventListener('pointermove', onMove, { passive:false });
+      window.addEventListener('pointerup', onUp);
+    });
   });
-  diffRow.appendChild(diffBtns);
-  form.appendChild(diffRow);
+}
 
-  // Today's bounty preview — shows the day's mat schedule + base reward (tier-scaled).
-  const previewDiv=document.createElement('div'); previewDiv.className='task-gains-preview inscribe-preview';
-  const _pvScale = getWorkRewardScale();
-  const _pvDiff  = TASK_DIFFICULTY[selectedTaskDifficulty] || TASK_DIFFICULTY.medium;
-  const _pvDM    = _pvDiff.mult;
-  const _pvGrade = (typeof getHunterGrade === 'function' ? (getHunterGrade()||{}).tier : '') || 'F';
-  const _pvBaseG = Math.round(WORK_TASK_REWARD.base.gold  * _pvScale * _pvDM);
-  const _pvFlowG = Math.round(WORK_TASK_REWARD.inflow.gold * _pvScale * _pvDM);
-  const _pvBaseW = Math.round(WORK_TASK_REWARD.base.wxp   * _pvDM);
-  const _pvFlowW = Math.round(WORK_TASK_REWARD.inflow.wxp * _pvDM);
-  const _pvMatScale = Math.min(1.5, 1 + (_pvScale - 1) * 0.10);
-  const _pvBaseM = Math.max(1, Math.round(WORK_TASK_REWARD.base.mats * _pvMatScale * _pvDM));
-  const _pvFlowMMin = Math.max(1, Math.round(2 * _pvMatScale * _pvDM));
-  const _pvFlowMMax = Math.max(1, Math.round(3 * _pvMatScale * _pvDM));
-  const _dayLbl = WORK_MAT_DAY_LABEL[new Date().getDay()];
-  // Pool-aware bounty preview — show ALL of today's possible mats so the player
-  // can plan ("push on Mon for timber"). The actual mat is rolled at completion
-  // time by rollWorkMat(), not here — the chip is intentionally a tease, not a
-  // commitment. Weekend days show all 4 (full pool).
-  const _todayPoolMeta = (typeof todaysWorkMatPoolMeta === 'function') ? todaysWorkMatPoolMeta() : [];
-  const _poolIcons = _todayPoolMeta.map(m => matIconHtml(m.id, 18, 1)).join('');
-  const _poolWord  = _todayPoolMeta.length >= 4 ? 'ANY MAT' : _todayPoolMeta.map(m => m.label).join(' · ');
-  previewDiv.innerHTML = `<span class="inscribe-bounty-label">⟦ TODAY'S BOUNTY · ${_dayLbl} ⟧</span>`
-    + `<div class="inscribe-bounty-chips">`
-    +   `<span class="gain-chip" style="color:#ffc107;border-color:rgba(255,193,7,0.35)">⚒ +${_pvBaseW} WXP</span>`
-    +   `<span class="gain-chip gain-gold"><img src="img/gold.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;display:inline-block"> ${_pvBaseG}g</span>`
-    +   `<span class="gain-chip gain-mat" title="One of these will drop, rolled at completion · ${_poolWord}">${_poolIcons}<span style="opacity:0.55;margin:0 3px">?</span>×${_pvBaseM}</span>`
-    +   `<span class="gain-chip" style="color:${_pvDiff.color};border-color:${_pvDiff.color}55;font-size:8.5px" title="Difficulty multiplier">${_pvDiff.emoji} ${_pvDiff.label} ×${_pvDM.toFixed(1)}</span>`
-    +   `<span class="gain-chip" style="color:#ffc107;border-color:rgba(255,193,7,0.35);font-size:8.5px" title="Hunter Grade scaling">GRADE ${_pvGrade} · ×${_pvScale.toFixed(1)}</span>`
+function renderWorkTaskList(tasks, isDone, opts){
+  opts = opts || {};
+  const almost = !!opts.almostDone;   // "one push to finish" section — adds a FINISH button, no drag
+  const wrap = document.createElement('div'); wrap.className = 'work-task-list' + (isDone ? ' done-list' : '') + (almost ? ' almost-list' : '');
+  tasks.forEach(task => {
+    const prog = workTaskProgress(task);
+    const row = document.createElement('div'); row.className = 'work-task-row' + (isDone ? ' done' : '') + (almost ? ' almost' : ''); row.dataset.id = task.id;
+    let cells = '';
+    for(let k = 1; k <= 4; k++) cells += `<button class="wt-cell${prog >= k*25 ? ' on' : ''}" data-v="${k*25}" title="${k*25}%"></button>`;
+    row.innerHTML =
+      ((isDone || almost) ? '' : `<div class="wt-grip" title="Drag to reorder">⠿</div>`)
+      + `<div class="wt-body">`
+      +   `<span class="wt-text">${_escWork(task.text)}</span>`
+      +   `<div class="wt-prog"><div class="wt-cells">${cells}</div><span class="wt-prog-pct">${prog}%</span></div>`
+      + `</div>`
+      + (almost ? `<button class="wt-finish" title="Finish it">FINISH ✓</button>` : `<button class="wt-del" title="Delete">✕</button>`);
+    row.querySelectorAll('.wt-cell').forEach(c => {
+      c.addEventListener('click', e => { e.stopPropagation(); const v = +c.dataset.v; setWorkProgress(task.id, v === prog ? v - 25 : v); });
+    });
+    const finBtn = row.querySelector('.wt-finish');
+    if (finBtn) finBtn.addEventListener('click', e => { e.stopPropagation(); setWorkProgress(task.id, 100); });
+    const delBtn = row.querySelector('.wt-del');
+    if (delBtn) delBtn.addEventListener('click', e => { e.stopPropagation(); deleteWorkTask(task.id); });
+    wrap.appendChild(row);
+  });
+  if(!isDone && !almost) _enableWorkDragReorder(wrap);
+  return wrap;
+}
+
+// ── QUICK CAPTURE — global brain-dump into the WORK backlog ────────────────────
+let _qcCount = 0;
+function openQuickCapture(){
+  _qcCount = 0;
+  const o = document.getElementById('quickCaptureOverlay'); if(!o) return;
+  o.hidden = false;
+  const inp = document.getElementById('qcInput'), rec = document.getElementById('qcRecent'), cnt = document.getElementById('qcCount');
+  if(rec) rec.innerHTML = ''; if(cnt) cnt.textContent = '';
+  if(inp){ inp.value = ''; setTimeout(() => inp.focus(), 30); }
+}
+function closeQuickCapture(){
+  const o = document.getElementById('quickCaptureOverlay'); if(o) o.hidden = true;
+  if(typeof currentTab !== 'undefined' && currentTab === 'work') renderAll(); // surface captured tasks
+}
+function qcSaveOne(){
+  const inp = document.getElementById('qcInput'); if(!inp) return;
+  const text = inp.value.trim(); if(!text) return;
+  state.trabajo.unshift({ id:'t'+Date.now(), text, progress:0, awardedPts:0, createdAt:Date.now(), done:{} });
+  saveState();
+  _qcCount++;
+  inp.value = ''; inp.focus();
+  const cnt = document.getElementById('qcCount'); if(cnt) cnt.textContent = `${_qcCount} captured → WORK`;
+  const rec = document.getElementById('qcRecent');
+  if(rec){ const chip = document.createElement('div'); chip.className = 'qc-recent-item'; chip.textContent = '✓ ' + text; rec.prepend(chip); }
+}
+(function _wireQuickCapture(){
+  const fab = document.getElementById('quickCaptureFab'); if(fab) fab.addEventListener('click', openQuickCapture);
+  const save = document.getElementById('qcSave'); if(save) save.addEventListener('click', qcSaveOne);
+  const close = document.getElementById('qcClose'); if(close) close.addEventListener('click', closeQuickCapture);
+  const inp = document.getElementById('qcInput');
+  if(inp) inp.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); qcSaveOne(); } else if(e.key === 'Escape'){ closeQuickCapture(); } });
+  const ov = document.getElementById('quickCaptureOverlay');
+  if(ov) ov.addEventListener('click', e => { if(e.target === ov) closeQuickCapture(); });
+})();
+
+// One-thing-now spotlight: shows a SINGLE task big, hiding everything else, so
+// there's no "which do I pick" decision. Priority: closest-to-done first (finish it),
+// else the top of the list.
+function renderWorkSpotlight(task){
+  const wrap = document.createElement('div'); wrap.className = 'work-spotlight';
+  const prog = workTaskProgress(task);
+  let cells = ''; for(let k=1;k<=4;k++) cells += `<button class="wt-cell${prog>=k*25?' on':''}" data-v="${k*25}" title="${k*25}%"></button>`;
+  wrap.innerHTML =
+    `<div class="ws-eyebrow">🎯 JUST THIS ONE</div>`
+    + `<div class="ws-task">${_escWork(task.text)}</div>`
+    + `<div class="ws-prog"><div class="wt-cells">${cells}</div><span class="ws-pct">${prog}%</span></div>`
+    + `<div class="ws-actions"><button class="ws-finish">FINISH ✓</button><button class="ws-skip">SKIP →</button></div>`
+    + `<button class="ws-exit">‹ show the full list</button>`;
+  wrap.querySelectorAll('.wt-cell').forEach(c => c.addEventListener('click', () => { const v = +c.dataset.v; setWorkProgress(task.id, v === prog ? v - 25 : v); }));
+  wrap.querySelector('.ws-finish').addEventListener('click', () => setWorkProgress(task.id, 100));
+  wrap.querySelector('.ws-skip').addEventListener('click', () => {
+    const t = state.trabajo.find(x => x.id === task.id);
+    state.trabajo = state.trabajo.filter(x => x.id !== task.id); if(t) state.trabajo.push(t);
+    saveState(); renderAll();
+  });
+  wrap.querySelector('.ws-exit').addEventListener('click', () => { workFocusMode = false; renderAll(); });
+  return wrap;
+}
+
+// The single task WORK hands you by default. Priority: closest-to-done first (push it
+// over the line), else the top of your order. Honors "→ different one" session skips.
+function getCurrentWorkTask(){
+  const open = state.trabajo.filter(t => !t.completed);
+  if(!open.length) return null;
+  const notSkipped = open.filter(t => !_workTaskSkips.has(t.id));
+  const pool = notSkipped.length ? notSkipped : open;   // all skipped → ignore skips
+  const almost = pool.filter(t => workTaskProgress(t) >= 75);
+  return almost[0] || pool[0];
+}
+function renderWorkCurrentTask(){
+  const task = getCurrentWorkTask(); if(!task) return null;
+  const prog = workTaskProgress(task);
+  const openCount = state.trabajo.filter(t => !t.completed).length;
+  const nearDone = prog >= 75;
+  const card = document.createElement('div'); card.className = 'work-current';
+  let cells = ''; for(let k=1;k<=4;k++) cells += `<button class="wt-cell${prog>=k*25?' on':''}" data-v="${k*25}" title="${k*25}%"></button>`;
+  card.innerHTML =
+    `<div class="wc-stars"></div>`
+    + `<div class="wc-inner">`
+    +   `<div class="wc-eyebrow">▶ CURRENT TASK</div>`
+    +   `<div class="wc-title">${_escWork(task.text)}</div>`
+    +   `<div class="wc-prog"><div class="wt-cells">${cells}</div><span class="wc-pct">${prog}%</span></div>`
+    +   `<button class="wc-finish">${nearDone ? '✓ FINISH IT' : '✓ MARK DONE'}</button>`
+    +   `<div class="wc-secondary">`
+    +     (prog < 100 ? `<button class="wc-bump">▷ +25% progress</button>` : '')
+    +     (openCount > 1 ? `<button class="wc-skip">→ different one</button>` : '')
+    +   `</div>`
+    + `</div>`;
+  card.querySelectorAll('.wt-cell').forEach(c => c.addEventListener('click', e => { e.stopPropagation(); const v = +c.dataset.v; setWorkProgress(task.id, v === prog ? v - 25 : v); }));
+  card.querySelector('.wc-finish').addEventListener('click', () => setWorkProgress(task.id, 100));
+  const bump = card.querySelector('.wc-bump'); if(bump) bump.addEventListener('click', () => setWorkProgress(task.id, Math.min(100, prog + 25)));
+  const skip = card.querySelector('.wc-skip'); if(skip) skip.addEventListener('click', () => { _workTaskSkips.add(task.id); renderAll(); });
+  return card;
+}
+
+function renderTrabajo(){
+  panelTitle.textContent = 'WORK';
+  panelSubtitle.textContent = 'Add what you need to do. Chip at it — every % counts.';
+  panelContent.innerHTML = '';
+  const hdr = document.getElementById('panelHeaderActions');
+  if(hdr) hdr.innerHTML = '';
+
+  const today = todayKey();
+  const wlv = calcWorkerLevel(state.workXp||0);
+  const RANK_CLR = { F:'#9e9e9e', E:'#80deea', D:'#82b1ff', C:'#69f0ae', B:'#ffc107', A:'#ffa726', S:'#ffd700', SS:'#ea80fc', SSS:'#ffffff' };
+  const rc = RANK_CLR[wlv.rank] || '#ffc107';
+  const xpPct = wlv.level < 99 ? Math.round((wlv.xpProgress / wlv.xpPerLevel) * 100) : 100;
+  const openTasks = state.trabajo.filter(t => !t.completed);          // manual/drag order preserved
+  const doneToday = state.trabajo.filter(t => t.completed && t.completedDate === today);
+  // The 80% wall: tasks already ≥75% get pulled into a "one push to finish" band so
+  // they can't rot at 90%. Closing them is the hardest, highest-value moment.
+  const almostDone = openTasks.filter(t => workTaskProgress(t) >= 75);
+  const todoTasks  = openTasks.filter(t => workTaskProgress(t) < 75);
+
+  // ── CURRENT TASK — the default trigger: ONE task handed to you, first thing, so
+  // there's no list to scan-and-bounce. The full list still sits below it. ──
+  if(openTasks.length){ const ct = renderWorkCurrentTask(); if(ct) panelContent.appendChild(ct); }
+
+  // ── Progress hero — leads with TODAY'S PROGRESS (the aggregate that makes a
+  // scattered/bursty day read as real motion), level/all-time as the quiet footer. ──
+  const wt = _workTodayData();
+  const flow = _workFlowActive();
+  const frontsWord = wt.fronts === 1 ? 'front' : 'fronts';
+  const hero = document.createElement('div'); hero.className = 'work-hero';
+  hero.innerHTML =
+    `<div class="wh-today-block">`
+    +   `<div class="wh-today-row">`
+    +     `<div><span class="wh-today-lbl">TODAY'S PROGRESS</span><div class="wh-today-main">+${wt.pts}<span class="wh-today-unit"> pts</span></div></div>`
+    +     `<div class="wh-today-stats"><span class="wh-today-fin">✓ ${wt.finished} finished</span><span class="wh-today-fronts">${wt.fronts} ${frontsWord} moved</span></div>`
+    +   `</div>`
+    +   (flow >= 2 ? `<div class="wh-flow">🔥 FLOW ×${flow} · you're on a roll</div>` : '')
     + `</div>`
-    + `<div class="inscribe-bounty-flow">⚡ Finish inside one focus session → IN-FLOW bonus (⚒+${_pvFlowW} · <img src="img/gold.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;display:inline-block">${_pvFlowG}g · ${_poolIcons}<span style="opacity:0.55">?</span>×${_pvFlowMMin}–${_pvFlowMMax})</div>`;
-  form.appendChild(previewDiv);
+    + `<div class="wh-bar"><div class="wh-fill" style="width:${xpPct}%;background:${rc};color:${rc}"></div></div>`
+    + `<div class="wh-sub"><span>RANK ${wlv.rank} · WORK LV.${wlv.level}${wlv.level < 99 ? ` · ${wlv.xpProgress}/${wlv.xpPerLevel}` : ' · MAX'}</span><span class="wh-total">${(state.workXp||0).toLocaleString()} all-time</span></div>`;
+  panelContent.appendChild(hero);
 
-  // Input + epic button
-  const inputRow=document.createElement('div'); inputRow.className='task-input-row';
-  inputRow.innerHTML=`<input type="text" class="add-task-input inscribe-input" id="taskInput" placeholder="Name your quest..." maxlength="80"><button class="add-btn inscribe-btn" id="addBtn">⚔ ADD TO LEDGER</button>`;
+  // Motivational quote (system voice, no NPC)
+  panelContent.appendChild(renderWorkStrip());
+
+  // (Old opt-in "🎯 One thing now" full-screen focus toggle removed 2026-09 — the
+  // CURRENT TASK hero above is now the always-on default trigger.)
+
+  // ── ADD TASK — top of the list so it's the first thing, zero decisions ──
+  const form = document.createElement('div'); form.className = 'add-task-form inscribe-form work-add-top';
+  const inputRow = document.createElement('div'); inputRow.className = 'task-input-row';
+  inputRow.innerHTML = `<input type="text" class="add-task-input inscribe-input" id="taskInput" placeholder="What do you need to do?" maxlength="90"><button class="add-btn inscribe-btn" id="addBtn">+ ADD</button>`;
   form.appendChild(inputRow);
-
   panelContent.appendChild(form);
-  document.getElementById('addBtn').addEventListener('click',addTask);
-  document.getElementById('taskInput').addEventListener('keydown',e=>{ if(e.key==='Enter') addTask(); });
+  document.getElementById('addBtn').addEventListener('click', addTask);
+  document.getElementById('taskInput').addEventListener('keydown', e => { if(e.key === 'Enter') addTask(); });
 
-  // Job Board (commissions + next-craft) retired from the QUESTS view —
-  // workflow is cleaner without it. Functions remain available for callers
-  // elsewhere (commission state is still kept up to date on completion).
-  panelContent.appendChild(renderFooter('trabajo'));
+  // ── ONE PUSH TO FINISH — tasks already ≥75%, with a big FINISH button ──
+  if(almostDone.length){
+    const finHdr = document.createElement('div'); finHdr.className = 'dungeon-divider almost-divider';
+    finHdr.innerHTML = `<span>🏁 ONE PUSH TO FINISH · ${almostDone.length}</span>`;
+    panelContent.appendChild(finHdr);
+    panelContent.appendChild(renderWorkTaskList(almostDone, false, {almostDone:true}));
+  }
+
+  // ── TO DO ──
+  const openHdr = document.createElement('div'); openHdr.className = 'dungeon-divider';
+  openHdr.innerHTML = `<span>⟦ TO DO${todoTasks.length ? ` · ${todoTasks.length}` : ''} ⟧</span>`;
+  panelContent.appendChild(openHdr);
+
+  if(!openTasks.length){
+    const empty = document.createElement('div'); empty.className = 'empty-state';
+    empty.innerHTML = doneToday.length
+      ? `<div class="empty-icon">✓</div><div class="empty-text">ALL CLEAR</div><div class="empty-sub">Nothing left on the list. Add what's next, or rest — you earned it.</div>`
+      : `<div class="empty-icon">⚒</div><div class="empty-text">NOTHING HERE YET</div><div class="empty-sub">Add one thing above. Then just move it 25%. That's the whole trick.</div>`;
+    panelContent.appendChild(empty);
+  } else if(!todoTasks.length){
+    // everything open is already in the finish band
+    const note = document.createElement('div'); note.className = 'work-drag-hint';
+    note.textContent = 'Everything left is a push away. Close them out above.';
+    panelContent.appendChild(note);
+  } else {
+    panelContent.appendChild(renderWorkTaskList(todoTasks, false));
+    const hint = document.createElement('div'); hint.className = 'work-drag-hint';
+    hint.textContent = 'Tap the bar to set progress · drag ⠿ to reorder by priority';
+    panelContent.appendChild(hint);
+  }
+
+  // ── DONE TODAY (collapsible; tap the bar to reopen) ──
+  if(doneToday.length){
+    const isOpen = !!completedExpanded['trabajo-done'];
+    const sep = document.createElement('div'); sep.className = 'work-archived-sep'; sep.style.cursor = 'pointer';
+    sep.innerHTML = `<div class="work-archived-line"></div><span>${isOpen?'▲':'▼'} ✓ ${doneToday.length} DONE TODAY</span><div class="work-archived-line"></div>`;
+    sep.addEventListener('click', () => { completedExpanded['trabajo-done'] = !completedExpanded['trabajo-done']; renderAll(); });
+    panelContent.appendChild(sep);
+    if(isOpen) panelContent.appendChild(renderWorkTaskList(doneToday, true));
+  }
 }
 
 function renderFooter(tabKey) {
@@ -19993,7 +20637,9 @@ function renderFooter(tabKey) {
     showConfirmDialog(
       "Reset today's progress?<br><span style='font-size:11px;opacity:0.7'>All checks cleared and stats reversed.</span>",
       () => {
-        [...state.habitos,...state.trabajo].forEach(t=>{ if(t.done[today]){const c=getCompletion(t,today);if(c){applyGains(c.gains,-1);state.totalXp=Math.max(0,state.totalXp-(c.xp||0));if(c.drops) applyWorkDrops(c.drops,-1);}delete t.done[today]; if(t.completed&&t.completedDate===today){t.completed=false;delete t.completedDate;}}});
+        state.habitos.forEach(t=>{ if(t.done[today]){const c=getCompletion(t,today);if(c){applyGains(c.gains,-1);state.totalXp=Math.max(0,state.totalXp-(c.xp||0));}delete t.done[today];}});
+        // WORK tasks: reverse the exact points awarded today and reopen them.
+        state.trabajo.forEach(t=>{ if(t.completed&&t.completedDate===today){ state.workXp=Math.max(0,(state.workXp||0)-(t.awardedPts||0)); t.completed=false; delete t.completedDate; delete t.awardedPts; if(t.done) delete t.done[today]; }});
         saveState(); renderAll();
       },
       { title: 'RESET DAY', okLabel: 'RESET' }
@@ -20011,14 +20657,21 @@ function getCharNextMilestones() {
   // 1) Equipped class mastery (if a class is equipped and not yet mastered)
   const eqId = state.classData && state.classData.equipped;
   if (eqId && CLASSES[eqId] && !(state.classData.masteredClasses || {})[eqId]) {
-    const thr = CLASS_MASTERY_THRESHOLD[eqId] || 100;
-    const pts = Math.min(thr, (state.classData.masteryPoints || {})[eqId] || 0);
-    const trialDone = !!(state.classData.classQuests && state.classData.classQuests[eqId] && state.classData.classQuests[eqId].onetimeDone);
+    let sub;
+    if (_classIsDaily(eqId)) {
+      const need = (CLASSES[eqId].masteryDays || 7), have = getClassMasteryDays(eqId);
+      sub = `${Math.max(0, need - have)} more days`;
+    } else {
+      const thr = CLASS_MASTERY_THRESHOLD[eqId] || 100;
+      const pts = Math.min(thr, (state.classData.masteryPoints || {})[eqId] || 0);
+      const trialDone = !!(state.classData.classQuests && state.classData.classQuests[eqId] && state.classData.classQuests[eqId].onetimeDone);
+      sub = trialDone ? `${Math.max(0, thr - pts)} MP to go` : `${Math.max(0, thr - pts)} MP · trial pending`;
+    }
     out.push({
       icon: (typeof CQ_ICONS !== 'undefined' && CQ_ICONS[eqId]) || '🎖️',
       label: `${CLASSES[eqId].name} MASTERY`,
-      sub: trialDone ? `${pts} / ${thr} MP` : `${pts} / ${thr} MP · Trial pending`,
-      pct: Math.min(100, pts / thr * 100),
+      sub,
+      pct: getClassMasteryPct(eqId),
       color: CLASSES[eqId].color || '#ffd700',
     });
   }
@@ -20032,7 +20685,7 @@ function getCharNextMilestones() {
     out.push({
       icon: '',
       label: `${r.k} → GRADE ${nextTier ? nextTier.t : '?'}`,
-      sub: `${r.pts} / ${r.tf.nextMin}`,
+      sub: `${Math.max(0, r.tf.nextMin - r.pts)} to go`,
       pct: r.tf.pctToNext,
       color: STAT_COLORS[r.k] || '#4dd0e1',
     });
@@ -20105,7 +20758,7 @@ function renderCharStatusHeader() {
   const _milestones = getCharNextMilestones();
   const _milestonesHtml = _milestones.length ? `
     <div class="char-next-milestones">
-      <div class="cnm-label">⟦ NEXT MILESTONES ⟧</div>
+      <div class="cnm-label">⟦ NEXT REWARDS ⟧</div>
       ${_milestones.map(m => {
         const pct = Math.min(100, Math.round(m.pct));
         return `<div class="cnm-row">
@@ -20744,7 +21397,10 @@ function renderClassQuests() {
 
   const pts       = Math.round((state.classData.masteryPoints || {})[classId] || 0);
   const threshold = CLASS_MASTERY_THRESHOLD[classId] || 150;
-  const mastPct   = Math.min(100, Math.round((pts / threshold) * 100));
+  const _dayBased = _classIsDaily(classId);
+  const mastPct   = getClassMasteryPct(classId);   // day-based for starters, points-based otherwise
+  const _mstDays  = getClassMasteryDays(classId);
+  const _mstNeed  = (cls.masteryDays || 7);
   const mastBarColor = isMastered ? 'var(--sao-gold)' : cls.color;
   const trialDone    = !!(cqs.onetimeDone);
   const barFull      = mastPct >= 100;
@@ -20771,10 +21427,12 @@ function renderClassQuests() {
   mastSpan.className = 'cq-mastery-label';
   if (isMastered) {
     mastSpan.innerHTML = '<span style="color:var(--sao-gold)">✦ CLASS MASTERED</span>';
-  } else if (barFull && !trialDone) {
+  } else if (barFull && !trialDone && cqDef.onetime) {
     mastSpan.innerHTML = '<span style="color:#ffc107">⚔ TRIAL PENDING</span>';
+  } else if (_dayBased) {
+    mastSpan.innerHTML = `<span style="color:${cls.color}">${mastPct}%</span> <span style="opacity:0.6;font-size:0.85em">· ${_mstDays}/${_mstNeed} days</span>`;
   } else {
-    mastSpan.textContent = `${pts} / ${threshold} MST`;
+    mastSpan.textContent = `${mastPct}%`;
   }
 
   const chevron = document.createElement('span');
@@ -20863,7 +21521,8 @@ function renderClassQuests() {
 
     const mstChip = document.createElement('span');
     mstChip.className = 'gain-chip cq-mst-chip';
-    mstChip.textContent = `+${mst} MST`;
+    // Day-based starters: each daily = 1 day toward the week; others show mastery points.
+    mstChip.textContent = _dayBased ? `🗝 +1 day` : `+${mst} MST`;
     gains.appendChild(mstChip);
 
     const xpAmt = Object.values(q.stats).reduce((s, v) => s + v, 0) * 10;
@@ -20952,9 +21611,7 @@ function renderClassPanel() {
 
   if (cls) {
     const tierName   = TIER_NAMES[cls.tier] || '';
-    const pts        = Math.round((state.classData.masteryPoints || {})[eqId] || 0);
-    const threshold  = CLASS_MASTERY_THRESHOLD[eqId] || 150;
-    const mastPct    = Math.min(100, Math.round((pts / threshold) * 100));
+    const mastPct    = getClassMasteryPct(eqId);
     const isMastered = state.classData.masteredClasses[eqId];
     const passiveStr = `+${Math.round(cls.passive*100)}% passive · ×${(1+cls.multiplier).toFixed(2)} gains`;
     const chipsHtml  = cls.stats.map(s =>
@@ -20962,17 +21619,17 @@ function renderClassPanel() {
     ).join('');
     const trialDone  = !!(state.classData.classQuests?.[eqId]?.onetimeDone);
     const barFull    = mastPct >= 100;
-    const barColor   = isMastered ? 'var(--sao-gold)' : (barFull && !trialDone) ? '#ffc107' : cls.color;
-    const barGlow    = isMastered ? 'rgba(255,215,0,0.5)' : (barFull && !trialDone) ? 'rgba(255,193,7,0.55)' : `${cls.color}70`;
+    const _db        = _classIsDaily(eqId);
+    const _trialGate = barFull && !trialDone && !_db && !!(CLASS_QUESTS[eqId] && CLASS_QUESTS[eqId].onetime);
+    const barColor   = isMastered ? 'var(--sao-gold)' : _trialGate ? '#ffc107' : cls.color;
+    const barGlow    = isMastered ? 'rgba(255,215,0,0.5)' : _trialGate ? 'rgba(255,193,7,0.55)' : `${cls.color}70`;
     const mastLabel  = isMastered
       ? `<span style="color:var(--sao-gold-soft)">✦ MASTERED</span>`
-      : (barFull && !trialDone)
+      : _trialGate
         ? `<span style="color:#ffc107">⚔ TRIAL PENDING</span>`
-        : `${pts} / ${threshold} MST`;
-    const trialHtml  = !isMastered
-      ? (barFull && !trialDone
-          ? `<div class="class-mastery-trial-gate">⚔ COMPLETE THE TRIAL TO UNLOCK MASTERY</div>`
-          : (!trialDone ? `<div class="class-mastery-trial-pending">⚔ Trial required for mastery</div>` : ''))
+        : (_db ? `${mastPct}% · ${getClassMasteryDays(eqId)}/${cls.masteryDays||7} days` : `${mastPct}%`);
+    const trialHtml  = (!isMastered && _trialGate)
+      ? `<div class="class-mastery-trial-gate">⚔ COMPLETE THE TRIAL TO UNLOCK MASTERY</div>`
       : '';
 
     panel.innerHTML += `
@@ -21214,7 +21871,7 @@ function renderClassPopupBody() {
     const unlockStr  = unlocks.length ? unlocks.map(c => `<span style="color:${c.color}">${c.name}</span>`).join(' ') : '';
 
     // Mastery bar (points-based)
-    const mastPct   = isMast ? 100 : Math.min(100, Math.round((pts / threshold) * 100));
+    const mastPct   = isMast ? 100 : getClassMasteryPct(id);
     const barColor  = isMast ? 'var(--sao-gold)' : cls.color;
     const mastLabel = isMast ? '✦ MASTERED' : `${pts} / ${threshold} MST`;
     const mastBarHtml = `
@@ -21879,8 +22536,8 @@ function _renderHistoryExtras(container) {
     const _lvl = calcLevel(state.totalXp || 0).level;
     const _xp = state.totalXp || 0;
     const _best = Math.max(state.lastStreakPeak || 0, state.streak || 0);
-    const _gold = state.totalGoldEarned || 0;
-    const _runs = (state.dungeonLog || []).length;
+    const _perfect = (state.logros && state.logros.perfectDayCount) || 0;   // replaces dead GOLD EARNED
+    const _workLv = calcWorkerLevel(state.workXp || 0).level;               // replaces dead DUNGEONS
     const _topKey = STAT_KEYS.reduce((a, b) => (state.stats[a] || 0) >= (state.stats[b] || 0) ? a : b, STAT_KEYS[0]);
     const _topVal = state.stats[_topKey] || 0;
     const card = document.createElement('div');
@@ -21890,10 +22547,10 @@ function _renderHistoryExtras(container) {
       <div class="lst-grid">
         <div class="lst-cell"><div class="lst-val">${_lvl}</div><div class="lst-label">LEVEL</div></div>
         <div class="lst-cell"><div class="lst-val">${_xp.toLocaleString()}</div><div class="lst-label">TOTAL XP</div></div>
-        <div class="lst-cell"><div class="lst-val" style="color:#ffd700">${_best}d</div><div class="lst-label">BEST STREAK</div></div>
+        <div class="lst-cell"><div class="lst-val" style="color:#b388ff">${_perfect}</div><div class="lst-label">PERFECT DAYS</div></div>
         <div class="lst-cell"><div class="lst-val" style="color:${STAT_COLORS[_topKey]}">${_topKey} ${_topVal}</div><div class="lst-label">TOP STAT</div></div>
-        <div class="lst-cell"><div class="lst-val" style="color:#ffc107">${_gold.toLocaleString()}g</div><div class="lst-label">GOLD EARNED</div></div>
-        <div class="lst-cell"><div class="lst-val">${_runs}</div><div class="lst-label">DUNGEONS</div></div>
+        <div class="lst-cell"><div class="lst-val" style="color:#ffc107">${_workLv}</div><div class="lst-label">WORK LV</div></div>
+        <div class="lst-cell"><div class="lst-val" style="color:#ffd700">${_best}d</div><div class="lst-label">BEST STREAK</div></div>
       </div>`;
     container.appendChild(card);
   }
@@ -21987,60 +22644,31 @@ function renderHistory() {
   panelTitle.textContent='HISTORY'; panelSubtitle.textContent='Past performance';
   panelContent.innerHTML='';
 
-  // ── STREAK HERO PILL ──────────────────────────────────────
+  // ── CONSISTENCY HERO (2026-09) — replaced the old streak pill (AT RISK / BROKEN /
+  // "70% required" pressure) with a calm, non-punishing summary: lifetime PERFECT
+  // DAYS + days shown up + today's ring. Nothing here can shame you.
   {
     const todayStr2  = todayKey();
     const todayInfo  = getHabitPct(todayStr2);
     const todayPct   = todayInfo ? todayInfo.pct : 0;
-    const streak     = state.streak || 0;
-    const avoidRelapsedToday = (state.negativos||[]).some(n => !!n.done[todayStr2]);
-    const isSecured  = todayPct >= 70 && !avoidRelapsedToday;
-    const isAtRisk   = streak > 0 && !isSecured;
-    const heroState  = streak === 0 ? 'zero' : isAtRisk ? 'atrisk' : 'secured';
-
-    const t30 = streak >= 30, t14 = streak >= 14, t7 = streak >= 7;
-    const icon = streak === 0 ? '💀' : t30 ? '⚡🔥' : (t14 || t7) ? '🔥🔥' : '🔥';
-    const nextMilestone = streak < 7 ? 7 : streak < 30 ? 30 : Math.ceil((streak+1)/30)*30;
-    const daysToNext = nextMilestone - streak;
-    const nextIcon = nextMilestone >= 30 ? '⚡🔥' : '🔥🔥';
-    const milestoneHint = streak > 0 ? `${daysToNext}d to ${nextIcon} tier` : '';
+    const perfectDays = (state.logros && state.logros.perfectDayCount) || 0;
+    const activeDays = Object.keys(
+      state.habitos.reduce((acc,h) => { Object.keys(h.done||{}).forEach(k => { if(h.done[k]) acc[k]=1; }); return acc; }, {})
+    ).length;
 
     const pill = document.createElement('div');
-    pill.className = `hist-streak-hero hero-${heroState}`;
-
-    const numCol = heroState === 'secured' ? 'col-secured' : heroState === 'atrisk' ? 'col-atrisk' : 'col-zero';
-    const statusCls = heroState === 'secured' ? 'st-secured' : heroState === 'atrisk' ? 'st-atrisk' : 'st-zero';
-    const statusTxt = heroState === 'secured' ? '● SECURED TODAY'
-                    : heroState === 'atrisk'  ? '⚠ AT RISK — COMPLETE YOUR HABITS'
-                    : streak === 0 && (state.lastStreakPeak || 0) > 1
-                      ? `✕ BROKEN — BEST WAS ${state.lastStreakPeak}D`
-                      : '— START YOUR STREAK';
-
-    // Mini ring: today's completion
+    pill.className = 'hist-streak-hero hero-secured';
+    const ringCol = todayPct >= 70 ? '#69f0ae' : todayPct >= 30 ? '#fdd835' : 'rgba(224,247,250,0.28)';
     const circ = 100.53, offset = circ * (1 - todayPct / 100);
-    const ringCol = todayPct >= 70 ? '#69f0ae' : todayPct >= 30 ? '#fdd835' : todayPct > 0 ? '#ff5252' : 'rgba(224,247,250,0.15)';
-
-    if (heroState === 'atrisk') {
-      pill.style.cursor = 'pointer';
-      pill.title = 'Tap to go to Habits';
-      pill.addEventListener('click', () => {
-        currentTab = 'habits';
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelector('[data-tab="habits"]')?.classList.add('active');
-        renderAll();
-      });
-    }
     pill.innerHTML = `
-      <div class="hero-streak-icon">${icon}</div>
+      <div class="hero-streak-icon">✦</div>
       <div class="hero-streak-body">
         <div class="hero-streak-top">
-          <span class="hero-streak-num ${numCol}">${streak}</span>
+          <span class="hero-streak-num col-secured">${perfectDays}</span>
           <span class="hero-streak-unit">DAYS</span>
         </div>
-        <div class="hero-streak-label">CURRENT STREAK</div>
-        <div class="hero-streak-status ${statusCls}">${statusTxt}</div>
-        ${heroState==='atrisk'?`<div class="hero-streak-threshold">70% required — ${todayPct}% done today ↗ tap to act</div>`:''}
-        ${milestoneHint?`<div class="hero-streak-milestone">${milestoneHint}</div>`:''}
+        <div class="hero-streak-label">PERFECT DAYS</div>
+        <div class="hero-streak-status st-secured">✓ ${activeDays} day${activeDays===1?'':'s'} shown up · nothing to lose</div>
       </div>
       <div class="hero-streak-ring">
         <svg viewBox="0 0 36 36" width="44" height="44">
@@ -23196,8 +23824,9 @@ function renderDungeonLog() {
 }
 
 function renderLog() {
+  // DUNGEONS sub-tab removed with the RPG layer — coerce stale state to achievements.
+  if (logSubTab === 'dungeons') logSubTab = 'achievements';
   if (logSubTab === 'achievements') renderLogros();
-  else if (logSubTab === 'dungeons') renderDungeonLog();
   else renderHistory();
   // Prepend subtab bar (after subrender overwrites panelContent)
   const bar = document.createElement('div');
@@ -23205,24 +23834,17 @@ function renderLog() {
   bar.innerHTML = `
     <button class="log-subtab ${logSubTab==='achievements'?'active':''}" onclick="logSubTab='achievements';renderLog()">🏆 ACHIEVEMENTS</button>
     <button class="log-subtab ${logSubTab==='history'?'active':''}" onclick="logSubTab='history';renderLog()">📊 HISTORY</button>
-    <button class="log-subtab ${logSubTab==='dungeons'?'active':''}" onclick="logSubTab='dungeons';renderLog()">⚔ DUNGEONS</button>
   `;
   panelContent.insertBefore(bar, panelContent.firstChild);
   panelTitle.textContent = 'LOG';
-  panelSubtitle.textContent = logSubTab === 'achievements' ? 'Milestones & rewards' : logSubTab === 'dungeons' ? 'Expedition records' : 'Your progress over time';
+  panelSubtitle.textContent = logSubTab === 'achievements' ? 'Milestones & rewards' : 'Your progress over time';
 }
 
 function renderCharTab() {
-  if (charSubTab === 'stats') renderPersonaje();
-  else renderInventory();
-  // Prepend subtab bar (after subrender overwrites panelContent)
-  const bar = document.createElement('div');
-  bar.className = 'char-subtab-bar';
-  bar.innerHTML = `
-    <button class="char-subtab ${charSubTab==='stats'?'active':''}" onclick="charSubTab='stats';renderCharTab()">👤 STATS</button>
-    <button class="char-subtab ${charSubTab==='gear'?'active':''}" onclick="charSubTab='gear';renderCharTab()">🎒 GEAR</button>
-  `;
-  panelContent.insertBefore(bar, panelContent.firstChild);
+  // GEAR sub-tab removed with the RPG layer — CHAR is now just the stats/identity
+  // screen, so no sub-tab bar is needed. Coerce any stale state to stats.
+  charSubTab = 'stats';
+  renderPersonaje();
 }
 
 // ============================================================
@@ -25106,16 +25728,12 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
       if (_isPhoenix) { if(navigator.vibrate) navigator.vibrate([40,30,80,30,120]); setTimeout(()=>showNotif('[SYSTEM] ⚡ RESURRECTION PROTOCOL — ×1.5 COMEBACK OVERRIDE'), 300); }
       if (_isCrit) { if(navigator.vibrate) navigator.vibrate([10,20,80,25,160,25,80]); setTimeout(()=>showCritFloat(_scaledGains), _isPhoenix ? 650 : 180); }
       if(isFirst && periodKey===todayKey()) {
-        // Morning System Login Cache — variable reward gated on the FIRST real habit
-        // check of the day (never on merely opening the app). Once per day.
-        if (!state.dailyCache || state.dailyCache.dateKey!==todayKey()) {
-          setTimeout(()=>grantDailyLoginCache(), 320);
-        } else {
-          setTimeout(()=>showFirstHabitOverlay(), 320);
-        }
+        // System Cache DELETED (2026-09) — it only fed the removed gold/materials
+        // economy. First habit of the day still gets its celebratory overlay.
+        setTimeout(()=>showFirstHabitOverlay(), 320);
       }
       else if(isLast) { playLastHabit(); if(navigator.vibrate) navigator.vibrate([40,20,80]); }
-      else { if(listKey==='weekly') { playWeeklyTap(); } else { playSwordSlash(); } if(navigator.vibrate) navigator.vibrate(40); }
+      else { if(_cqCompleting) { /* CURRENT QUEST plays its own galactic sound + vibration */ } else { if(listKey==='weekly') { playWeeklyTap(); } else { playSwordSlash(); } if(navigator.vibrate) navigator.vibrate(40); } }
       // HP restore: each completed habit restores 4% of max HP
       { const _mhp = calcMaxHP(); if (state.hp === null || state.hp === undefined) state.hp = _mhp; state.hp = Math.min(_mhp, state.hp + Math.round(_mhp * 0.04)); }
       const _tags = []; if(_isPhoenix) _tags.push(`×${_phoenixMult}🔥`); if(_isCrit) _tags.push('⚡CRIT'); if(_masteryMult>1) _tags.push('👑×1.2');
@@ -25638,52 +26256,6 @@ function showFirstHabitOverlay() {
   setTimeout(dismiss, 2800);
 }
 
-// ── MORNING SYSTEM LOGIN CACHE ───────────────────────────────────────────────
-// Variable-ratio reward, claimable ONLY by completing the first real habit of the
-// day. Reinforces the keystone action — never pays out for merely opening the app.
-function grantDailyLoginCache() {
-  const today = todayKey();
-  state.dailyCache = { dateKey: today, claimed: true };
-  const matKeys = ['timber','scroll','crystal','gear'];
-  const matId   = matKeys[Math.floor(Math.random() * matKeys.length)];
-  const matDef  = Object.values(WORK_MATERIALS).find(m => m.id === matId);
-  const roll = Math.random();
-  let tier, gold, matQty, label;
-  if      (roll < 0.10) { tier='rare';     gold = 30 + Math.floor(Math.random()*21); matQty = 4; label='RARE CACHE';   }
-  else if (roll < 0.38) { tier='uncommon'; gold = 15 + Math.floor(Math.random()*16); matQty = 2; label='SUPPLY CACHE'; }
-  else                  { tier='common';   gold = 10 + Math.floor(Math.random()*11); matQty = 0; label='SYSTEM CACHE'; }
-  const drops = { gold, matId, matEmoji: matDef?.emoji || '⚙️', matLabel: matDef?.label || '', matQty };
-  applyWorkDrops(drops, 1);
-  const _cacheWxp = grantWorkXp(10);
-  saveState();
-  showCacheOverlay(tier, label, gold, matDef, matQty, _cacheWxp);
-  setTimeout(flashGoldDisplay, 30);
-}
-
-function showCacheOverlay(tier, label, gold, matDef, matQty, wxp) {
-  if (soundEnabled) playWorkComplete();
-  if (navigator.vibrate) navigator.vibrate(tier==='rare' ? [20,40,80,40,160] : [20,40,80]);
-  const accent  = tier==='rare' ? '#ffd54f' : tier==='uncommon' ? '#80deea' : '#4dd0e1';
-  const matLine = matQty > 0 ? `<div class="cache-reward">${matDef?.emoji||''} ${matDef?.label||''} ×${matQty}</div>` : '';
-  const el = document.createElement('div');
-  el.className = 'cache-overlay' + (tier==='rare' ? ' cache-rare' : '');
-  el.style.setProperty('--cache-accent', accent);
-  el.innerHTML = `
-    <div class="cache-scan"></div>
-    <div class="cache-icon">📦</div>
-    <div class="cache-eyebrow">⟦ SYSTEM LOGIN ⟧</div>
-    <div class="cache-title">${label}</div>
-    <div class="cache-line"></div>
-    <div class="cache-reward">${goldImg(18)} ${gold} GOLD</div>
-    ${matLine}
-    ${wxp ? `<div class="fr-wxp">⚒ +${wxp} WXP</div>` : ''}
-    <div class="cache-sub">First quest of the day cleared.</div>
-    <div class="cache-tap">TAP TO CONTINUE</div>`;
-  document.body.appendChild(el);
-  const dismiss = () => { el.classList.add('leaving'); setTimeout(() => el.remove(), 460); };
-  el.addEventListener('click', dismiss);
-  setTimeout(dismiss, 3600);
-}
 
 // ── SYSTEM FORTUNE float — small variable EXP windfall ───────────────────────
 function showFortuneFloat(xp) {
@@ -25714,23 +26286,17 @@ function getNearestAchievements(limit) {
 }
 
 // ── Stateful notification bodies — pull live state for a real reason to return ─
+// Notification bodies now surface the CURRENT QUEST so the reminder IS the trigger
+// reaching out — one glowing habit, no scan-and-decide. No streak-guilt, no economy.
 function _pickMorningNotifBody() {
-  const lines = ['📦 A System Cache is waiting — your first quest unlocks it.'];
-  const s = state.streak || 0;
-  if (s >= 3) lines.push(`⚠ ${s}-day streak active. One miss resets it — today decides.`);
-  const near = getNearestAchievements(1)[0];
-  if (near) lines.push(`🏆 ${near.name}: ${near.count}/${near.target} — almost "${near.label}".`);
-  lines.push('⚔ Your daily quests are waiting. First action wins the day.');
-  return lines[Math.floor(Math.random() * lines.length)];
+  const q = getCurrentQuestHabit();
+  if (q) return `▶ ${q.text} — your first quest. Just do this one.`;
+  return 'A fresh day. Your quests are ready when you are.';
 }
 function _pickEveningNotifBody(done, total, tag) {
-  if (total <= 0) return '📊 Log your progress for today.';
-  if (done >= total) return `✓ All ${total} quests cleared${tag}. Lock in tomorrow's first quest.`;
-  const remaining = total - done;
-  const lines = [`📊 ${done}/${total} quests done${tag}. ${remaining} to a perfect day.`];
-  const hasCommissions = state.commissions && Array.isArray(state.commissions.list) && state.commissions.list.length > 0;
-  if (hasCommissions) lines.push(`📋 ${done}/${total} done${tag} · commissions reset in ${commissionCountdown()}.`);
-  return lines[Math.floor(Math.random() * lines.length)];
+  const q = getCurrentQuestHabit();
+  if (!q) return `✓ Everything's done today. Rest — you earned it.`;
+  return `🌙 Before the couch wins: ▶ ${q.text}. One quest, that's the whole trick.`;
 }
 
 function showPerfectDayOverlay() {
@@ -26485,19 +27051,17 @@ function unarchiveWorkTask(id) { const t=state.trabajo.find(t=>t.id===id); if(!t
 function addTask() {
   const input=document.getElementById('taskInput'); if(!input) return;
   const text=input.value.trim(); if(!text) return;
+  // Simple task: just a name + a 0→100% progress. No difficulty, no economy.
+  // New tasks go to the TOP so they're the first thing you see (drag to reprioritize).
   const taskData = {
     id:'t'+Date.now(), text,
-    xp: 0,                 // work tasks give Worker XP, never character XP
-    gains: {},
-    drops: getWorkTaskDrops(selectedTaskCategory),
-    category: selectedTaskCategory,
-    difficulty: TASK_DIFFICULTY[selectedTaskDifficulty] ? selectedTaskDifficulty : 'medium',
-    createdAt: Date.now(),   // feeds age-overdue bonus on completion
-    sessionsBefore: 0,       // bumped per focus session linked to this task
+    progress: 0,           // 0→100; points paid proportionally as it climbs
+    awardedPts: 0,         // points already granted for this task's progress
+    createdAt: Date.now(),
     done:{}
   };
   input.value='';
-  state.trabajo.push(taskData);
+  state.trabajo.unshift(taskData);
   saveState(); renderAll();
 }
 
@@ -26676,7 +27240,8 @@ function renderModalBody(existingHabit) {
     <div class="m-field" id="mTimeField" style="${isWeekly?'display:none':''}">
       <label class="m-label">TIME OF DAY</label>
       <div class="m-toggle-row">
-        <button class="m-toggle ${modalData.timeOfDay!=='night'?'morning-active':''}" id="togMorning" onclick="setModalTime('morning')">🌅 MORNING</button>
+        <button class="m-toggle ${modalData.timeOfDay==='morning'?'morning-active':''}" id="togMorning" onclick="setModalTime('morning')">🌅 MORNING</button>
+        <button class="m-toggle ${modalData.timeOfDay==='anytime'?'anytime-active':''}" id="togAnytime" onclick="setModalTime('anytime')">⭐ ANYTIME</button>
         <button class="m-toggle ${modalData.timeOfDay==='night'?'night-active':''}" id="togNight" onclick="setModalTime('night')">🌙 NIGHT</button>
       </div>
     </div>
@@ -26802,7 +27367,8 @@ function setModalList(listKey) {
 
 function setModalTime(t) {
   modalData.timeOfDay = t;
-  document.getElementById('togMorning').className='m-toggle'+(t!=='night'?' morning-active':'');
+  document.getElementById('togMorning').className='m-toggle'+(t==='morning'?' morning-active':'');
+  const _a=document.getElementById('togAnytime'); if(_a) _a.className='m-toggle'+(t==='anytime'?' anytime-active':'');
   document.getElementById('togNight').className='m-toggle'+(t==='night'?' night-active':'');
 }
 
@@ -30603,6 +31169,18 @@ tickMasteryOnLoad();
 checkAchievements();
 _updateAchBadge();
 tickHpMp();
+// Open into the tab that fits the hour (2026-09). Habits are a morning-open /
+// night-close ritual, so the middle of the day belongs to WORK: open in WORK from
+// 10:00–18:59, QUESTS otherwise. (A comeback/first-load overlay still shows on top.)
+(function _openTabByHour(){
+  const h = new Date().getHours();
+  const target = (h >= 10 && h < 19) ? 'work' : 'habits';
+  if (target !== currentTab) {
+    currentTab = target;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`[data-tab="${target}"]`)?.classList.add('active');
+  }
+})();
 saveState();
 renderAll();
 scheduleNotifications();
