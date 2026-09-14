@@ -8364,6 +8364,38 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .arise-pop .arise-card{text-align:center}
 .arise-word{font-family:'Cinzel',serif;font-size:30px;font-weight:700;color:#ffd700;letter-spacing:3px;
   text-shadow:0 0 20px rgba(255,215,0,0.7);margin-bottom:6px}
+/* ── Per-drop Red Gate skins (accent is set inline in JS; these add mood) ── */
+.gate-card.red-gate{position:relative}
+.rg-theme-cyberpunk{background:linear-gradient(135deg,rgba(0,229,255,0.10),rgba(255,46,136,0.06))}
+.rg-theme-cyberpunk .gate-title{color:#7df9ff;text-shadow:0 0 7px rgba(0,229,255,0.6),1.5px 0 rgba(255,46,136,0.55)}
+.rg-theme-cyberpunk .gate-rank.red{color:#ff2e88}
+.rg-theme-cyberpunk::after{content:'';position:absolute;inset:0;pointer-events:none;border-radius:9px;
+  background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,229,255,0.04) 3px 4px)}
+.rg-theme-psycho{background:linear-gradient(135deg,rgba(124,77,255,0.13),rgba(38,222,180,0.06))}
+.rg-theme-psycho .gate-title{color:#ff7a94;text-shadow:0 0 8px rgba(124,77,255,0.55)}
+.rg-theme-psycho .gate-rank.red{color:#7cf5d8}
+.rg-theme-hero{background:linear-gradient(135deg,rgba(53,199,89,0.10),rgba(255,59,48,0.07))}
+.rg-theme-hero .gate-title{color:#6bff8f;text-shadow:0 0 8px rgba(53,199,89,0.5),0 0 2px rgba(255,59,48,0.5)}
+.rg-theme-hero .gate-rank.red{color:#ff6b5e}
+.rg-theme-clover{background:linear-gradient(135deg,rgba(41,209,122,0.11),rgba(255,255,255,0.02))}
+.rg-theme-clover .gate-title{color:#5df0a3;text-shadow:0 0 7px rgba(41,209,122,0.5)}
+.rg-theme-clover .gate-rank.red{color:#5df0a3}
+.rg-theme-festival{background:linear-gradient(135deg,rgba(255,193,77,0.13),rgba(255,105,180,0.05))}
+.rg-theme-festival .gate-title{color:#ffd98a;text-shadow:0 0 7px rgba(255,193,77,0.5)}
+.rg-theme-festival .gate-rank.red{color:#ffd98a}
+.rg-theme-poke{background:linear-gradient(135deg,rgba(255,203,5,0.12),rgba(255,59,48,0.06))}
+.rg-theme-poke .gate-title{color:#ffe066;text-shadow:0 0 7px rgba(255,203,5,0.5)}
+.rg-theme-poke .gate-rank.red{color:#ff6b5e}
+.rg-theme-poke::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;z-index:1;background:linear-gradient(90deg,#ff3b30 0 50%,#111 50% 100%)}
+.rg-theme-berserk{background:radial-gradient(120% 80% at 50% -10%,rgba(192,36,44,0.20),rgba(0,0,0,0.25))}
+.rg-theme-berserk .gate-title{color:#ff5a5f;text-shadow:0 0 8px rgba(192,36,44,0.6)}
+.rg-theme-berserk .gate-rank.red{color:#ff5a5f}
+@media (prefers-reduced-motion:no-preference){
+  .rg-theme-psycho{animation:rgPsychoPulse 3.4s ease-in-out infinite}
+  .rg-theme-berserk{animation:rgBerserkPulse 4s ease-in-out infinite}
+}
+@keyframes rgPsychoPulse{0%,100%{box-shadow:0 0 0 rgba(124,77,255,0)}50%{box-shadow:0 0 16px rgba(124,77,255,0.28)}}
+@keyframes rgBerserkPulse{0%,100%{box-shadow:0 0 0 rgba(192,36,44,0)}50%{box-shadow:0 0 14px rgba(192,36,44,0.3)}}
 .work-task-list{display:flex;flex-direction:column;gap:7px;margin:8px 0}
 .work-task-row{display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid rgba(255,255,255,0.09);
   border-radius:7px;background:rgba(255,255,255,0.02);font-family:'Rajdhani',sans-serif;transition:background 0.15s;touch-action:pan-y}
@@ -20666,7 +20698,7 @@ const REDGATES_SEED = [
   { id:'rg_psycho',   codename:'100% Psycho',   drop:'Mob Psycho drop',   deadline:'2026-09-22', steps:_dropSteps() },
   { id:'rg_hero',     codename:'My Hero',       drop:'My Hero Academia drop', deadline:'2026-09-28', steps:_dropSteps() },
   { id:'rg_clover',   codename:'5 Leaf Clover', drop:'Black Clover drop', deadline:'2026-09-30', steps:_dropSteps() },
-  { id:'rg_festival', codename:'The Festival',  drop:'10 designs → designer before Christmas', deadline:'2026-09-30', steps:[
+  { id:'rg_festival', codename:'The Festival',  drop:'10 designs → designer before Christmas', deadline:'2026-09-20', steps:[
     {id:'f1',text:'Pick 6 anime designs for serigraphy',done:false},
     {id:'f2',text:'Pick 4 asian-streetwear designs',done:false},
     {id:'f3',text:'Compile references / specs for each',done:false},
@@ -20676,11 +20708,19 @@ const REDGATES_SEED = [
   { id:'rg_poke',     codename:'Poke Cafe',     drop:'Pokémon drop',   deadline:'2026-10-31', steps:_dropSteps() },
   { id:'rg_berserk',  codename:'Going Crazy',   drop:'Berserk drop',      deadline:'2026-10-31', steps:_dropSteps() },
 ];
+// Per-drop skins — each Red Gate reads as its own franchise (icon + accent +
+// a CSS theme class). Keyed by gate id so it works without re-seeding saves.
+const RG_THEME  = { rg_night:'cyberpunk', rg_psycho:'psycho', rg_hero:'hero', rg_clover:'clover', rg_festival:'festival', rg_poke:'poke', rg_berserk:'berserk' };
+const RG_ICON   = { rg_night:'🌃', rg_psycho:'🌀', rg_hero:'💥', rg_clover:'🍀', rg_festival:'🎏', rg_poke:'🟡', rg_berserk:'⚔️' };
+const RG_ACCENT = { rg_night:'#00e5ff', rg_psycho:'#ff4d6d', rg_hero:'#35c759', rg_clover:'#29d17a', rg_festival:'#ffc14d', rg_poke:'#ffcb05', rg_berserk:'#c0242c' };
 function _ensureWorkBattle(){
   if(!state.hunts)    state.hunts    = HUNTS_SEED.map(h => ({...h}));
   if(!state.gates)    state.gates    = GATES_SEED.map(g => ({...g, steps:g.steps.map(s=>({...s}))}));
   if(!state.redGates) state.redGates = REDGATES_SEED.map(g => ({...g, steps:g.steps.map(s=>({...s}))}));
   if(!state.huntState) state.huntState = {};
+  // migration: Festival deadline moved Sep 30 → Sep 20 (only if untouched/uncleared)
+  const _f = state.redGates.find(r => r.id === 'rg_festival');
+  if(_f && !_f.clearedAt && _f.deadline === '2026-09-30') _f.deadline = '2026-09-20';
 }
 
 // ── period + reward plumbing ────────────────────────────────────────────────
@@ -20862,11 +20902,12 @@ function renderGateCard(g, isRed){
   const key = (isRed?'rg-':'gate-') + g.id;
   const isOpen = (completedExpanded[key] !== undefined) ? completedExpanded[key] : (status==='active');
   const RANK_CLR = { C:'#69f0ae', B:'#ffc107', A:'#ffa726', S:'#ffd700' };
-  const accent = isRed ? '#ff5252' : (RANK_CLR[g.rank] || '#ffc107');
-  const card = document.createElement('div'); card.className = 'gate-card ' + (isRed?'red-gate':'gate') + ' status-' + status;
+  const accent = isRed ? (RG_ACCENT[g.id] || '#ff5252') : (RANK_CLR[g.rank] || '#ffc107');
+  const card = document.createElement('div');
+  card.className = 'gate-card ' + (isRed?'red-gate':'gate') + ' status-' + status + (isRed ? ' rg-theme-' + (RG_THEME[g.id] || 'default') : '');
   card.style.setProperty('--gate-accent', accent);
   const badge = isRed
-    ? `<span class="gate-rank red">🔴 ${_deadlineLabel(g)}</span>`
+    ? `<span class="gate-rank red">${RG_ICON[g.id] || '🔴'} ${_deadlineLabel(g)}</span>`
     : `<span class="gate-rank" style="color:${accent};border-color:${accent}">${g.rank}</span>`;
   const statusTag = status==='cleared' ? `<span class="gate-cleared">✦ CLEARED</span>`
                   : status==='collapsed' ? `<span class="gate-collapsed">✕ COLLAPSED</span>` : '';
