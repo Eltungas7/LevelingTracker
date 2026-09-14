@@ -8315,6 +8315,28 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .work-current .wc-skip{background:none;border:none;color:rgba(224,247,250,0.55);font-family:'Rajdhani',sans-serif;font-size:12px;cursor:pointer;letter-spacing:0.03em}
 .work-current .wc-skip:hover{color:rgba(224,247,250,0.85)}
 @media (prefers-reduced-motion:reduce){.work-current,.work-current .wc-stars,.work-current .wc-eyebrow,.work-current .wc-finish{animation:none}}
+/* Themed hero — adopts the current drop/boss accent (--wc-accent set in JS) */
+.work-current.wc-themed{
+  border-color:color-mix(in srgb,var(--wc-accent) 55%,transparent);
+  background:radial-gradient(ellipse at 30% -10%, color-mix(in srgb,var(--wc-accent) 24%, #100d0a) 0%, #0c0a07 55%, #070605 100%);
+  animation:wcThemedAura 2.8s ease-in-out infinite}
+.work-current.wc-themed .wc-eyebrow{color:var(--wc-accent);text-shadow:0 0 10px color-mix(in srgb,var(--wc-accent) 70%,transparent)}
+.work-current.wc-themed .wc-title{text-shadow:0 0 16px color-mix(in srgb,var(--wc-accent) 55%,transparent)}
+.work-current.wc-themed .wc-pct{color:var(--wc-accent)}
+.work-current.wc-themed .wt-cell{border-color:color-mix(in srgb,var(--wc-accent) 45%,transparent)}
+.work-current.wc-themed .wt-cell.on{background:var(--wc-accent);border-color:var(--wc-accent);box-shadow:0 0 6px color-mix(in srgb,var(--wc-accent) 55%,transparent)}
+.work-current.wc-themed .wc-finish{color:#0a0a0a;
+  background:linear-gradient(135deg, color-mix(in srgb,var(--wc-accent) 72%, #fff), var(--wc-accent));
+  animation:wcThemedBtn 2.2s ease-in-out infinite}
+.work-current.wc-themed .wc-bump{background:color-mix(in srgb,var(--wc-accent) 14%,transparent);
+  border-color:color-mix(in srgb,var(--wc-accent) 45%,transparent);color:color-mix(in srgb,var(--wc-accent) 65%, #fff)}
+.work-current.wc-themed .wc-bump:hover{background:color-mix(in srgb,var(--wc-accent) 24%,transparent)}
+@keyframes wcThemedAura{
+  0%,100%{box-shadow:0 0 0 1px color-mix(in srgb,var(--wc-accent) 15%,transparent), 0 0 28px color-mix(in srgb,var(--wc-accent) 28%,transparent), inset 0 0 40px color-mix(in srgb,var(--wc-accent) 8%,transparent)}
+  50%{box-shadow:0 0 0 1px color-mix(in srgb,var(--wc-accent) 32%,transparent), 0 0 48px color-mix(in srgb,var(--wc-accent) 52%,transparent), inset 0 0 56px color-mix(in srgb,var(--wc-accent) 16%,transparent)}}
+@keyframes wcThemedBtn{
+  0%,100%{box-shadow:0 0 18px color-mix(in srgb,var(--wc-accent) 40%,transparent)}
+  50%{box-shadow:0 0 34px color-mix(in srgb,var(--wc-accent) 72%,transparent)}}
 
 .work-add-top{margin:10px 0 4px}
 /* ── Solo Leveling battle system (Hunts / Gates / Red Gates) ── */
@@ -20875,7 +20897,10 @@ function renderWorkHero(){
   } else {
     const g = a.gate, s = a.step, isRed = a.type==='redgate';
     const total = g.steps.length, done = g.steps.filter(x=>x.done).length, pct = Math.round(done/total*100);
-    const badge = isRed ? `🔴 ${_escWork(g.codename)} · ${_deadlineLabel(g)}` : `🚪 ${g.rank}-RANK · ${_escWork(g.codename)}`;
+    // Hero takes on the drop/boss colours so it visually "becomes" what you're fighting.
+    const heroAccent = isRed ? (RG_ACCENT[g.id] || '#ff5252') : (GATE_ACCENT[g.id] || '#ffc107');
+    card.classList.add('wc-themed'); card.style.setProperty('--wc-accent', heroAccent);
+    const badge = isRed ? `${RG_ICON[g.id] || '🔴'} ${_escWork(g.codename)} · ${_deadlineLabel(g)}` : `${GATE_ICON[g.id] || '🚪'} ${g.rank}-RANK · ${_escWork(g.codename)}`;
     card.innerHTML = `<div class="wc-stars"></div><div class="wc-inner">`
       + `<div class="wc-eyebrow">▶ NEXT STEP · ${badge}</div>`
       + `<div class="wc-title">${_escWork(s.text)}</div>`
