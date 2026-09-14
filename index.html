@@ -1614,10 +1614,15 @@ body {
 .quest-action-primary  { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
 
 .drag-handle {
-  color: var(--sao-text-dim); font-size: 14px;
-  cursor: grab; padding: 0 2px;
-  opacity: 1;
+  color: var(--sao-text-dim); font-size: 20px; line-height: 1;
+  cursor: grab; padding: 8px 12px; margin: -6px -6px -6px 0;
+  opacity: 0.6; touch-action: none; user-select: none; -webkit-user-select: none;
+  display: flex; align-items: center; align-self: stretch;
+  transition: opacity 0.15s, color 0.15s;
 }
+.drag-handle:hover { opacity: 0.9; }
+.drag-handle:active { cursor: grabbing; opacity: 1; color: var(--sao-blue); }
+.quest.dragging { opacity: 0.92; box-shadow: 0 6px 22px rgba(0,0,0,0.5); transform: scale(1.015); position: relative; z-index: 5; }
 
 .streak-badge {
   display: flex; flex-direction: column; align-items: flex-end; gap: 1px;
@@ -8319,9 +8324,11 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .work-task-row.done{opacity:0.6}
 .work-task-row.done .wt-text{text-decoration:line-through}
 .work-task-row.wt-dragging{background:rgba(255,193,7,0.12);border-color:#ffc10788;box-shadow:0 4px 16px rgba(0,0,0,0.4);opacity:0.97}
-.work-task-row .wt-grip{flex:0 0 auto;width:20px;color:var(--sao-text-dim);font-size:16px;line-height:1;cursor:grab;
-  text-align:center;opacity:0.5;touch-action:none;user-select:none}
-.work-task-row .wt-grip:active{cursor:grabbing}
+.work-task-row .wt-grip{flex:0 0 auto;width:34px;color:var(--sao-text-dim);font-size:20px;line-height:1;cursor:grab;
+  display:flex;align-items:center;justify-content:center;align-self:stretch;padding:8px 4px;margin:-8px 0;
+  opacity:0.6;touch-action:none;user-select:none;-webkit-user-select:none;transition:opacity 0.15s,color 0.15s}
+.work-task-row .wt-grip:hover{opacity:0.9}
+.work-task-row .wt-grip:active{cursor:grabbing;opacity:1;color:#ffc107}
 .work-task-row .wt-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
 .work-task-row .wt-text{font-size:14.5px;color:var(--sao-text);word-break:break-word;line-height:1.25}
 .work-task-row .wt-prog{display:flex;align-items:center;gap:9px}
@@ -17386,6 +17393,7 @@ function makeSortable(listEl, listKey) {
     });
     handle.addEventListener('pointermove', e => {
       if (!dragId || dragId !== quest.dataset.taskId) return;
+      _dragAutoScroll(e.clientY);
       const wraps = Array.from(listEl.querySelectorAll('[data-wrap-id]'));
       const targetWrap = wraps.find(w => { const r=w.getBoundingClientRect(); return e.clientY>=r.top && e.clientY<=r.bottom; });
       listEl.querySelectorAll('.quest').forEach(q => q.classList.remove('drag-over-top','drag-over-bottom'));
@@ -17396,6 +17404,7 @@ function makeSortable(listEl, listKey) {
     });
     const finishDrag = e => {
       if (!dragId || dragId !== quest.dataset.taskId) return;
+      _dragAutoScrollStop();
       const wraps = Array.from(listEl.querySelectorAll('[data-wrap-id]'));
       const targetWrap = wraps.find(w => { const r=w.getBoundingClientRect(); return e.clientY>=r.top && e.clientY<=r.bottom; });
       listEl.querySelectorAll('.quest').forEach(q => q.classList.remove('dragging','drag-over-top','drag-over-bottom'));
@@ -20357,6 +20366,22 @@ function _commitWorkOrder(ids){
   saveState(); renderAll();
 }
 
+// Edge auto-scroll while dragging: when your finger nears the top or bottom of
+// the screen, the page scrolls so you can drop a row past what's currently
+// visible. Shared by both the WORK and HABITS reorder handlers.
+let _dragScrollRAF = null, _dragScrollV = 0;
+function _dragAutoScroll(y){
+  const M = 90, h = window.innerHeight;               // edge zone (px)
+  if(y < M)            _dragScrollV = -Math.ceil((M - y) / 5);
+  else if(y > h - M)   _dragScrollV =  Math.ceil((y - (h - M)) / 5);
+  else                 _dragScrollV = 0;
+  if(_dragScrollV && !_dragScrollRAF){
+    const step = () => { if(!_dragScrollV){ _dragScrollRAF = null; return; } window.scrollBy(0, _dragScrollV); _dragScrollRAF = requestAnimationFrame(step); };
+    _dragScrollRAF = requestAnimationFrame(step);
+  }
+}
+function _dragAutoScrollStop(){ _dragScrollV = 0; if(_dragScrollRAF){ cancelAnimationFrame(_dragScrollRAF); _dragScrollRAF = null; } }
+
 // Pointer-based drag reorder (works on touch + mouse). Snap-to-position: the
 // dragged row jumps to where it will land as you move, so there's no jitter math.
 function _enableWorkDragReorder(container){
@@ -20365,6 +20390,7 @@ function _enableWorkDragReorder(container){
     if(!dragEl) return;
     ev.preventDefault();
     const y = ev.clientY != null ? ev.clientY : (ev.touches && ev.touches[0] ? ev.touches[0].clientY : 0);
+    _dragAutoScroll(y);
     const sibs = [...container.querySelectorAll('.work-task-row')].filter(r => r !== dragEl);
     let placed = false;
     for(const s of sibs){ const r = s.getBoundingClientRect(); if(y < r.top + r.height/2){ container.insertBefore(dragEl, s); placed = true; break; } }
@@ -20372,6 +20398,7 @@ function _enableWorkDragReorder(container){
   };
   const onUp = () => {
     if(!dragEl) return;
+    _dragAutoScrollStop();
     dragEl.classList.remove('wt-dragging');
     const ids = [...container.querySelectorAll('.work-task-row')].map(r => r.dataset.id);
     dragEl = null;
@@ -20383,6 +20410,7 @@ function _enableWorkDragReorder(container){
     grip.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       dragEl = grip.closest('.work-task-row'); if(!dragEl) return;
+      try { grip.setPointerCapture(e.pointerId); } catch(_){}
       dragEl.classList.add('wt-dragging');
       window.addEventListener('pointermove', onMove, { passive:false });
       window.addEventListener('pointerup', onUp);
