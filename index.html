@@ -8502,6 +8502,34 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 @keyframes wfpOut{to{opacity:0}}
 @keyframes wfpCheck{0%{transform:scale(0) rotate(-20deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
 @media (prefers-reduced-motion:reduce){.work-finish-pop,.work-finish-pop .wfp-check{animation:none}}
+/* ══ Event "CONGRATULATIONS" banner — themed to the cleared Gate's accent ══ */
+.event-congrats{background:radial-gradient(ellipse at center,rgba(8,12,20,0.74),rgba(6,10,16,0.35) 60%,transparent)}
+.event-congrats .ec-card{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;
+  padding:28px 30px 22px;border-radius:18px;max-width:min(360px,88vw);
+  background:rgba(12,16,22,0.97);border:1.5px solid var(--ec-accent,#ffc107);
+  box-shadow:0 12px 55px rgba(0,0,0,0.6),0 0 42px -6px var(--ec-accent,#ffc107),inset 0 0 34px -14px var(--ec-accent,#ffc107);
+  font-family:'Rajdhani',sans-serif;animation:ecPop 0.5s cubic-bezier(.34,1.56,.64,1) both}
+.event-congrats .ec-burst{position:absolute;top:-20px;font-size:36px;filter:drop-shadow(0 0 12px var(--ec-accent,#ffc107));animation:ecBurst 0.65s ease both}
+.event-congrats .ec-eyebrow{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--ec-accent,#ffc107);opacity:0.92;margin-top:6px}
+.event-congrats .ec-icon{font-size:46px;line-height:1;margin:3px 0 1px;filter:drop-shadow(0 0 14px var(--ec-accent,#ffc107));animation:ecIcon 0.6s cubic-bezier(.34,1.56,.64,1) both}
+.event-congrats .ec-congrats{font-family:'Cinzel',serif;font-size:23px;font-weight:700;letter-spacing:2px;color:#fff;
+  text-shadow:0 0 18px var(--ec-accent,#ffc107),0 0 6px var(--ec-accent,#ffc107)}
+.event-congrats .ec-name{font-family:'Cinzel',serif;font-size:17px;color:var(--ec-accent,#ffc107);letter-spacing:0.5px;margin-top:2px}
+.event-congrats .ec-sub{font-size:12.5px;color:var(--sao-text-dim);max-width:290px;margin-top:1px}
+.event-congrats .ec-line{font-size:13.5px;color:var(--sao-text);opacity:0.92;margin-top:9px;max-width:300px;line-height:1.35}
+.event-congrats .ec-continue{margin-top:16px;padding:8px 24px;border:1.5px solid var(--ec-accent,#ffc107);border-radius:9px;background:transparent;
+  color:var(--ec-accent,#ffc107);font-family:'Rajdhani',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:background .15s,color .15s}
+.event-congrats .ec-continue:hover{background:var(--ec-accent,#ffc107);color:#0b0f16}
+@keyframes ecPop{0%{transform:scale(0.82) translateY(12px);opacity:0}100%{transform:scale(1) translateY(0);opacity:1}}
+@keyframes ecBurst{0%{transform:scale(0) rotate(-30deg);opacity:0}60%{transform:scale(1.3) rotate(8deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes ecIcon{0%{transform:scale(0) rotate(-14deg)}100%{transform:scale(1) rotate(0)}}
+@media (prefers-reduced-motion:reduce){.event-congrats .ec-card,.event-congrats .ec-burst,.event-congrats .ec-icon{animation:none}}
+/* multi-completion step counter badge (e.g. 3 TikToks) */
+.gate-step .gs-count{flex:0 0 auto;margin-left:auto;padding:1px 8px;border-radius:10px;font-family:'Rajdhani',sans-serif;
+  font-size:11.5px;font-weight:700;letter-spacing:0.5px;color:var(--gate-accent,#ffc107);
+  border:1px solid color-mix(in srgb,var(--gate-accent,#ffc107) 55%,transparent);background:rgba(255,255,255,0.04)}
+.gate-step .gs-count.full{color:#8affc0;border-color:rgba(138,255,192,0.5)}
+.wc-counter{font-family:'Rajdhani',sans-serif;font-size:12.5px;font-weight:700;color:var(--wc-accent,#ffc107);letter-spacing:0.5px;margin:1px 0 2px}
 
 /* ═══ QUICK CAPTURE — global brain-dump FAB + overlay ═══ */
 .qc-fab{position:fixed;right:16px;bottom:74px;width:52px;height:52px;border-radius:50%;z-index:9000;
@@ -18011,6 +18039,181 @@ function playStellarComplete(tier){
     }
   }catch(e){}
 }
+// ── Per-theme Gate / Red-Gate CLEAR jingles ──────────────────────────────────
+// Every Gate clears with a sound that fits its world, so each reads as its own
+// franchise / boss when you finish it:
+//   Red-Gate anime drops:
+//     cyberpunk (Night City)  → neon / technologic synthwave
+//     hero (My Hero Academia) → triumphant "Plus Ultra" fanfare
+//     poke (Poké Café)        → friendly, happy chiptune "item get"
+//     psycho (Mob Psycho 100) → tension swell into a 100% psychic burst
+//     clover (Black Clover)   → dark anti-magic → defiant rising motif
+//     berserk (Going Crazy)   → ominous, heavy, brooding
+//     festival (The Festival) → taiko drums + festive flute
+//   Rank-Gate bosses (one distinct victory each):
+//     knight  (C) → steel clang → noble minor→major "redemption"
+//     dragon  (B) → descending roar + fire → triumphant rise
+//     demon   (A) → infernal sub + dissonant tritone + dark choir
+//     vampire (S) → gothic pipe-organ + haunting descending melody
+// Returns true if it played a themed jingle, false to fall back to the stellar SFX.
+function playThemeGateClear(theme){
+  if(!soundEnabled || !_ACtx) return false;
+  try{
+    const ctx = _getCtx(), t = ctx.currentTime;
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value=-8; comp.knee.value=5; comp.ratio.value=3.5; comp.attack.value=0.001; comp.release.value=0.16; comp.connect(ctx.destination);
+    // tone(freq, startOffset, dur, opts) — one enveloped oscillator
+    const tone = (f, st, d, o={}) => {
+      const { type='sine', peak=0.12, det=0 } = o;
+      const osc=ctx.createOscillator(), g=ctx.createGain(); osc.type=type; osc.frequency.value=f; osc.detune.value=det;
+      g.gain.setValueAtTime(0, t+st); g.gain.linearRampToValueAtTime(peak, t+st+0.012); g.gain.exponentialRampToValueAtTime(0.001, t+st+d);
+      osc.connect(g); g.connect(comp); osc.start(t+st); osc.stop(t+st+d+0.05);
+    };
+    // sweepUp(f0,f1,start,dur,opts) — pitch + filter glide (whoosh / neon lead)
+    const sweepUp = (f0, f1, st, d, o={}) => {
+      const { type='sawtooth', peak=0.12, cut0=300, cut1=6000, q=6 } = o;
+      const osc=ctx.createOscillator(), g=ctx.createGain(), bf=ctx.createBiquadFilter();
+      osc.type=type; osc.frequency.setValueAtTime(f0, t+st); osc.frequency.exponentialRampToValueAtTime(f1, t+st+d);
+      bf.type='lowpass'; bf.frequency.setValueAtTime(cut0, t+st); bf.frequency.exponentialRampToValueAtTime(cut1, t+st+d); bf.Q.value=q;
+      g.gain.setValueAtTime(0, t+st); g.gain.linearRampToValueAtTime(peak, t+st+0.04); g.gain.exponentialRampToValueAtTime(0.001, t+st+d+0.1);
+      osc.connect(bf); bf.connect(g); g.connect(comp); osc.start(t+st); osc.stop(t+st+d+0.15);
+    };
+    // noise(start,dur,opts) — filtered white-noise burst (impact / taiko / glitch)
+    const noise = (st, d, o={}) => {
+      const { peak=0.4, hp=800, lp=null } = o;
+      const len=Math.max(1, Math.floor(ctx.sampleRate*(d+0.02)));
+      const buf=ctx.createBuffer(1, len, ctx.sampleRate), nd=buf.getChannelData(0);
+      for(let i=0;i<len;i++) nd[i]=Math.random()*2-1;
+      const src=ctx.createBufferSource(); src.buffer=buf;
+      const hpf=ctx.createBiquadFilter(); hpf.type='highpass'; hpf.frequency.value=hp; src.connect(hpf);
+      let node=hpf;
+      if(lp){ const lpf=ctx.createBiquadFilter(); lpf.type='lowpass'; lpf.frequency.value=lp; node.connect(lpf); node=lpf; }
+      const g=ctx.createGain(); g.gain.setValueAtTime(0, t+st); g.gain.linearRampToValueAtTime(peak, t+st+0.004); g.gain.exponentialRampToValueAtTime(0.001, t+st+d);
+      node.connect(g); g.connect(comp); src.start(t+st); src.stop(t+st+d+0.03);
+    };
+
+    switch(theme){
+      case 'cyberpunk': { // Night City — neon synthwave, minor, glitchy
+        sweepUp(55,110,0,0.9,{type:'sawtooth',peak:0.22,cut0:200,cut1:1300,q:3});
+        noise(0,0.05,{peak:0.16,hp:2200});
+        [[220,0.05],[329.63,0.14],[440,0.23],[659.25,0.32],[880,0.44]].forEach(([f,s])=> tone(f,s,0.16,{type:'square',peak:0.12,det:6}));
+        sweepUp(440,1760,0.44,0.5,{type:'sawtooth',peak:0.11,cut0:600,cut1:8000,q:8});
+        [880,1046.5,1318.51].forEach((f,i)=> tone(f,0.6+i*0.02,0.9,{type:'triangle',peak:0.09,det:-4}));
+        [2093,2637].forEach((f,i)=> tone(f,0.72+i*0.09,0.25,{type:'square',peak:0.045}));
+        break;
+      }
+      case 'hero': { // My Hero Academia — "Plus Ultra" triumphant major fanfare
+        noise(0,0.09,{peak:0.34,hp:400,lp:6000});
+        tone(65.41,0,0.5,{type:'sine',peak:0.3});
+        [[261.63,0.08],[329.63,0.18],[392,0.28],[523.25,0.4]].forEach(([f,s])=>{ tone(f,s,0.5,{type:'square',peak:0.11}); tone(f,s,0.5,{type:'triangle',peak:0.11}); });
+        [523.25,659.25,783.99,1046.5].forEach((f,i)=> tone(f,0.55,1.6,{type:'triangle',peak:0.13-i*0.015,det:4}));
+        [523.25,659.25,783.99,1046.5].forEach((f)=> tone(f,0.55,1.6,{type:'triangle',peak:0.045,det:-8}));
+        [1567.98,2093].forEach((f,i)=> tone(f,0.62+i*0.09,0.9,{type:'sine',peak:0.05}));
+        break;
+      }
+      case 'poke': { // Poké Café — friendly, happy chiptune "item get"
+        [[130.81,0],[130.81,0.3]].forEach(([f,s])=> tone(f,s,0.14,{type:'triangle',peak:0.14}));
+        [[523.25,0.0,0.1],[659.25,0.1,0.1],[783.99,0.2,0.1],[1046.5,0.32,0.14],[783.99,0.46,0.1],[1046.5,0.56,0.42]].forEach(([f,s,d])=> tone(f,s,d,{type:'square',peak:0.12}));
+        [[659.25,0.32],[1318.51,0.56]].forEach(([f,s])=> tone(f,s,0.3,{type:'sine',peak:0.07}));
+        tone(1567.98,0.98,0.5,{type:'triangle',peak:0.08});
+        break;
+      }
+      case 'psycho': { // Mob Psycho 100 — tension swell → 100% burst → shimmer
+        sweepUp(110,440,0,0.55,{type:'sine',peak:0.16,cut0:200,cut1:3200,q:2});
+        noise(0.55,0.18,{peak:0.4,hp:300,lp:5000});
+        tone(80,0.55,0.4,{type:'sine',peak:0.28});
+        [622.25,784,932.33,1244.51].forEach((f,i)=> tone(f,0.6+i*0.03,1.1,{type:'triangle',peak:0.09,det:i%2?10:-10}));
+        [1864.66,2489].forEach((f,i)=> tone(f,0.66+i*0.1,0.9,{type:'sine',peak:0.04}));
+        break;
+      }
+      case 'clover': { // Black Clover — dark anti-magic → defiant rising motif
+        sweepUp(55,82,0,0.9,{type:'sawtooth',peak:0.2,cut0:150,cut1:900,q:3});
+        noise(0,0.06,{peak:0.24,hp:200,lp:2500});
+        [[293.66,0.1],[349.23,0.24],[440,0.38],[587.33,0.54]].forEach(([f,s])=>{ tone(f,s,0.5,{type:'sawtooth',peak:0.1,det:5}); tone(f,s,0.5,{type:'triangle',peak:0.08}); });
+        [587.33,698.46,880].forEach((f,i)=> tone(f,0.62,1.4,{type:'triangle',peak:0.11-i*0.02}));
+        break;
+      }
+      case 'berserk': { // Berserk — ominous, heavy, brooding minor
+        tone(43.65,0,1.4,{type:'sine',peak:0.3});
+        noise(0,0.12,{peak:0.3,hp:150,lp:1800});
+        [164.81,196,246.94].forEach((f,i)=> tone(f,0.05,1.6,{type:'sawtooth',peak:0.09-i*0.015,det:i?8:-8}));
+        [[246.94,0.2],[233.08,0.5],[196,0.8]].forEach(([f,s])=> tone(f,s,0.6,{type:'triangle',peak:0.1}));
+        tone(987.77,0.3,1.3,{type:'sine',peak:0.03});
+        break;
+      }
+      case 'festival': { // The Festival — matsuri taiko drums + festive flute
+        [0,0.28,0.56].forEach(s=>{ tone(70,s,0.18,{type:'sine',peak:0.28}); noise(s,0.06,{peak:0.14,hp:120,lp:1500}); });
+        [[783.99,0.15,0.12],[880,0.3,0.12],[1046.5,0.45,0.12],[880,0.6,0.12],[1318.51,0.75,0.5]].forEach(([f,s,d])=> tone(f,s,d,{type:'triangle',peak:0.1}));
+        [1567.98,2093].forEach((f,i)=> tone(f,0.82+i*0.1,0.7,{type:'sine',peak:0.05}));
+        break;
+      }
+      // ── Rank Gates (bosses) — one distinct victory per boss ──────────────────
+      case 'knight': { // C · The Damned Knight — steel clang → noble minor→major
+        noise(0,0.05,{peak:0.3,hp:1500,lp:7000});
+        tone(98,0,0.5,{type:'sine',peak:0.24});
+        [[220,0.05],[261.63,0.16],[329.63,0.28],[440,0.42]].forEach(([f,s])=>{ tone(f,s,0.5,{type:'sawtooth',peak:0.09,det:4}); tone(f,s,0.5,{type:'triangle',peak:0.08}); });
+        [440,554.37,659.25].forEach((f,i)=> tone(f,0.5,1.5,{type:'triangle',peak:0.11-i*0.02})); // redemption chord
+        break;
+      }
+      case 'dragon': { // B · The Dragon — descending roar + fire → triumphant rise
+        sweepUp(320,80,0,0.5,{type:'sawtooth',peak:0.26,cut0:1600,cut1:250,q:4});
+        noise(0,0.18,{peak:0.2,hp:200,lp:2500});
+        tone(55,0.1,0.6,{type:'square',peak:0.13});
+        [[293.66,0.4],[440,0.52],[587.33,0.64],[880,0.78]].forEach(([f,s])=> tone(f,s,0.6,{type:'triangle',peak:0.1}));
+        [587.33,739.99,880].forEach((f,i)=> tone(f,0.82,1.3,{type:'triangle',peak:0.1-i*0.018}));
+        break;
+      }
+      case 'demon': { // A · The Demon — infernal sub, dissonant tritone, dark choir
+        tone(48,0,1.3,{type:'sawtooth',peak:0.24});
+        noise(0,0.14,{peak:0.3,hp:120,lp:1600});
+        [130.81,185].forEach(f=> tone(f,0.05,0.7,{type:'sawtooth',peak:0.1,det:6})); // C–F# tritone
+        [196,233.08,311.13].forEach((f,i)=> tone(f,0.35,1.2,{type:'triangle',peak:0.09,det:i%2?12:-12}));
+        tone(1244.51,0.4,0.9,{type:'sine',peak:0.035});
+        break;
+      }
+      case 'vampire': { // S · The Vampire — gothic pipe-organ + haunting descent
+        [146.83,220,293.66,349.23].forEach((f,i)=>{ tone(f,0,1.9,{type:'sawtooth',peak:0.08-i*0.01,det:-6}); tone(f,0,1.9,{type:'triangle',peak:0.07-i*0.01,det:6}); });
+        noise(0,0.04,{peak:0.12,hp:2500});
+        [[880,0.25,0.3],[830.61,0.5,0.3],[698.46,0.75,0.3],[587.33,1.0,0.7]].forEach(([f,s,d])=> tone(f,s,d,{type:'sine',peak:0.09}));
+        [1174.66,1567.98].forEach((f,i)=> tone(f,0.3+i*0.12,1.0,{type:'sine',peak:0.04}));
+        break;
+      }
+      default: return false;
+    }
+    return true;
+  }catch(e){ return false; }
+}
+// Objective checked inside a Gate / Red Gate — a crisp "locked in" confirm that
+// climbs a major scale as the gate fills, so you *hear* the boss getting closer.
+// (frac = fraction of the gate's steps now done, 0..1)
+function playObjectiveDone(frac){
+  if(!soundEnabled || !_ACtx) return;
+  frac = Math.max(0, Math.min(1, frac || 0));
+  try{
+    const ctx=_getCtx(), t=ctx.currentTime;
+    const comp=ctx.createDynamicsCompressor(); comp.threshold.value=-10; comp.knee.value=5; comp.ratio.value=3; comp.attack.value=0.001; comp.release.value=0.12; comp.connect(ctx.destination);
+    const semis=[0,2,4,5,7,9,11,12]; // C major scale
+    const base=523.25*Math.pow(2, semis[Math.min(semis.length-1, Math.round(frac*(semis.length-1)))]/12);
+    const mk=(f,st,d,type,peak)=>{ const o=ctx.createOscillator(),g=ctx.createGain(); o.type=type; o.frequency.value=f; g.gain.setValueAtTime(0,t+st); g.gain.linearRampToValueAtTime(peak,t+st+0.008); g.gain.exponentialRampToValueAtTime(0.001,t+st+d); o.connect(g); g.connect(comp); o.start(t+st); o.stop(t+st+d+0.05); };
+    mk(base, 0, 0.15, 'triangle', 0.22);
+    mk(base*1.5, 0.055, 0.24, 'sine', 0.15);   // perfect-fifth confirm
+    if(frac >= 0.999) mk(base*2, 0.12, 0.5, 'sine', 0.11); // extra sparkle right before the clear
+  }catch(e){}
+}
+// Normal WORK quest (hunt) tick — the SAME light blip for every hunt, rising a
+// little with each 25% cell so partial progress still feels good.
+function playHuntTick(frac){
+  if(!soundEnabled || !_ACtx) return;
+  frac = Math.max(0, Math.min(1, frac || 0));
+  try{
+    const ctx=_getCtx(), t=ctx.currentTime;
+    const comp=ctx.createDynamicsCompressor(); comp.threshold.value=-12; comp.knee.value=6; comp.ratio.value=3; comp.attack.value=0.001; comp.release.value=0.10; comp.connect(ctx.destination);
+    const base=440*Math.pow(2, Math.round(frac*4)/12); // small semitone rise per quarter
+    const mk=(f,st,d,type,peak)=>{ const o=ctx.createOscillator(),g=ctx.createGain(); o.type=type; o.frequency.value=f; g.gain.setValueAtTime(0,t+st); g.gain.linearRampToValueAtTime(peak,t+st+0.006); g.gain.exponentialRampToValueAtTime(0.001,t+st+d); o.connect(g); g.connect(comp); o.start(t+st); o.stop(t+st+d+0.04); };
+    mk(base, 0, 0.10, 'square', 0.12);
+    mk(base*2, 0.02, 0.12, 'sine', 0.07);
+  }catch(e){}
+}
 // Full-screen supernova burst (canvas particles + expanding ring). Scales with tier.
 function showStellarBurst(tier){
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -18031,7 +18234,7 @@ function showStellarBurst(tier){
   for(let i=0;i<N;i++){ const a=Math.random()*Math.PI*2, sp=2+Math.random()*spMax; parts.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,hue:hueBase+Math.random()*hueRange,size:1+Math.random()*(huge?3.4:2.6)}); }
   const start = performance.now(); const dur = reduce ? 650 : (huge?1450:big?1300:1150);
   function frame(now){
-    const el = now - start; g.clearRect(0,0,W,H);
+    const el = Math.max(0, now - start); g.clearRect(0,0,W,H);   // rAF ts can be a touch before start → clamp so the ring radius never goes negative
     const ring = el*0.62; g.beginPath(); g.arc(cx,cy,ring,0,Math.PI*2);
     g.strokeStyle = `rgba(179,136,255,${Math.max(0,0.55-el/700)})`; g.lineWidth = 3; g.stroke();
     parts.forEach(p=>{ if(p.life<=0) return; p.x+=p.vx; p.y+=p.vy; p.vy+=0.045; p.life-=0.011;
@@ -20696,13 +20899,58 @@ const HUNTS_SEED = [
   { id:'h_meta',   text:'Analyze & adjust META campaigns',   cadence:'weekly' },
   { id:'h_fact',   text:'Facturar / invoicing',              cadence:'monthly', window:'monthEnd' },
 ];
+// Canonical launch checklist for every anime drop. ORDER MATTERS — this is the
+// real order of the launch flow. Steps 1-5 are the usual show/sell flow; steps
+// 6-7 (3 TikTok posts + a second video reel) are newer additions so people can
+// see the design on video too.
 function _dropSteps(){ return [
-  { id:'p1', text:'Photography & visual pieces',   done:false },
-  { id:'p2', text:'Upload the product to the web', done:false },
-  { id:'p3', text:'Prepare mail marketing',        done:false },
-  { id:'p4', text:'Prepare first & second post',   done:false },
-  { id:'p5', text:'Prepare & launch ad campaign',  done:false },
+  { id:'p1', text:'Photography and visual pieces',            done:false },
+  { id:'p2', text:'Upload the product to the web',            done:false },
+  { id:'p3', text:'Prepare first carrousel post. Publish it', done:false },
+  { id:'p4', text:'Prepare & launch ad campaign',             done:false },
+  { id:'p5', text:'Prepare & launch email marketing',         done:false },
+  { id:'p6', text:'Prepare 3 TIKTOK post. Publish them',      target:3, count:0, done:false },
+  { id:'p7', text:'Prepare second reel post. Publish it',     done:false },
 ]; }
+// Map a drop's existing steps onto the current canonical list, preserving what's
+// already checked (matched by concept, since order/ids/wording have changed over
+// time) and adding any new steps as not-done. Never wipes real progress.
+function _reconcileDropSteps(oldSteps){
+  const conceptOf = s => {
+    const x = (s.text || '').toLowerCase();
+    if(x.includes('photograph'))                       return 'photo';
+    if(x.includes('upload'))                           return 'upload';
+    if(x.includes('first') && x.includes('second'))   return 'both';   // legacy "first & second post"
+    if(x.includes('carrousel') || x.includes('carousel')) return 'carousel';
+    if(x.includes('tiktok'))                           return 'tiktok';
+    if(x.includes('reel') || x.includes('second'))     return 'reel';
+    if(x.includes('mail'))                             return 'email';  // "mail" / "email marketing"
+    if(x.includes('campaign') || x.includes('ad '))    return 'ad';
+    return null;
+  };
+  const done = new Set();
+  const counts = {};   // concept -> prior count (for multi-completion steps)
+  (oldSteps || []).forEach(s => {
+    const c = conceptOf(s); if(!c) return;
+    if(s.done) done.add(c);
+    if(typeof s.count === 'number') counts[c] = s.count;
+  });
+  const idConcept = { p1:'photo', p2:'upload', p3:'carousel', p4:'ad', p5:'email', p6:'tiktok', p7:'reel' };
+  return _dropSteps().map(s => {
+    const c = idConcept[s.id];
+    const wasDone = done.has(c) || (done.has('both') && (c === 'carousel' || c === 'reel'));
+    const out = { ...s };
+    if(s.target && s.target > 1){
+      // multi-completion step: carry prior count (or infer from done), cap at target
+      let cnt = counts[c] != null ? counts[c] : (wasDone ? s.target : 0);
+      out.count = Math.max(0, Math.min(s.target, cnt));
+      out.done  = out.count >= s.target;
+    } else {
+      out.done = wasDone;
+    }
+    return out;
+  });
+}
 const GATES_SEED = [
   { id:'g_knight', rank:'C', codename:'The Damned Knight', goal:'Improve the online shop', steps:[
     {id:'k1',text:'Audit the shop — screenshot pass, list what looks off',done:false},
@@ -20747,7 +20995,7 @@ const GATES_SEED = [
   ]},
 ];
 const REDGATES_SEED = [
-  { id:'rg_night',    codename:'Night City',    drop:'Cyberpunk drop',    deadline:'2026-09-15', steps:_dropSteps() },
+  { id:'rg_night',    codename:'Night City',    drop:'Cyberpunk drop',    deadline:'2026-09-18', steps:_dropSteps() },
   { id:'rg_psycho',   codename:'100% Psycho',   drop:'Mob Psycho drop',   deadline:'2026-09-22', steps:_dropSteps() },
   { id:'rg_hero',     codename:'My Hero',       drop:'My Hero Academia drop', deadline:'2026-09-28', steps:_dropSteps() },
   { id:'rg_clover',   codename:'5 Leaf Clover', drop:'Black Clover drop', deadline:'2026-09-30', steps:_dropSteps() },
@@ -20778,13 +21026,20 @@ function _ensureWorkBattle(){
   // migration: Festival deadline moved Sep 30 → Sep 20 (only if untouched/uncleared)
   const _f = state.redGates.find(r => r.id === 'rg_festival');
   if(_f && !_f.clearedAt && _f.deadline === '2026-09-30') _f.deadline = '2026-09-20';
-  // migration: anime-drop steps reworked to the new 5-step launch flow — only for
-  // a gate that hasn't been touched, so real progress is never wiped
+  // migration: Night City (Cyberpunk) extended Sep 15 → Fri Sep 18 — more time for
+  // the new TikTok + second-reel steps (only if untouched/uncleared)
+  const _n = state.redGates.find(r => r.id === 'rg_night');
+  if(_n && !_n.clearedAt && _n.deadline === '2026-09-15') _n.deadline = '2026-09-18';
+  // migration: reconcile every anime drop onto the current 7-step launch flow.
+  // Preserves already-checked steps by concept (order + wording changed over time)
+  // and folds in the new TikTok / second-reel steps — real progress is never wiped.
   state.redGates.forEach(rg => {
-    if(_DROP_IDS.includes(rg.id) && !rg.clearedAt && Array.isArray(rg.steps)
-       && rg.steps.every(s => !s.done) && (rg.steps.length !== 5 || rg.steps[0].id !== 'p1')){
-      rg.steps = _dropSteps();
-    }
+    if(!_DROP_IDS.includes(rg.id) || rg.clearedAt || !Array.isArray(rg.steps)) return;
+    const canon = _dropSteps();
+    const isCanon = rg.steps.length === canon.length
+      && rg.steps.every((s, i) => s.id === canon[i].id && s.text === canon[i].text
+                                   && (s.target || 1) === (canon[i].target || 1));
+    if(!isCanon) rg.steps = _reconcileDropSteps(rg.steps);
   });
 }
 
@@ -20824,16 +21079,37 @@ function setHuntProgress(h, pct){
   if(justDone){ const wt=_ensureWorkToday(); wt.finished = (wt.finished||0) + 1; }
   saveState(); renderAll();
   if(justDone) showWorkFinishCelebration(h.text, lv.after>lv.before ? lv.after : null, 0, 0);
-  else if(lv.after > lv.before) showNotif(`⚒ WORK LEVEL ${lv.after}`);
+  else {
+    // Advanced a hunt cell (25/50/75%) → same light tick for every quest.
+    if(delta > 0 && soundEnabled && typeof playHuntTick==='function'){
+      playHuntTick(pct/100);
+      if(navigator.vibrate) navigator.vibrate(14);
+    }
+    if(lv.after > lv.before) showNotif(`⚒ WORK LEVEL ${lv.after}`);
+  }
 }
 function toggleGateStep(gate, stepId, isRed){
   if(gate.clearedAt) return;
   if(isRed && _redGateStatus(gate)==='collapsed') return;   // collapsed = locked until re-opened
   const st = gate.steps.find(s => s.id === stepId); if(!st) return;
   const per = isRed ? REDGATE_STEP : GATE_STEP;
-  st.done = !st.done;
-  const lv = _awardWork(st.done ? per : -per);
-  if(st.done){ const wt=_ensureWorkToday(); wt.stepsToday = (wt.stepsToday||0) + 1; }
+  const target = st.target || 1;
+  // units = how many "completions" this tap adds (or removes). Multi-completion
+  // steps (e.g. "3 TikTok posts") count up one at a time; tapping a full one wraps
+  // back to zero. Points scale with real work done, so 3 posts = 3× the points.
+  let units, midProgress = false;
+  if(target > 1){
+    const prev = st.count || 0;
+    const next = prev >= target ? 0 : prev + 1;   // increment, or reset when full
+    st.count = next; st.done = next >= target;
+    units = next - prev;                           // +1 per publish, -target on reset
+    midProgress = units > 0 && !st.done;           // an intermediate post (1/3, 2/3)
+  } else {
+    st.done = !st.done;
+    units = st.done ? 1 : -1;
+  }
+  const lv = _awardWork(units * per);
+  if(units > 0){ const wt=_ensureWorkToday(); wt.stepsToday = (wt.stepsToday||0) + units; }
   let cleared = false;
   if(gate.steps.every(s => s.done) && !gate.clearedAt){
     gate.clearedAt = todayKey();
@@ -20841,8 +21117,21 @@ function toggleGateStep(gate, stepId, isRed){
     cleared = true;
   }
   saveState(); renderAll();
-  if(cleared) showAriseCelebration(gate, isRed);
-  else if(lv.after > lv.before) showNotif(`⚒ WORK LEVEL ${lv.after}`);
+  if(cleared){ showAriseCelebration(gate, isRed); }
+  else {
+    if(units > 0 && soundEnabled){
+      if(midProgress && typeof playHuntTick==='function'){
+        // logged one of several (e.g. TikTok 1/3) → light tick that rises per post
+        playHuntTick((st.count||0)/target);
+      } else if(typeof playObjectiveDone==='function'){
+        // a full objective is done → progress-scaled confirm sound
+        const total=gate.steps.length, doneN=gate.steps.filter(s=>s.done).length;
+        playObjectiveDone(total ? doneN/total : 0);
+      }
+      if(navigator.vibrate) navigator.vibrate(midProgress ? 14 : 18);
+    }
+    if(lv.after > lv.before) showNotif(`⚒ WORK LEVEL ${lv.after}`);
+  }
 }
 function reopenRedGate(rg){
   const d=new Date(), nm=new Date(d.getFullYear(), d.getMonth()+2, 0);   // last day of next month
@@ -20901,11 +21190,16 @@ function renderWorkHero(){
     const heroAccent = isRed ? (RG_ACCENT[g.id] || '#ff5252') : (GATE_ACCENT[g.id] || '#ffc107');
     card.classList.add('wc-themed'); card.style.setProperty('--wc-accent', heroAccent);
     const badge = isRed ? `${RG_ICON[g.id] || '🔴'} ${_escWork(g.codename)} · ${_deadlineLabel(g)}` : `${GATE_ICON[g.id] || '🚪'} ${g.rank}-RANK · ${_escWork(g.codename)}`;
+    // Multi-completion step (e.g. 3 TikToks) → show N/target and a "log one" button.
+    const tgt = s.target || 1, cnt = Math.min(s.count || 0, tgt);
+    const counterLine = tgt > 1 ? `<div class="wc-counter">📱 ${cnt}/${tgt} published</div>` : '';
+    const btnLabel = tgt > 1 ? `✓ LOG ONE (${cnt}/${tgt})` : '✓ STEP DONE';
     card.innerHTML = `<div class="wc-stars"></div><div class="wc-inner">`
       + `<div class="wc-eyebrow">▶ NEXT STEP · ${badge}</div>`
       + `<div class="wc-title">${_escWork(s.text)}</div>`
+      + counterLine
       + `<div class="wc-steps-meta">${done}/${total} steps · ${pct}%</div>`
-      + `<button class="wc-finish">✓ STEP DONE</button>`
+      + `<button class="wc-finish">${btnLabel}</button>`
       + `<div class="wc-secondary"><button class="wc-skip">→ different one</button></div>`
       + `</div>`;
     card.querySelector('.wc-finish').addEventListener('click', () => toggleGateStep(g, s.id, isRed));
@@ -20932,16 +21226,47 @@ function renderWorkRestBanner(){
   el.innerHTML = `<div class="wrb-title">✓ You've done enough today</div><div class="wrb-sub">${sub} Enjoy your evening — the rest keeps.</div>`;
   return el;
 }
+const _CONGRATS_LINES = [
+  "Another one shipped. That's the work.",
+  "You took it all the way to 100%. Every step, done.",
+  "Cleared. This is what finishing actually feels like.",
+  "Gate down — the momentum is yours now.",
+  "Done and dusted. Take the win, you earned it.",
+  "Start to finish, no loose ends. That's a full clear.",
+];
 function showAriseCelebration(g, isRed){
-  const el = document.createElement('div'); el.className = 'work-finish-pop arise-pop';
-  const label = isRed ? 'RED GATE CLEARED' : `${g.rank}-RANK GATE CLEARED`;
-  el.innerHTML = `<div class="wfp-card arise-card"><div class="arise-word">✦ ARISE ✦</div><div class="wfp-body"><div class="wfp-title">${label}</div><div class="wfp-task">${_escWork(g.codename)}</div></div></div>`;
+  const accent = isRed ? (RG_ACCENT[g.id] || '#ff5252') : (GATE_ACCENT[g.id] || '#ffc107');
+  const icon   = isRed ? (RG_ICON[g.id]   || '🔴')      : (GATE_ICON[g.id]   || '🚪');
+  const kind   = isRed ? 'RED GATE CLEARED' : `${g.rank}-RANK GATE CLEARED`;
+  const sub    = isRed ? (g.drop || '') : (g.goal || '');
+  const line   = _CONGRATS_LINES[Math.floor(Math.random() * _CONGRATS_LINES.length)];
+  const el = document.createElement('div');
+  el.className = 'work-finish-pop event-congrats';
+  el.style.setProperty('--ec-accent', accent);
+  el.innerHTML = `<div class="ec-card">`
+    + `<div class="ec-burst">🎉</div>`
+    + `<div class="ec-eyebrow">✦ ${kind} ✦</div>`
+    + `<div class="ec-icon">${icon}</div>`
+    + `<div class="ec-congrats">CONGRATULATIONS</div>`
+    + `<div class="ec-name">${_escWork(g.codename)}</div>`
+    + (sub ? `<div class="ec-sub">${_escWork(sub)}</div>` : '')
+    + `<div class="ec-line">${_escWork(line)}</div>`
+    + `<button class="ec-continue">CONTINUE ▸</button>`
+    + `</div>`;
   document.body.appendChild(el);
-  if(soundEnabled && typeof playStellarComplete==='function') playStellarComplete(isRed ? 'supernova' : 'stellar');
+  if(soundEnabled){
+    // Play this gate's own jingle — a franchise drop (cyberpunk/hero/poke/…) for
+    // Red Gates, or a per-boss victory (knight/dragon/demon/vampire) for rank
+    // Gates; fall back to the generic stellar SFX for any un-themed gate.
+    const theme = isRed ? RG_THEME[g.id] : GATE_THEME[g.id];
+    let themed = false;
+    if(theme && typeof playThemeGateClear==='function') themed = playThemeGateClear(theme);
+    if(!themed && typeof playStellarComplete==='function') playStellarComplete(isRed ? 'supernova' : 'stellar');
+  }
   if(navigator.vibrate) navigator.vibrate([40,50,140,50,240]);
-  if(typeof showStellarBurst==='function') showStellarBurst();
+  if(typeof showStellarBurst==='function') showStellarBurst(isRed ? 'supernova' : 'stellar');
   const kill = () => { el.classList.add('wfp-out'); setTimeout(()=>el.remove(), 400); };
-  el.addEventListener('click', kill); setTimeout(kill, 2600);
+  el.addEventListener('click', kill); setTimeout(kill, 5200);
 }
 
 // ── section renderers ────────────────────────────────────────────────────────
@@ -20990,8 +21315,14 @@ function renderGateCard(g, isRed){
     + (status==='collapsed' ? `<button class="gate-reopen">⟳ Re-open next month</button>` : '');
   const stepsWrap = card.querySelector('.gate-steps');
   g.steps.forEach(s => {
-    const r = document.createElement('div'); r.className = 'gate-step' + (s.done?' done':'');
-    r.innerHTML = `<span class="gs-box">${s.done?'☑':'☐'}</span><span class="gs-text">${_escWork(s.text)}</span>`;
+    const tgt = s.target || 1;
+    const cnt = Math.min(s.count || 0, tgt);
+    const r = document.createElement('div'); r.className = 'gate-step' + (s.done?' done':'') + (tgt>1?' gate-step-counter':'');
+    const box = tgt > 1
+      ? `<span class="gs-box">${s.done ? '☑' : (cnt>0 ? '◧' : '☐')}</span>`
+      : `<span class="gs-box">${s.done ? '☑' : '☐'}</span>`;
+    const counter = tgt > 1 ? `<span class="gs-count${s.done?' full':''}">${cnt}/${tgt}</span>` : '';
+    r.innerHTML = box + `<span class="gs-text">${_escWork(s.text)}</span>` + counter;
     if(status==='active') r.addEventListener('click', () => toggleGateStep(g, s.id, isRed));
     stepsWrap.appendChild(r);
   });
