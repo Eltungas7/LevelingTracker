@@ -12970,34 +12970,11 @@ const STAT_COLORS  = { STR:'#ff8a80', DEX:'#b9f6ca', CON:'#ffd180', INT:'#82b1ff
 
 function getAchievementCount(ach) {
   if (ach.id === 'quest_runner')    return state.trabajo.reduce((s,t) => s + Object.keys(t.done||{}).length, 0);
-  if (ach.id === 'gold_earner')     return state.totalGoldEarned || 0;
-  if (ach.id === 'commission_ace')  return state.totalCommissionsDone || 0;
-  if (ach.id === 'master_forger')   return state.totalItemsCrafted || 0;
-  if (ach.id === 'pomo_warrior')    return state.totalForgePomos || 0;
-  if (ach.id === 'guild_patron')    return Object.values(state.guildUpgrades||{}).filter(Boolean).length;
-  if (ach.id === 'work_streak')     return state.workStreak || 0;
-  if (ach.id === 'lucky_strike')    return state.legendaryCraftCount || 0;
-  if (ach.id === 'refined_steel')   return state.g5RefineCount || 0;
-  if (ach.id === 'tier_climber')    return state.maxTierCrafted || 0;
-  if (ach.id === 'reforged_fortune')return state.totalReforges || 0;
-  if (ach.id === 'guild_maxed')     return GUILD_UPGRADES.reduce((a, u) => a + (state.guildUpgrades?.[u.id] || 0), 0);
   if (ach.id === 'master_worker')   return calcWorkerLevel(state.workXp || 0).level;
-  if (ach.id === 'dungeon_conqueror') return state.totalBossKills || 0;
-  if (ach.id === 'cartographer')    return Object.keys(state.dungeonsClearedSet || {}).length;
-  if (ach.id === 'full_set') {
-    // Live: highest tier T such that every equipped slot has a crafted item with recipe.tier >= T.
-    const eq = state.equipment || {};
-    let minTier = 99;
-    for (const slot of EQUIP_SLOTS) {
-      const id = eq[slot.id];
-      if (!id) return 0;
-      const it = ITEMS_DB[id]; if (!it || !it.crafted) return 0;
-      const rec = CRAFT_RECIPES.find(r => r.itemId === id);
-      if (!rec) return 0;
-      if (rec.tier < minTier) minTier = rec.tier;
-    }
-    return minTier === 99 ? 0 : minTier;
-  }
+  if (ach.id === 'drop_master')     return state.dropsShipped || 0;
+  if (ach.id === 'gate_breaker')    return state.raidsCleared || 0;
+  if (ach.id === 'collector')       return (state.gacha && Array.isArray(state.gacha.vault)) ? state.gacha.vault.length : 0;
+  if (ach.id === 'jackpot')         return (state.gacha && Array.isArray(state.gacha.vault)) ? state.gacha.vault.filter(v => v.tier === 'ssr').length : 0;
   if (ach.id === 'streak_gen') return state.streak;
   if (ach.id === 'perf_week')  return state.logros.perfectWeekCount || 0;
   if (ach.id === 'phoenix')    return state.logros.phoenixCount || 0;
@@ -15029,15 +15006,10 @@ function renderInventory() {
 let _achFilter = localStorage.getItem('achFilter') || 'all';
 let _achTierFilter = localStorage.getItem('achTierFilter') || 'all';
 
-// Achievements tied to the removed RPG systems (forge / dungeon / guild / gold /
-// commission / craft / work-streak) are dead — hidden from the LOG so the list
-// stops implying homework that can't be done. Still-reachable work achievements
-// (quest_runner, master_worker) are kept.
-const DEAD_ACH = new Set(['gold_earner','commission_ace','master_forger','pomo_warrior','guild_patron','work_streak','lucky_strike','refined_steel','tier_climber','full_set','reforged_fortune','guild_maxed','dungeon_conqueror','cartographer']);
 function renderLogros() {
   panelTitle.textContent = 'ACHIEVEMENTS'; panelSubtitle.textContent = 'Milestones & rewards';
   panelContent.innerHTML = '';
-  const _ACT = ACHIEVEMENTS.filter(a => !DEAD_ACH.has(a.id));
+  const _ACT = ACHIEVEMENTS;
 
   // ── Step 7: Arc summary header ─────────────────────────────
   const totalTiers = _ACT.reduce((s,a) => s + a.tiers.length, 0);
@@ -15181,12 +15153,13 @@ function renderLogros() {
 
 function buildAchievementFeed(wrap) {
   wrap.innerHTML = '';
-  const _ACT = ACHIEVEMENTS.filter(a => !DEAD_ACH.has(a.id));  // hide dead-system achievements here too
+  const _ACT = ACHIEVEMENTS;  // hide dead-system achievements here too
   const CAT_DEFS = [
     { key:'progresion',   label:'⟦ PROGRESSION ⟧'  },
     { key:'hitos',        label:'⟦ MILESTONES ⟧'    },
     { key:'maestria',     label:'⟦ MASTERY ⟧'       },
     { key:'racha',        label:'⟦ STREAK ⟧'        },
+    { key:'trabajo',      label:'⟦ WORK ⟧'          },
   ];
   const visibleCats = _achFilter === 'all' ? CAT_DEFS : CAT_DEFS.filter(c => c.key === _achFilter);
 
@@ -21293,6 +21266,8 @@ function toggleGateStep(gate, stepId, isRed){
   if(gate.steps.every(s => s.done) && !gate.clearedAt){
     gate.clearedAt = todayKey();
     _awardWork(isRed ? REDGATE_CLEAR_BONUS : GATE_CLEAR_BONUS);
+    if(isRed) state.dropsShipped = (state.dropsShipped||0) + 1;   // achievement: Drop Master
+    else      state.raidsCleared = (state.raidsCleared||0) + 1;   // achievement: Gate Breaker
     cleared = true;
   }
   // ── gacha: shards per completed step; Signet at raid 50% + on any clear; Trophy on clear ──

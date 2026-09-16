@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // ACHIEVEMENTS (LOGROS)
 // ============================================================
 // Achievement reward design: ALL rewards use statAll:true — every tier's reward is added to
@@ -115,68 +115,27 @@ const ACHIEVEMENTS = [
   { id:'avoid_clean', name:'Iron Will', icon:'🛡️', category:'racha', desc:'Consecutive days clean from addiction', stat:'VOL', statAll:true,
     tiers:[{count:7,label:'First Week',reward:1,title:null},{count:30,label:'Month of Clarity',reward:2,title:null},{count:90,label:'Iron Mind',reward:4,title:'Iron Mind'},{count:180,label:'Liberated',reward:6,title:'Liberated'},{count:365,label:'UNBREAKABLE',reward:8,title:'UNBREAKABLE'}]},
 
-  // ── WORK — QUESTS  (1+2+4+7+11 = 25) ───────────────────────
+  // ── WORK — SIDE QUESTS  (1+2+4+7+11 = 25) ──────────────────
   { id:'quest_runner', name:'Quest Runner', icon:'⚒', category:'trabajo', desc:'Complete work tasks across all days', statAll:true,
     tiers:[{count:5,label:'First Contracts',reward:1,title:null},{count:25,label:'Field Agent',reward:2,title:null},{count:75,label:'Veteran Contractor',reward:4,title:'Veteran Contractor'},{count:200,label:'Elite Operative',reward:7,title:'Elite Operative'},{count:500,label:'SHADOW LEGEND',reward:11,title:'SHADOW LEGEND'}]},
 
-  // ── WORK — GOLD  (1+3+5+8+12 = 29) ─────────────────────────
-  { id:'gold_earner', name:'Gold Hunter', icon:'<img src="img/gold.png" style="height:1em;width:auto;object-fit:contain;vertical-align:middle;display:inline-block">', category:'trabajo', desc:'Accumulate lifetime gold earned', statAll:true,
-    tiers:[{count:100,label:'First Pouch',reward:1,title:null},{count:500,label:'Prospector',reward:3,title:null},{count:2000,label:'Merchant Lord',reward:5,title:'Merchant Lord'},{count:5000,label:'Tycoon',reward:8,title:'Tycoon'},{count:10000,label:'GOLD SOVEREIGN',reward:12,title:'GOLD SOVEREIGN'}]},
-
-  // ── WORK — COMMISSIONS  (1+2+4+7+11 = 25) ──────────────────
-  { id:'commission_ace', name:'Commission Ace', icon:'📋', category:'trabajo', desc:'Fulfill commissions from the board', statAll:true,
-    tiers:[{count:1,label:'First Brief',reward:1,title:null},{count:10,label:'Regular Client',reward:2,title:null},{count:30,label:'Trusted Agent',reward:4,title:'Trusted Agent'},{count:75,label:'Commission Master',reward:7,title:'Commission Master'},{count:150,label:'SOVEREIGN CONTRACTOR',reward:11,title:'SOVEREIGN CONTRACTOR'}]},
-
-  // ── WORK — FORGE  (1+2+4+7+11 = 25) ────────────────────────
-  { id:'master_forger', name:'Master Forger', icon:'🔨', category:'trabajo', desc:'Craft items in the Forge', statAll:true,
-    tiers:[{count:1,label:'First Craft',reward:1,title:null},{count:5,label:'Apprentice Smith',reward:2,title:null},{count:15,label:'Journeyman',reward:4,title:'Journeyman'},{count:40,label:'Master Smith',reward:7,title:'Master Smith'},{count:100,label:'LEGENDARY ARTISAN',reward:11,title:'LEGENDARY ARTISAN'}]},
-
-  // ── WORK — POMODORO  (1+2+4+7+11 = 25) ─────────────────────
-  { id:'pomo_warrior', name:'Pomo Warrior', icon:'🍅', category:'trabajo', desc:'Complete forge sessions (25-min work blocks)', statAll:true,
-    tiers:[{count:1,label:'First Session',reward:1,title:null},{count:10,label:'Focused',reward:2,title:null},{count:50,label:'Iron Focus',reward:4,title:'Iron Focus'},{count:150,label:'Flow State',reward:7,title:'Flow State'},{count:300,label:'ETERNAL GRINDER',reward:11,title:'ETERNAL GRINDER'}]},
-
-  // ── WORK — GUILD  (2+5+10 = 17) ─────────────────────────────
-  { id:'guild_patron', name:'Guild Patron', icon:'🏛', category:'trabajo', desc:'Purchase upgrades in the Guild', statAll:true,
-    tiers:[{count:1,label:'Initiate',reward:2,title:null},{count:3,label:'Benefactor',reward:5,title:'Benefactor'},{count:5,label:'GUILD SOVEREIGN',reward:10,title:'GUILD SOVEREIGN'}]},
-
-  // ── WORK — STREAK  (1+2+4+6+8 = 21) ────────────────────────
-  { id:'work_streak', name:'Iron Contractor', icon:'🔩', category:'trabajo', desc:'Consecutive days completing at least 1 work task', statAll:true,
-    tiers:[{count:3,label:'On the Clock',reward:1,title:null},{count:7,label:'Weekly Grind',reward:2,title:null},{count:14,label:'Relentless',reward:4,title:'Relentless'},{count:30,label:'Iron Month',reward:6,title:'Iron Month'},{count:100,label:'UNBREAKABLE GRINDER',reward:8,title:'UNBREAKABLE GRINDER'}]},
-
-  // ── WORK — FORGE CHASE: Legendary rarity rolls  (2+5+10 = 17) ─
-  { id:'lucky_strike', name:'Lucky Strike', icon:'👑', category:'trabajo', desc:'Craft items that roll Legendary rarity', statAll:true,
-    tiers:[{count:1,label:'First Legend',reward:2,title:null},{count:5,label:'Fortune Favored',reward:5,title:'Fortune Favored'},{count:25,label:'GOLDEN HAND',reward:10,title:'GOLDEN HAND'}]},
-
-  // ── WORK — REFINEMENT mastery: items pushed to max grade (G5)  (2+5+9 = 16) ─
-  { id:'refined_steel', name:'Refined Steel', icon:'✦', category:'trabajo', desc:'Refine crafted items to maximum grade (G5)', statAll:true,
-    tiers:[{count:1,label:'First Edge',reward:2,title:null},{count:5,label:'Master Refiner',reward:5,title:'Master Refiner'},{count:15,label:'ETERNAL EDGE',reward:9,title:'ETERNAL EDGE'}]},
-
-  // ── WORK — TIER CLIMBER: deepest recipe tier crafted  (2+5+10 = 17) ─
-  { id:'tier_climber', name:'Tier Climber', icon:'🗻', category:'trabajo', desc:'Craft items from deeper forge tiers', statAll:true,
-    tiers:[{count:3,label:'Tier III Smith',reward:2,title:null},{count:6,label:'Tier VI Artisan',reward:5,title:'Tier VI Artisan'},{count:9,label:'TIER IX MASTER',reward:10,title:'TIER IX MASTER'}]},
-
-  // ── WORK — FULL SET: all 10 slots filled with crafted gear at tier ≥ N  (2+6+12 = 20) ─
-  // count = current highest tier N such that every equipped slot holds a crafted item with recipe.tier >= N.
-  { id:'full_set', name:'Full Set', icon:'🛡️', category:'trabajo', desc:'Equip a complete (10/10) crafted set — every slot at least Tier N', statAll:true,
-    tiers:[{count:1,label:'Tier I Loadout',reward:2,title:null},{count:5,label:'Tier V Loadout',reward:6,title:'Tier V Loadout'},{count:9,label:'TIER IX LOADOUT',reward:12,title:'PARAGON LOADOUT'}]},
-
-  // ── WORK — REFORGED FORTUNE: affix rerolls (gold sink chase)  (2+5 = 7) ─
-  { id:'reforged_fortune', name:'Reforged Fortune', icon:'🎲', category:'trabajo', desc:'Reroll affix values on crafted gear', statAll:true,
-    tiers:[{count:10,label:'Tinkerer',reward:2,title:null},{count:50,label:'OBSESSED ROLLER',reward:5,title:'OBSESSED ROLLER'}]},
-
-  // ── WORK — GUILD MAXED: total levels across all guild upgrades  (2+5+10 = 17) ─
-  { id:'guild_maxed', name:'Guild Maxed', icon:'🏛️', category:'trabajo', desc:'Total levels across all Guild upgrades', statAll:true,
-    tiers:[{count:10,label:'Builder',reward:2,title:null},{count:30,label:'Architect',reward:5,title:'Guild Architect'},{count:60,label:'GUILD PARAGON',reward:10,title:'GUILD PARAGON'}]},
-
-  // ── WORK — MASTER WORKER: Worker rank ladder  (1+2+5+10 = 18) ──────
+  // ── WORK — WORKER RANK LADDER  (1+2+5+10 = 18) ─────────────
   { id:'master_worker', name:'Master Worker', icon:'⚒', category:'trabajo', desc:'Reach worker level milestones', statAll:true,
     tiers:[{count:5,label:'Journeyman',reward:1,title:null},{count:20,label:'Veteran Hand',reward:2,title:null},{count:50,label:'Foreman',reward:5,title:'Foreman'},{count:99,label:'GUILD GRANDMASTER',reward:10,title:'GUILD GRANDMASTER'}]},
 
-  // ── DUNGEON — CONQUEROR: total boss kills  (1+3+6+10 = 20) ─────────
-  { id:'dungeon_conqueror', name:'Dungeon Conqueror', icon:'⚔️', category:'hitos', desc:'Defeat dungeon bosses (bossKill expeditions)', statAll:true,
-    tiers:[{count:5,label:'Boss Hunter',reward:1,title:null},{count:25,label:'Slayer',reward:3,title:'Slayer'},{count:100,label:'Boss Reaper',reward:6,title:'Boss Reaper'},{count:300,label:'DEATHLESS KING',reward:10,title:'DEATHLESS KING'}]},
+  // ── WORK — DROPS shipped (Red Gate / event clears)  (1+2+4+7+11 = 25) ─
+  { id:'drop_master', name:'Drop Master', icon:'🎏', category:'trabajo', desc:'Ship anime drops (clear Red Gates)', statAll:true,
+    tiers:[{count:1,label:'First Drop',reward:1,title:null},{count:5,label:'Serial Launcher',reward:2,title:null},{count:15,label:'Hype Machine',reward:4,title:'Hype Machine'},{count:30,label:'Drop Lord',reward:7,title:'Drop Lord'},{count:50,label:'RELEASE SOVEREIGN',reward:11,title:'RELEASE SOVEREIGN'}]},
 
-  // ── DUNGEON — CARTOGRAPHER: distinct dungeons cleared (variety)  (1+3+8 = 12) ─
-  { id:'cartographer', name:'Cartographer', icon:'🗺️', category:'hitos', desc:'Defeat the boss of distinct dungeons (one of each)', statAll:true,
-    tiers:[{count:5,label:'Pathfinder',reward:1,title:null},{count:15,label:'Trailblazer',reward:3,title:'Trailblazer'},{count:24,label:'WORLD WALKER',reward:8,title:'WORLD WALKER'}]},
+  // ── WORK — RAIDS cleared (Gate bosses — real business milestones)  (2+5+9+14 = 30) ─
+  { id:'gate_breaker', name:'Gate Breaker', icon:'🚪', category:'trabajo', desc:'Clear raid bosses (Gates)', statAll:true,
+    tiers:[{count:1,label:'First Slain',reward:2,title:null},{count:2,label:'Double Kill',reward:5,title:null},{count:4,label:'Raid Veteran',reward:9,title:'Raid Veteran'},{count:6,label:'GATE SOVEREIGN',reward:14,title:'GATE SOVEREIGN'}]},
+
+  // ── WORK — GACHA: rewards won from pulls  (1+2+4+7+11 = 25) ─
+  { id:'collector', name:'Collector', icon:'🎁', category:'trabajo', desc:'Win rewards from pulls', statAll:true,
+    tiers:[{count:1,label:'First Pull',reward:1,title:null},{count:10,label:'Hoarder',reward:2,title:null},{count:50,label:'Vault Keeper',reward:4,title:'Vault Keeper'},{count:150,label:'Treasure Baron',reward:7,title:'Treasure Baron'},{count:500,label:'VAULT SOVEREIGN',reward:11,title:'VAULT SOVEREIGN'}]},
+
+  // ── WORK — GACHA: SSR rewards won (the rare jackpots)  (3+6+12 = 21) ─
+  { id:'jackpot', name:'Jackpot', icon:'🌈', category:'trabajo', desc:'Win SSR rewards from pulls', statAll:true,
+    tiers:[{count:1,label:'First SSR',reward:3,title:null},{count:3,label:'Fortune Favored',reward:6,title:'Fortune Favored'},{count:10,label:'GOLDEN HAND',reward:12,title:'GOLDEN HAND'}]},
 ];
