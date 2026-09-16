@@ -1,4 +1,4 @@
-﻿// ── Yami's daily line — one stoic quote per day-of-month, wraps at 31. Shown as a
+﻿// ── Daily stoic line — one stoic quote per day-of-month, wraps at 31. Shown as a
 // full overlay right after the harvest briefing on the first open of a new day
 // (see updateStreakOnLoad()), then minimized to a strip at the top of QUESTS.
 const DAILY_QUOTES = [
@@ -129,14 +129,14 @@ function showDailyQuoteOverlay() {
   const ov = document.createElement('div');
   ov.className = 'dquote-overlay';
   ov.innerHTML = `
-    <div class="dquote-label">⟦ YAMI ⟧</div>
+    <div class="dquote-label">⟦ DAILY STOIC ⟧</div>
     <div class="dquote-text">"${q.text}"</div>
     <div class="dquote-author">— ${q.author}</div>
     <button class="dquote-dismiss" onclick="
       const ov=this.closest('.dquote-overlay');
       ov.style.animation='masteryFadeOut 0.4s ease forwards';
       setTimeout(()=>{ ov.remove(); const next=_pendingAnims.shift(); if(next) next(); },400);
-    ">⟦ SURPASS YOUR LIMITS ⟧</button>
+    ">⟦ BEGIN ⟧</button>
   `;
   document.body.appendChild(ov);
 }

@@ -5234,8 +5234,8 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .msb-stat-lbl { flex:1; font-family:'Rajdhani',sans-serif; font-size:12px; color:#e8dcb8; letter-spacing:0.4px; }
 .msb-stat-val { font-family:'Cinzel',serif; font-size:13px; font-weight:700; color:#ffd700; }
 /* ── YAMI — single stoic daily line, minimal strip (no box, no portrait). ── */
-.yami-strip { padding:4px 2px 10px; margin-bottom:6px; border-bottom:1px solid rgba(255,82,82,0.18); text-align:center; }
-.yami-strip-text { font-family:'Rajdhani',sans-serif; font-size:11.5px; font-style:italic; color:#c9a8a0; letter-spacing:0.2px; }
+.dq-strip { padding:4px 2px 10px; margin-bottom:6px; border-bottom:1px solid rgba(255,82,82,0.18); text-align:center; }
+.dq-strip-text { font-family:'Rajdhani',sans-serif; font-size:11.5px; font-style:italic; color:#c9a8a0; letter-spacing:0.2px; }
 /* ── MANIN — single 1%-improvement daily line, minimal strip (no box, no portrait). ── */
 .manin-strip { padding:4px 2px 10px; margin-bottom:6px; border-bottom:1px solid rgba(212,165,116,0.18); text-align:center; }
 .manin-strip-text { font-family:'Rajdhani',sans-serif; font-size:11.5px; font-style:italic; color:#c9ab84; letter-spacing:0.2px; }
@@ -8450,6 +8450,153 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 @keyframes glowGold{0%,100%{box-shadow:0 0 0 rgba(255,122,24,0)}50%{box-shadow:0 0 16px rgba(255,122,24,0.34)}}
 @keyframes glowMagenta{0%,100%{box-shadow:0 0 0 rgba(224,17,95,0)}50%{box-shadow:0 0 16px rgba(224,17,95,0.36)}}
 @keyframes cyberFlicker{0%,96%,100%{opacity:1}97%{opacity:.5}98.5%{opacity:.85}}
+
+/* ══ GACHA-STYLE EVENT BANNERS — persistent "LIVE DROPS" shelf ══════════════ */
+.event-shelf{margin:12px 0 6px}
+.event-shelf-hd{display:flex;align-items:center;justify-content:space-between;margin:0 3px 8px}
+.event-shelf-hd .esh-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:1.6px;color:#ff8a80;display:flex;align-items:center;gap:6px;text-shadow:0 0 10px rgba(255,82,82,0.35)}
+.event-shelf-hd .esh-count{font-family:'Rajdhani',sans-serif;font-size:10.5px;color:var(--sao-text-dim);letter-spacing:.5px}
+.event-track{display:flex;gap:11px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:3px 3px 9px;scrollbar-width:none}
+.event-track::-webkit-scrollbar{display:none}
+.event-banner{scroll-snap-align:start;flex:0 0 86%;max-width:340px;position:relative;border-radius:13px;overflow:hidden;
+  border:1px solid rgba(255,255,255,0.13);border-left:3px solid var(--eb-accent,#ff5252);cursor:pointer;
+  min-height:116px;padding:12px 14px;display:flex;flex-direction:column;justify-content:space-between;
+  background:rgba(255,255,255,0.03);transition:transform .18s ease,box-shadow .2s ease}
+.event-banner:hover{transform:translateY(-2px)}
+.event-banner:active{transform:scale(0.985)}
+.eb-art{position:absolute;inset:0;z-index:0;opacity:.92}
+.eb-scrim{position:absolute;inset:0;z-index:1;background:linear-gradient(175deg,rgba(6,10,18,0.12) 0%,rgba(6,10,18,0.30) 45%,rgba(6,10,18,0.62) 100%)}
+.eb-shine{position:absolute;top:0;left:-75%;width:55%;height:100%;z-index:2;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,0.16),transparent);transform:skewX(-18deg)}
+@media (prefers-reduced-motion:no-preference){.eb-shine{animation:gateSheen 6.5s ease-in-out infinite}}
+.eb-top,.eb-bot{position:relative;z-index:3}
+.eb-titlerow{display:flex;align-items:center;gap:8px}
+.eb-icon{font-size:19px;line-height:1;filter:drop-shadow(0 1px 3px rgba(0,0,0,.65))}
+.eb-name{font-family:'Cinzel',serif;font-size:16px;letter-spacing:.4px;color:#fff;text-shadow:0 1px 7px rgba(0,0,0,.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.eb-drop{font-family:'Rajdhani',sans-serif;font-size:12px;color:rgba(255,255,255,0.88);text-shadow:0 1px 5px rgba(0,0,0,.8);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.eb-timer{display:inline-flex;align-items:center;gap:5px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:12.5px;
+  letter-spacing:.6px;padding:3px 9px;border-radius:999px;background:rgba(0,0,0,0.44);color:#ffe9c7;border:1px solid rgba(255,255,255,0.15)}
+.eb-timer .ebt-ico{font-size:11px}
+.eb-timer.urgent{background:rgba(255,23,68,0.24);border-color:rgba(255,82,82,0.65);color:#ffd0d0}
+@media (prefers-reduced-motion:no-preference){.eb-timer.urgent{animation:ebtBlink 1.1s steps(1) infinite}}
+@keyframes ebtBlink{0%,62%{opacity:1}63%,100%{opacity:.5}}
+.eb-progline{display:flex;align-items:center;gap:8px;margin-top:9px}
+.eb-bar{flex:1;height:5px;border-radius:999px;background:rgba(0,0,0,0.42);overflow:hidden}
+.eb-fill{height:100%;border-radius:999px;background:var(--eb-accent,#ff5252);box-shadow:0 0 8px var(--eb-accent,#ff5252);transition:width .35s ease}
+.eb-pct{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.75)}
+.eb-ribbon{position:absolute;top:12px;right:-31px;z-index:4;transform:rotate(45deg);width:122px;text-align:center;
+  font-family:'Rajdhani',sans-serif;font-weight:700;font-size:9.5px;letter-spacing:1.2px;padding:2px 0;color:#0b0b0b;box-shadow:0 1px 6px rgba(0,0,0,.4)}
+.eb-ribbon.new{background:linear-gradient(90deg,#7df9ff,#4dd0e1)}
+.eb-ribbon.soon{background:linear-gradient(90deg,#ff5252,#ff1744);color:#fff}
+.event-banner.ending{animation:ebPulse 1.9s ease-in-out infinite}
+@keyframes ebPulse{0%,100%{box-shadow:0 0 0 rgba(255,23,68,0)}50%{box-shadow:0 0 20px rgba(255,23,68,0.5)}}
+.event-dots{display:flex;justify-content:center;gap:6px;margin-top:3px}
+.event-dots .ed{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.22);transition:background .2s,width .2s}
+.event-dots .ed.on{width:16px;border-radius:999px;background:#ff8a80}
+.event-empty{font-family:'Rajdhani',sans-serif;font-size:12px;color:var(--sao-text-dim);text-align:center;padding:15px;
+  border:1px dashed rgba(255,255,255,0.13);border-radius:11px;line-height:1.4}
+.eb-emblem{flex:1;min-width:0;max-width:230px;margin-top:-1px}
+.eb-emblem .em-svg{width:100%;height:auto;display:block;overflow:visible}
+@media (prefers-reduced-motion:no-preference){
+  .eb-emblem-night{animation:ncFlick 5.5s steps(1) infinite}
+  .eb-emblem-psycho{animation:psyPulse 3.2s ease-in-out infinite}
+  .eb-emblem-hero{animation:heroPop 4.6s ease-in-out infinite}
+  .eb-emblem-berserk{animation:bskShudder 4.2s steps(1) infinite}
+  .eb-emblem-festival{animation:fesSway 5s ease-in-out infinite}
+}
+@keyframes ncFlick{0%,92%,100%{opacity:1}93%{opacity:.72}94%{opacity:1}96%{opacity:.85}96.6%{opacity:1}}
+@keyframes psyPulse{0%,100%{filter:none}50%{filter:brightness(1.14) drop-shadow(0 0 6px rgba(162,75,255,0.5))}}
+@keyframes heroPop{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+@keyframes bskShudder{0%,90%,100%{transform:translate(0,0)}91%{transform:translate(-1px,.5px)}94%{transform:translate(1px,-.5px)}97%{transform:translate(-.6px,0)}}
+@keyframes fesSway{0%,100%{transform:rotate(-.6deg)}50%{transform:rotate(.6deg)}}
+.rg-livetimer{font-family:'Rajdhani',sans-serif;font-variant-numeric:tabular-nums}
+.rg-livetimer.urgent{color:#ff8a80;font-weight:700}
+.gate-flash{animation:gateFlash 1.2s ease}
+@keyframes gateFlash{0%,100%{box-shadow:0 0 0 rgba(255,138,128,0)}30%{box-shadow:0 0 22px rgba(255,138,128,0.6)}}
+
+/* ══ GACHA REWARD ENGINE — pull bar · pull reveal · vault · trophies ══════════ */
+.gacha-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:11px 0 4px;padding:11px 13px;border-radius:12px;
+  border:1px solid rgba(255,255,255,0.1);background:linear-gradient(135deg,rgba(123,75,255,0.11),rgba(255,207,63,0.06));position:relative;overflow:hidden}
+.gacha-x2{display:inline-block;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:9.5px;letter-spacing:.5px;color:#ffd24d;background:rgba(255,193,7,0.12);border:1px solid rgba(255,210,77,0.4);border-radius:6px;padding:1px 5px;margin-left:6px;vertical-align:middle;text-shadow:0 0 7px rgba(255,193,7,0.5)}
+.gacha-shards{display:flex;flex-direction:column;gap:6px;flex:1;min-width:150px}
+.gs-row{display:flex;align-items:center;justify-content:space-between;font-family:'Rajdhani',sans-serif;font-size:12.5px;letter-spacing:.5px;color:var(--sao-text)}
+.gs-row .gs-shardn{color:#7fe0ff;font-weight:700}
+.gs-bar{height:6px;border-radius:999px;background:rgba(0,0,0,0.35);overflow:hidden}
+.gs-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#4dd0e1,#7fe0ff);box-shadow:0 0 8px rgba(127,224,255,0.7);transition:width .4s ease}
+.gacha-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pull-btn{font-family:'Cinzel',serif;font-size:12px;letter-spacing:.5px;padding:9px 13px;border-radius:9px;cursor:pointer;border:1px solid;background:none;transition:transform .12s,box-shadow .2s,opacity .2s}
+.pull-btn:active{transform:scale(.96)}
+.pull-btn.standard{border-color:#4dd0e1;background:rgba(77,208,225,0.12);color:#9becff}
+.pull-btn.premium{border-color:#ffcf3f;background:rgba(255,207,63,0.14);color:#ffe08a}
+.pull-btn:disabled{opacity:.38;cursor:default;box-shadow:none;animation:none}
+.pull-btn.standard.ready{animation:pbReadyC 1.8s ease-in-out infinite}
+.pull-btn.premium.ready{animation:pbReadyG 1.8s ease-in-out infinite}
+@keyframes pbReadyC{0%,100%{box-shadow:0 0 5px rgba(127,224,255,0.3)}50%{box-shadow:0 0 15px rgba(127,224,255,0.75)}}
+@keyframes pbReadyG{0%,100%{box-shadow:0 0 6px rgba(255,207,63,0.35)}50%{box-shadow:0 0 18px rgba(255,207,63,0.85)}}
+.vault-open{font-family:'Rajdhani',sans-serif;font-size:11.5px;color:var(--sao-text-dim);cursor:pointer;padding:7px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;white-space:nowrap}
+.vault-open .vo-badge{color:#ffcf3f;font-weight:700}
+/* pull reveal overlay */
+.pull-overlay{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 50% 45%,rgba(10,14,26,0.85),rgba(4,6,12,0.96))}
+.pull-stage{position:relative;width:100%;max-width:340px;display:flex;align-items:center;justify-content:center;min-height:380px}
+.pull-orb{width:118px;height:118px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff,#9becff 55%,#4dd0e1 100%);
+  box-shadow:0 0 40px rgba(127,224,255,0.7),inset 0 0 28px rgba(255,255,255,0.6);animation:orbCharge 1.1s ease-in forwards}
+.pull-orb.hint-r{background:radial-gradient(circle at 40% 35%,#fff,#7fb8ff 55%,#4da3ff 100%);box-shadow:0 0 50px rgba(77,163,255,0.85)}
+.pull-orb.hint-sr{background:radial-gradient(circle at 40% 35%,#fff,#d3a6ff 55%,#c07bff 100%);box-shadow:0 0 62px rgba(192,123,255,0.9)}
+.pull-orb.hint-ssr{background:radial-gradient(circle at 40% 35%,#fff,#ffe58a 50%,#ffcf3f 100%);box-shadow:0 0 82px rgba(255,207,63,1)}
+@keyframes orbCharge{0%{transform:scale(.4);opacity:.2}60%{transform:scale(1);opacity:1}80%{transform:scale(.9)}100%{transform:scale(1.16);opacity:1}}
+.pull-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+.pull-flash.go{animation:pullFlash .5s ease-out}
+@keyframes pullFlash{0%{opacity:0}28%{opacity:.9}100%{opacity:0}}
+.pull-card{position:relative;width:232px;padding:22px 18px;border-radius:16px;text-align:center;
+  border:2px solid var(--pc-color);background:linear-gradient(160deg,rgba(20,24,38,0.96),rgba(8,10,18,0.98));
+  box-shadow:0 0 40px var(--pc-glow),inset 0 0 24px rgba(255,255,255,0.05);animation:cardIn .5s cubic-bezier(.2,1.3,.4,1)}
+@keyframes cardIn{0%{transform:scale(.5) rotateY(85deg);opacity:0}100%{transform:scale(1) rotateY(0);opacity:1}}
+.pc-rarity{font-family:'Cinzel',serif;font-weight:700;font-size:26px;letter-spacing:3px;color:var(--pc-color);text-shadow:0 0 16px var(--pc-glow)}
+.pc-reward{font-family:'Rajdhani',sans-serif;font-size:20px;color:#fff;margin:12px 0 6px;line-height:1.25}
+.pc-note{font-family:'Rajdhani',sans-serif;font-size:11.5px;color:var(--sao-text-dim);letter-spacing:.5px}
+.pc-ok{margin-top:16px;font-family:'Cinzel',serif;font-size:13px;letter-spacing:1px;padding:10px 22px;border-radius:9px;
+  border:1px solid var(--pc-color);background:rgba(255,255,255,0.06);color:#fff;cursor:pointer}
+.pc-ok:active{transform:scale(.96)}
+.pull-card.tier-ssr{animation:cardIn .5s cubic-bezier(.2,1.3,.4,1),ssrShimmer 2.4s ease-in-out .5s infinite}
+@keyframes ssrShimmer{0%,100%{box-shadow:0 0 40px var(--pc-glow)}50%{box-shadow:0 0 72px var(--pc-glow),0 0 120px var(--pc-glow)}}
+/* vault modal */
+.vault-overlay{position:fixed;inset:0;z-index:8500;display:flex;align-items:flex-end;justify-content:center;background:rgba(4,6,12,0.7)}
+.vault-sheet{width:100%;max-width:520px;max-height:86vh;overflow-y:auto;background:linear-gradient(180deg,#0d1220,#080a12);
+  border:1px solid rgba(255,255,255,0.12);border-radius:16px 16px 0 0;padding:16px 15px 26px}
+.vault-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.vault-hd h3{font-family:'Cinzel',serif;font-size:16px;color:#fff;letter-spacing:1px;margin:0}
+.vault-close{background:none;border:none;color:var(--sao-text-dim);font-size:20px;cursor:pointer;line-height:1}
+.vault-sec{font-family:'Cinzel',serif;font-size:11px;letter-spacing:1.5px;color:var(--sao-text-dim);margin:14px 0 8px;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:5px}
+.vault-item{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:9px;margin-bottom:7px;border:1px solid var(--vi-color);background:rgba(255,255,255,0.025)}
+.vi-tier{font-family:'Cinzel',serif;font-weight:700;font-size:11px;letter-spacing:1px;color:var(--vi-color);flex:0 0 auto;min-width:42px}
+.vi-name{flex:1;font-family:'Rajdhani',sans-serif;font-size:14px;color:#fff}
+.vi-redeem{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:11.5px;padding:6px 11px;border-radius:7px;border:1px solid var(--vi-color);background:rgba(255,255,255,0.05);color:#fff;cursor:pointer}
+.vault-item.claimed{opacity:.5}
+.vault-item.claimed .vi-name{text-decoration:line-through}
+.trophy-grid{display:flex;flex-wrap:wrap;gap:9px}
+.trophy{display:flex;flex-direction:column;align-items:center;gap:4px;width:76px;padding:11px 6px;border-radius:10px;border:1px solid rgba(255,207,63,0.35);background:rgba(255,207,63,0.06)}
+.trophy .tr-ico{font-size:24px}
+.trophy .tr-name{font-family:'Rajdhani',sans-serif;font-size:9.5px;text-align:center;color:#ffe08a;line-height:1.15}
+.vault-empty{font-family:'Rajdhani',sans-serif;font-size:12.5px;color:var(--sao-text-dim);text-align:center;padding:16px}
+.work-cap-note{margin:6px 0 2px;padding:8px 12px;border-radius:9px;text-align:center;border:1px solid rgba(255,207,63,0.42);background:rgba(255,207,63,0.08);font-family:'Rajdhani',sans-serif;font-size:12px;color:#ffe08a;letter-spacing:.3px}
+.work-cap-note b{color:#fff}
+.daily-done-chip{display:flex;flex-direction:column;gap:2px;align-items:center;text-align:center;margin:8px 0 2px;padding:8px 12px;border-radius:9px;border:1px solid rgba(105,240,174,0.3);background:rgba(105,240,174,0.07)}
+.ddc-main{font-family:'Cinzel',serif;font-size:12px;letter-spacing:1px;color:#8affc0}
+.ddc-sub{font-family:'Rajdhani',sans-serif;font-size:11px;color:var(--sao-text-dim);letter-spacing:.3px}
+.work-subtab-bar{display:flex;gap:0;margin:2px 0 12px;border:1px solid var(--sao-border);border-radius:6px;overflow:hidden}
+.work-subtab{flex:1;padding:9px 4px;background:none;border:none;cursor:pointer;font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;color:var(--sao-text-dim);transition:color .15s,background .15s}
+.work-subtab:not(:last-child){border-right:1px solid var(--sao-border)}
+.work-subtab.active{color:var(--sao-cyan);background:rgba(77,208,225,0.1)}
+.work-subtab .wst-badge{display:inline-block;min-width:15px;padding:0 4px;border-radius:999px;background:#ffcf3f;color:#0b0b0b;font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;vertical-align:middle}
+.vault-summary{display:flex;justify-content:space-around;gap:8px;margin:2px 0 10px;padding:9px;border-radius:9px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.025);font-family:'Rajdhani',sans-serif;font-size:12.5px;color:var(--sao-text)}
+.vault-summary b{color:#fff}
+.trophy-banner{min-height:104px}
+.tb-medal{position:absolute;top:8px;right:10px;z-index:4;font-size:22px;filter:drop-shadow(0 1px 4px rgba(0,0,0,.6))}
+.tb-date{display:inline-flex;align-items:center;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:11.5px;letter-spacing:.6px;padding:3px 9px;border-radius:999px;background:rgba(0,0,0,0.42);color:#ffe9c7;border:1px solid rgba(255,255,255,0.14)}
+.vi-date{font-family:'Rajdhani',sans-serif;font-size:11px;color:var(--sao-text-dim);flex:0 0 auto}
+.pc-claimed{font-family:'Cinzel',serif;font-weight:700;font-size:20px;letter-spacing:2px;color:var(--pc-color);text-shadow:0 0 14px var(--pc-glow)}
+
 .work-task-list{display:flex;flex-direction:column;gap:7px;margin:8px 0}
 .work-task-row{display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid rgba(255,255,255,0.09);
   border-radius:7px;background:rgba(255,255,255,0.02);font-family:'Rajdhani',sans-serif;transition:background 0.15s;touch-action:pan-y}
@@ -10020,9 +10167,9 @@ const LEVEL_BANDS = [
   { rank:'C',   from:21, to:35, xpPerLevel:2400,  title:'Experienced Adventurer'  },
   { rank:'B',   from:36, to:50, xpPerLevel:3200,  title:'Renowned Adventurer'     },
   { rank:'A',   from:51, to:69, xpPerLevel:3200,  title:'Legendary Adventurer'    },
-  { rank:'S',   from:70, to:84, xpPerLevel:9200,  title:'Mythic Adventurer'       },
-  { rank:'SS',  from:85, to:94, xpPerLevel:15600, title:'Transcendent Adventurer' },
-  { rank:'SSS', from:95, to:99, xpPerLevel:32000, title:'Absolute Adventurer'     },
+  { rank:'S',   from:70, to:84, xpPerLevel:3800,  title:'Mythic Adventurer'       },
+  { rank:'SS',  from:85, to:94, xpPerLevel:6650,  title:'Transcendent Adventurer' },
+  { rank:'SSS', from:95, to:99, xpPerLevel:8000,  title:'Absolute Adventurer'     },
 ];
 // LEVEL_XP_TABLE[n] = total XP needed to reach level n
 const LEVEL_XP_TABLE = (() => {
@@ -10241,7 +10388,7 @@ function goldImg(sz) { sz = sz||20; return `<img src="img/gold.png" style="width
 // dungeon-stage income even on Legendary tasks. Gold ~2×, WXP ~1.7× — both still
 // multiply by difficulty (0.7×–2.8×), grade scale (gold), and in-flow.
 const WORK_TASK_REWARD = {
-  base:   { gold:25, wxp:25, mats:1 },
+  base:   { gold:25, wxp:15, mats:1 },
   inflow: { gold:90, wxp:85, mats:3 },
 };
 // Difficulty tiers — user-selected on inscribe. Easiest sits on top of the task list (lowest
@@ -11225,7 +11372,7 @@ const PATH_MASTERY = {
     perkType: 'crit',
     titles: ['Rogue', 'Shadow-Walker', 'Shadow Captain', 'Shadow Captain of the Long Winter'],
     perkScale: [0.01, 0.03, 0.05, 0.08],
-    npc: 'yami',
+    npc: 'leah',
   },
   mage: {
     label: 'Path of the Sigil',
@@ -12216,24 +12363,44 @@ const WORKER_RANK_BANDS = [
   { from:25, to:34, rank:'C',   xpPerLevel:600   },
   { from:35, to:44, rank:'B',   xpPerLevel:1200  },
   { from:45, to:54, rank:'A',   xpPerLevel:2500  },
-  { from:55, to:69, rank:'S',   xpPerLevel:5000  },
-  { from:70, to:84, rank:'SS',  xpPerLevel:9000  },
-  { from:85, to:99, rank:'SSS', xpPerLevel:15000 },
+  { from:55, to:69, rank:'S',   xpPerLevel:900   },
+  { from:70, to:84, rank:'SS',  xpPerLevel:810   },
+  { from:85, to:99, rank:'SSS', xpPerLevel:900   },
 ];
 
+// Raids GATE your rank: you can grind XP to fill a rank, but you can't break past
+// it until you clear that rank's raid (Knight→B, Dragon→A, Demon→S, Vampire→SS+).
+// Cap = the rank of the lowest-ranked UNCLEARED raid; all raids cleared = uncapped.
+const WORKER_RANK_ORDER = ['F','E','D','C','B','A','S','SS','SSS'];
+function _workerRankCap() {
+  const gates = (typeof state !== 'undefined' && state.gates) ? state.gates : [];
+  if (!gates.length) return { capRank:'SSS', capLevel:99, nextGate:null };
+  const uncleared = gates.filter(g => !g.clearedAt)
+    .sort((a,b) => WORKER_RANK_ORDER.indexOf(a.rank) - WORKER_RANK_ORDER.indexOf(b.rank));
+  if (!uncleared.length) return { capRank:'SSS', capLevel:99, nextGate:null };
+  const g = uncleared[0];
+  const band = WORKER_RANK_BANDS.find(b => b.rank === g.rank);
+  return { capRank:g.rank, capLevel: band ? band.to : 99, nextGate:g };
+}
 function calcWorkerLevel(workXp) {
-  let lv = 1, xpLeft = workXp || 0;
+  const cap = _workerRankCap();
+  let lv = 1, xpLeft = workXp || 0, raw = null;
   for (const band of WORKER_RANK_BANDS) {
     const lvInBand = band.to - band.from + 1;
     for (let i = 0; i < lvInBand; i++) {
-      if (xpLeft < band.xpPerLevel) {
-        return { level:lv, rank:band.rank, xpProgress:xpLeft, xpPerLevel:band.xpPerLevel };
-      }
+      if (xpLeft < band.xpPerLevel) { raw = { level:lv, rank:band.rank, xpProgress:xpLeft, xpPerLevel:band.xpPerLevel }; break; }
       xpLeft -= band.xpPerLevel; lv++;
-      if (lv >= 99) return { level:99, rank:'SSS', xpProgress:0, xpPerLevel:15000 };
+      if (lv >= 99) { raw = { level:99, rank:'SSS', xpProgress:0, xpPerLevel:900 }; break; }
     }
+    if (raw) break;
   }
-  return { level:99, rank:'SSS', xpProgress:0, xpPerLevel:15000 };
+  if (!raw) raw = { level:99, rank:'SSS', xpProgress:0, xpPerLevel:900 };
+  // clamp to the raid-gated cap — excess XP stays banked in state.workXp and releases on clear
+  if (raw.level > cap.capLevel) {
+    const cband = WORKER_RANK_BANDS.find(b => cap.capLevel >= b.from && cap.capLevel <= b.to) || WORKER_RANK_BANDS[WORKER_RANK_BANDS.length-1];
+    return { level:cap.capLevel, rank:cap.capRank, xpProgress:cband.xpPerLevel, xpPerLevel:cband.xpPerLevel, capped:true, nextGate:cap.nextGate, rawLevel:raw.level };
+  }
+  return { level:raw.level, rank:raw.rank, xpProgress:raw.xpProgress, xpPerLevel:raw.xpPerLevel, capped:false, nextGate:cap.nextGate, rawLevel:raw.level };
 }
 
 // ── Worker rank passive bonuses (derived from achieved rank, never stored) ───
@@ -13762,7 +13929,7 @@ function showRefineCelebrationOverlay(itemId, fromGrade, toGrade) {
 
 // ── Path Mastery — tier crossing banner ─────────────────────────────────────
 // Fires once per crossed tier (apprentice/journeyman/master/legend) per path.
-// Voice rotates by path: Iron→Manin, Shadows→Yami, Sigil→Leah, Convergence→all.
+// Voice rotates by path: Iron→Manin, Shadows→Leah, Sigil→Leah, Convergence→all.
 // Legend lines lean into the "someone before you" Mythos foreshadowing without
 // naming him yet — that's the Stage 4 reveal, not the Stage 1 hook.
 const PATH_TIER_BANNER_LINES = {
@@ -13773,10 +13940,10 @@ const PATH_TIER_BANNER_LINES = {
     { tier:4, npc:'manin', text:"You cleared every Iron rank. Every single one. There was someone before you who couldn't finish this path. He stopped. You didn't. That's the whole difference, kid." },
   ],
   rogue: [
-    { tier:1, npc:'yami', text:"Whisperfen claimed a rank. Not bad, kid. Surpass your limits. Keep moving." },
-    { tier:2, npc:'yami', text:"Three Shadow ranks. Shadow-Walker. I'd call you that to your face if it didn't sound dumb. Keep your edge." },
-    { tier:3, npc:'yami', text:"Shadow Captain. You earned it. The Whisperfen doesn't give that title easy. Surpass your limits. Once more." },
-    { tier:4, npc:'yami', text:"100% on Shadows. Whole damn path cleared. Some kid used to stand where you're standing now. He didn't finish. You did. That's all I'm gonna say." },
+    { tier:1, npc:'leah', text:"Tuni — first rank in the Whisperfen. The shadows already move differently around you. Keep going, quietly." },
+    { tier:2, npc:'leah', text:"Three Shadow ranks. Shadow-Walker. You slip through things that used to stop you. I've noticed. So has the Whisperfen." },
+    { tier:3, npc:'leah', text:"Shadow Captain. The Whisperfen doesn't hand that title out — you took it. I'm proud of you, Tuni." },
+    { tier:4, npc:'leah', text:"100% on Shadows. The whole path, cleared. Someone stood here once and couldn't finish it. You did. That's the difference, and it's yours." },
   ],
   mage: [
     { tier:1, npc:'leah', text:"Tuni — first rank on the Sigil Path. Aelthorn's Sanctum is reading your magic. Keep going. I'm proud already and I shouldn't say that this early." },
@@ -13787,14 +13954,14 @@ const PATH_TIER_BANNER_LINES = {
   engineer: [
     { tier:1, npc:'manin', text:"First Convergence rank. The Maker's Heart is humming. Don't get proud — the Convergence is everyone's path. You just walked it first." },
     { tier:2, npc:'leah', text:"Three Convergence ranks! Tuni, the polyvalent path is HARD because it asks for everything. You're giving it everything. I love that about you." },
-    { tier:3, npc:'yami', text:"Convergence Master. The path no one specializes in. You did. That takes a brain AND hands. Surpass your limits." },
-    { tier:4, npc:'rotate', text:"All six Convergence ranks cleared. Leah, Yami, and Manin are all watching now. Three sprites in a trench coat congratulating you. You've walked every path that matters, Tuni. ONE THRONE LEFT." },
+    { tier:3, npc:'leah', text:"Convergence Master. The path no one specializes in — because it asks for everything. You gave it everything. That takes a brain AND hands." },
+    { tier:4, npc:'rotate', text:"All six Convergence ranks cleared. Leah and Manin are both watching now — two sprites in a trench coat congratulating you. You've walked every path that matters, Tuni. ONE THRONE LEFT." },
   ],
 };
 const PATH_TIER_NAMES = ['', 'APPRENTICE', 'JOURNEYMAN', 'MASTER', 'LEGEND'];
 const PATH_TIER_COLORS = ['', '#80deea', '#b388ff', '#ffd54f', '#ff8a65'];
-const PATH_NPC_LABEL = { manin:'MANIN', yami:'YAMI', leah:'LEAH', rotate:'LEAH · MANIN · YAMI' };
-const PATH_NPC_ACCENT = { manin:'#ff8a65', yami:'#b71c1c', leah:'#ce93d8', rotate:'#ffd54f' };
+const PATH_NPC_LABEL = { manin:'MANIN', leah:'LEAH', rotate:'LEAH · MANIN' };
+const PATH_NPC_ACCENT = { manin:'#ff8a65', leah:'#ce93d8', rotate:'#ffd54f' };
 
 function showPathMasteryTierBanner(pathKey, tier) {
   const def = PATH_MASTERY[pathKey]; if (!def) return;
@@ -16398,7 +16565,7 @@ function updateStreakOnLoad() {
     }
     // Defer _buildHarvestInfo so it captures any retroactive completions from late check-in
     _pendingAnims.push(() => showHarvestOverlay(_buildHarvestInfo(y))); // Daily Briefing (Yesterday + Today)
-    // Yami's daily line — fires right after the harvest briefing, once per new day.
+    // Daily stoic line — fires right after the harvest briefing, once per new day.
     _pendingAnims.push(() => showDailyQuoteOverlay());
     // Auto weekly report on Mondays (queued after harvest so it shows on dismiss)
     if (new Date().getDay() === 1 && state.lastWeeklyReport !== today) {
@@ -18300,12 +18467,12 @@ function renderHabitos() {
 
   const week=isoWeekKey(new Date(activeDate+'T12:00:00'));
 
-  // Yami's daily line — small strip, today's day-of-month quote. Full overlay version
+  // Daily stoic line — small strip, today's day-of-month quote. Full overlay version
   // fires once per day from updateStreakOnLoad(); this is the persistent minimized form.
   // ── CURRENT QUEST — the hero/trigger: one app-chosen habit, glowing, first thing. ──
   if (isToday && !state.habitsPaused && state.habitos.length > 0) panelContent.appendChild(renderCurrentQuest());
 
-  if (isToday) panelContent.appendChild(renderYamiStrip());
+  if (isToday) panelContent.appendChild(renderDailyQuoteStrip());
 
   // Progress bars (weekly / monthly / potential) — the non-punishing replacement
   // for the streak headline. Shown on the live day only.
@@ -20658,6 +20825,7 @@ function setWorkProgress(id, pct){
     flow = _bumpWorkFlow();
     if(flow >= 2){ flowBonus = 5*(flow-1); state.workXp += flowBonus; wt.pts += flowBonus; }
   }
+  if(justFinished && !task.shardsClaimed){ task.shardsClaimed = true; _grantShards(SHARD_SIDEQUEST); }   // gacha: one grant per task, ever
   const after = calcWorkerLevel(state.workXp).level;
   saveState(); renderAll();
   // Finishing is the hardest, most-rewarded moment (closure aversion) — give it a
@@ -20886,9 +21054,13 @@ function renderWorkCurrentTask(){
 // project-work-solo-leveling-battle-system. Points funnel into state.workXp so
 // the existing worker level + TODAY'S PROGRESS hero keep working.
 // ════════════════════════════════════════════════════════════════════════════
-const HUNT_POOL = 20;                 // pts for a hunt at 100%, paid proportionally
-const GATE_STEP = 15, GATE_CLEAR_BONUS = 40;
-const REDGATE_STEP = 20, REDGATE_CLEAR_BONUS = 60;
+// WORK XP (worker level). Consistency (dailies/side quests) = low but steady;
+// events = big (limited-time); raids = huge (finite, and they GATE your rank).
+// Tunable from real use.
+const HUNT_POOL = { daily:20, weekly:50, monthly:80 };   // per-cadence, paid proportionally
+function huntPool(h){ return (HUNT_POOL[h && h.cadence]) || 20; }
+const GATE_STEP = 150, GATE_CLEAR_BONUS = 1500;          // raids: each step + clear are massive (a rank-up)
+const REDGATE_STEP = 60, REDGATE_CLEAR_BONUS = 250;      // events: way more than dailies, less than raids
 let _wgSkips = new Set();             // session skips for the CURRENT-action hero
 
 const HUNTS_SEED = [
@@ -20896,6 +21068,7 @@ const HUNTS_SEED = [
   { id:'h_msg',    text:'Answer messages (incl. IG DMs)',    cadence:'daily' },
   { id:'h_orders', text:'Write down new orders & money flow',cadence:'daily' },
   { id:'h_stock',  text:'Update stock',                      cadence:'daily' },
+  { id:'h_sidequests', text:'Add any pending side quests',  cadence:'daily' },
   { id:'h_meta',   text:'Analyze & adjust META campaigns',   cadence:'weekly' },
   { id:'h_fact',   text:'Facturar / invoicing',              cadence:'monthly', window:'monthEnd' },
 ];
@@ -21020,6 +21193,11 @@ const GATE_ACCENT = { g_knight:'#9b8cff', g_dragon:'#ff7a18', g_demon:'#ff3b30',
 const _DROP_IDS = ['rg_night','rg_psycho','rg_hero','rg_clover','rg_poke','rg_berserk'];
 function _ensureWorkBattle(){
   if(!state.hunts)    state.hunts    = HUNTS_SEED.map(h => ({...h}));
+  // migration: add the "Add any pending side quests" daily hunt to existing saves
+  if(state.hunts && !state.hunts.some(h => h.id === 'h_sidequests')){
+    const daily = state.hunts.filter(h => h.cadence === 'daily').length;
+    state.hunts.splice(daily, 0, { id:'h_sidequests', text:'Add any pending side quests', cadence:'daily' });
+  }
   if(!state.gates)    state.gates    = GATES_SEED.map(g => ({...g, steps:g.steps.map(s=>({...s}))}));
   if(!state.redGates) state.redGates = REDGATES_SEED.map(g => ({...g, steps:g.steps.map(s=>({...s}))}));
   if(!state.huntState) state.huntState = {};
@@ -21070,13 +21248,14 @@ function setHuntProgress(h, pct){
   pct = Math.max(0, Math.min(100, Math.round(pct)));
   const e = _huntEntry(h);
   const wasDone = e.pct >= 100;
-  const newAward = Math.round(HUNT_POOL * pct / 100);
+  const newAward = Math.round(huntPool(h) * pct / 100);
   const delta = newAward - (e.awarded||0);
   e.pct = pct; e.awarded = newAward;
   const lv = _awardWork(delta);
   if(delta > 0){ const wt=_ensureWorkToday(); if(!wt.touched.includes(h.id)) wt.touched.push(h.id); }
   const justDone = pct >= 100 && !wasDone;
   if(justDone){ const wt=_ensureWorkToday(); wt.finished = (wt.finished||0) + 1; }
+  if(justDone && !e.shardsClaimed){ e.shardsClaimed = true; _grantShards(SHARD_HUNT); }   // gacha: once per hunt per period
   saveState(); renderAll();
   if(justDone) showWorkFinishCelebration(h.text, lv.after>lv.before ? lv.after : null, 0, 0);
   else {
@@ -21116,8 +21295,18 @@ function toggleGateStep(gate, stepId, isRed){
     _awardWork(isRed ? REDGATE_CLEAR_BONUS : GATE_CLEAR_BONUS);
     cleared = true;
   }
+  // ── gacha: shards per completed step; Signet at raid 50% + on any clear; Trophy on clear ──
+  if(st.done && !st.shardsClaimed){
+    st.shardsClaimed = true;
+    _grantShards((isRed ? SHARD_EVENT_STEP : SHARD_RAID_STEP) * EVENT_SHARD_MULT);
+  }
+  {
+    const _tot = gate.steps.length, _dn = gate.steps.filter(s => s.done).length;
+    if(!isRed && _tot && _dn/_tot >= 0.5 && !gate.signet50){ gate.signet50 = true; _grantSignet(); }   // raids: half-way Signet
+    if(cleared && !gate.signet100){ gate.signet100 = true; _grantSignet(); _grantTrophy(gate.id, gate.codename); }
+  }
   saveState(); renderAll();
-  if(cleared){ showAriseCelebration(gate, isRed); }
+  if(cleared){ showAriseCelebration(gate, isRed); if(!isRed) setTimeout(() => showNotif(`⚒ RANK CAP LIFTED · you can climb past ${gate.rank} now`), 5200); }
   else {
     if(units > 0 && soundEnabled){
       if(midProgress && typeof playHuntTick==='function'){
@@ -21226,6 +21415,23 @@ function renderWorkRestBanner(){
   el.innerHTML = `<div class="wrb-title">✓ You've done enough today</div><div class="wrb-sub">${sub} Enjoy your evening — the rest keeps.</div>`;
   return el;
 }
+// Replaces the old "go rest" banner: shows ONLY when every daily hunt is truly at
+// 100% (can't be triggered by one click), and states facts — never permission to stop.
+function renderDailyDoneChip(){
+  const daily = state.hunts.filter(h => h.cadence==='daily');
+  if(!daily.length || !daily.every(h => _huntEntry(h).pct >= 100)) return null;
+  const wt = _ensureWorkToday(), today = todayKey();
+  const parts = [];
+  const sq = state.trabajo.filter(t => t.completed && t.completedDate === today).length;
+  if(sq) parts.push(`${sq} side quest${sq>1?'s':''}`);
+  const steps = _workStepsToday();
+  if(steps) parts.push(`${steps} event/boss step${steps>1?'s':''}`);
+  if(state.hunts.filter(h => h.cadence!=='daily').some(h => (wt.touched||[]).includes(h.id))) parts.push('weekly');
+  const chip = document.createElement('div'); chip.className = 'daily-done-chip';
+  chip.innerHTML = `<div class="ddc-main">✓ ALL DAILY QUESTS DONE</div>`
+    + (parts.length ? `<div class="ddc-sub">also today · ${parts.join(' · ')}</div>` : '');
+  return chip;
+}
 const _CONGRATS_LINES = [
   "Another one shipped. That's the work.",
   "You took it all the way to 100%. Every step, done.",
@@ -21300,11 +21506,15 @@ function renderGateCard(g, isRed){
   const card = document.createElement('div');
   card.className = 'gate-card ' + (isRed?'red-gate':'gate') + ' status-' + status + ' ' + themeClass;
   card.style.setProperty('--gate-accent', accent);
+  card.dataset.rgid = g.id;
   const titleIcon = isRed ? '' : (GATE_ICON[g.id] ? GATE_ICON[g.id] + ' ' : '');
+  const rgTimer = (isRed && status==='active')
+    ? `<span class="rg-livetimer" data-eb-deadline="${g.deadline}"><span class="ebt-txt">${_fmtCountdown(g.deadline).txt}</span> left</span>`
+    : _deadlineLabel(g);
   const badge = isRed
-    ? `<span class="gate-rank red">${RG_ICON[g.id] || '🔴'} ${_deadlineLabel(g)}</span>`
+    ? `<span class="gate-rank red">${RG_ICON[g.id] || '🔴'} ${rgTimer}</span>`
     : `<span class="gate-rank" style="color:${accent};border-color:${accent}">${g.rank}</span>`;
-  const statusTag = status==='cleared' ? `<span class="gate-cleared">✦ CLEARED</span>`
+  const statusTag = status==='cleared' ? `<span class="gate-cleared">✦ CLEARED 🏆</span>`
                   : status==='collapsed' ? `<span class="gate-collapsed">✕ COLLAPSED</span>` : '';
   card.innerHTML = `<span class="gate-shine"></span><div class="gate-head">`
     + `<div class="gate-head-l">${badge}<div class="gate-titles"><div class="gate-title">${titleIcon}${_escWork(g.codename)}</div><div class="gate-sub">${_escWork(isRed?g.drop:g.goal)}</div></div></div>`
@@ -21332,28 +21542,495 @@ function renderGateCard(g, isRed){
 }
 function renderRedGatesSection(){
   const frag = document.createDocumentFragment();
-  const rankOf = { active:0, collapsed:1, cleared:2 };
-  const list = [...state.redGates].sort((a,b) => {
+  const rankOf = { active:0, collapsed:1 };
+  // active + missed stay visible; CLEARED tuck into a collapsed "COMPLETED" fold
+  const live = state.redGates.filter(rg => _redGateStatus(rg) !== 'cleared').sort((a,b) => {
     const sa=_redGateStatus(a), sb=_redGateStatus(b);
     return rankOf[sa]!==rankOf[sb] ? rankOf[sa]-rankOf[sb] : _daysLeft(a.deadline)-_daysLeft(b.deadline);
   });
-  list.forEach(rg => frag.appendChild(renderGateCard(rg, true)));
+  const done = state.redGates.filter(rg => _redGateStatus(rg)==='cleared').sort((a,b)=>(b.clearedAt||'').localeCompare(a.clearedAt||''));
+  live.forEach(rg => frag.appendChild(renderGateCard(rg, true)));
+  if(done.length){
+    const isOpen = !!completedExpanded['rg-completed'];
+    const sep = document.createElement('div'); sep.className = 'work-archived-sep'; sep.style.cursor = 'pointer';
+    sep.innerHTML = `<div class="work-archived-line"></div><span>${isOpen?'▲':'▼'} 🏆 ${done.length} COMPLETED</span><div class="work-archived-line"></div>`;
+    sep.addEventListener('click', () => { completedExpanded['rg-completed'] = !isOpen; renderAll(); });
+    frag.appendChild(sep);
+    if(isOpen) done.forEach(rg => frag.appendChild(renderGateCard(rg, true)));
+  }
   return frag;
 }
 function renderGatesSection(){
   const frag = document.createDocumentFragment();
   const order = { C:0, B:1, A:2, S:3 };
-  [...state.gates].sort((a,b)=>(order[a.rank]??9)-(order[b.rank]??9)).forEach(g => frag.appendChild(renderGateCard(g, false)));
+  const gates = [...state.gates].sort((a,b)=>(order[a.rank]??9)-(order[b.rank]??9));
+  const live = gates.filter(g => !g.clearedAt);
+  const done = gates.filter(g => g.clearedAt);
+  live.forEach(g => frag.appendChild(renderGateCard(g, false)));
+  if(done.length){
+    const isOpen = !!completedExpanded['gate-completed'];
+    const sep = document.createElement('div'); sep.className = 'work-archived-sep'; sep.style.cursor = 'pointer';
+    sep.innerHTML = `<div class="work-archived-line"></div><span>${isOpen?'▲':'▼'} 🏆 ${done.length} COMPLETED</span><div class="work-archived-line"></div>`;
+    sep.addEventListener('click', () => { completedExpanded['gate-completed'] = !isOpen; renderAll(); });
+    frag.appendChild(sep);
+    if(isOpen) done.forEach(g => frag.appendChild(renderGateCard(g, false)));
+  }
   return frag;
+}
+
+// ── GACHA EVENT BANNERS — persistent "LIVE DROPS" shelf + live countdowns ────
+// Drops close at the END of their deadline day (local 23:59:59), so the timer
+// only flips to CLOSED once that day is fully over — same day _redGateStatus uses.
+function _fmtCountdown(deadline){
+  const end = new Date(deadline + 'T23:59:59');
+  let ms = end - new Date();
+  if(ms <= 0) return { txt:'CLOSED', urgent:true, over:true };
+  const day = 86400000;
+  const d = Math.floor(ms / day); ms -= d*day;
+  const h = Math.floor(ms / 3600000); ms -= h*3600000;
+  const m = Math.floor(ms / 60000); ms -= m*60000;
+  const s = Math.floor(ms / 1000);
+  const p2 = n => String(n).padStart(2,'0');
+  const txt = d >= 1 ? `${d}d ${p2(h)}h ${p2(m)}m` : `${p2(h)}:${p2(m)}:${p2(s)}`;
+  return { txt, urgent: d < 1, over:false, days:d };
+}
+let _eventTimer = null;
+function _tickEventTimers(){
+  document.querySelectorAll('[data-eb-deadline]').forEach(el => {
+    const c = _fmtCountdown(el.dataset.ebDeadline);
+    const t = el.querySelector('.ebt-txt'); if(t) t.textContent = c.txt;
+    el.classList.toggle('urgent', c.urgent);
+  });
+}
+function _startEventTimers(){
+  if(_eventTimer){ clearInterval(_eventTimer); _eventTimer = null; }
+  if(!document.querySelector('[data-eb-deadline]')) return;
+  _tickEventTimers();
+  _eventTimer = setInterval(() => {
+    if(document.hidden || (typeof currentTab !== 'undefined' && currentTab !== 'work') || !document.querySelector('[data-eb-deadline]')){
+      clearInterval(_eventTimer); _eventTimer = null; return;
+    }
+    _tickEventTimers();
+  }, 1000);
+}
+// Original, franchise-FLAVORED title emblems (never the official trademarked
+// logos). Keyed by theme; returns '' when a drop has no custom emblem yet, so the
+// banner falls back to plain codename text.
+function _dropEmblem(rg){
+  const theme = RG_THEME[rg.id];
+  if(theme === 'cyberpunk'){
+    return `<div class="eb-emblem eb-emblem-night"><svg class="em-svg" viewBox="0 0 340 70" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${_escWork(rg.codename)}">`
+      + `<defs>`
+      +   `<filter id="ncGlow" x="-20%" y="-45%" width="140%" height="190%"><feGaussianBlur stdDeviation="1.3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`
+      +   `<linearGradient id="ncBar" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e88"/></linearGradient>`
+      + `</defs>`
+      + `<g font-family="'Rajdhani',sans-serif" font-weight="700" font-size="42" letter-spacing="3" text-anchor="middle">`
+      +   `<text x="168" y="44" fill="#00e5ff" opacity="0.7">NIGHT CITY</text>`
+      +   `<text x="172" y="45" fill="#ff2e88" opacity="0.62">NIGHT CITY</text>`
+      +   `<text x="170" y="44" fill="#eafcff" filter="url(#ncGlow)">NIGHT CITY</text>`
+      + `</g>`
+      + `<rect x="42" y="53" width="256" height="2.6" fill="url(#ncBar)"/>`
+      + `<path d="M6 8 H21 M6 8 V21" stroke="#00e5ff" stroke-width="2.2" fill="none"/>`
+      + `<path d="M334 62 H319 M334 62 V49" stroke="#ff2e88" stroke-width="2.2" fill="none"/>`
+      + `</svg></div>`;
+  }
+  if(theme === 'psycho'){
+    return `<div class="eb-emblem eb-emblem-psycho"><svg class="em-svg" viewBox="0 0 340 70" preserveAspectRatio="xMidYMid meet" role="img" aria-label="100% Psycho">`
+      + `<defs><filter id="psyGlow" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="1.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`
+      + `<radialGradient id="psyAura" cx="50%" cy="50%" r="52%"><stop offset="0" stop-color="#a24bff" stop-opacity="0.55"/><stop offset="62%" stop-color="#a24bff" stop-opacity="0.12"/><stop offset="100%" stop-color="#a24bff" stop-opacity="0"/></radialGradient></defs>`
+      + `<ellipse cx="170" cy="36" rx="156" ry="30" fill="url(#psyAura)"/>`
+      + `<text x="171" y="47" font-family="'Rajdhani',sans-serif" font-weight="700" font-size="34" letter-spacing="1.5" text-anchor="middle" fill="#a24bff" opacity="0.4">100% PSYCHO</text>`
+      + `<text x="170" y="46" font-family="'Rajdhani',sans-serif" font-weight="700" font-size="34" letter-spacing="1.5" text-anchor="middle" filter="url(#psyGlow)"><tspan fill="#4ff0c4">100%</tspan> <tspan fill="#e2c6ff">PSYCHO</tspan></text>`
+      + `</svg></div>`;
+  }
+  if(theme === 'hero'){
+    return `<div class="eb-emblem eb-emblem-hero"><svg class="em-svg" viewBox="0 0 340 70" preserveAspectRatio="xMidYMid meet" role="img" aria-label="My Hero">`
+      + `<defs><filter id="heroGlow" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="1.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`
+      + `<g stroke="#3ddc84" stroke-width="2.2" stroke-linecap="round" opacity="0.45"><line x1="26" y1="36" x2="7" y2="29"/><line x1="26" y1="36" x2="9" y2="47"/><line x1="314" y1="36" x2="333" y2="27"/><line x1="314" y1="36" x2="331" y2="47"/><line x1="170" y1="7" x2="151" y2="1"/><line x1="170" y1="65" x2="189" y2="70"/></g>`
+      + `<g font-family="'Rajdhani',sans-serif" font-weight="700" font-style="italic" font-size="42" text-anchor="middle">`
+      + `<text x="174" y="48" fill="#0084ff" opacity="0.75">MY HERO</text>`
+      + `<text x="170" y="45" fill="#8effbf" filter="url(#heroGlow)">MY HERO</text>`
+      + `</g></svg></div>`;
+  }
+  if(theme === 'clover'){
+    return `<div class="eb-emblem eb-emblem-clover"><svg class="em-svg" viewBox="0 0 340 70" preserveAspectRatio="xMidYMid meet" role="img" aria-label="5 Leaf Clover">`
+      + `<defs><filter id="clvGlow" x="-20%" y="-55%" width="140%" height="210%"><feGaussianBlur stdDeviation="1.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`
+      + `<g transform="translate(32,35)" fill="#ff2d55"><ellipse cx="0" cy="-9" rx="5.2" ry="8.6"/><ellipse cx="0" cy="-9" rx="5.2" ry="8.6" transform="rotate(72)"/><ellipse cx="0" cy="-9" rx="5.2" ry="8.6" transform="rotate(144)"/><ellipse cx="0" cy="-9" rx="5.2" ry="8.6" transform="rotate(216)"/><ellipse cx="0" cy="-9" rx="5.2" ry="8.6" transform="rotate(288)"/><circle cx="0" cy="0" r="2.6" fill="#7a0f24"/></g>`
+      + `<text x="196" y="46" font-family="'Rajdhani',sans-serif" font-weight="700" font-size="27" letter-spacing="1" text-anchor="middle" fill="#ff5a78" filter="url(#clvGlow)">5 LEAF CLOVER</text>`
+      + `</svg></div>`;
+  }
+  if(theme === 'festival'){
+    return `<div class="eb-emblem eb-emblem-festival"><svg class="em-svg" viewBox="0 0 340 70" preserveAspectRatio="xMidYMid meet" role="img" aria-label="The Festival">`
+      + `<defs><filter id="fesGlow" x="-20%" y="-55%" width="140%" height="210%"><feGaussianBlur stdDeviation="1.3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`
+      + `<path d="M18 13 Q170 25 322 13" stroke="#ffc14d" stroke-width="1.5" fill="none" opacity="0.6"/>`
+      + `<g opacity="0.92"><g><line x1="62" y1="19" x2="62" y2="24" stroke="#ffc14d"/><circle cx="62" cy="28" r="4.4" fill="#ff8ac2"/></g><g><line x1="108" y1="21" x2="108" y2="26" stroke="#ffc14d"/><circle cx="108" cy="30" r="4.4" fill="#ffc14d"/></g><g><line x1="170" y1="22" x2="170" y2="27" stroke="#ffc14d"/><circle cx="170" cy="31" r="4.6" fill="#ff8ac2"/></g><g><line x1="232" y1="21" x2="232" y2="26" stroke="#ffc14d"/><circle cx="232" cy="30" r="4.4" fill="#ffc14d"/></g><g><line x1="278" y1="19" x2="278" y2="24" stroke="#ffc14d"/><circle cx="278" cy="28" r="4.4" fill="#ff8ac2"/></g></g>`
+      + `<text x="170" y="56" font-family="'Rajdhani',sans-serif" font-weight="700" font-size="29" letter-spacing="1.5" text-anchor="middle" fill="#ffd98a" filter="url(#fesGlow)">THE FESTIVAL</text>`
+      + `</svg></div>`;
+  }
+  if(theme === 'poke'){
+    return `<div class="eb-emblem eb-emblem-poke"><svg class="em-svg" viewBox="0 0 340 70" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Poke Cafe">`
+      + `<defs><filter id="pokeGlow" x="-20%" y="-55%" width="140%" height="210%"><feGaussianBlur stdDeviation="1.1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><clipPath id="pokeClip"><circle cx="0" cy="0" r="13"/></clipPath></defs>`
+      + `<g transform="translate(33,36)"><g clip-path="url(#pokeClip)"><rect x="-13" y="-13" width="26" height="26" fill="#ffcb05"/><path d="M13 -13 L13 13 L-13 13 Z" fill="#ff3b30"/><line x1="-13" y1="13" x2="13" y2="-13" stroke="#3a2a00" stroke-width="1.6"/></g><circle cx="0" cy="0" r="13" fill="none" stroke="#3a2a00" stroke-width="1.6"/><circle cx="-3.5" cy="-4.5" r="2.1" fill="#fff8e1"/></g>`
+      + `<text x="196" y="47" font-family="'Rajdhani',sans-serif" font-weight="700" font-size="33" letter-spacing="1" text-anchor="middle" fill="#ffe14d" stroke="#c0392b" stroke-width="0.8" paint-order="stroke" filter="url(#pokeGlow)">POKE CAFE</text>`
+      + `</svg></div>`;
+  }
+  if(theme === 'berserk'){
+    return `<div class="eb-emblem eb-emblem-berserk"><svg class="em-svg" viewBox="0 0 340 70" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Going Crazy">`
+      + `<defs><filter id="bskRough" x="-10%" y="-35%" width="120%" height="170%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="1" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>`
+      + `<filter id="bskGlow" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="1.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`
+      + `<text x="170" y="47" font-family="'Rajdhani',sans-serif" font-weight="700" font-size="31" letter-spacing="2" text-anchor="middle" fill="#c0242c" opacity="0.5" filter="url(#bskGlow)">GOING CRAZY</text>`
+      + `<text x="170" y="47" font-family="'Rajdhani',sans-serif" font-weight="700" font-size="31" letter-spacing="2" text-anchor="middle" fill="#e23b3b" filter="url(#bskRough)">GOING CRAZY</text>`
+      + `<path d="M22 52 L302 16" stroke="#ff2d2d" stroke-width="2.6" opacity="0.85" stroke-linecap="round"/>`
+      + `<path d="M44 12 L250 55" stroke="#8a0f14" stroke-width="1.6" opacity="0.55" stroke-linecap="round"/>`
+      + `</svg></div>`;
+  }
+  return '';
+}
+function _eventBannerCard(rg){
+  const theme  = RG_THEME[rg.id]  || 'default';
+  const accent = RG_ACCENT[rg.id] || '#ff5252';
+  const icon   = RG_ICON[rg.id]   || '🔴';
+  const total = rg.steps.length, done = rg.steps.filter(s => s.done).length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  const c = _fmtCountdown(rg.deadline);
+  const days = _daysLeft(rg.deadline);
+  const soon  = days <= 3;      // ENDING SOON + pulse
+  const fresh = days >= 20;     // lots of runway → NEW
+  const card = document.createElement('div');
+  card.className = 'event-banner' + (soon ? ' ending' : '');
+  card.style.setProperty('--eb-accent', accent);
+  card.innerHTML =
+      `<div class="eb-art rg-theme-${theme}"></div><div class="eb-scrim"></div><div class="eb-shine"></div>`
+    + (soon ? `<div class="eb-ribbon soon">ENDING SOON</div>` : (fresh ? `<div class="eb-ribbon new">NEW</div>` : ''))
+    + `<div class="eb-top">`
+    +   `<div class="eb-titlerow"><span class="eb-icon">${icon}</span>${_dropEmblem(rg) || `<span class="eb-name">${_escWork(rg.codename)}</span>`}</div>`
+    +   `<div class="eb-drop">🎁 ${_escWork(rg.drop)}</div>`
+    + `</div>`
+    + `<div class="eb-bot">`
+    +   `<div class="eb-timer${c.urgent?' urgent':''}" data-eb-deadline="${rg.deadline}"><span class="ebt-ico">⏳</span><span class="ebt-txt">${c.txt}</span></div>`
+    +   `<div class="eb-progline"><div class="eb-bar"><div class="eb-fill" style="width:${pct}%"></div></div><span class="eb-pct">${pct}%</span></div>`
+    + `</div>`;
+  card.addEventListener('click', () => {
+    completedExpanded['rg-' + rg.id] = true;   // open its full step-list card
+    renderAll();
+    setTimeout(() => {
+      const target = document.querySelector('.gate-card.red-gate[data-rgid="' + rg.id + '"]');
+      if(target){
+        target.scrollIntoView({ behavior:'smooth', block:'center' });
+        target.classList.add('gate-flash');
+        setTimeout(() => target.classList.remove('gate-flash'), 1200);
+      }
+    }, 60);
+  });
+  return card;
+}
+function renderEventShelf(){
+  const active = state.redGates
+    .filter(rg => _redGateStatus(rg) === 'active')
+    .sort((a,b) => _daysLeft(a.deadline) - _daysLeft(b.deadline));
+  const shelf = document.createElement('div'); shelf.className = 'event-shelf';
+  const hd = document.createElement('div'); hd.className = 'event-shelf-hd';
+  hd.innerHTML = `<span class="esh-title">🎏 LIVE DROPS</span>`
+    + `<span class="esh-count">${active.length ? `${active.length} banner${active.length===1?'':'s'} open` : 'none live'}</span>`;
+  shelf.appendChild(hd);
+  if(!active.length){
+    const e = document.createElement('div'); e.className = 'event-empty';
+    e.textContent = 'No drops live right now — a fresh banner appears when the next one is scheduled.';
+    shelf.appendChild(e);
+    return shelf;
+  }
+  const track = document.createElement('div'); track.className = 'event-track';
+  active.forEach(rg => track.appendChild(_eventBannerCard(rg)));
+  shelf.appendChild(track);
+  if(active.length > 1){
+    const dots = document.createElement('div'); dots.className = 'event-dots';
+    active.forEach((_, i) => { const d = document.createElement('span'); d.className = 'ed' + (i===0?' on':''); dots.appendChild(d); });
+    shelf.appendChild(dots);
+    track.addEventListener('scroll', () => {
+      const i = Math.round(track.scrollLeft / (track.scrollWidth / active.length));
+      dots.querySelectorAll('.ed').forEach((d, j) => d.classList.toggle('on', j === Math.min(i, active.length-1)));
+    }, { passive:true });
+  }
+  return shelf;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// GACHA REWARD ENGINE — shards → Standard pulls · Signets → Premium pulls.
+// Currency-free: pulls award real-life reward VOUCHERS into a Vault; clearing
+// events awards Trophies. Reward lists below are editable SEEDS (final list TBD).
+// ══════════════════════════════════════════════════════════════════════════
+const SHARDS_PER_PULL  = 10;
+let   EVENT_SHARD_MULT = 2;      // ×2 "event-heavy season" — set to 1 to end it
+const SHARD_SIDEQUEST  = 2;      // per completed side quest
+const SHARD_HUNT       = 3;      // per completed hunt (daily/weekly/monthly)
+const SHARD_EVENT_STEP = 5;      // per red-gate step (×MULT)
+const SHARD_RAID_STEP  = 5;      // per gate/raid step (×MULT)
+const PREMIUM_SSR_RATE = 0.30;   // Signet pull SSR chance (+ hard pity after 1 miss)
+
+const GACHA_RARITY = {
+  common:{ label:'COMMON', color:'#b0bec5', glow:'rgba(176,190,197,0.55)' },
+  r:     { label:'R',      color:'#4da3ff', glow:'rgba(77,163,255,0.65)'  },
+  sr:    { label:'SR',     color:'#c07bff', glow:'rgba(192,123,255,0.75)' },
+  ssr:   { label:'SSR',    color:'#ffcf3f', glow:'rgba(255,207,63,0.9)'   },
+};
+// Tuni's real reward pools (defined 2026-09-16). Common = FREE micro-cuts only,
+// kept clear of habits. Rarity = size of the permission; games span every tier.
+const GACHA_REWARDS = {
+  common:['🎮 15-min game break','☀️ 15-min balcony sun break','🍵 Mate / coffee break','🎧 One song, feet up'],
+  r:     ['🎮 2-hour gaming block','📺 2 hours of anime','🥐 3 medialunas for breakfast','🛒 A cheap little something you want'],
+  sr:    ['🎮 Full gaming night (9pm–12)','📺 Anime binge — 12 episodes','🍔 Order food you like','🛍️ Buy a small wanted thing'],
+  ssr:   ['🌈 FREE WEEKEND — no work Sat & Sun','🎮 A wanted game + gaming weekend','🍽️ Dinner out'],
+};
+
+function _ensureGacha(){
+  let g = state.gacha;
+  if(!g || typeof g !== 'object') g = state.gacha = {};
+  if(typeof g.shards      !== 'number') g.shards = 0;
+  if(typeof g.signets     !== 'number') g.signets = 0;
+  if(!Array.isArray(g.vault))    g.vault = [];
+  if(!Array.isArray(g.trophies)) g.trophies = [];
+  if(typeof g.premiumMiss !== 'number') g.premiumMiss = 0;
+  return g;
+}
+function _grantShards(n){ if(n > 0) _ensureGacha().shards += n; }
+function _grantSignet(){ _ensureGacha().signets += 1; if(typeof showNotif === 'function') showNotif('🎴 SIGNET earned — Premium pull ready'); }
+function _grantTrophy(id, name){ const g = _ensureGacha(); if(!g.trophies.some(t => t.id === id)) g.trophies.push({ id, name, wonAt: todayKey() }); }
+
+function _rollStandard(){
+  const r = Math.random(); let acc = 0;
+  for(const [tier, p] of [['ssr',0.005],['sr',0.025],['r',0.09],['common',0.88]]){ acc += p; if(r < acc) return tier; }
+  return 'common';
+}
+function _rollPremium(g){
+  const tier = (g.premiumMiss >= 1) ? 'ssr' : (Math.random() < PREMIUM_SSR_RATE ? 'ssr' : 'sr');   // hard pity after 1 miss
+  g.premiumMiss = (tier === 'ssr') ? 0 : g.premiumMiss + 1;
+  return tier;
+}
+function _pickReward(tier){ const pool = GACHA_REWARDS[tier] || GACHA_REWARDS.common; return pool[Math.floor(Math.random() * pool.length)]; }
+
+let _pullBusy = false;
+function doPull(kind){
+  if(_pullBusy) return;
+  const g = _ensureGacha();
+  if(kind === 'premium'){ if(g.signets < 1) return; g.signets -= 1; }
+  else { if(g.shards < SHARDS_PER_PULL) return; g.shards -= SHARDS_PER_PULL; }
+  const tier = (kind === 'premium') ? _rollPremium(g) : _rollStandard();
+  const name = _pickReward(tier);
+  g.vault.push({ id:'gv'+Date.now().toString(36)+Math.floor(Math.random()*1e4), tier, name, redeemed:false, wonAt: todayKey() });
+  saveState();
+  _showPullReveal(tier, name);
+}
+function _showPullReveal(tier, name){
+  _pullBusy = true;
+  const rar = GACHA_RARITY[tier];
+  const ov = document.createElement('div'); ov.className = 'pull-overlay';
+  ov.innerHTML = `<div class="pull-stage"><div class="pull-orb hint-${tier}"></div><div class="pull-flash"></div></div>`;
+  document.body.appendChild(ov);
+  const stage = ov.querySelector('.pull-stage');
+  if(soundEnabled && typeof playHuntTick === 'function') playHuntTick(0.25);
+  setTimeout(() => {
+    const flash = ov.querySelector('.pull-flash'); if(flash) flash.classList.add('go');
+    const orb = ov.querySelector('.pull-orb'); if(orb) orb.remove();
+    const card = document.createElement('div');
+    card.className = 'pull-card tier-' + tier;
+    card.style.setProperty('--pc-color', rar.color);
+    card.style.setProperty('--pc-glow', rar.glow);
+    card.innerHTML = `<div class="pc-rarity">${rar.label}</div><div class="pc-reward">${_escWork(name)}</div>`
+      + `<div class="pc-note">Sent to your Vault 🎒</div><button class="pc-ok">COLLECT</button>`;
+    stage.appendChild(card);
+    if(tier === 'ssr'){
+      if(typeof showStellarBurst === 'function') showStellarBurst('supernova');
+      if(soundEnabled && typeof playStellarComplete === 'function') playStellarComplete('supernova');
+      if(navigator.vibrate) navigator.vibrate([40,50,140,50,240]);
+    } else if(tier === 'sr'){
+      if(typeof showStellarBurst === 'function') showStellarBurst('stellar');
+      if(soundEnabled && typeof playStellarComplete === 'function') playStellarComplete('stellar');
+      if(navigator.vibrate) navigator.vibrate([30,40,120]);
+    } else {
+      if(soundEnabled && typeof playObjectiveDone === 'function') playObjectiveDone(1);
+      if(navigator.vibrate) navigator.vibrate(18);
+    }
+    const close = () => { _pullBusy = false; ov.remove(); renderAll(); };
+    card.querySelector('.pc-ok').addEventListener('click', close);
+    ov.addEventListener('click', e => { if(e.target === ov) close(); });
+  }, 1150);
+}
+function renderGachaBar(){
+  const g = _ensureGacha();
+  const cur = g.shards % SHARDS_PER_PULL;
+  const pullsReady = Math.floor(g.shards / SHARDS_PER_PULL);
+  const pct = Math.round(cur / SHARDS_PER_PULL * 100);
+  const canStd = g.shards >= SHARDS_PER_PULL, canPrem = g.signets >= 1;
+  const unclaimed = g.vault.filter(v => !v.redeemed).length;
+  const bar = document.createElement('div'); bar.className = 'gacha-bar';
+  bar.innerHTML =
+      `<div class="gacha-shards">`
+    +   `<div class="gs-row"><span>🔹 <span class="gs-shardn">${g.shards}</span> shards${pullsReady ? ` · ${pullsReady} pull${pullsReady>1?'s':''} ready` : ''}${EVENT_SHARD_MULT > 1 ? ` <span class="gacha-x2" title="×${EVENT_SHARD_MULT} event & raid shards — event-heavy season">⚡ ×${EVENT_SHARD_MULT}</span>` : ''}</span><span>🎴 ${g.signets} signet${g.signets===1?'':'s'}</span></div>`
+    +   `<div class="gs-bar"><div class="gs-fill" style="width:${canStd ? 100 : pct}%"></div></div>`
+    + `</div>`
+    + `<div class="gacha-actions">`
+    +   `<button class="pull-btn standard${canStd ? ' ready' : ''}" ${canStd ? '' : 'disabled'}>PULL · 10🔹</button>`
+    +   `<button class="pull-btn premium${canPrem ? ' ready' : ''}" ${canPrem ? '' : 'disabled'}>PREMIUM · 🎴</button>`
+    +   `<div class="vault-open">🎒 Vault${unclaimed ? ` <span class="vo-badge">${unclaimed}</span>` : ''}</div>`
+    + `</div>`;
+  const sb = bar.querySelector('.pull-btn.standard'); if(sb && canStd) sb.addEventListener('click', () => doPull('standard'));
+  const pb = bar.querySelector('.pull-btn.premium');  if(pb && canPrem) pb.addEventListener('click', () => doPull('premium'));
+  bar.querySelector('.vault-open').addEventListener('click', openVault);
+  return bar;
+}
+function openVault(){
+  const g = _ensureGacha();
+  const order = ['ssr','sr','r','common'];
+  const unredeemed = g.vault.filter(v => !v.redeemed).sort((a,b) => order.indexOf(a.tier) - order.indexOf(b.tier));
+  const claimed = g.vault.filter(v => v.redeemed);
+  const ov = document.createElement('div'); ov.className = 'vault-overlay';
+  let html = `<div class="vault-sheet"><div class="vault-hd"><h3>🎒 VAULT</h3><button class="vault-close">✕</button></div>`;
+  html += `<div class="vault-sec">🔹 ${g.shards} SHARDS · 🎴 ${g.signets} SIGNETS</div>`;
+  if(!g.vault.length && !g.trophies.length){
+    html += `<div class="vault-empty">No rewards yet — finish tasks to earn 🔹 shards, then pull.</div>`;
+  } else {
+    html += `<div class="vault-sec">UNCLAIMED · ${unredeemed.length}</div>`;
+    if(!unredeemed.length) html += `<div class="vault-empty">Nothing to claim right now.</div>`;
+    unredeemed.forEach(v => { const r = GACHA_RARITY[v.tier];
+      html += `<div class="vault-item" style="--vi-color:${r.color}" data-id="${v.id}"><span class="vi-tier">${r.label}</span><span class="vi-name">${_escWork(v.name)}</span><button class="vi-claim">CLAIM</button></div>`; });
+    if(g.trophies.length){
+      html += `<div class="vault-sec">🏆 TROPHIES · ${g.trophies.length}</div><div class="trophy-grid">`;
+      g.trophies.forEach(t => { html += `<div class="trophy"><div class="tr-ico">🏆</div><div class="tr-name">${_escWork(t.name)}</div></div>`; });
+      html += `</div>`;
+    }
+    if(claimed.length){
+      html += `<div class="vault-sec">CLAIMED · ${claimed.length}</div>`;
+      claimed.slice().reverse().forEach(v => { const r = GACHA_RARITY[v.tier];
+        html += `<div class="vault-item claimed" style="--vi-color:${r.color}"><span class="vi-tier">${r.label}</span><span class="vi-name">${_escWork(v.name)}</span></div>`; });
+    }
+  }
+  html += `</div>`;
+  ov.innerHTML = html;
+  document.body.appendChild(ov);
+  ov.querySelector('.vault-close').addEventListener('click', () => ov.remove());
+  ov.addEventListener('click', e => { if(e.target === ov) ov.remove(); });
+  ov.querySelectorAll('.vi-claim').forEach(btn => btn.addEventListener('click', () => {
+    const id = btn.closest('.vault-item').dataset.id;
+    const item = g.vault.find(v => v.id === id);
+    if(item){ item.redeemed = true; item.redeemedAt = todayKey(); saveState(); ov.remove(); _showClaimCelebration(item); renderAll(); }
+  }));
+}
+
+// A little "you CLAIMED this — now enjoy it" moment when a reward is cashed in.
+function _showClaimCelebration(item){
+  const rar = GACHA_RARITY[item.tier] || GACHA_RARITY.common;
+  const ov = document.createElement('div'); ov.className = 'pull-overlay';
+  ov.innerHTML = `<div class="pull-stage"><div class="pull-card claim-card tier-${item.tier}" style="--pc-color:${rar.color};--pc-glow:${rar.glow}">`
+    + `<div class="pc-claimed">✓ CLAIMED</div>`
+    + `<div class="pc-reward">${_escWork(item.name)}</div>`
+    + `<div class="pc-note">It's yours — now go enjoy it 🎉</div>`
+    + `<button class="pc-ok">ENJOY ▸</button>`
+    + `</div></div>`;
+  document.body.appendChild(ov);
+  if(item.tier === 'ssr' || item.tier === 'sr'){
+    if(typeof showStellarBurst === 'function') showStellarBurst(item.tier === 'ssr' ? 'supernova' : 'stellar');
+    if(soundEnabled && typeof playStellarComplete === 'function') playStellarComplete(item.tier === 'ssr' ? 'supernova' : 'stellar');
+  } else {
+    if(soundEnabled && typeof playObjectiveDone === 'function') playObjectiveDone(1);
+  }
+  if(navigator.vibrate) navigator.vibrate([30,40,120]);
+  const close = () => ov.remove();
+  ov.querySelector('.pc-ok').addEventListener('click', close);
+  ov.addEventListener('click', e => { if(e.target === ov) close(); });
+}
+
+// ── WORK sub-tabs: MISSIONS (the board) · VAULT (trophies + claimed rewards) ──
+let workSubtab = 'board';
+function renderWorkSubtabBar(){
+  const g = _ensureGacha();
+  const uncl = g.vault.filter(v => !v.redeemed).length;
+  const bar = document.createElement('div'); bar.className = 'work-subtab-bar';
+  [['board','⚔ MISSIONS'],['vault','🎒 VAULT']].forEach(([key,label]) => {
+    const b = document.createElement('button'); b.className = 'work-subtab' + (workSubtab===key ? ' active' : '');
+    b.innerHTML = label + (key==='vault' && uncl ? ` <span class="wst-badge">${uncl}</span>` : '');
+    b.addEventListener('click', () => { if(workSubtab !== key){ workSubtab = key; renderAll(); } });
+    bar.appendChild(b);
+  });
+  return bar;
+}
+function _fmtDate(k){ if(!k) return ''; const p = k.split('-').map(Number); const mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][(p[1]||1)-1] || ''; return `${p[2]} ${mo} ${p[0]}`; }
+function _trophyBanner(t){
+  const rg = state.redGates.find(x => x.id === t.id), gate = state.gates.find(x => x.id === t.id);
+  const isRed = !!rg, src = rg || gate;
+  const accent = isRed ? (RG_ACCENT[t.id]||'#ff5252') : (GATE_ACCENT[t.id]||'#ffc107');
+  const icon   = isRed ? (RG_ICON[t.id]||'🔴')       : (GATE_ICON[t.id]||'🚪');
+  const themeCls = isRed ? ('rg-theme-'+(RG_THEME[t.id]||'default')) : ('gt-theme-'+(GATE_THEME[t.id]||'default'));
+  const sub = src ? (isRed ? src.drop : src.goal) : '';
+  const emblem = src ? _dropEmblem(src) : '';
+  const card = document.createElement('div'); card.className = 'event-banner trophy-banner'; card.style.setProperty('--eb-accent', accent);
+  card.innerHTML =
+      `<div class="eb-art ${themeCls}"></div><div class="eb-scrim"></div><div class="tb-medal">🏆</div>`
+    + `<div class="eb-top"><div class="eb-titlerow"><span class="eb-icon">${icon}</span>${emblem || `<span class="eb-name">${_escWork(t.name)}</span>`}</div>`
+    +   (sub ? `<div class="eb-drop">🎁 ${_escWork(sub)}</div>` : '')
+    + `</div>`
+    + `<div class="eb-bot"><div class="tb-date">✦ CLEARED · ${_fmtDate(t.wonAt)}</div></div>`;
+  return card;
+}
+function renderVaultTab(){
+  const g = _ensureGacha();
+  panelSubtitle.textContent = "Trophies you've earned and rewards you've claimed.";
+  const order = ['ssr','sr','r','common'];
+  const sum = document.createElement('div'); sum.className = 'vault-summary';
+  sum.innerHTML = `<span>🔹 <b>${g.shards}</b> shards</span><span>🎴 <b>${g.signets}</b> signets</span><span>🏆 <b>${g.trophies.length}</b> trophies</span>`;
+  panelContent.appendChild(sum);
+  // 🏆 TROPHIES — swipeable banners
+  const tHdr = document.createElement('div'); tHdr.className = 'dungeon-divider'; tHdr.innerHTML = `<span>🏆 TROPHIES${g.trophies.length?` · ${g.trophies.length}`:''}</span>`; panelContent.appendChild(tHdr);
+  if(g.trophies.length){
+    const trophies = [...g.trophies].sort((a,b) => (b.wonAt||'').localeCompare(a.wonAt||''));
+    const shelf = document.createElement('div'); shelf.className = 'event-shelf';
+    const track = document.createElement('div'); track.className = 'event-track';
+    trophies.forEach(t => track.appendChild(_trophyBanner(t)));
+    shelf.appendChild(track);
+    if(trophies.length > 1){
+      const dots = document.createElement('div'); dots.className = 'event-dots';
+      trophies.forEach((_,i) => { const d = document.createElement('span'); d.className = 'ed'+(i===0?' on':''); dots.appendChild(d); });
+      shelf.appendChild(dots);
+      track.addEventListener('scroll', () => { const i = Math.round(track.scrollLeft/(track.scrollWidth/trophies.length)); dots.querySelectorAll('.ed').forEach((d,j) => d.classList.toggle('on', j===Math.min(i,trophies.length-1))); }, {passive:true});
+    }
+    panelContent.appendChild(shelf);
+  } else {
+    const e = document.createElement('div'); e.className = 'vault-empty'; e.textContent = 'No trophies yet — clear an event or a boss to earn one.'; panelContent.appendChild(e);
+  }
+  // 🎁 REWARDS to claim
+  const uncl = g.vault.filter(v => !v.redeemed).sort((a,b) => order.indexOf(a.tier)-order.indexOf(b.tier));
+  const rHdr = document.createElement('div'); rHdr.className = 'dungeon-divider'; rHdr.innerHTML = `<span>🎁 REWARDS${uncl.length?` · ${uncl.length} to claim`:''}</span>`; panelContent.appendChild(rHdr);
+  if(uncl.length){
+    uncl.forEach(v => { const r = GACHA_RARITY[v.tier];
+      const row = document.createElement('div'); row.className = 'vault-item'; row.style.setProperty('--vi-color', r.color); row.dataset.id = v.id;
+      row.innerHTML = `<span class="vi-tier">${r.label}</span><span class="vi-name">${_escWork(v.name)}</span><button class="vi-claim">CLAIM</button>`;
+      row.querySelector('.vi-claim').addEventListener('click', () => { v.redeemed = true; v.redeemedAt = todayKey(); saveState(); _showClaimCelebration(v); renderAll(); });
+      panelContent.appendChild(row);
+    });
+  } else {
+    const e = document.createElement('div'); e.className = 'vault-empty'; e.textContent = 'Nothing to claim — win rewards from pulls on the PULLS bar.'; panelContent.appendChild(e);
+  }
+  // ✓ CLAIMED history (with dates)
+  const claimed = g.vault.filter(v => v.redeemed).sort((a,b) => (b.redeemedAt||'').localeCompare(a.redeemedAt||''));
+  if(claimed.length){
+    const cHdr = document.createElement('div'); cHdr.className = 'dungeon-divider'; cHdr.innerHTML = `<span>✓ CLAIMED · ${claimed.length}</span>`; panelContent.appendChild(cHdr);
+    claimed.forEach(v => { const r = GACHA_RARITY[v.tier];
+      const row = document.createElement('div'); row.className = 'vault-item claimed'; row.style.setProperty('--vi-color', r.color);
+      row.innerHTML = `<span class="vi-tier">${r.label}</span><span class="vi-name">${_escWork(v.name)}</span><span class="vi-date">${_fmtDate(v.redeemedAt)}</span>`;
+      panelContent.appendChild(row);
+    });
+  }
 }
 
 function renderTrabajo(){
   _ensureWorkBattle();
   panelTitle.textContent = 'WORK';
-  panelSubtitle.textContent = 'Clear your hunts, push a Gate — then rest.';
+  panelSubtitle.textContent = 'Hunts, Gates and live drops.';
   panelContent.innerHTML = '';
   const hdr = document.getElementById('panelHeaderActions');
   if(hdr) hdr.innerHTML = '';
+
+  panelContent.appendChild(renderWorkSubtabBar());
+  if(workSubtab === 'vault'){ renderVaultTab(); return; }
 
   const today = todayKey();
   const wlv = calcWorkerLevel(state.workXp||0);
@@ -21361,11 +22038,14 @@ function renderTrabajo(){
   const rc = RANK_CLR[wlv.rank] || '#ffc107';
   const xpPct = wlv.level < 99 ? Math.round((wlv.xpProgress / wlv.xpPerLevel) * 100) : 100;
 
-  // ── "you've earned your rest" — the north-star reward: permission to stop ──
-  if(_workRestEarned()) panelContent.appendChild(renderWorkRestBanner());
+  // ── daily-quests-done acknowledgement — factual only, NO "go rest" language ──
+  const ddc = renderDailyDoneChip(); if(ddc) panelContent.appendChild(ddc);
 
   // ── NEXT ACTION — one thing handed to you (urgent Red Gate → daily hunt → …) ──
   const hero = renderWorkHero(); if(hero) panelContent.appendChild(hero);
+
+  // ── 🎏 LIVE DROPS — persistent gacha-style event banner shelf (always present) ──
+  panelContent.appendChild(renderEventShelf());
 
   // ── Progress hero — TODAY'S PROGRESS aggregate + worker level ──
   const wt = _workTodayData();
@@ -21382,7 +22062,16 @@ function renderTrabajo(){
     + `<div class="wh-bar"><div class="wh-fill" style="width:${xpPct}%;background:${rc};color:${rc}"></div></div>`
     + `<div class="wh-sub"><span>RANK ${wlv.rank} · WORK LV.${wlv.level}${wlv.level < 99 ? ` · ${wlv.xpProgress}/${wlv.xpPerLevel}` : ' · MAX'}</span><span class="wh-total">${(state.workXp||0).toLocaleString()} all-time</span></div>`;
   panelContent.appendChild(ph);
+  if(wlv.capped && wlv.nextGate){
+    const capEl = document.createElement('div'); capEl.className = 'work-cap-note';
+    const gi = GATE_ICON[wlv.nextGate.id] || '🚪';
+    capEl.innerHTML = `⚡ RANK CAP · clear ${gi} <b>${_escWork(wlv.nextGate.codename)}</b> (${wlv.nextGate.rank}-Rank raid) to break past ${wlv.rank}`;
+    panelContent.appendChild(capEl);
+  }
   panelContent.appendChild(renderWorkStrip());
+
+  // ── 🎰 PULLS — shards / signets / vault (gacha reward bar) ──
+  panelContent.appendChild(renderGachaBar());
 
   // ── ⚔️ HUNTS (daily / weekly / monthly) ──
   panelContent.appendChild(renderHuntsSection());
@@ -21418,6 +22107,8 @@ function renderTrabajo(){
     panelContent.appendChild(sep);
     if(isOpen) panelContent.appendChild(renderWorkTaskList(doneToday, true));
   }
+
+  _startEventTimers();   // live-tick every LIVE DROPS + Red Gate countdown
 }
 
 function renderFooter(tabKey) {
@@ -25735,9 +26426,9 @@ function renderWinterBanner() {
 // ── LEAH's old contextual dialogue system was removed — replaced by a single
 // day-of-month work/productivity quote (WORK_QUOTES in data/content.js), shown
 // as a small strip at the top of both WORK (workbench) and CITY. No popup, no
-// box, no portrait — same treatment as Yami/Manin. Her milestone banner became
-// the character-free SYSTEM milestone banner (_checkMilestoneBanners /
-// showMilestoneBanner) when all NPC art was deleted.
+// box, no portrait. Her milestone banner became the character-free SYSTEM
+// milestone banner (_checkMilestoneBanners / showMilestoneBanner) when all NPC
+// art was deleted.
 function renderWorkStrip() {
   const q = _getWorkQuote();
   const el = document.createElement('div');
@@ -25746,14 +26437,13 @@ function renderWorkStrip() {
   return el;
 }
 
-// ── YAMI's old contextual dialogue system was removed — replaced by a single
-// day-of-month stoic quote (DAILY_QUOTES in data/content.js), shown as a small
-// strip at the top of QUESTS and as the daily overlay after the harvest briefing.
-function renderYamiStrip() {
+// ── Daily stoic quote (DAILY_QUOTES in data/content.js), shown as a small strip
+// at the top of QUESTS and as the daily overlay after the harvest briefing.
+function renderDailyQuoteStrip() {
   const q = _getDailyQuote();
   const el = document.createElement('div');
-  el.className = 'yami-strip';
-  el.innerHTML = `<span class="yami-strip-text">"${q.text}"</span>`;
+  el.className = 'dq-strip';
+  el.innerHTML = `<span class="dq-strip-text">"${q.text}"</span>`;
   return el;
 }
 

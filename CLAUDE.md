@@ -22,8 +22,7 @@ Bottom nav: **QUESTS | CHAR | WORK | LOG** (4 tabs, no SHOP — it was deleted).
 ### NPC ownership
 | NPC | Tabs |  Voice |
 |---|---|---|
-| **Yami** | QUESTS | Yami Sukehiro from Black Clover. Profanity, tough love, treats Tuni like a lazy fuck. Anchor catchphrase: "Surpass your limits." ~32% absentee gags (he's offscreen — at HQ, eating, hiding from Charlotte, etc). |
-| **Leah** | WORK + CITY | Rise from Persona 4 baseline, but adult/+18 honest. Funny, motivational, openly flirty. Brand-specific work references (orders queue, DMs, content calendar, ads dashboard). Addresses Tuni as "Tuni" — pet names "Muns"/"Tungas" reserved for high-emotion peaks only (3-5 lines total). Less commanding, more partner-energy. |
+| **Leah** | WORK + CITY (+ QUESTS daily strip) | Rise from Persona 4 baseline, but adult/+18 honest. Funny, motivational, openly flirty. Brand-specific work references (orders queue, DMs, content calendar, ads dashboard). Addresses Tuni as "Tuni" — pet names "Muns"/"Tungas" reserved for high-emotion peaks only (3-5 lines total). Less commanding, more partner-energy. |
 | **Manin** | FORGE + WORKSHOP | Deadpool, but a blacksmith. Fourth-wall-breaking, chaotic, fun-as-hell. Aware he's an NPC in a habit tracker. Profanity allowed. |
 
 ### State shape (key fields)
@@ -153,7 +152,7 @@ Unlock prerequisites: T2: 2×T1 · T3: 2×T2 + WLv5 · T4: 2×T3 + WLv10 · T5: 
 | `renderCommissionBoard()` | Commission board widget |
 | `renderMerchantPanel()` | Traveling merchant panel in QUESTS |
 | `renderChar()` | CHAR tab render (STATS + GEAR sub-tabs) |
-| `renderHabitos()` | QUESTS tab render (Yami lives here) |
+| `renderHabitos()` | QUESTS tab render (daily stoic quote strip lives here) |
 | `renderTrabajo()` | WORK tab dispatcher (workbench / forge / workshop / city) |
 | `renderLog()` | LOG tab render (Achievements / History / Dungeons sub-tabs) |
 | `getEquippedStats()` | Total gear stats (incl. guild barracks/sanctum auras) |
@@ -165,7 +164,7 @@ Unlock prerequisites: T2: 2×T1 · T3: 2×T2 + WLv5 · T4: 2×T3 + WLv10 · T5: 
 | `getActiveBoostMult(type)` | Product of timed boosts (`xp`/`dungeon`) |
 | `repairStreak()` / `canRepairStreak()` | Restore a just-broken streak (25✦) |
 | `showLeahIntimateBanner(mood)` | Full-screen Leah modal — `'tender'` / `'bold'` / `'milestone'` / `'night'` |
-| `pickLeahLine(ctx)` / `pickLeahCityLine(ctx)` / `pickYamiLine(ctx)` / `pickManinLine(ctx)` | Cached dialogue pickers (10 min TTL per contextKey) |
+| `pickLeahLine(ctx)` / `pickLeahCityLine(ctx)` / `pickManinLine(ctx)` | Cached dialogue pickers (10 min TTL per contextKey) |
 | `loadState()` / `saveState()` | localStorage persistence + migration |
 
 ---
