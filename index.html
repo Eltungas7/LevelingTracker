@@ -12,7 +12,7 @@
 <meta name="theme-color" content="#020d14">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cinzel+Decorative:wght@700;900&family=Orbitron:wght@600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
 <style>
 :root {
@@ -582,9 +582,10 @@ body {
   color:rgba(255,255,255,0.28); text-transform:uppercase;
 }
 .char-hunter-grade-badge {
-  font-family:'Cinzel',serif; font-size:10px; font-weight:700; letter-spacing:2px;
-  padding:1px 8px; border-radius:3px; border:1px solid;
+  font-family:'Cinzel',serif; font-size:12px; font-weight:700; letter-spacing:2px;
+  padding:2px 10px; border-radius:5px; border:1px solid;
   text-shadow:0 0 10px currentColor;
+  animation: hudGradePulse 3.6s ease-in-out infinite;
 }
 .char-hg-next-badge {
   font-family:'Cinzel',serif; font-size:9px; font-weight:700; letter-spacing:2px;
@@ -596,7 +597,7 @@ body {
   font-family:'Cinzel',serif; font-size:10px; font-weight:700; letter-spacing:1px;
 }
 .char-hg-bar-track {
-  height:3px; background:rgba(255,255,255,0.07); border-radius:2px; overflow:hidden; margin-bottom:4px;
+  height:6px; background:rgba(255,255,255,0.07); border-radius:3px; overflow:hidden; margin-bottom:4px;
 }
 .char-hg-bar-fill {
   height:100%; border-radius:2px; box-shadow:0 0 6px currentColor;
@@ -645,22 +646,34 @@ body {
   min-width: 0;
 }
 .player-info { min-width: 0; }
+/* NAME / TITLE / GRADE HUD (2026-09) — dressed up: gradient name, glowing gold
+   title, a filled pulsing grade badge. EXP bar + LV block left as-is. */
 .player-name {
   font-family: 'Cinzel', serif;
-  font-size: 15px; font-weight: 700;
-  color: #fff;
+  font-size: 18px; font-weight: 700; letter-spacing: 0.5px;
+  background: linear-gradient(100deg,#eafcff 0%,#4dd0e1 42%,#b388ff 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: #eafcff;
+  filter: drop-shadow(0 0 9px rgba(77,208,225,0.35));
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  line-height: 1.2;
 }
 .player-tag {
-  font-size: 10px; letter-spacing: 1.5px;
-  color: var(--sao-cyan); opacity: 0.7;
+  display: inline-block; margin-top: 1px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 10px; font-weight: 700; letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #ffd54f;
+  text-shadow: 0 0 9px rgba(255,213,79,0.45);
 }
+@keyframes hudGradePulse { 0%,100%{ filter:brightness(1) } 50%{ filter:brightness(1.28) } }
 .rank-badge-inline {
-  display: inline-block; margin-top: 3px;
-  font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700;
-  letter-spacing: 1.5px; padding: 1px 6px;
-  border-radius: 3px; border: 1px solid rgba(158,158,158,0.4);
-  color: #9e9e9e;
+  display: inline-flex; align-items: center; margin-top: 5px;
+  font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+  letter-spacing: 2px; padding: 2px 10px;
+  border-radius: 5px; border: 1px solid rgba(158,158,158,0.4);
+  color: #9e9e9e; background: rgba(255,255,255,0.03);
+  animation: hudGradePulse 3.6s ease-in-out infinite;
 }
 .player-edit-btn {
   background: none; border: 1px solid var(--sao-border);
@@ -1845,8 +1858,9 @@ body {
 
 /* ── SOCIAL STATS CARD ── */
 .social-card {
-  background: var(--sao-bg2); border: 1px solid var(--sao-border);
-  border-radius: 6px; padding: 10px;
+  background: linear-gradient(160deg, rgba(77,208,225,0.05), rgba(4,14,24,0.5));
+  border: 1px solid rgba(77,208,225,0.16);
+  border-radius: 10px; padding: 11px;
 }
 .social-card-title {
   font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 2px;
@@ -1941,9 +1955,19 @@ body {
 .stats-list { display: flex; flex-direction: column; gap: 5px; }
 .stat-row-wrap {}
 .stat-row {
-  background: var(--sao-bg2); border: 1px solid var(--sao-border);
-  border-radius: 5px; padding: 8px 10px; cursor: pointer;
+  position: relative; overflow: hidden;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--sc,#4dd0e1) 18%, transparent), rgba(4,14,24,0.55));
+  border: 1px solid color-mix(in srgb, var(--sc,#4dd0e1) 40%, transparent);
+  border-left: 4px solid var(--sc,#4dd0e1);
+  border-radius: 9px; padding: 9px 12px 10px; cursor: pointer;
+  box-shadow: 0 0 14px color-mix(in srgb, var(--sc,#4dd0e1) 15%, transparent), inset 0 0 16px color-mix(in srgb, var(--sc,#4dd0e1) 7%, transparent);
+  transition: box-shadow 0.18s, transform 0.18s, border-color 0.18s;
 }
+.stat-row:hover { transform: translateY(-1px); box-shadow: 0 0 24px color-mix(in srgb, var(--sc,#4dd0e1) 32%, transparent), inset 0 0 18px color-mix(in srgb, var(--sc,#4dd0e1) 11%, transparent); }
+.stat-row .stat-emoji { font-size: 15px; margin-right: 1px; filter: drop-shadow(0 0 5px color-mix(in srgb, var(--sc,#4dd0e1) 75%, transparent)); }
+.stat-row .stat-code { color: var(--sc, var(--sao-cyan)); font-size: 14px; font-weight: 700; text-shadow: 0 0 11px color-mix(in srgb, var(--sc,#4dd0e1) 80%, transparent); }
+.stat-row-bar { height: 9px; }
+.stat-row-fill { box-shadow: 0 0 9px color-mix(in srgb, var(--sc,#4dd0e1) 85%, transparent); }
 .stat-row-top {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 5px;
@@ -2004,9 +2028,18 @@ body {
 
 /* ── CLASS PANEL ── */
 .class-panel {
-  background: var(--sao-bg2); border: 1px solid var(--sao-border);
-  border-radius: 6px; padding: 10px; margin-bottom: 8px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--cls-accent,#b388ff) 8%, transparent), rgba(4,14,24,0.5));
+  border: 1px solid color-mix(in srgb, var(--cls-accent,#b388ff) 22%, transparent);
+  border-radius: 10px; padding: 11px; margin-bottom: 8px;
+  --rank-color: var(--cls-accent, #b388ff);
+  box-shadow: inset 0 0 20px color-mix(in srgb, var(--cls-accent,#b388ff) 5%, transparent);
 }
+/* ── CLASS PANEL glam escalation: T1 modest → T5 legendary ── */
+.class-panel.clsp-t3 { border-color: color-mix(in srgb, var(--cls-accent,#b388ff) 42%, transparent); box-shadow: 0 0 24px color-mix(in srgb, var(--cls-accent,#b388ff) 20%, transparent), inset 0 0 22px color-mix(in srgb, var(--cls-accent,#b388ff) 7%, transparent); }
+.class-panel.clsp-t4 { border-width:1.5px; border-color: color-mix(in srgb, var(--cls-accent,#b388ff) 55%, transparent); box-shadow: 0 0 34px color-mix(in srgb, var(--cls-accent,#b388ff) 28%, transparent), inset 0 0 28px color-mix(in srgb, var(--cls-accent,#b388ff) 9%, transparent); animation:hgPulse 3.2s ease-in-out infinite; }
+.class-panel.clsp-t5 { border-width:2px; box-shadow: 0 0 48px color-mix(in srgb, var(--cls-accent,#ffd700) 40%, transparent), inset 0 0 34px color-mix(in srgb, var(--cls-accent,#ffd700) 13%, transparent); animation:hgPulseHard 2.3s ease-in-out infinite; }
+.class-name-big { font-family:'Cinzel Decorative','Cinzel',serif; }
+.class-panel.clsp-t5 .class-name-big { animation:hgLetterGlow 1.8s ease-in-out infinite; }
 .class-panel-hdr {
   font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 2px;
   color: var(--sao-cyan); text-align: center; margin-bottom: 8px;
@@ -2425,10 +2458,17 @@ body {
 .cstat-cat-line { flex: 1; height: 1px; }
 .cstat-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 5px; }
 .cstat-card {
-  background: var(--sao-bg2); border: 1px solid var(--sao-border);
-  border-radius: 5px; padding: 7px 8px;
-  border-left: 2px solid var(--cc, var(--sao-cyan));
+  position: relative; overflow: hidden;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--cc,#4dd0e1) 13%, transparent), rgba(4,14,24,0.5));
+  border: 1px solid color-mix(in srgb, var(--cc,#4dd0e1) 30%, transparent);
+  border-left: 3px solid var(--cc, var(--sao-cyan));
+  border-radius: 8px; padding: 8px 9px;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--cc,#4dd0e1) 12%, transparent), inset 0 0 14px color-mix(in srgb, var(--cc,#4dd0e1) 5%, transparent);
+  transition: transform 0.15s, box-shadow 0.15s;
 }
+.cstat-card:not(.cstat-zero):hover { transform: translateY(-1px); box-shadow: 0 0 18px color-mix(in srgb, var(--cc,#4dd0e1) 28%, transparent); }
+.cstat-icon { filter: drop-shadow(0 0 5px color-mix(in srgb, var(--cc,#4dd0e1) 60%, transparent)); }
+.cstat-value { font-family:'Orbitron',sans-serif; text-shadow:0 0 9px color-mix(in srgb, var(--cc,#4dd0e1) 55%, transparent); }
 .cstat-card.cstat-zero { opacity: 0.4; }
 .cstat-card:not(.cstat-zero) { cursor: pointer; transition: background 0.15s; }
 .cstat-card:not(.cstat-zero):active { background: rgba(77,208,225,0.07); }
@@ -2611,10 +2651,11 @@ body {
 .period-selector::-webkit-scrollbar { display: none; }
 .period-btn {
   font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1px;
-  background: var(--sao-bg2); border: 1px solid var(--sao-border);
-  color: var(--sao-text-dim); border-radius: 4px;
+  background: linear-gradient(160deg, rgba(255,255,255,0.04), rgba(4,14,24,0.4)); border: 1px solid var(--sao-border);
+  color: var(--sao-text-dim); border-radius: 6px;
   padding: 6px 10px; cursor: pointer; min-height: 34px;
   flex-shrink: 0; scroll-snap-align: start; white-space: nowrap;
+  transition: all 0.15s;
 }
 .period-btn.active { border-color: var(--sao-cyan); color: var(--sao-cyan); background: rgba(77,208,225,0.1); }
 
@@ -2688,7 +2729,7 @@ body {
 .chart-label-cell.today { color: var(--sao-cyan); }
 .chart-label-spacer { width: 8px; flex-shrink: 0; }
 
-.chart-summary { display: flex; align-items: center; justify-content: space-around; background: var(--sao-bg2); border: 1px solid var(--sao-border); border-radius: 6px; padding: 10px; margin-bottom: 8px; }
+.chart-summary { display: flex; align-items: center; justify-content: space-around; background: linear-gradient(160deg, rgba(77,208,225,0.05), rgba(4,14,24,0.5)); border: 1px solid rgba(77,208,225,0.16); border-radius: 10px; padding: 11px; margin-bottom: 8px; }
 .chart-summary-item { text-align: center; }
 .chart-summary-label { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px; color: var(--sao-text-dim); }
 .chart-summary-value { font-size: 20px; font-weight: 700; color: var(--sao-cyan-bright); }
@@ -2779,7 +2820,7 @@ body {
 .hist-no-habits-btn:hover { background: rgba(77,208,225,0.1); }
 
 /* ── LIFETIME STATS CARD ─────────────────────────────────────── */
-.lifetime-stats-card { margin: 10px 0 6px; background: rgba(77,208,225,0.04); border: 1px solid rgba(77,208,225,0.15); border-radius: 8px; padding: 10px 12px; }
+.lifetime-stats-card { margin: 10px 0 6px; background: linear-gradient(160deg, rgba(77,208,225,0.08), rgba(4,14,24,0.5)); border: 1px solid rgba(77,208,225,0.2); border-radius: 10px; padding: 11px 13px; box-shadow: inset 0 0 20px rgba(77,208,225,0.04); }
 .lst-header { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.5px; color: var(--sao-cyan); opacity: 0.7; margin-bottom: 8px; text-align: center; }
 .lst-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .lst-cell { text-align: center; padding: 6px 4px; background: rgba(255,255,255,0.03); border-radius: 5px; }
@@ -3190,10 +3231,10 @@ body {
 .spark-empty { background: rgba(255,255,255,0.08); }
 
 /* ── RECORDS ── */
-.records-section { background: var(--sao-bg2); border: 1px solid var(--sao-border); border-radius: 6px; padding: 10px; margin-bottom: 8px; }
+.records-section { background: linear-gradient(160deg, rgba(77,208,225,0.05), rgba(4,14,24,0.5)); border: 1px solid rgba(77,208,225,0.16); border-radius: 10px; padding: 11px; margin-bottom: 8px; }
 .records-title { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px; color: var(--sao-cyan); margin-bottom: 8px; }
 .records-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-.record-card { background: rgba(0,0,0,0.2); border: 1px solid var(--sao-border); border-radius: 4px; padding: 8px; }
+.record-card { background: rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.08); border-radius: 7px; padding: 9px; }
 .record-val { font-size: 22px; font-weight: 700; color: var(--sao-gold); line-height: 1; }
 .record-label { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1px; color: var(--sao-text-dim); margin-top: 3px; }
 .record-hint { font-family: 'Rajdhani', sans-serif; font-size: 10px; color: var(--sao-text-dim); margin-top: 5px; line-height: 1.3; }
@@ -3292,11 +3333,13 @@ body {
 
 .logros-grid { display: flex; flex-direction: column; gap: 6px; }
 .logro-card {
-  background: var(--sao-bg2); border: 1px solid var(--sao-border);
-  border-radius: 6px; padding: 10px 12px; cursor: pointer;
+  background: linear-gradient(160deg, rgba(255,255,255,0.035), rgba(4,14,24,0.5));
+  border: 1px solid var(--sao-border);
+  border-radius: 8px; padding: 10px 12px; cursor: pointer;
   display: flex; align-items: center; gap: 10px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
 }
+.logro-card:hover { transform: translateY(-1px); box-shadow: 0 3px 12px rgba(0,0,0,0.3); }
 .logro-card.tier-1 { border-color: rgba(180,120,60,0.4); }
 .logro-card.tier-2 { border-color: rgba(160,160,170,0.4); }
 .logro-card.tier-3 { border-color: rgba(255,193,7,0.4); }
@@ -3369,14 +3412,71 @@ body {
 
 /* ── CHAR STATUS HEADER ── */
 .char-status-header {
-  background: linear-gradient(135deg, rgba(6,26,43,0.95) 0%, rgba(2,13,20,0.98) 100%);
-  border: 1px solid var(--sao-border);
-  border-radius: 10px;
-  padding: 12px 14px 10px;
-  margin: 0 0 10px;
+  background:
+    radial-gradient(130% 90% at 50% 0%, color-mix(in srgb, var(--rank-color,#4dd0e1) 13%, transparent), transparent 62%),
+    linear-gradient(160deg, rgba(14,20,40,0.96) 0%, rgba(3,10,20,0.98) 100%);
+  border: 1px solid color-mix(in srgb, var(--rank-color,#4dd0e1) 34%, transparent);
+  border-radius: 14px;
+  padding: 11px 15px 13px;
+  margin: 0 0 12px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 0 26px color-mix(in srgb, var(--rank-color,#4dd0e1) 13%, transparent), inset 0 0 30px rgba(179,136,255,0.05);
 }
+/* diagonal light sheen sweep — the "system window" shimmer */
+.char-status-header::after {
+  content:''; position:absolute; top:0; left:-60%; width:45%; height:100%; pointer-events:none;
+  background:linear-gradient(100deg, transparent, rgba(255,255,255,0.055), transparent);
+  transform:skewX(-18deg); animation:cseSheen 6.5s ease-in-out infinite;
+}
+@keyframes cseSheen { 0%,42%{left:-60%} 72%,100%{left:135%} }
+/* ── EPIC STATUS WINDOW (2026-09-17) ── */
+.cse-titlebar { display:flex; align-items:center; gap:9px; margin:0 0 11px; }
+.cse-tb-line { flex:1; height:1px; background:linear-gradient(90deg, transparent, color-mix(in srgb, var(--rank-color,#4dd0e1) 55%, transparent), transparent); }
+.cse-tb-txt { font-family:'Cinzel Decorative', 'Cinzel', serif; font-size:10px; font-weight:700; letter-spacing:4px; color:color-mix(in srgb, var(--rank-color,#4dd0e1) 85%, white); text-shadow:0 0 10px color-mix(in srgb, var(--rank-color,#4dd0e1) 60%, transparent); }
+.cse-hero { display:flex; align-items:center; gap:15px; }
+.cse-grade-sigil { position:relative; width:80px; height:80px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  border:2px solid color-mix(in srgb, var(--gc,#9e9e9e) 55%, transparent); border-radius:16px;
+  background:radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--gc,#9e9e9e) 22%, transparent), transparent 70%);
+  box-shadow:0 0 22px color-mix(in srgb, var(--gc,#9e9e9e) 30%, transparent), inset 0 0 18px color-mix(in srgb, var(--gc,#9e9e9e) 12%, transparent);
+  animation:cseSigil 3.4s ease-in-out infinite; }
+@keyframes cseSigil { 0%,100%{ box-shadow:0 0 20px color-mix(in srgb, var(--gc,#9e9e9e) 26%, transparent), inset 0 0 16px color-mix(in srgb, var(--gc,#9e9e9e) 10%, transparent); } 50%{ box-shadow:0 0 34px color-mix(in srgb, var(--gc,#9e9e9e) 46%, transparent), inset 0 0 22px color-mix(in srgb, var(--gc,#9e9e9e) 18%, transparent); } }
+.cse-grade-sigil::before, .cse-grade-sigil::after { content:''; position:absolute; width:12px; height:12px; border:2px solid color-mix(in srgb, var(--gc,#9e9e9e) 80%, white); }
+.cse-grade-sigil::before { top:-2px; left:-2px; border-right:none; border-bottom:none; border-top-left-radius:6px; }
+.cse-grade-sigil::after  { bottom:-2px; right:-2px; border-left:none; border-top:none; border-bottom-right-radius:6px; }
+.cse-grade-letter { font-family:'Cinzel Decorative','Cinzel',serif; font-size:44px; font-weight:900; line-height:1; color:var(--gc,#9e9e9e); text-shadow:0 0 18px color-mix(in srgb, var(--gc,#9e9e9e) 65%, transparent); }
+.cse-grade-cap { font-family:'Cinzel',serif; font-size:7px; letter-spacing:3px; color:color-mix(in srgb, var(--gc,#9e9e9e) 75%, white); margin-top:2px; }
+.cse-hero-right { flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+.cse-pl { display:flex; align-items:baseline; gap:7px; }
+.cse-pl-num { font-family:'Orbitron', sans-serif; font-size:34px; font-weight:800; line-height:1; letter-spacing:0.5px; text-shadow:0 0 16px currentColor; }
+.cse-pl-lbl { font-family:'Cinzel',serif; font-size:9px; letter-spacing:3px; color:rgba(224,247,250,0.5); }
+.cse-pl-sub { font-family:'Rajdhani',sans-serif; font-size:11px; font-weight:600; letter-spacing:0.5px; margin-top:2px; }
+.cse-grade-prog { margin-top:12px; }
+.cse-gp-top { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px; font-family:'Cinzel',serif; font-size:10px; letter-spacing:1px; color:rgba(224,247,250,0.7); }
+.cse-gear-line { margin-top:5px; font-family:'Rajdhani',sans-serif; font-size:10px; letter-spacing:0.3px; }
+/* ── GRADE GLAM ESCALATION — F humble → SSS godlike (2026-09-17) ── */
+/* F: a plain, dim window. No sheen, no pulse, grey sigil. "kinda shit" on purpose. */
+.char-status-header.hg-F { box-shadow: inset 0 0 16px rgba(255,255,255,0.025); border-color: rgba(255,255,255,0.12); }
+.char-status-header.hg-F::after { opacity:0; }
+.char-status-header.hg-F .cse-grade-sigil { animation:none; box-shadow:none; border-color:rgba(255,255,255,0.18); background:rgba(255,255,255,0.02); }
+.char-status-header.hg-F .cse-grade-letter { text-shadow:0 0 6px rgba(255,255,255,0.15); }
+.char-status-header.hg-F .cse-tb-txt { text-shadow:none; color:rgba(224,247,250,0.5); }
+/* E–D: awakening — the base glow kicks in (uses --rank-color). */
+.char-status-header.hg-E, .char-status-header.hg-D { box-shadow: 0 0 20px color-mix(in srgb,var(--rank-color) 12%,transparent), inset 0 0 24px rgba(179,136,255,0.05); }
+/* C–B: established — stronger aura. */
+.char-status-header.hg-C, .char-status-header.hg-B { box-shadow: 0 0 32px color-mix(in srgb,var(--rank-color) 20%,transparent), inset 0 0 30px rgba(179,136,255,0.06); }
+/* A–S: ascendant — pulsing border, brighter sigil. */
+.char-status-header.hg-A, .char-status-header.hg-S { border-width:1.5px; box-shadow: 0 0 40px color-mix(in srgb,var(--rank-color) 28%,transparent), inset 0 0 34px color-mix(in srgb,var(--rank-color) 9%,transparent); animation:hgPulse 3s ease-in-out infinite; }
+.char-status-header.hg-A .cse-grade-sigil, .char-status-header.hg-S .cse-grade-sigil { animation-duration:2.1s; border-width:2.5px; }
+.char-status-header.hg-A .cse-grade-letter, .char-status-header.hg-S .cse-grade-letter { text-shadow:0 0 26px color-mix(in srgb,var(--gc) 85%,transparent); }
+/* SS–SSS: godlike — hard pulse, blazing sigil, shimmering letter. "OMG SO EPIC". */
+.char-status-header.hg-SS, .char-status-header.hg-SSS { border-width:2px; box-shadow: 0 0 56px color-mix(in srgb,var(--rank-color) 40%,transparent), inset 0 0 42px color-mix(in srgb,var(--rank-color) 15%,transparent); animation:hgPulseHard 2.2s ease-in-out infinite; }
+.char-status-header.hg-SS .cse-grade-sigil, .char-status-header.hg-SSS .cse-grade-sigil { animation-duration:1.5s; border-width:3px; }
+.char-status-header.hg-SS .cse-grade-letter, .char-status-header.hg-SSS .cse-grade-letter { text-shadow:0 0 36px var(--gc), 0 0 12px #fff; animation:hgLetterGlow 1.7s ease-in-out infinite; }
+.char-status-header.hg-SS .cse-tb-txt, .char-status-header.hg-SSS .cse-tb-txt { animation:hgLetterGlow 1.7s ease-in-out infinite; }
+@keyframes hgPulse { 0%,100%{ border-color:color-mix(in srgb,var(--rank-color) 40%,transparent);} 50%{ border-color:color-mix(in srgb,var(--rank-color) 82%,transparent);} }
+@keyframes hgPulseHard { 0%,100%{ border-color:color-mix(in srgb,var(--rank-color) 55%,transparent); filter:brightness(1);} 50%{ border-color:var(--rank-color); filter:brightness(1.09);} }
+@keyframes hgLetterGlow { 0%,100%{ filter:brightness(1);} 50%{ filter:brightness(1.35);} }
 .char-status-header::before {
   content: '';
   position: absolute; top: 0; left: 0; right: 0; height: 2px;
@@ -3417,8 +3517,8 @@ body {
   display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
 }
 .char-status-rank {
-  font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700;
-  letter-spacing: 3px; text-shadow: 0 0 12px currentColor;
+  font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700;
+  letter-spacing: 3px; text-shadow: 0 0 15px currentColor;
 }
 .char-status-level {
   display: flex; align-items: baseline; gap: 3px;
@@ -3428,8 +3528,9 @@ body {
   color: var(--sao-text-dim); opacity: 0.7;
 }
 .char-status-lv-num {
-  font-family: 'Cinzel', serif; font-size: 22px; font-weight: 700;
+  font-family: 'Cinzel', serif; font-size: 24px; font-weight: 700;
   color: var(--sao-text); line-height: 1;
+  text-shadow: 0 0 14px rgba(255,255,255,0.16);
 }
 .char-status-xp { }
 .char-status-xp-bar {
@@ -8087,6 +8188,49 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .briefing-focus { font-family:'Rajdhani',sans-serif; font-size:13px; color:#ffd54f; text-align:center; margin:8px auto 2px; max-width:88%; }
 .briefing-cache-hint { font-family:'Rajdhani',sans-serif; font-size:12px; color:rgba(224,247,250,0.6); text-align:center; margin-top:8px; }
 
+/* ── EVENING RITUAL POPUP + MOOD TREND (2026-09-17) ── */
+.eve-overlay { position:fixed; inset:0; z-index:9000; background:rgba(2,8,16,0.72); backdrop-filter:blur(3px);
+  display:flex; align-items:center; justify-content:center; padding:20px; animation:eveIn 0.2s ease; }
+@keyframes eveIn { from{opacity:0} to{opacity:1} }
+.eve-box { width:min(400px,100%); max-height:88vh; overflow-y:auto;
+  background:linear-gradient(160deg, rgba(24,18,43,0.98), rgba(4,12,22,0.99));
+  border:1px solid rgba(179,136,255,0.3); border-radius:16px; padding:18px 18px 16px;
+  box-shadow:0 12px 48px rgba(0,0,0,0.6), inset 0 0 30px rgba(179,136,255,0.05);
+  animation:eveBoxIn 0.28s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes eveBoxIn { from{transform:scale(0.9) translateY(10px);opacity:0} to{transform:scale(1) translateY(0);opacity:1} }
+.eve-title { font-family:'Cinzel',serif; font-size:15px; letter-spacing:3px; color:#d1b3ff; text-align:center; text-shadow:0 0 14px rgba(179,136,255,0.5); }
+.eve-sub { font-family:'Rajdhani',sans-serif; font-size:12px; color:rgba(224,247,250,0.55); text-align:center; margin:3px 0 4px; }
+.eve-sec-label { font-family:'Cinzel',serif; font-size:9px; letter-spacing:2px; color:rgba(224,247,250,0.5); margin:13px 0 6px; }
+.eve-soc-row { display:flex; gap:6px; flex-wrap:wrap; }
+.eve-soc { flex:1; min-width:44px; display:flex; flex-direction:column; align-items:center; gap:1px; padding:6px 2px;
+  background:rgba(255,255,255,0.03); border:1px solid; border-radius:8px; cursor:pointer; font-size:17px; transition:background 0.15s; }
+.eve-soc.open { background:rgba(255,255,255,0.08); }
+.eve-soc-picker { display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; padding:7px; border:1px solid; border-radius:8px; background:rgba(0,0,0,0.25); }
+.eve-act { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.14); color:var(--sao-text);
+  font-family:'Rajdhani',sans-serif; font-size:11px; padding:5px 9px; border-radius:6px; cursor:pointer; }
+.eve-act:active { background:rgba(179,136,255,0.2); }
+.eve-stars { display:flex; gap:8px; justify-content:center; }
+.eve-star { background:none; border:none; font-size:30px; cursor:pointer; padding:0; line-height:1; }
+.eve-note { width:100%; box-sizing:border-box; margin-top:10px; padding:9px 11px; resize:vertical;
+  background:rgba(0,0,0,0.3); border:1px solid rgba(179,136,255,0.25); border-radius:10px;
+  color:var(--sao-text); font-family:'Rajdhani',sans-serif; font-size:13px; }
+.eve-btns { display:flex; gap:8px; margin-top:14px; }
+.eve-skip { flex:0 0 auto; background:none; border:1px solid rgba(255,255,255,0.18); color:rgba(224,247,250,0.6);
+  font-family:'Cinzel',serif; font-size:10px; letter-spacing:1px; border-radius:8px; padding:10px 14px; cursor:pointer; }
+.eve-save { flex:1; background:linear-gradient(90deg,#b388ff,#ffd54f); color:#1a1030; border:none;
+  font-family:'Cinzel',serif; font-size:11px; letter-spacing:1.5px; font-weight:700; border-radius:8px; padding:10px; cursor:pointer;
+  box-shadow:0 0 16px rgba(179,136,255,0.4); }
+.rating-trend-card { margin:16px 0 8px; padding:11px 13px; border-radius:10px;
+  background:linear-gradient(160deg, rgba(179,136,255,0.08), rgba(4,14,24,0.5)); border:1px solid rgba(179,136,255,0.2); }
+.rt-title { font-family:'Cinzel',serif; font-size:10px; letter-spacing:2px; color:#d1b3ff; margin-bottom:9px; }
+.rt-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:7px; }
+.rt-cell { text-align:center; background:rgba(0,0,0,0.22); border:1px solid rgba(255,255,255,0.07); border-radius:7px; padding:8px 4px; }
+.rt-lbl { font-family:'Cinzel',serif; font-size:7px; letter-spacing:1px; color:rgba(224,247,250,0.45); }
+.rt-val { font-family:'Cinzel',serif; font-size:19px; font-weight:700; color:#ffd54f; line-height:1.1; margin-top:3px; }
+.rt-em { font-size:12px; margin-left:2px; }
+.rt-n { font-family:'Rajdhani',sans-serif; font-size:8px; color:rgba(224,247,250,0.4); margin-top:1px; }
+@media (max-width:360px){ .rt-grid{ grid-template-columns:1fr 1fr; } }
+
 /* ── CLOSE THE DAY (daily reflection) ── */
 .daily-closeout-wrap { margin: 10px 12px 6px; padding: 12px 14px; border-radius: 12px;
   background: rgba(77,208,225,0.05); border: 1px solid rgba(77,208,225,0.22); }
@@ -8371,13 +8515,24 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .gate-collapsed{font-family:'Rajdhani',sans-serif;font-size:10.5px;font-weight:600;color:#ff8a80;letter-spacing:0.5px}
 .gate-bar{height:4px;background:rgba(255,255,255,0.08)}
 .gate-fill{height:100%;transition:width 0.35s ease;box-shadow:0 0 8px currentColor}
-.gate-steps{padding:4px 13px 10px;display:flex;flex-direction:column;gap:2px}
-.gate-step{display:flex;align-items:flex-start;gap:9px;padding:8px 6px;border-radius:6px;cursor:pointer;
-  font-family:'Rajdhani',sans-serif;font-size:13.5px;color:rgba(224,247,250,0.9);transition:background 0.12s}
-.gate-step:hover{background:rgba(255,255,255,0.05)}
-.gate-step .gs-box{flex:0 0 auto;font-size:16px;line-height:1.2;color:var(--gate-accent,#ffc107)}
-.gate-step.done{color:var(--sao-text-dim)}
-.gate-step.done .gs-text{text-decoration:line-through}
+.gate-steps{padding:6px 12px 12px;display:flex;flex-direction:column;gap:5px}
+/* JRPG quest-log entries (2026-09-17) — accent-bordered menu rows that slide + glow
+   on hover; cleared rows resolve to green. Persona/FF quest-menu energy. */
+.gate-step{position:relative;display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:7px;cursor:pointer;
+  font-family:'Rajdhani',sans-serif;font-size:13.5px;font-weight:500;color:rgba(224,247,250,0.92);
+  background:linear-gradient(100deg, color-mix(in srgb,var(--gate-accent,#ffc107) 9%,transparent), rgba(255,255,255,0.014));
+  border:1px solid rgba(255,255,255,0.07);border-left:3px solid color-mix(in srgb,var(--gate-accent,#ffc107) 55%,transparent);
+  transition:transform 0.14s, background 0.14s, box-shadow 0.14s, border-color 0.14s}
+.gate-step:hover{transform:translateX(3px);border-left-color:var(--gate-accent,#ffc107);
+  background:linear-gradient(100deg, color-mix(in srgb,var(--gate-accent,#ffc107) 17%,transparent), rgba(255,255,255,0.03));
+  box-shadow:0 0 14px color-mix(in srgb,var(--gate-accent,#ffc107) 16%,transparent)}
+.gate-step .gs-box{flex:0 0 auto;font-size:17px;line-height:1;color:var(--gate-accent,#ffc107);
+  filter:drop-shadow(0 0 5px color-mix(in srgb,var(--gate-accent,#ffc107) 55%,transparent))}
+.gate-step .gs-text{flex:1;line-height:1.3}
+.gate-step.done{color:rgba(224,247,250,0.42);border-left-color:rgba(105,240,174,0.5);
+  background:linear-gradient(100deg, rgba(105,240,174,0.07), transparent)}
+.gate-step.done .gs-text{text-decoration:line-through;text-decoration-color:rgba(105,240,174,0.55)}
+.gate-step.done .gs-box{color:#69f0ae;filter:drop-shadow(0 0 5px rgba(105,240,174,0.55))}
 .status-cleared .gate-step,.status-collapsed .gate-step{cursor:default}
 .gate-reopen{margin:0 13px 11px;padding:8px 12px;width:calc(100% - 26px);border:1px solid rgba(255,138,128,0.4);
   border-radius:7px;background:rgba(255,82,82,0.08);color:#ff8a80;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
@@ -8598,9 +8753,12 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .pc-claimed{font-family:'Cinzel',serif;font-weight:700;font-size:20px;letter-spacing:2px;color:var(--pc-color);text-shadow:0 0 14px var(--pc-glow)}
 
 .work-task-list{display:flex;flex-direction:column;gap:7px;margin:8px 0}
-.work-task-row{display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid rgba(255,255,255,0.09);
-  border-radius:7px;background:rgba(255,255,255,0.02);font-family:'Rajdhani',sans-serif;transition:background 0.15s;touch-action:pan-y}
-.work-task-row:hover{background:rgba(255,255,255,0.045)}
+.work-task-row{display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid rgba(255,255,255,0.08);
+  border-left:3px solid rgba(255,193,7,0.5);
+  border-radius:8px;background:linear-gradient(100deg, rgba(255,193,7,0.05), rgba(255,255,255,0.012));font-family:'Rajdhani',sans-serif;
+  transition:transform 0.14s, background 0.14s, box-shadow 0.14s, border-color 0.14s;touch-action:pan-y}
+.work-task-row:hover{transform:translateX(3px);border-left-color:#ffc107;
+  background:linear-gradient(100deg, rgba(255,193,7,0.11), rgba(255,255,255,0.03));box-shadow:0 0 14px rgba(255,193,7,0.13)}
 .work-task-row.done{opacity:0.6}
 .work-task-row.done .wt-text{text-decoration:line-through}
 .work-task-row.wt-dragging{background:rgba(255,193,7,0.12);border-color:#ffc10788;box-shadow:0 4px 16px rgba(0,0,0,0.4);opacity:0.97}
@@ -8896,11 +9054,10 @@ details[open] .devt-hist-summary::after { content:'▲'; }
           <div class="exp-fill" id="xpFill" style="width:0%"></div>
         </div>
       </div>
-      <div class="micro-stats">
-        <div class="micro"><div class="micro-label">PERFECT</div><div class="micro-value gold" id="statStreak">0</div></div>
-        <div class="micro"><div class="micro-label">DAY</div><div class="micro-value" id="statQuests">0/0</div></div>
-        <div class="micro"><div class="micro-label">WEEK</div><div class="micro-value weekly-val" id="statWeek">0/0</div></div>
-      </div>
+      <!-- PERFECT / DAY / WEEK micros removed (2026-09) — they lived in the global
+           header (so they showed on every tab) but were HABITS-only, and framed
+           success as hitting 100% today. Consistency at 75–90% is the real win;
+           week/month completion % lives in LOG → HISTORY instead. -->
       <div class="hud-currency" id="hudCurrency" style="display:none">
         <span class="hud-cur hud-gold" title="Gold — earn from Work tasks"><img src="img/gold.png" class="hud-gold-icon" alt="gold"><span class="hud-cur-val" id="hudGoldVal">0</span></span>
         <span class="hud-cur-sep">·</span>
@@ -9379,13 +9536,17 @@ function playPhoenix() {
 }
 
 // Daily habit tap — ascending F major triad: F4 → A4 → C5, sine-primary + soft shimmer
-function playSwordSlash() {
+function playSwordSlash(prog) {
   if (!soundEnabled || !_ACtx) return;
   try {
     const ctx = _getCtx(), t = ctx.currentTime;
     const master = ctx.createGain(); master.gain.value = 0.34; master.connect(ctx.destination);
+    // Crescendo (2026-09-17): transpose up to a 4th as the day's dailies fill, so each
+    // check rises toward the last-habit resolution. prog is 0..1 (fraction done).
+    const _pm = Math.pow(2, Math.max(0, Math.min(1, prog||0)) * 5/12);
     // F4 → A4 → C5 ascending F major (warm, upward)
     [[349.23,0.00,0.26],[440.00,0.10,0.28],[523.25,0.20,0.40]].forEach(([f,s,d])=>{
+      f *= _pm;
       const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
       g.gain.setValueAtTime(0,t+s); g.gain.linearRampToValueAtTime(0.25,t+s+0.010);
       g.gain.setValueAtTime(0.25,t+s+d*0.44); g.gain.exponentialRampToValueAtTime(0.001,t+s+d+0.05);
@@ -9397,6 +9558,7 @@ function playSwordSlash() {
     });
     // Soft shimmer tail
     [1318.51,1760.00].forEach((f,i)=>{
+      f *= _pm;
       const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
       const st=t+0.22+i*0.055;
       g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(0.030-i*0.008,st+0.010);
@@ -17214,10 +17376,13 @@ function renderHeader() {
   // climbs, so it can never signal failure. Streak is still computed elsewhere for
   // the aura/achievements, just not shown as a headline.
   const _pd = (state.logros && state.logros.perfectDayCount) || 0;
-  statStreak.textContent = _pd;
+  // PERFECT & WEEK micros removed from the header (2026-09) — DAY is the only
+  // headline count now; the Hunter Grade block carries progression. These refs
+  // are null-guarded so header render is safe with the boxes gone.
+  if (statStreak) statStreak.textContent = _pd;
   const _todayDone=state.habitos.filter(h=>h.done[today]).length;
   const _todayPct=state.habitos.length ? _todayDone/state.habitos.length : 0;
-  const _streakMicro = statStreak.closest('.micro');
+  const _streakMicro = statStreak && statStreak.closest('.micro');
   if (_streakMicro) {
     // Milestone tint by lifetime perfect-day count (trophy colour, not pressure).
     const _tier = _pd >= 365 ? 6 : _pd >= 200 ? 5 : _pd >= 100 ? 4 : _pd >= 60 ? 3 : _pd >= 30 ? 2 : _pd >= 14 ? 1 : 0;
@@ -17225,8 +17390,8 @@ function renderHeader() {
     _streakMicro.classList.add('streak-tier-' + _tier);
     _streakMicro.classList.toggle('streak-secured', _todayPct >= 1);
   }
-  statQuests.textContent=`${state.habitos.filter(h=>h.done[today]).length}/${state.habitos.length}`;
-  statWeek.textContent=`${state.weekly.filter(w=>w.done[week]).length}/${state.weekly.length}`;
+  if (statQuests) statQuests.textContent=`${state.habitos.filter(h=>h.done[today]).length}/${state.habitos.length}`;
+  if (statWeek) statWeek.textContent=`${state.weekly.filter(w=>w.done[week]).length}/${state.weekly.length}`;
   const xpPctHdr = lv.neededForNext > 0 ? Math.round((lv.currentLevelXp/lv.neededForNext)*100) : 100;
   xpText.textContent=`${lv.currentLevelXp}/${lv.neededForNext} · ${xpPctHdr}%`;
   xpFill.style.width=`${xpPctHdr}%`;
@@ -17248,8 +17413,9 @@ function renderHeader() {
   if (rankBadgeEl) {
     rankBadgeEl.textContent = `GRADE ${hunterGrade}`;
     rankBadgeEl.style.color = gradeColor;
-    rankBadgeEl.style.borderColor = gradeColor + '55';
-    rankBadgeEl.style.textShadow = `0 0 8px ${gradeColor}70`;
+    rankBadgeEl.style.borderColor = gradeColor + '66';
+    rankBadgeEl.style.background = gradeColor + '18';
+    rankBadgeEl.style.textShadow = `0 0 9px ${gradeColor}80`;
   }
   const avatarFrame = document.getElementById('avatarFrame');
   if (avatarFrame) {
@@ -17952,49 +18118,37 @@ function isWeekMastered() {
   return dailyDone && weeklyDone && avoidClean;
 }
 
-// ── HABIT PROGRESS BARS (2026-09) — replace the streak headline with three
-// always-filling, never-punishing bars. Missing a day never empties them; they
-// just fill more the more you do. No streak, no clock, no penalty.
-//  · THIS WEEK / THIS MONTH  = habit completions vs the period's capacity (a "limit bar")
-//  · POTENTIAL               = lifetime PERFECT days (all habits done in a day) toward 365,
-//                              reached whenever you reach it — 365 days or 600, doesn't matter.
-function _habitBarsData(){
-  const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  const now = new Date();
-  // Current week, Monday→Sunday
-  const monday = new Date(now); const dow = (now.getDay()+6)%7; monday.setDate(now.getDate()-dow); monday.setHours(0,0,0,0);
-  let wDone=0, wCap=0;
-  for(let i=0;i<7;i++){ const d=new Date(monday); d.setDate(monday.getDate()+i); const inf=getHabitPct(fmt(d)); if(inf){ wDone+=inf.done; wCap+=inf.total; } }
-  // Current month
-  const y=now.getFullYear(), m=now.getMonth(), dim=new Date(y,m+1,0).getDate();
-  let mDone=0, mCap=0;
-  for(let d=1; d<=dim; d++){ const inf=getHabitPct(`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`); if(inf){ mDone+=inf.done; mCap+=inf.total; } }
-  const perfect = (state.logros && state.logros.perfectDayCount) || 0;
-  return { wDone, wCap, mDone, mCap, perfect };
-}
-function renderHabitBars(){
-  const s = _habitBarsData();
-  const card = document.createElement('div'); card.className = 'habit-bars-card';
-  const bar = (label, val, cap, color) => {
-    const pct = cap>0 ? Math.min(100, Math.round(val/cap*100)) : 0;
-    const maxed = pct >= 100;
-    // Filling the bar to 100% is the ONLY place a 👑 award shows (this is where the
-    // old "Week Mastered" banner moved to) — the reward lives with the progress.
-    const award = maxed ? `<span class="hbar-award" title="Filled — mastered!">👑</span>` : '';
-    return `<div class="hbar${maxed?' hbar-maxed':''}">`
-      + `<div class="hbar-top"><span class="hbar-label" style="color:${color}">${label}${award}</span><span class="hbar-val" style="color:${color}">${pct}%</span></div>`
-      + `<div class="hbar-track"><div class="hbar-fill" style="width:${pct}%;background:${color};box-shadow:0 0 6px ${color}"></div></div>`
+// ── RANK BLOCK (2026-09) — replaces the THIS WEEK / THIS MONTH / 365 POTENTIAL
+// bars. The Hunter Grade letter (F→E→D…, driven by the average of your 6 stats)
+// is the north star: a near, visible milestone instead of a year-away 365 bar.
+// Every habit that gives stats nudges the bar toward the next grade. No streak,
+// no clock, no penalty — it only ever fills.
+function renderRankBlock(){
+  const total = (typeof getHunterGradeTotal === 'function') ? getHunterGradeTotal() : 0;
+  const g = tierFor(total / STAT_KEYS.length);
+  const pct = Math.round(g.pctToNext);
+  // Grade is the per-stat-average threshold × 6 stats, so "pts to next" is in
+  // TOTAL stat points — the same currency every completed habit pays out.
+  const remain = g.capped ? 0 : Math.max(0, Math.ceil(g.nextMin * STAT_KEYS.length - total));
+  const accent = '#b388ff';
+  const card = document.createElement('div');
+  card.style.cssText = 'display:flex;align-items:center;gap:16px;margin:4px 0 12px;padding:12px 15px;border:1px solid rgba(179,136,255,0.28);border-radius:12px;background:linear-gradient(180deg,rgba(179,136,255,0.10),rgba(179,136,255,0.02))';
+  const letter = `<div style="font-family:'Cinzel',serif;font-size:52px;line-height:1;font-weight:700;color:${accent};text-shadow:0 0 14px rgba(179,136,255,0.5);min-width:54px;text-align:center">${g.tier}</div>`;
+  let body;
+  if(g.capped){
+    body = `<div style="flex:1">`
+      + `<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:1.5px;color:#cbb6ff">HUNTER GRADE</span><span style="font-family:'Cinzel',serif;font-size:15px;color:${accent}">MAX</span></div>`
+      + `<div style="height:8px;border-radius:5px;background:rgba(255,255,255,0.08);overflow:hidden"><div style="height:100%;width:100%;background:${accent}"></div></div>`
+      + `<div style="margin-top:6px;font-family:'Rajdhani',sans-serif;font-size:11px;color:#9a86c4">Apex grade reached. There is no ceiling above you.</div>`
       + `</div>`;
-  };
-  const pPct = Math.min(100, Math.round(s.perfect/365*100));
-  card.innerHTML =
-    bar('THIS WEEK', s.wDone, s.wCap, '#4dd0e1')
-    + bar('THIS MONTH', s.mDone, s.mCap, '#82b1ff')
-    + `<div class="hbar hbar-potential">`
-    +   `<div class="hbar-top"><span class="hbar-label" style="color:#b388ff">✦ POTENTIAL</span><span class="hbar-val" style="color:#b388ff">${pPct}%</span></div>`
-    +   `<div class="hbar-track"><div class="hbar-fill" style="width:${pPct}%;background:linear-gradient(90deg,#b388ff,#ffd54f);box-shadow:0 0 8px rgba(179,136,255,0.6)"></div></div>`
-    +   `<div class="hbar-note">Every day you complete ALL your habits fills this a little. At your pace — reaching 365 is reaching it, whether it takes 365 days or 600.</div>`
-    + `</div>`;
+  } else {
+    body = `<div style="flex:1">`
+      + `<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:1.5px;color:#cbb6ff">HUNTER GRADE · NEXT <b style="color:${accent}">${g.nextTier}</b></span><span style="font-family:'Cinzel',serif;font-size:16px;color:${accent}">${pct}%</span></div>`
+      + `<div style="height:8px;border-radius:5px;background:rgba(255,255,255,0.08);overflow:hidden"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#b388ff,#ffd54f);box-shadow:0 0 8px rgba(179,136,255,0.55);transition:width .4s ease"></div></div>`
+      + `<div style="margin-top:6px;font-family:'Rajdhani',sans-serif;font-size:11px;color:#9a86c4"><b style="color:#cbb6ff">${remain}</b> stat pts to Grade ${g.nextTier} · every habit moves you closer</div>`
+      + `</div>`;
+  }
+  card.innerHTML = letter + body;
   return card;
 }
 
@@ -18447,9 +18601,9 @@ function renderHabitos() {
 
   if (isToday) panelContent.appendChild(renderDailyQuoteStrip());
 
-  // Progress bars (weekly / monthly / potential) — the non-punishing replacement
-  // for the streak headline. Shown on the live day only.
-  if (isToday && !state.habitsPaused && state.habitos.length > 0) panelContent.appendChild(renderHabitBars());
+  // Rank block — the Hunter Grade north star (replaces the weekly/monthly/365
+  // bars). Shown on the live day only.
+  if (isToday && !state.habitsPaused && state.habitos.length > 0) panelContent.appendChild(renderRankBlock());
 
   // ── CLASS QUESTS (shown only when a class is equipped) ──
   // Rendered FIRST: these rotate with the equipped class, so they need the
@@ -18517,8 +18671,16 @@ function renderHabitos() {
     if (!list.length) return;
     let collapsed;
     if (habitTimeCollapse[t] !== undefined) collapsed = habitTimeCollapse[t];
-    else if (t === 'anytime') collapsed = false;
-    else collapsed = isToday && _bothAnchored ? (t !== _curBlock) : false;
+    else if (!isToday || t === 'anytime') collapsed = false;
+    else {
+      // Time-aware default (2026-09-17): a fully-done group collapses to declutter.
+      // Otherwise MORNING (incomplete) stays visible ALL day so you can still catch
+      // up; NIGHT stays folded until the evening (its hour), then opens.
+      const _allDone = list.every(h => !!h.done[activeDate]);
+      if (_allDone) collapsed = true;
+      else if (t === 'night') collapsed = new Date().getHours() < 18;
+      else collapsed = false;
+    }
     const done = list.filter(h=>!!h.done[activeDate]).length;
     const hdr = document.createElement('div'); hdr.className = `time-subheader ${t}`; hdr.style.cursor = 'pointer';
     hdr.innerHTML = `<span>${collapsed?'▸':'▾'} ${_LBL[t]}</span><span class="time-subheader-count">${done}/${list.length}</span>`;
@@ -18590,9 +18752,10 @@ function renderHabitos() {
   const nBroken = negs.filter(n=>n.lastBreakDate===activeDate).length;
   const bestStreak = negs.length ? Math.max(...negs.map(n=>getAvoidStreak(n))) : 0;
   const streakMeta = nBroken > 0 ? `⚠ ${nBroken} relapse today` : (bestStreak > 0 ? `🛡️ ${bestStreak}d clean` : 'no relapses');
-  // Collapsible + default-collapsed (2026-09) to cut scroll; the header keeps the
-  // clean/relapse status visible so nothing important is hidden.
-  const _avoidOpen = !!completedExpanded['avoid-open'];
+  // Collapsible, default-OPEN (2026-09) — Tuni forgets to log AVOID/SOCIAL if they
+  // aren't visible; they sit at the bottom so being expanded costs no attention up
+  // top. Still manually collapsible.
+  const _avoidOpen = (completedExpanded['avoid-open'] !== undefined) ? completedExpanded['avoid-open'] : true;
   nh.style.cursor = 'pointer';
   nh.innerHTML=`<span class="section-label neg">${_avoidOpen?'▾':'▸'} ⟦ AVOID ⟧</span><div class="section-line neg"></div><span class="section-meta">${streakMeta}</span>`;
   nh.appendChild(nAddBtn);
@@ -18600,9 +18763,23 @@ function renderHabitos() {
   avoidGroup.appendChild(nh);
   if (_avoidOpen) {
     const negList=document.createElement('div'); negList.className='quest-list';
-    negs.forEach(task=>negList.appendChild(renderNegativeItem(task,activeDate)));
     if (negs.length === 0) {
       negList.appendChild(_emptyQuestCard('🚫', 'NOTHING TO AVOID', 'Tap + to track a habit you’re working to break.', 'var(--sao-red)'));
+    } else {
+      // Handled today (parried clean OR relapsed) collapse into a small fold, so the
+      // section shows only what still needs attention today (Tuni ask 2026-09-17).
+      const _handledAv = n => !!(n.checkins && n.checkins[activeDate]) || n.lastBreakDate===activeDate;
+      const _pendAv = negs.filter(n => !_handledAv(n));
+      const _doneAv = negs.filter(n =>  _handledAv(n));
+      _pendAv.forEach(task=>negList.appendChild(renderNegativeItem(task,activeDate)));
+      if (_doneAv.length) {
+        const _dOpen = !!completedExpanded['avoid-done-fold'];
+        const _dsep = document.createElement('div'); _dsep.className='work-archived-sep'; _dsep.style.cursor='pointer';
+        _dsep.innerHTML = `<div class="work-archived-line"></div><span>${_dOpen?'▲':'▼'} ✓ ${_doneAv.length} handled today</span><div class="work-archived-line"></div>`;
+        _dsep.addEventListener('click', ()=>{ completedExpanded['avoid-done-fold']=!_dOpen; renderAll(); });
+        negList.appendChild(_dsep);
+        if (_dOpen) _doneAv.forEach(task=>negList.appendChild(renderNegativeItem(task,activeDate)));
+      }
     }
     avoidGroup.appendChild(negList);
   }
@@ -18612,7 +18789,7 @@ function renderHabitos() {
   if (isToday) {
     const socialGroup = document.createElement('div'); socialGroup.className = 'section-group';
     socialGroup.id = 'socialLogSection';
-    const _socialOpen = !!completedExpanded['social-open'];
+    const _socialOpen = (completedExpanded['social-open'] !== undefined) ? completedExpanded['social-open'] : true;
     const ssh = document.createElement('div'); ssh.className = 'section-header'; ssh.style.cursor = 'pointer';
     ssh.innerHTML = `<span class="section-label" style="color:#ea80fc;opacity:0.85">${_socialOpen?'▾':'▸'} ⟦ SOCIAL LOG ⟧</span><div class="section-line" style="background:rgba(234,128,252,0.25)"></div>`;
     ssh.addEventListener('click', () => { completedExpanded['social-open'] = !_socialOpen; renderAll(); });
@@ -21470,11 +21647,15 @@ function renderHuntsSection(){
   });
   return frag;
 }
-function renderGateCard(g, isRed){
+function renderGateCard(g, isRed, defaultOpen){
   const total = g.steps.length, done = g.steps.filter(s=>s.done).length, pct = total?Math.round(done/total*100):0;
   const status = isRed ? _redGateStatus(g) : (g.clearedAt ? 'cleared' : 'active');
   const key = (isRed?'rg-':'gate-') + g.id;
-  const isOpen = (completedExpanded[key] !== undefined) ? completedExpanded[key] : (status==='active');
+  // defaultOpen (2026-09) lets the section decide what expands: only the urgent /
+  // current gate opens as a full checklist, the rest stay as collapsed banners so
+  // the board reads ~20 objectives instead of ~100. A manual tap still overrides.
+  const _def = (defaultOpen !== undefined) ? defaultOpen : (status==='active');
+  const isOpen = (completedExpanded[key] !== undefined) ? completedExpanded[key] : _def;
   const RANK_CLR = { C:'#69f0ae', B:'#ffc107', A:'#ffa726', S:'#ffd700' };
   const accent = isRed ? (RG_ACCENT[g.id] || '#ff5252') : (GATE_ACCENT[g.id] || RANK_CLR[g.rank] || '#ffc107');
   const themeClass = isRed ? ('rg-theme-' + (RG_THEME[g.id] || 'default')) : ('gt-theme-' + (GATE_THEME[g.id] || 'default'));
@@ -21524,7 +21705,8 @@ function renderRedGatesSection(){
     return rankOf[sa]!==rankOf[sb] ? rankOf[sa]-rankOf[sb] : _daysLeft(a.deadline)-_daysLeft(b.deadline);
   });
   const done = state.redGates.filter(rg => _redGateStatus(rg)==='cleared').sort((a,b)=>(b.clearedAt||'').localeCompare(a.clearedAt||''));
-  live.forEach(rg => frag.appendChild(renderGateCard(rg, true)));
+  // Only drops ending within 7 days open as full checklists; the rest stay banners.
+  live.forEach(rg => frag.appendChild(renderGateCard(rg, true, _redGateStatus(rg)==='active' && _daysLeft(rg.deadline) <= 7)));
   if(done.length){
     const isOpen = !!completedExpanded['rg-completed'];
     const sep = document.createElement('div'); sep.className = 'work-archived-sep'; sep.style.cursor = 'pointer';
@@ -21541,7 +21723,8 @@ function renderGatesSection(){
   const gates = [...state.gates].sort((a,b)=>(order[a.rank]??9)-(order[b.rank]??9));
   const live = gates.filter(g => !g.clearedAt);
   const done = gates.filter(g => g.clearedAt);
-  live.forEach(g => frag.appendChild(renderGateCard(g, false)));
+  // Only the current boss (lowest live rank) opens; the rest stay as banners.
+  live.forEach((g, i) => frag.appendChild(renderGateCard(g, false, i === 0)));
   if(done.length){
     const isOpen = !!completedExpanded['gate-completed'];
     const sep = document.createElement('div'); sep.className = 'work-archived-sep'; sep.style.cursor = 'pointer';
@@ -22051,6 +22234,30 @@ function renderTrabajo(){
   // ── ⚔️ HUNTS (daily / weekly / monthly) ──
   panelContent.appendChild(renderHuntsSection());
 
+  // ── ⚡ SIDE QUESTS (moved below MONTHLY / above RED GATES, 2026-09-17) — small
+  // one-off tasks sit here so they're caught before the big gates, not buried. ──
+  {
+    const openTasks = state.trabajo.filter(t => !t.completed);
+    const doneToday = state.trabajo.filter(t => t.completed && t.completedDate === today);
+    const sqHdr = document.createElement('div'); sqHdr.className = 'dungeon-divider';
+    sqHdr.innerHTML = `<span>⚡ SIDE QUESTS${openTasks.length ? ` · ${openTasks.length}` : ''}</span>`;
+    panelContent.appendChild(sqHdr);
+    const form = document.createElement('div'); form.className = 'add-task-form inscribe-form work-add-top';
+    form.innerHTML = `<div class="task-input-row"><input type="text" class="add-task-input inscribe-input" id="taskInput" placeholder="One-off task…" maxlength="90"><button class="add-btn inscribe-btn" id="addBtn">+ ADD</button></div>`;
+    panelContent.appendChild(form);
+    document.getElementById('addBtn').addEventListener('click', addTask);
+    document.getElementById('taskInput').addEventListener('keydown', e => { if(e.key === 'Enter') addTask(); });
+    if(openTasks.length) panelContent.appendChild(renderWorkTaskList(openTasks, false));
+    if(doneToday.length){
+      const isOpen = !!completedExpanded['trabajo-done'];
+      const sep = document.createElement('div'); sep.className = 'work-archived-sep'; sep.style.cursor = 'pointer';
+      sep.innerHTML = `<div class="work-archived-line"></div><span>${isOpen?'▲':'▼'} ✓ ${doneToday.length} DONE TODAY</span><div class="work-archived-line"></div>`;
+      sep.addEventListener('click', () => { completedExpanded['trabajo-done'] = !completedExpanded['trabajo-done']; renderAll(); });
+      panelContent.appendChild(sep);
+      if(isOpen) panelContent.appendChild(renderWorkTaskList(doneToday, true));
+    }
+  }
+
   // ── 🔴 RED GATES (time-limited events) ──
   const rgHdr = document.createElement('div'); rgHdr.className = 'dungeon-divider redgate-divider';
   rgHdr.innerHTML = `<span>🔴 RED GATES · limited time</span>`; panelContent.appendChild(rgHdr);
@@ -22060,28 +22267,6 @@ function renderTrabajo(){
   const gHdr = document.createElement('div'); gHdr.className = 'dungeon-divider gate-divider';
   gHdr.innerHTML = `<span>🚪 GATES · your bosses</span>`; panelContent.appendChild(gHdr);
   panelContent.appendChild(renderGatesSection());
-
-  // ── ⚡ SIDE QUESTS (ad-hoc one-offs; the old task list + quick-capture) ──
-  const openTasks = state.trabajo.filter(t => !t.completed);
-  const doneToday = state.trabajo.filter(t => t.completed && t.completedDate === today);
-  const sqHdr = document.createElement('div'); sqHdr.className = 'dungeon-divider';
-  sqHdr.innerHTML = `<span>⚡ SIDE QUESTS${openTasks.length ? ` · ${openTasks.length}` : ''}</span>`;
-  panelContent.appendChild(sqHdr);
-  const form = document.createElement('div'); form.className = 'add-task-form inscribe-form work-add-top';
-  form.innerHTML = `<div class="task-input-row"><input type="text" class="add-task-input inscribe-input" id="taskInput" placeholder="One-off task…" maxlength="90"><button class="add-btn inscribe-btn" id="addBtn">+ ADD</button></div>`;
-  panelContent.appendChild(form);
-  document.getElementById('addBtn').addEventListener('click', addTask);
-  document.getElementById('taskInput').addEventListener('keydown', e => { if(e.key === 'Enter') addTask(); });
-  if(openTasks.length) panelContent.appendChild(renderWorkTaskList(openTasks, false));
-
-  if(doneToday.length){
-    const isOpen = !!completedExpanded['trabajo-done'];
-    const sep = document.createElement('div'); sep.className = 'work-archived-sep'; sep.style.cursor = 'pointer';
-    sep.innerHTML = `<div class="work-archived-line"></div><span>${isOpen?'▲':'▼'} ✓ ${doneToday.length} DONE TODAY</span><div class="work-archived-line"></div>`;
-    sep.addEventListener('click', () => { completedExpanded['trabajo-done'] = !completedExpanded['trabajo-done']; renderAll(); });
-    panelContent.appendChild(sep);
-    if(isOpen) panelContent.appendChild(renderWorkTaskList(doneToday, true));
-  }
 
   _startEventTimers();   // live-tick every LIVE DROPS + Red Gate countdown
 }
@@ -22244,42 +22429,32 @@ function renderCharStatusHeader() {
     </div>` : '';
 
   el.style.setProperty('--rank-color', gradeColor);
+  // Grade glam escalation — F humble → SSS godlike (CSS keys off .hg-<grade>).
+  ['hg-F','hg-E','hg-D','hg-C','hg-B','hg-A','hg-S','hg-SS','hg-SSS'].forEach(c => el.classList.remove(c));
+  el.classList.add('hg-' + hunterGrade);
   el.innerHTML = `
-    <div class="char-status-top-row">
-      <div class="char-status-rank" style="color:${gradeColor}">${adventureTitle.toUpperCase()}</div>
-      <div class="char-status-level">
-        <span class="char-status-lv-label">LV.</span>
-        <span class="char-status-lv-num" style="color:${gradeColor}">${level}</span>
+    <div class="cse-titlebar"><span class="cse-tb-line"></span><span class="cse-tb-txt">⟦ STATUS ⟧</span><span class="cse-tb-line"></span></div>
+    <div class="cse-hero">
+      <div class="cse-grade-sigil" style="--gc:${gradeColor}">
+        <span class="cse-grade-letter">${hunterGrade}</span>
+        <span class="cse-grade-cap">GRADE</span>
+      </div>
+      <div class="cse-hero-right">
+        <div class="char-status-rank" style="color:${gradeColor}">${adventureTitle.toUpperCase()}</div>
+        <div class="cse-pl"><span class="cse-pl-num" style="color:#4dd0e1">${_totalCP.toLocaleString()}</span><span class="cse-pl-lbl">POWER LEVEL</span></div>
+        <div class="cse-pl-sub"><span style="color:rgba(224,247,250,0.6)">LV ${level}</span> · <span style="color:#ff8a80">⚔ ${_cp.effAtk.toLocaleString()}</span> · <span style="color:#80deea">❤ ${_cp.effHP.toLocaleString()}</span></div>
       </div>
     </div>
-    <div class="char-hunter-grade-row">
-      <div class="char-hg-top">
-        <div class="char-hg-left">
-          <span class="char-hunter-grade-label">HUNTER GRADE</span>
-          <span class="char-hunter-grade-badge" style="color:${gradeColor};border-color:${gradeColor}55">${hunterGrade}</span>
-          ${nextGrade ? `<span class="char-hg-arrow">→</span><span class="char-hg-next-badge" style="color:${nextColor};border-color:${nextColor}55">${nextGrade}</span>` : ''}
-        </div>
-        <span class="char-hg-pct" style="color:${gradeColor}">${gradeInfo.capped ? '✦ MAX' : `${gradePct}%`}</span>
-      </div>
-      <div style="display:flex;align-items:baseline;gap:8px;margin:5px 0 2px;">
-        <span style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;color:${gradeColor};line-height:1;text-shadow:0 0 10px ${gradeColor}55;">${_totalCP.toLocaleString()}</span>
-        <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:rgba(224,247,250,0.5);">POWER LEVEL</span>
-        <span style="margin-left:auto;font-size:10px;color:rgba(224,247,250,0.55);">⚔ ${_cp.effAtk.toLocaleString()} · ❤ ${_cp.effHP.toLocaleString()}</span>
-      </div>
-      <div style="display:flex;align-items:baseline;gap:5px;margin:0 0 6px;font-size:10px;">
-        <span style="color:rgba(224,247,250,0.6);">Base ${_cp.cp.toLocaleString()}</span>
-        <span style="color:#ffc107;">+ Gear ${_gearCP.toLocaleString()}</span>
-        <span style="color:rgba(224,247,250,0.45);">= Total ${_totalCP.toLocaleString()}</span>
-      </div>
-      <div class="char-hg-bar-track">
-        <div class="char-hg-bar-fill" style="width:${gradePct}%;background:${gradeColor};color:${gradeColor}"></div>
-      </div>
+    <div class="cse-grade-prog">
+      <div class="cse-gp-top"><span>HUNTER GRADE <b style="color:${gradeColor}">${hunterGrade}</b>${nextGrade ? ` → <b style="color:${nextColor}">${nextGrade}</b>` : ''}</span><span style="color:${gradeColor}">${gradeInfo.capped ? '✦ MAX' : `${gradePct}%`}</span></div>
+      <div class="char-hg-bar-track"><div class="char-hg-bar-fill" style="width:${gradePct}%;background:linear-gradient(90deg,${gradeColor},${nextColor});color:${gradeColor}"></div></div>
       <div class="char-hg-bar-sub">
         <span>${totalStatPts.toLocaleString()} stat pts</span>
         ${gradeInfo.capped
           ? `<span style="color:${gradeColor}">✦ APEX GRADE</span>`
-          : `<span style="color:${nextColor}">${statsToNext.toLocaleString()} stat pts to Grade ${nextGrade}</span>`}
+          : `<span style="color:${nextColor}">${statsToNext.toLocaleString()} to Grade ${nextGrade}</span>`}
       </div>
+      <div class="cse-gear-line"><span style="color:rgba(224,247,250,0.6)">Base ${_cp.cp.toLocaleString()}</span> &nbsp;<span style="color:#ffc107">+ Gear ${_gearCP.toLocaleString()}</span> &nbsp;<span style="color:rgba(224,247,250,0.4)">= ${_totalCP.toLocaleString()}</span></div>
     </div>
     ${_identityHtml}
     ${_milestonesHtml}
@@ -22334,9 +22509,10 @@ function renderPersonaje() {
 
     const row = document.createElement('div');
     row.className = `stat-row ${k}${isOpen ? ' stat-row-open' : ''}`;
+    row.style.setProperty('--sc', SCOL[k]);  // per-stat color drives the row's glow/accent
     row.innerHTML = `
       <div class="stat-row-top">
-        <div class="stat-name-block"><span class="stat-code">${k}</span><span class="stat-full-name">${STAT_NAMES[k]}</span></div>
+        <div class="stat-name-block"><span class="stat-emoji">${STAT_EMOJI[k]||''}</span><span class="stat-code">${k}</span><span class="stat-full-name">${STAT_NAMES[k]}</span></div>
         <div style="display:flex;align-items:center;gap:8px">
           <div class="stat-tier" style="color:${TIER_COLORS[t.tier]||'#9e9e9e'};border-color:${TIER_COLORS[t.tier]||'#9e9e9e'}44;text-shadow:0 0 8px ${TIER_COLORS[t.tier]||'#9e9e9e'}60">RANK ${t.tier}</div>
           <span style="font-family:'Cinzel',serif;font-size:9px;color:var(--sao-text-dim)">${isOpen?'▲':'▼'}</span>
@@ -23079,7 +23255,7 @@ function renderClassPanel() {
   const hasNew  = avail.length > 0;
 
   const panel = document.createElement('div');
-  panel.className = 'class-panel';
+  panel.className = 'class-panel' + (cls ? ' clsp-t' + cls.tier : '');
   if (cls) panel.style.setProperty('--cls-accent', cls.color);
   panel.innerHTML = `<div class="class-panel-hdr">⟦ CLASS ⟧</div>`;
 
@@ -23942,6 +24118,96 @@ function saveDayReflection() {
   showNotif(firstTime ? '🌙 Day closed · +30 XP · <img src="img/gold.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;display:inline-block">+10g' : '🌙 Reflection updated.');
   renderAll();
 }
+// ── EVENING RITUAL POPUP (2026-09-17) — a 9pm prompt to log social wins, rate the
+// day (1–5) and brain-dump a note. Writes to the same state.dayReflections used by
+// Close-the-Day + the History mood trend. Fires once per evening from INIT. ──
+let _eveSocialOpen = null;
+function showEveningRitual() {
+  if (document.querySelector('.eve-overlay')) return;
+  const ov = document.createElement('div'); ov.className = 'eve-overlay';
+  const box = document.createElement('div'); box.className = 'eve-box';
+  ov.appendChild(box); document.body.appendChild(ov);
+  const close = () => ov.remove();
+  ov.addEventListener('click', e => { if (e.target === ov) close(); });
+  let _rating = 0, _note = '';
+  function draw() {
+    const social = SOCIAL_STATS.map(def => {
+      const pts = (state.socialStats || {})[def.id] || 0; const rank = getSocialRank(pts);
+      const open = _eveSocialOpen === def.id;
+      return `<button class="eve-soc${open?' open':''}" data-soc="${def.id}" style="border-color:${def.color}${open?'88':'33'}">${def.emoji}<span style="color:${def.color};font-size:8px">Lv.${rank}</span></button>`;
+    }).join('');
+    let picker = '';
+    if (_eveSocialOpen) { const d = SOCIAL_STATS.find(s => s.id === _eveSocialOpen);
+      if (d) picker = `<div class="eve-soc-picker" style="border-color:${d.color}44">${d.acts.map(a => `<button class="eve-act" data-act="${_rflEsc(a)}">${_rflEsc(a)}</button>`).join('')}</div>`; }
+    box.innerHTML = `
+      <div class="eve-title">⟦ CLOSE THE DAY ⟧</div>
+      <div class="eve-sub">Log any social wins, rate the day, unload your head.</div>
+      <div class="eve-sec-label">💬 SOCIAL WINS · tap to log</div>
+      <div class="eve-soc-row">${social}</div>${picker}
+      <div class="eve-sec-label">⭐ HOW WAS TODAY?</div>
+      <div class="eve-stars">${[1,2,3,4,5].map(i => `<button class="eve-star" data-star="${i}">${_rating>=i?'⭐':'☆'}</button>`).join('')}</div>
+      <textarea class="eve-note" id="eve-note" maxlength="280" rows="3" placeholder="Brain dump — how you're feeling, what happened, anything…">${_rflEsc(_note)}</textarea>
+      <div class="eve-btns">
+        <button class="eve-skip">Later</button>
+        <button class="eve-save">🌙 CLOSE THE DAY · +30 XP</button>
+      </div>`;
+    const grabNote = () => { const n = document.getElementById('eve-note'); if (n) _note = n.value; };
+    box.querySelectorAll('.eve-soc').forEach(b => b.addEventListener('click', () => { grabNote(); _eveSocialOpen = _eveSocialOpen === b.dataset.soc ? null : b.dataset.soc; draw(); }));
+    box.querySelectorAll('.eve-act').forEach(b => b.addEventListener('click', () => { grabNote(); logSocialAct(_eveSocialOpen, b.dataset.act); _eveSocialOpen = null; draw(); }));
+    box.querySelectorAll('.eve-star').forEach(b => b.addEventListener('click', () => { grabNote(); _rating = +b.dataset.star; draw(); }));
+    box.querySelector('.eve-skip').addEventListener('click', close);
+    box.querySelector('.eve-save').addEventListener('click', () => {
+      grabNote();
+      if (!_rating) { showNotif('Pick a rating to close the day.'); return; }
+      const dk = todayKey(); if (!state.dayReflections) state.dayReflections = {};
+      const prev = state.dayReflections[dk] || {}; const firstTime = !state.dayReflections[dk];
+      state.dayReflections[dk] = { rating: _rating, win: prev.win || '', tomorrow: prev.tomorrow || '', note: _note.trim(), ts: Date.now() };
+      if (firstTime) { state.totalXp = (state.totalXp||0)+30; state.col = (state.col||0)+30; state.gold = Math.max(0,(state.gold||0)+10); state.totalGoldEarned = (state.totalGoldEarned||0)+10; }
+      saveState(); showNotif('🌙 Day closed · +30 XP'); close(); renderAll();
+    });
+  }
+  draw();
+}
+// Decides whether to pop the evening ritual. Fires (a) at 9pm on load, once/day, or
+// (b) the moment all daily habits are done, whenever that happens — but never if the
+// day is already closed. Session flag stops double-pops within one load. (2026-09-17)
+let _eveRitualShownSession = false;
+function maybeShowEveningRitual(opts) {
+  opts = opts || {};
+  try {
+    const dk = todayKey();
+    if ((state.dayReflections || {})[dk]) return;   // already closed today
+    if (_eveRitualShownSession) return;             // already popped this session
+    const h = new Date().getHours();
+    const trigger = opts.dailiesDone === true || (h >= 21 && state.closeDayPromptedDay !== dk);
+    if (!trigger) return;
+    _eveRitualShownSession = true;
+    if (h >= 21) { state.closeDayPromptedDay = dk; saveState(); }
+    setTimeout(() => { try { showEveningRitual(); } catch(e) {} }, opts.delay || 1000);
+  } catch(e) {}
+}
+// Mood / rating averages over time — reads state.dayReflections ratings. Shown in History.
+function renderRatingTrend(container) {
+  const refs = Object.entries(state.dayReflections || {}).filter(([, r]) => r && r.rating > 0);
+  if (!refs.length) return;
+  const now = new Date();
+  const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const monday = new Date(now); const dow = (now.getDay()+6)%7; monday.setDate(now.getDate()-dow); const wk = fmt(monday);
+  const mo = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const yr = `${now.getFullYear()}`;
+  const avg = arr => arr.length ? arr.reduce((s,v)=>s+v,0)/arr.length : 0;
+  const cell = (label, vals) => { const a = avg(vals);
+    const em = a>=4.5?'🌟':a>=3.5?'😊':a>=2.5?'🙂':a>=1.5?'😐':a>0?'😞':'—';
+    return `<div class="rt-cell"><div class="rt-lbl">${label}</div><div class="rt-val">${a?a.toFixed(1):'—'}<span class="rt-em">${a?em:''}</span></div><div class="rt-n">${vals.length} day${vals.length===1?'':'s'}</div></div>`; };
+  const card = document.createElement('div'); card.className = 'rating-trend-card';
+  card.innerHTML = `<div class="rt-title">⟦ MOOD · AVG RATING ⟧</div><div class="rt-grid">`
+    + cell('THIS WEEK', refs.filter(([dk])=>dk>=wk).map(([,r])=>r.rating))
+    + cell('THIS MONTH', refs.filter(([dk])=>dk.startsWith(mo)).map(([,r])=>r.rating))
+    + cell('THIS YEAR', refs.filter(([dk])=>dk.startsWith(yr)).map(([,r])=>r.rating))
+    + cell('ALL TIME', refs.map(([,r])=>r.rating))
+    + `</div>`;
+  container.appendChild(card);
+}
 function renderDailyCloseOut(container) {
   const dk = todayKey();
   const existing = (state.dayReflections || {})[dk];
@@ -23976,7 +24242,7 @@ function renderDailyCloseOutList(container) {
   const entries = Object.entries(state.dayReflections || {})
     .filter(([dk]) => dk !== todayKey())
     .sort((a, b) => b[0].localeCompare(a[0]))
-    .slice(0, 7);
+    .slice(0, 30);
   if (!entries.length) return;
   const sec = document.createElement('div'); sec.style.cssText = 'padding:0 12px;';
   const title = document.createElement('div'); title.className = 'wr-section-title'; title.style.margin = '16px 0 10px';
@@ -24033,6 +24299,8 @@ function _renderHistoryExtras(container) {
   // ── TRENDS ──
   renderTrendChart(container);
   renderChronicles(container);
+  // ── MOOD · AVG RATING (week/month/year/all-time from Close-the-Day) ──
+  renderRatingTrend(container);
   // ── CLOSE THE DAY — evening only (9pm onward) ──
   if (new Date().getHours() >= 21) renderDailyCloseOut(container);
   renderDailyCloseOutList(container);
@@ -24894,6 +25162,21 @@ function renderHistory() {
       summary.appendChild(div());
       summary.appendChild(mkItem('PERFECT DAYS', `${perfDays}/${activeDays.length}`));
       summary.appendChild(div());
+      // WEEKLY HABITS completion for the same period. Weekly habits are keyed by
+      // ISO week, so we average the % of the week(s) this period touches — the
+      // week-to-week / month-to-month view the user reviews (the "Analyze this
+      // week's results" habit lives on this). Daily % is the AVERAGE stat above.
+      if((state.weekly||[]).length > 0){
+        const wkKeys = [...new Set(days.filter(dk=>dk<=todayDkSum).map(dk=>isoWeekKey(new Date(dk+'T12:00:00'))))];
+        if(wkKeys.length){
+          const wTot = state.weekly.length;
+          const wkPcts = wkKeys.map(wk => Math.round(state.weekly.filter(w=>w.done[wk]).length / wTot * 100));
+          const wAvg = Math.round(wkPcts.reduce((s,v)=>s+v,0)/wkPcts.length);
+          const wCls = wAvg>=70?'good':wAvg>=30?'mid':'low';
+          summary.appendChild(mkItem(wkKeys.length>1?`WEEKLY · ${wkKeys.length}wk avg`:'WEEKLY', wAvg+'%', wCls));
+          summary.appendChild(div());
+        }
+      }
       const xpItem = mkItem('PERIOD XP', `⚡${totalPeriodXp}`);
       // Top 3 XP contributors
       const habitXp = state.habitos.map(h => {
@@ -27206,7 +27489,7 @@ function toggleQuest(listKey, periodKey, id, anchorY) {
         setTimeout(()=>showFirstHabitOverlay(), 320);
       }
       else if(isLast) { playLastHabit(); if(navigator.vibrate) navigator.vibrate([40,20,80]); }
-      else { if(_cqCompleting) { /* CURRENT QUEST plays its own galactic sound + vibration */ } else { if(listKey==='weekly') { playWeeklyTap(); } else { playSwordSlash(); } if(navigator.vibrate) navigator.vibrate(40); } }
+      else { if(_cqCompleting) { /* CURRENT QUEST plays its own galactic sound + vibration */ } else { if(listKey==='weekly') { playWeeklyTap(); } else { playSwordSlash(state.habitos.length ? (_doneBefore+1)/state.habitos.length : 0); } if(navigator.vibrate) navigator.vibrate(40); } }
       // HP restore: each completed habit restores 4% of max HP
       { const _mhp = calcMaxHP(); if (state.hp === null || state.hp === undefined) state.hp = _mhp; state.hp = Math.min(_mhp, state.hp + Math.round(_mhp * 0.04)); }
       const _tags = []; if(_isPhoenix) _tags.push(`×${_phoenixMult}🔥`); if(_isCrit) _tags.push('⚡CRIT'); if(_masteryMult>1) _tags.push('👑×1.2');
@@ -28479,6 +28762,9 @@ function checkAllDone(listKey, periodKey) {
           setTimeout(()=>{ playDailyComplete(); }, pdDelay - 400);
         }
         setTimeout(()=>{ showPerfectDayOverlay(); }, pdDelay);
+        // Evening ritual: all dailies done → prompt the close-out after the PD
+        // celebration clears (unless the day is already closed). (2026-09-17)
+        maybeShowEveningRitual({ dailiesDone:true, delay: pdDelay + 4800 });
         // Perfect Week fires after PD auto-dismisses (PD lasts 4000ms + buffer)
         if (_isPerfectWeekToday()) {
           if (state.logros.lastPerfectWeekOverlay !== periodKey) {
@@ -32657,6 +32943,8 @@ tickHpMp();
 saveState();
 renderAll();
 scheduleNotifications();
+// Evening ritual popup — 9pm-on-load path (the all-dailies-done path fires from checkAllDone).
+maybeShowEveningRitual();
 if (_pendingAnims.length) setTimeout(() => { const fn = _pendingAnims.shift(); if (fn) fn(); }, 600);
 initAvatar();
 setInterval(()=>{ tickHpMp(); renderHeader(); _updateAchBadge(); saveState(); }, 60000);

@@ -107,7 +107,7 @@ const CLASS_MASTERY_THRESHOLD = {
 
 // Bonus mastery point rewards per quest type, by class tier
 const CQ_MP = {
-  1:{ daily:5,  weekly:25,  onetime:50   },
+  1:{ daily:20, weekly:25,  onetime:50   },
   2:{ daily:10, weekly:50,  onetime:100  },
   3:{ daily:15, weekly:75,  onetime:150  },
   4:{ daily:20, weekly:150, onetime:300  },
@@ -138,14 +138,19 @@ const CQ_TARGETS = {
 const CLASS_QUESTS = {
   // ── TIER 1 — NOVICE ──────────────────────────────────────────────────────
   // Starter classes are "sauce" (2026-09): ONE daily each, themed to the class's stat.
-  // A real but doable daily ritual, not a punishing challenge. Mastering a starter =
-  // 7 days of doing its daily (one full week). Higher tiers get revamped later.
-  knight:   { daily: { title:'Iron Sets',        desc:'Do 30 push-ups today. Break them into sets if you need to.',                 stats:{ STR:3 } } },
-  rogue:    { daily: { title:'Quick Feet',        desc:'Spend 5 minutes on a coordination or balance drill — jump rope, footwork, single-leg holds.', stats:{ DEX:3 } } },
-  guardian: { daily: { title:'Steady Engine',     desc:'Get 15 minutes of continuous cardio — brisk walk, run, cycle, anything sustained.', stats:{ CON:3 } } },
-  mage:     { daily: { title:'Daily Pages',       desc:'Read 10 pages, or study something for 15 focused minutes.',                  stats:{ INT:3 } } },
-  monk:     { daily: { title:'Zero Hour',         desc:'No phone for the first 30 minutes after you wake up. Anything analog instead.', stats:{ VOL:3 } } },
-  bard:     { daily: { title:'Real Talk',         desc:'Have one real 10-minute conversation — voice or face-to-face, not texting.', stats:{ CHA:3 } } },
+  // A real but doable daily ritual, not a punishing challenge. Higher tiers get
+  // revamped later.
+  // Reward upscale (2026-09-16): keeping only the easy daily dropped the old
+  // weekly(12)+one-time(20) rewards, so the kept daily was under-valued. Bumped to
+  // 10 stat / 20 MP (CQ_MP T1 daily) — ~half the original one-time reward, earnable
+  // daily. Discipline of doing the easy thing consistently is the point; mastery
+  // (100 MP) now lands in ~5 days of the daily + passive stat gains.
+  knight:   { daily: { title:'Iron Sets',        desc:'Do 30 push-ups today. Break them into sets if you need to.',                 stats:{ STR:10 } } },
+  rogue:    { daily: { title:'Quick Feet',        desc:'Spend 5 minutes on a coordination or balance drill — jump rope, footwork, single-leg holds.', stats:{ DEX:10 } } },
+  guardian: { daily: { title:'Steady Engine',     desc:'Get 15 minutes of continuous cardio — brisk walk, run, cycle, anything sustained.', stats:{ CON:10 } } },
+  mage:     { daily: { title:'Daily Pages',       desc:'Read 10 pages, or study something for 15 focused minutes.',                  stats:{ INT:10 } } },
+  monk:     { daily: { title:'Zero Hour',         desc:'No phone for the first 30 minutes after you wake up. Anything analog instead.', stats:{ VOL:10 } } },
+  bard:     { daily: { title:'Real Talk',         desc:'Have one real 10-minute conversation — voice or face-to-face, not texting.', stats:{ CHA:10 } } },
   // ── TIER 2 — ADEPT ───────────────────────────────────────────────────────
   paladin: {
     daily:   { title:'The Righteous Rep',       desc:'During your strength session today, identify the one set you want to skip — and do it anyway. Log only if you finished without cutting reps, reducing weight mid-set, or checking your phone between sets.', stats:{ STR:4, VOL:3 } },
