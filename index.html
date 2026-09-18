@@ -8553,6 +8553,14 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .gate-fill{height:100%;transition:width 0.35s ease;box-shadow:0 0 8px currentColor}
 .gate-steps{padding:7px 12px 13px;display:flex;flex-direction:column;gap:6px}
 .gate-steps[hidden]{display:none}   /* FIX (2026-09-17): the class display:flex was overriding the [hidden] attribute, so steps never actually collapsed — only the caret moved. */
+/* Two-phase drop headers (2026-09-18): Part 1 (launch & sell) + Part 2 (push & connect), each with its own countdown. */
+.gate-part-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 1px 1px;padding:2px 2px 5px;
+  border-bottom:1px dashed color-mix(in srgb,var(--gate-accent,#ffc107) 30%,transparent)}
+.gate-part-hd:first-child{margin-top:1px}
+.gp-label{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:color-mix(in srgb,var(--gate-accent,#ffc107) 88%,#fff)}
+.gp-timer{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.4px;color:rgba(224,247,250,0.7);white-space:nowrap}
+.gp-timer.done{color:#8affc0}
+.gp-timer.over,.rg-livetimer.over{color:#ffb04d}
 /* JRPG quest-log entries (2026-09-17) — bigger accent-bordered menu rows that slide,
    glow + reveal a chevron on hover; cleared rows resolve to green. Persona/FF energy. */
 .gate-step{position:relative;display:flex;align-items:center;gap:11px;padding:12px 13px;min-height:46px;border-radius:9px;cursor:pointer;
@@ -21272,17 +21280,24 @@ const HUNTS_SEED = [
   { id:'h_fact',   text:'Facturar / invoicing',              cadence:'monthly', window:'monthEnd' },
 ];
 // Canonical launch checklist for every anime drop. ORDER MATTERS — this is the
-// real order of the launch flow. Steps 1-5 are the usual show/sell flow; steps
-// 6-7 (3 TikTok posts + a second video reel) are newer additions so people can
-// see the design on video too.
+// real order of the launch flow. TWO PHASES (2026-09-18):
+//   PART 1 (p1-p5) = LAUNCH & SELL — the MINIMUM to complete the banner: shoot it,
+//     put it up, publish, ads, mail. This is the product going live and selling.
+//   PART 2 (p6-p8) = PUSH & CONNECT — 3 TikToks, a second reel (can reuse a winning
+//     TikTok meme), 3+ IG stories (memes/polls). Pushes reach, connects with people,
+//     builds the virtuous circle. Each part carries its OWN deadline (rg.deadline =
+//     P1, rg.deadline2 = P2). Night City (rg_night) is FROZEN on the legacy 7-step
+//     flow — already published (Part 2 comes when the anime releases). See
+//     _FROZEN_DROP_IDS + _hasParts / _currentDeadline below.
 function _dropSteps(){ return [
-  { id:'p1', text:'Photography and visual pieces',            done:false },
-  { id:'p2', text:'Upload the product to the web',            done:false },
-  { id:'p3', text:'Prepare first carrousel post. Publish it', done:false },
-  { id:'p4', text:'Prepare & launch ad campaign',             done:false },
-  { id:'p5', text:'Prepare & launch email marketing',         done:false },
-  { id:'p6', text:'Prepare 3 TIKTOK post. Publish them',      target:3, count:0, done:false },
-  { id:'p7', text:'Prepare second reel post. Publish it',     done:false },
+  { id:'p1', part:1, text:'Photography and visual pieces',            done:false },
+  { id:'p2', part:1, text:'Upload the product to the web',            done:false },
+  { id:'p3', part:1, text:'Prepare first carrousel post. Publish it', done:false },
+  { id:'p4', part:1, text:'Prepare & launch ad campaign',             done:false },
+  { id:'p5', part:1, text:'Prepare & launch email marketing',         done:false },
+  { id:'p6', part:2, text:'Prepare 3 TIKTOK post. Publish them',      target:3, count:0, done:false },
+  { id:'p7', part:2, text:'Prepare second reel — publish (reuse a hit TikTok meme if one lands)', done:false },
+  { id:'p8', part:2, text:'Post 3+ IG stories (memes / polls) — organic reach', target:3, count:0, done:false },
 ]; }
 // Map a drop's existing steps onto the current canonical list, preserving what's
 // already checked (matched by concept, since order/ids/wording have changed over
@@ -21292,6 +21307,7 @@ function _reconcileDropSteps(oldSteps){
     const x = (s.text || '').toLowerCase();
     if(x.includes('photograph'))                       return 'photo';
     if(x.includes('upload'))                           return 'upload';
+    if(x.includes('stor'))                             return 'story';  // IG stories (memes / polls)
     if(x.includes('first') && x.includes('second'))   return 'both';   // legacy "first & second post"
     if(x.includes('carrousel') || x.includes('carousel')) return 'carousel';
     if(x.includes('tiktok'))                           return 'tiktok';
@@ -21307,7 +21323,7 @@ function _reconcileDropSteps(oldSteps){
     if(s.done) done.add(c);
     if(typeof s.count === 'number') counts[c] = s.count;
   });
-  const idConcept = { p1:'photo', p2:'upload', p3:'carousel', p4:'ad', p5:'email', p6:'tiktok', p7:'reel' };
+  const idConcept = { p1:'photo', p2:'upload', p3:'carousel', p4:'ad', p5:'email', p6:'tiktok', p7:'reel', p8:'story' };
   return _dropSteps().map(s => {
     const c = idConcept[s.id];
     const wasDone = done.has(c) || (done.has('both') && (c === 'carousel' || c === 'reel'));
@@ -21367,10 +21383,21 @@ const GATES_SEED = [
   ]},
 ];
 const REDGATES_SEED = [
-  { id:'rg_night',    codename:'Night City',    drop:'Cyberpunk drop',    deadline:'2026-09-18', steps:_dropSteps() },
-  { id:'rg_psycho',   codename:'100% Psycho',   drop:'Mob Psycho drop',   deadline:'2026-09-22', steps:_dropSteps() },
-  { id:'rg_hero',     codename:'My Hero',       drop:'My Hero Academia drop', deadline:'2026-09-28', steps:_dropSteps() },
-  { id:'rg_clover',   codename:'5 Leaf Clover', drop:'Black Clover drop', deadline:'2026-09-30', steps:_dropSteps() },
+  // Night City = PUBLISHED Part 1 (Part 2 when the anime releases). Frozen on the
+  // legacy 7-step flow — no IG-stories step. Excluded from reconcile via _FROZEN_DROP_IDS.
+  { id:'rg_night',    codename:'Night City',    drop:'Cyberpunk drop',    deadline:'2026-09-18', steps:[
+    { id:'p1', text:'Photography and visual pieces',            done:false },
+    { id:'p2', text:'Upload the product to the web',            done:false },
+    { id:'p3', text:'Prepare first carrousel post. Publish it', done:false },
+    { id:'p4', text:'Prepare & launch ad campaign',             done:false },
+    { id:'p5', text:'Prepare & launch email marketing',         done:false },
+    { id:'p6', text:'Prepare 3 TIKTOK post. Publish them',      target:3, count:0, done:false },
+    { id:'p7', text:'Prepare second reel post. Publish it',     done:false },
+  ] },
+  // deadline = Part 1 (launch & sell) · deadline2 = Part 2 (push & connect).
+  { id:'rg_psycho',   codename:'100% Psycho',   drop:'Mob Psycho drop',   deadline:'2026-09-18', deadline2:'2026-09-23', steps:_dropSteps() },
+  { id:'rg_hero',     codename:'My Hero',       drop:'My Hero Academia drop', deadline:'2026-09-25', deadline2:'2026-09-30', steps:_dropSteps() },
+  { id:'rg_clover',   codename:'5 Leaf Clover', drop:'Black Clover drop', deadline:'2026-10-02', deadline2:'2026-10-10', steps:_dropSteps() },
   { id:'rg_festival', codename:'The Festival',  drop:'10 designs → designer before Christmas', deadline:'2026-09-20', steps:[
     {id:'f1',text:'Pick 6 anime designs for serigraphy',done:false},
     {id:'f2',text:'Pick 4 asian-streetwear designs',done:false},
@@ -21378,8 +21405,9 @@ const REDGATES_SEED = [
     {id:'f4',text:'Send all 10 to the designer',done:false},
     {id:'f5',text:'Confirm she received them + agree a timeline',done:false},
   ]},
-  { id:'rg_poke',     codename:'Poke Cafe',     drop:'Pokémon drop',   deadline:'2026-10-31', steps:_dropSteps() },
-  { id:'rg_berserk',  codename:'Going Crazy',   drop:'Berserk drop',      deadline:'2026-10-31', steps:_dropSteps() },
+  // Poke + Berserk = loose backup drops (both parts land Oct 31, can be done anytime).
+  { id:'rg_poke',     codename:'Poke Cafe',     drop:'Pokémon drop',   deadline:'2026-10-31', deadline2:'2026-10-31', steps:_dropSteps() },
+  { id:'rg_berserk',  codename:'Going Crazy',   drop:'Berserk drop',      deadline:'2026-10-31', deadline2:'2026-10-31', steps:_dropSteps() },
 ];
 // Per-boss / per-drop skins — each Gate & Red Gate reads as its own franchise
 // (icon + accent + a CSS theme class). Keyed by id so it works without re-seeding.
@@ -21405,6 +21433,9 @@ const GATE_CRY = {
   g_vampire:  'THE VAMPIRE MEETS THE DAWN.',
 };
 const _DROP_IDS = ['rg_night','rg_psycho','rg_hero','rg_clover','rg_poke','rg_berserk'];
+// Published drops kept on their legacy step flow — reconcile never rewrites these,
+// so they don't get the newer IG-stories step retro-added.
+const _FROZEN_DROP_IDS = new Set(['rg_night']);
 function _ensureWorkBattle(){
   if(!state.hunts)    state.hunts    = HUNTS_SEED.map(h => ({...h}));
   // migration: add the "Add any pending side quests" daily hunt to existing saves
@@ -21422,15 +21453,29 @@ function _ensureWorkBattle(){
   // the new TikTok + second-reel steps (only if untouched/uncleared)
   const _n = state.redGates.find(r => r.id === 'rg_night');
   if(_n && !_n.clearedAt && _n.deadline === '2026-09-15') _n.deadline = '2026-09-18';
+  // migration: split anime drops into Part 1 (launch) + Part 2 (push) deadlines.
+  // Runs once per drop (guarded by !deadline2); skips cleared drops. Progress kept.
+  const _DROP_SCHEDULE = {
+    rg_psycho:  { p1:'2026-09-18', p2:'2026-09-23' },
+    rg_hero:    { p1:'2026-09-25', p2:'2026-09-30' },
+    rg_clover:  { p1:'2026-10-02', p2:'2026-10-10' },
+    rg_poke:    { p1:'2026-10-31', p2:'2026-10-31' },
+    rg_berserk: { p1:'2026-10-31', p2:'2026-10-31' },
+  };
+  state.redGates.forEach(rg => {
+    const sch = _DROP_SCHEDULE[rg.id];
+    if(sch && !rg.clearedAt && !rg.deadline2){ rg.deadline = sch.p1; rg.deadline2 = sch.p2; }
+  });
   // migration: reconcile every anime drop onto the current 7-step launch flow.
   // Preserves already-checked steps by concept (order + wording changed over time)
   // and folds in the new TikTok / second-reel steps — real progress is never wiped.
   state.redGates.forEach(rg => {
-    if(!_DROP_IDS.includes(rg.id) || rg.clearedAt || !Array.isArray(rg.steps)) return;
+    if(!_DROP_IDS.includes(rg.id) || _FROZEN_DROP_IDS.has(rg.id) || rg.clearedAt || !Array.isArray(rg.steps)) return;
     const canon = _dropSteps();
     const isCanon = rg.steps.length === canon.length
       && rg.steps.every((s, i) => s.id === canon[i].id && s.text === canon[i].text
-                                   && (s.target || 1) === (canon[i].target || 1));
+                                   && (s.target || 1) === (canon[i].target || 1)
+                                   && (s.part || 1) === (canon[i].part || 1));
     if(!isCanon) rg.steps = _reconcileDropSteps(rg.steps);
   });
 }
@@ -21453,8 +21498,20 @@ function _awardWork(delta){
   return { before, after: calcWorkerLevel(state.workXp||0).level };
 }
 function _daysLeft(deadline){ const d=new Date(deadline+'T00:00:00'); d.setHours(0,0,0,0); const now=new Date(); now.setHours(0,0,0,0); return Math.round((d - now)/86400000); }
-function _redGateStatus(rg){ if(rg.clearedAt) return 'cleared'; if(_daysLeft(rg.deadline) < 0) return 'collapsed'; return 'active'; }
-function _deadlineLabel(rg){ const n=_daysLeft(rg.deadline); if(n<0) return 'COLLAPSED'; if(n===0) return 'DUE TODAY'; if(n===1) return '1 day left'; return n+' days left'; }
+// ── two-phase drops: Part 1 (launch & sell, p1-p5) + Part 2 (push & connect, p6-p8) ──
+// Each part has its own deadline (rg.deadline = P1, rg.deadline2 = P2). The drop's
+// hard COLLAPSE is the OUTER deadline (P2) — so a late launch turns P1 "overdue"
+// (pressure) but does NOT nuke the whole drop. The CURRENT part's deadline drives
+// the headline timer + "what's my next deadline" urgency.
+function _hasParts(rg){ return Array.isArray(rg.steps) && rg.steps.some(s => (s.part||1) === 2); }
+function _partSteps(rg, n){ return rg.steps.filter(s => (s.part||1) === n); }
+function _partDone(rg, n){ const ps = _partSteps(rg, n); return ps.length > 0 && ps.every(s => s.done); }
+function _partDeadline(rg, n){ return (n === 2 && rg.deadline2) ? rg.deadline2 : rg.deadline; }
+function _outerDeadline(rg){ return rg.deadline2 || rg.deadline; }
+function _currentPart(rg){ return (_hasParts(rg) && _partDone(rg, 1)) ? 2 : 1; }
+function _currentDeadline(rg){ return _partDeadline(rg, _currentPart(rg)); }
+function _redGateStatus(rg){ if(rg.clearedAt) return 'cleared'; if(_daysLeft(_outerDeadline(rg)) < 0) return 'collapsed'; return 'active'; }
+function _deadlineLabel(rg){ const n=_daysLeft(_currentDeadline(rg)); if(n<0) return 'COLLAPSED'; if(n===0) return 'DUE TODAY'; if(n===1) return '1 day left'; return n+' days left'; }
 function _workStepsToday(){ const tk=todayKey(); return (state.workToday && state.workToday.dateKey===tk) ? (state.workToday.stepsToday||0) : 0; }
 
 // ── actions ─────────────────────────────────────────────────────────────────
@@ -21540,16 +21597,18 @@ function toggleGateStep(gate, stepId, isRed){
 }
 function reopenRedGate(rg){
   const d=new Date(), nm=new Date(d.getFullYear(), d.getMonth()+2, 0);   // last day of next month
-  rg.deadline = nm.getFullYear()+'-'+String(nm.getMonth()+1).padStart(2,'0')+'-'+String(nm.getDate()).padStart(2,'0');
+  const iso = nm.getFullYear()+'-'+String(nm.getMonth()+1).padStart(2,'0')+'-'+String(nm.getDate()).padStart(2,'0');
+  rg.deadline = iso;
+  if(rg.deadline2) rg.deadline2 = iso;   // both parts get the fresh window
   saveState(); renderAll();
 }
 
 // ── the ONE next action the WORK tab hands you (Solo Leveling "current quest") ─
 function getWorkNextAction(){
   const active = state.redGates.filter(rg => _redGateStatus(rg)==='active');
-  const byDeadline = arr => [...arr].sort((a,b)=>_daysLeft(a.deadline)-_daysLeft(b.deadline));
-  // 1) a Red Gate collapsing within 3 days
-  for(const rg of byDeadline(active.filter(rg => _daysLeft(rg.deadline)<=3 && !_wgSkips.has(rg.id)))){
+  const byDeadline = arr => [...arr].sort((a,b)=>_daysLeft(_currentDeadline(a))-_daysLeft(_currentDeadline(b)));
+  // 1) a Red Gate whose current part is due within 3 days
+  for(const rg of byDeadline(active.filter(rg => _daysLeft(_currentDeadline(rg))<=3 && !_wgSkips.has(rg.id)))){
     const s = rg.steps.find(x => !x.done); if(s) return { type:'redgate', gate:rg, step:s };
   }
   // 2) an undone daily hunt (clearing dailies earns the rest)
@@ -21729,9 +21788,13 @@ function renderGateCard(g, isRed, defaultOpen){
   card.style.setProperty('--gate-accent', accent);
   card.dataset.rgid = g.id;
   const titleIcon = isRed ? '' : (GATE_ICON[g.id] ? GATE_ICON[g.id] + ' ' : '');
-  const rgTimer = (isRed && status==='active')
-    ? `<span class="rg-livetimer" data-eb-deadline="${g.deadline}"><span class="ebt-txt">${_fmtCountdown(g.deadline).txt}</span> left</span>`
-    : _deadlineLabel(g);
+  let rgTimer;
+  if(isRed && status==='active'){
+    const cp=_currentPart(g), cd=_partDeadline(g,cp), pfx=_hasParts(g)?`P${cp} · `:'';
+    rgTimer = (_daysLeft(cd)<0)
+      ? `<span class="rg-livetimer over">${pfx}⚠ OVERDUE</span>`
+      : `<span class="rg-livetimer" data-eb-deadline="${cd}">${pfx}<span class="ebt-txt">${_fmtCountdown(cd).txt}</span> left</span>`;
+  } else rgTimer = _deadlineLabel(g);
   const badge = isRed
     ? `<span class="gate-rank red">${RG_ICON[g.id] || '🔴'} ${rgTimer}</span>`
     : `<span class="gate-rank" style="color:${accent};border-color:${accent}">${g.rank}</span>`;
@@ -21745,7 +21808,7 @@ function renderGateCard(g, isRed, defaultOpen){
     + `<div class="gate-steps"${isOpen?'':' hidden'}></div>`
     + (status==='collapsed' ? `<button class="gate-reopen">⟳ Re-open next month</button>` : '');
   const stepsWrap = card.querySelector('.gate-steps');
-  g.steps.forEach(s => {
+  const _stepRow = s => {
     const tgt = s.target || 1;
     const cnt = Math.min(s.count || 0, tgt);
     const r = document.createElement('div'); r.className = 'gate-step' + (s.done?' done':'') + (tgt>1?' gate-step-counter':'');
@@ -21755,8 +21818,26 @@ function renderGateCard(g, isRed, defaultOpen){
     const counter = tgt > 1 ? `<span class="gs-count${s.done?' full':''}">${cnt}/${tgt}</span>` : '';
     r.innerHTML = box + `<span class="gs-text">${_escWork(s.text)}</span>` + counter;
     if(status==='active') r.addEventListener('click', () => toggleGateStep(g, s.id, isRed));
-    stepsWrap.appendChild(r);
-  });
+    return r;
+  };
+  if(isRed && _hasParts(g)){
+    // Two-phase drop: a labeled Part 1 / Part 2 header (each with its own timer),
+    // then that part's steps. P1 = launch & sell, P2 = push & connect.
+    const PART_LABEL = { 1:'PART 1 · LAUNCH & SELL', 2:'PART 2 · PUSH & CONNECT' };
+    [1,2].forEach(n => {
+      const dl = _partDeadline(g, n), pdone = _partDone(g, n), pover = !pdone && _daysLeft(dl) < 0;
+      let ptimer;
+      if(pdone)      ptimer = `<span class="gp-timer done">✓ DONE</span>`;
+      else if(pover) ptimer = `<span class="gp-timer over">⚠ OVERDUE</span>`;
+      else           ptimer = `<span class="gp-timer" data-eb-deadline="${dl}"><span class="ebt-txt">${_fmtCountdown(dl).txt}</span> left</span>`;
+      const hd = document.createElement('div'); hd.className = 'gate-part-hd part' + n;
+      hd.innerHTML = `<span class="gp-label">${PART_LABEL[n]}</span>` + ptimer;
+      stepsWrap.appendChild(hd);
+      _partSteps(g, n).forEach(s => stepsWrap.appendChild(_stepRow(s)));
+    });
+  } else {
+    g.steps.forEach(s => stepsWrap.appendChild(_stepRow(s)));
+  }
   card.querySelector('.gate-head').addEventListener('click', () => { completedExpanded[key] = !isOpen; renderAll(); });
   const ro = card.querySelector('.gate-reopen'); if(ro) ro.addEventListener('click', e => { e.stopPropagation(); reopenRedGate(g); });
   return card;
@@ -21767,11 +21848,11 @@ function renderRedGatesSection(){
   // active + missed stay visible; CLEARED tuck into a collapsed "COMPLETED" fold
   const live = state.redGates.filter(rg => _redGateStatus(rg) !== 'cleared').sort((a,b) => {
     const sa=_redGateStatus(a), sb=_redGateStatus(b);
-    return rankOf[sa]!==rankOf[sb] ? rankOf[sa]-rankOf[sb] : _daysLeft(a.deadline)-_daysLeft(b.deadline);
+    return rankOf[sa]!==rankOf[sb] ? rankOf[sa]-rankOf[sb] : _daysLeft(_currentDeadline(a))-_daysLeft(_currentDeadline(b));
   });
   const done = state.redGates.filter(rg => _redGateStatus(rg)==='cleared').sort((a,b)=>(b.clearedAt||'').localeCompare(a.clearedAt||''));
   // Only drops ending within 7 days open as full checklists; the rest stay banners.
-  live.forEach(rg => frag.appendChild(renderGateCard(rg, true, _redGateStatus(rg)==='active' && _daysLeft(rg.deadline) <= 7)));
+  live.forEach(rg => frag.appendChild(renderGateCard(rg, true, _redGateStatus(rg)==='active' && _daysLeft(_currentDeadline(rg)) <= 7)));
   if(done.length){
     const isOpen = !!completedExpanded['rg-completed'];
     const sep = document.createElement('div'); sep.className = 'work-archived-sep'; sep.style.cursor = 'pointer';
@@ -21915,8 +21996,12 @@ function _eventBannerCard(rg){
   const icon   = RG_ICON[rg.id]   || '🔴';
   const total = rg.steps.length, done = rg.steps.filter(s => s.done).length;
   const pct = total ? Math.round(done/total*100) : 0;
-  const c = _fmtCountdown(rg.deadline);
-  const days = _daysLeft(rg.deadline);
+  // Show the current part's countdown; if Part 1 is overdue but the drop is still
+  // live, fall back to the outer (Part 2) window so the timer never reads CLOSED.
+  let dl = _currentDeadline(rg);
+  if(_daysLeft(dl) < 0) dl = _outerDeadline(rg);
+  const c = _fmtCountdown(dl);
+  const days = _daysLeft(dl);
   const soon  = days <= 3;      // ENDING SOON + pulse
   const fresh = days >= 20;     // lots of runway → NEW
   const card = document.createElement('div');
@@ -21930,7 +22015,7 @@ function _eventBannerCard(rg){
     +   `<div class="eb-drop">🎁 ${_escWork(rg.drop)}</div>`
     + `</div>`
     + `<div class="eb-bot">`
-    +   `<div class="eb-timer${c.urgent?' urgent':''}" data-eb-deadline="${rg.deadline}"><span class="ebt-ico">⏳</span><span class="ebt-txt">${c.txt}</span></div>`
+    +   `<div class="eb-timer${c.urgent?' urgent':''}" data-eb-deadline="${dl}"><span class="ebt-ico">⏳</span><span class="ebt-txt">${c.txt}</span></div>`
     +   `<div class="eb-progline"><div class="eb-bar"><div class="eb-fill" style="width:${pct}%"></div></div><span class="eb-pct">${pct}%</span></div>`
     + `</div>`;
   card.addEventListener('click', () => {
@@ -21950,7 +22035,7 @@ function _eventBannerCard(rg){
 function renderEventShelf(){
   const active = state.redGates
     .filter(rg => _redGateStatus(rg) === 'active')
-    .sort((a,b) => _daysLeft(a.deadline) - _daysLeft(b.deadline));
+    .sort((a,b) => _daysLeft(_currentDeadline(a)) - _daysLeft(_currentDeadline(b)));
   const shelf = document.createElement('div'); shelf.className = 'event-shelf';
   const hd = document.createElement('div'); hd.className = 'event-shelf-hd';
   hd.innerHTML = `<span class="esh-title">🎏 LIVE DROPS</span>`
