@@ -21275,6 +21275,7 @@ const HUNTS_SEED = [
   { id:'h_msg',    text:'Answer messages (incl. IG DMs)',    cadence:'daily' },
   { id:'h_orders', text:'Write down new orders & money flow',cadence:'daily' },
   { id:'h_stock',  text:'Update stock',                      cadence:'daily' },
+  { id:'h_delist', text:'Delist sold-out / low-stock products', cadence:'daily' },
   { id:'h_sidequests', text:'Add any pending side quests',  cadence:'daily' },
   { id:'h_meta',   text:'Analyze & adjust META campaigns',   cadence:'weekly' },
   { id:'h_fact',   text:'Facturar / invoicing',              cadence:'monthly', window:'monthEnd' },
@@ -21442,6 +21443,12 @@ function _ensureWorkBattle(){
   if(state.hunts && !state.hunts.some(h => h.id === 'h_sidequests')){
     const daily = state.hunts.filter(h => h.cadence === 'daily').length;
     state.hunts.splice(daily, 0, { id:'h_sidequests', text:'Add any pending side quests', cadence:'daily' });
+  }
+  // migration: add the "Delist sold-out / low-stock products" daily right after Update stock
+  if(state.hunts && !state.hunts.some(h => h.id === 'h_delist')){
+    const si = state.hunts.findIndex(h => h.id === 'h_stock');
+    const at = si >= 0 ? si + 1 : state.hunts.filter(h => h.cadence === 'daily').length;
+    state.hunts.splice(at, 0, { id:'h_delist', text:'Delist sold-out / low-stock products', cadence:'daily' });
   }
   if(!state.gates)    state.gates    = GATES_SEED.map(g => ({...g, steps:g.steps.map(s=>({...s}))}));
   if(!state.redGates) state.redGates = REDGATES_SEED.map(g => ({...g, steps:g.steps.map(s=>({...s}))}));
