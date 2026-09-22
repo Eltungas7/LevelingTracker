@@ -8581,7 +8581,7 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .gate-step.done .gs-text{text-decoration:line-through;text-decoration-color:rgba(105,240,174,0.55)}
 .gate-step.done .gs-box{color:#69f0ae;filter:drop-shadow(0 0 6px rgba(105,240,174,0.6))}
 .gate-step.done::after{content:''}
-.status-cleared .gate-step,.status-collapsed .gate-step{cursor:default}
+.status-collapsed .gate-step{cursor:default}
 .gate-reopen{margin:0 13px 11px;padding:8px 12px;width:calc(100% - 26px);border:1px solid rgba(255,138,128,0.4);
   border-radius:7px;background:rgba(255,82,82,0.08);color:#ff8a80;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
 .gate-reopen:hover{background:rgba(255,82,82,0.16)}
@@ -21399,7 +21399,7 @@ const REDGATES_SEED = [
   { id:'rg_psycho',   codename:'100% Psycho',   drop:'Mob Psycho drop',   deadline:'2026-09-18', deadline2:'2026-09-23', steps:_dropSteps() },
   { id:'rg_hero',     codename:'My Hero',       drop:'My Hero Academia drop', deadline:'2026-09-25', deadline2:'2026-09-30', steps:_dropSteps() },
   { id:'rg_clover',   codename:'5 Leaf Clover', drop:'Black Clover drop', deadline:'2026-10-02', deadline2:'2026-10-10', steps:_dropSteps() },
-  { id:'rg_festival', codename:'The Festival',  drop:'10 designs → designer before Christmas', deadline:'2026-09-20', steps:[
+  { id:'rg_festival', codename:'The Festival',  drop:'10 designs → designer before Christmas', deadline:'2026-09-27', steps:[
     {id:'f1',text:'Pick 6 anime designs for serigraphy',done:false},
     {id:'f2',text:'Pick 4 asian-streetwear designs',done:false},
     {id:'f3',text:'Compile references / specs for each',done:false},
@@ -21453,9 +21453,15 @@ function _ensureWorkBattle(){
   if(!state.gates)    state.gates    = GATES_SEED.map(g => ({...g, steps:g.steps.map(s=>({...s}))}));
   if(!state.redGates) state.redGates = REDGATES_SEED.map(g => ({...g, steps:g.steps.map(s=>({...s}))}));
   if(!state.huntState) state.huntState = {};
-  // migration: Festival deadline moved Sep 30 → Sep 20 (only if untouched/uncleared)
+  // migration (2026-09-22): gates/drops are now un-checkable even after a clear.
+  // Anything already cleared is stamped as PAID so un-checking and re-clearing it
+  // can never hand out the clear bonus / achievement count a second time.
+  [...(state.gates||[]), ...(state.redGates||[])].forEach(g => {
+    if(g.clearedAt && g.clearRewarded === undefined) g.clearRewarded = true;
+  });
+  // migration: Festival deadline moved Sep 30 → Sep 20 → Sep 27 (only if untouched/uncleared)
   const _f = state.redGates.find(r => r.id === 'rg_festival');
-  if(_f && !_f.clearedAt && _f.deadline === '2026-09-30') _f.deadline = '2026-09-20';
+  if(_f && !_f.clearedAt && (_f.deadline === '2026-09-30' || _f.deadline === '2026-09-20')) _f.deadline = '2026-09-27';
   // migration: Night City (Cyberpunk) extended Sep 15 → Fri Sep 18 — more time for
   // the new TikTok + second-reel steps (only if untouched/uncleared)
   const _n = state.redGates.find(r => r.id === 'rg_night');
@@ -21546,7 +21552,10 @@ function setHuntProgress(h, pct){
   }
 }
 function toggleGateStep(gate, stepId, isRed){
-  if(gate.clearedAt) return;
+  // A cleared gate is NOT locked (2026-09-22): you can always un-check a step —
+  // the gate simply re-opens and shows up as live again. Everything already paid
+  // out (clear bonus, shards, Signet, Trophy, achievement counters) is kept and
+  // never paid a second time, so the tap is free to make.
   if(isRed && _redGateStatus(gate)==='collapsed') return;   // collapsed = locked until re-opened
   const st = gate.steps.find(s => s.id === stepId); if(!st) return;
   const per = isRed ? REDGATE_STEP : GATE_STEP;
@@ -21567,13 +21576,25 @@ function toggleGateStep(gate, stepId, isRed){
   }
   const lv = _awardWork(units * per);
   if(units > 0){ const wt=_ensureWorkToday(); wt.stepsToday = (wt.stepsToday||0) + units; }
-  let cleared = false;
-  if(gate.steps.every(s => s.done) && !gate.clearedAt){
+  let cleared = false, reopened = false;
+  const allDone = gate.steps.every(s => s.done);
+  if(allDone && !gate.clearedAt){
     gate.clearedAt = todayKey();
-    _awardWork(isRed ? REDGATE_CLEAR_BONUS : GATE_CLEAR_BONUS);
-    if(isRed) state.dropsShipped = (state.dropsShipped||0) + 1;   // achievement: Drop Master
-    else      state.raidsCleared = (state.raidsCleared||0) + 1;   // achievement: Gate Breaker
+    // The clear payout is ONCE PER GATE, ever. Re-clearing a gate you re-opened
+    // fires the celebration but pays nothing — and re-opening never claws the
+    // original payout back.
+    if(!gate.clearRewarded){
+      gate.clearRewarded = true;
+      _awardWork(isRed ? REDGATE_CLEAR_BONUS : GATE_CLEAR_BONUS);
+      if(isRed) state.dropsShipped = (state.dropsShipped||0) + 1;   // achievement: Drop Master
+      else      state.raidsCleared = (state.raidsCleared||0) + 1;   // achievement: Gate Breaker
+    }
     cleared = true;
+  } else if(!allDone && gate.clearedAt){
+    gate.clearedAt = null;   // un-checked after the clear → the gate is live again
+    // A drop cleared AFTER its window closed would fall straight into COLLAPSED
+    // (and lock itself) the moment it re-opens — so hand it a fresh window instead.
+    if(isRed && _redGateStatus(gate)==='collapsed'){ _setRedGateWindow(gate, _nextWindowEnd()); reopened = true; }
   }
   // ── gacha: shards per completed step; Signet at raid 50% + on any clear; Trophy on clear ──
   if(st.done && !st.shardsClaimed){
@@ -21599,14 +21620,20 @@ function toggleGateStep(gate, stepId, isRed){
       }
       if(navigator.vibrate) navigator.vibrate(midProgress ? 14 : 18);
     }
-    if(lv.after > lv.before) showNotif(`⚒ WORK LEVEL ${lv.after}`);
+    if(reopened) showNotif(`${isRed ? '🔴' : '🚪'} ${gate.codename} is live again · fresh window, rewards kept`);
+    else if(lv.after > lv.before) showNotif(`⚒ WORK LEVEL ${lv.after}`);
   }
 }
-function reopenRedGate(rg){
+function _nextWindowEnd(){
   const d=new Date(), nm=new Date(d.getFullYear(), d.getMonth()+2, 0);   // last day of next month
-  const iso = nm.getFullYear()+'-'+String(nm.getMonth()+1).padStart(2,'0')+'-'+String(nm.getDate()).padStart(2,'0');
+  return nm.getFullYear()+'-'+String(nm.getMonth()+1).padStart(2,'0')+'-'+String(nm.getDate()).padStart(2,'0');
+}
+function _setRedGateWindow(rg, iso){
   rg.deadline = iso;
   if(rg.deadline2) rg.deadline2 = iso;   // both parts get the fresh window
+}
+function reopenRedGate(rg){
+  _setRedGateWindow(rg, _nextWindowEnd());
   saveState(); renderAll();
 }
 
@@ -21824,7 +21851,8 @@ function renderGateCard(g, isRed, defaultOpen){
       : `<span class="gs-box">${s.done ? '☑' : '☐'}</span>`;
     const counter = tgt > 1 ? `<span class="gs-count${s.done?' full':''}">${cnt}/${tgt}</span>` : '';
     r.innerHTML = box + `<span class="gs-text">${_escWork(s.text)}</span>` + counter;
-    if(status==='active') r.addEventListener('click', () => toggleGateStep(g, s.id, isRed));
+    // Cleared gates stay tappable — un-checking a step re-opens the gate (rewards already paid are kept, never re-paid).
+    if(status!=='collapsed') r.addEventListener('click', () => toggleGateStep(g, s.id, isRed));
     return r;
   };
   if(isRed && _hasParts(g)){
