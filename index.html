@@ -10673,7 +10673,7 @@ function goldImg(sz) { sz = sz||20; return `<img src="img/gold.png" style="width
 // dungeon-stage income even on Legendary tasks. Gold ~2×, WXP ~1.7× — both still
 // multiply by difficulty (0.7×–2.8×), grade scale (gold), and in-flow.
 const WORK_TASK_REWARD = {
-  base:   { gold:25, wxp:15, mats:1 },
+  base:   { gold:25, wxp:25, mats:1 },
   inflow: { gold:90, wxp:85, mats:3 },
 };
 // Difficulty tiers — user-selected on inscribe. Easiest sits on top of the task list (lowest
@@ -12641,17 +12641,25 @@ const WORKER_RANK_MILESTONES = {
            effect:'+25000g · +300 each mat · ⏱ -25% FORGE TIME total' },
 };
 
+// Re-fitted 2026-09-23 to Tuni's real cadence: hunts Mon-Fri, ~25 side quests a
+// month, 2-3 drops a month, 8 Gates ever. Costs now rise on EVERY band (the old
+// curve spiked at A then got cheaper, so S/SS were easier than the rank below).
+// F/E/D are untouched so no existing level is taken away. Target: rank SSS at
+// ~18 months of 75%-ish weeks; Lv.99 is the victory lap past it, not the goal.
 const WORKER_RANK_BANDS = [
   { from:1,  to:4,  rank:'F',   xpPerLevel:50    },
   { from:5,  to:14, rank:'E',   xpPerLevel:120   },
   { from:15, to:24, rank:'D',   xpPerLevel:280   },
-  { from:25, to:34, rank:'C',   xpPerLevel:600   },
-  { from:35, to:44, rank:'B',   xpPerLevel:1200  },
-  { from:45, to:54, rank:'A',   xpPerLevel:2500  },
-  { from:55, to:69, rank:'S',   xpPerLevel:900   },
-  { from:70, to:84, rank:'SS',  xpPerLevel:810   },
-  { from:85, to:99, rank:'SSS', xpPerLevel:900   },
+  { from:25, to:34, rank:'C',   xpPerLevel:650   },
+  { from:35, to:44, rank:'B',   xpPerLevel:1400  },
+  { from:45, to:54, rank:'A',   xpPerLevel:2600  },
+  { from:55, to:69, rank:'S',   xpPerLevel:3100  },
+  { from:70, to:84, rank:'SS',  xpPerLevel:3500  },
+  { from:85, to:99, rank:'SSS', xpPerLevel:3900  },
 ];
+// max-level fallbacks read the band instead of a hardcoded number, so re-tuning the
+// curve never leaves a stale value behind
+const _SSS_PER_LEVEL = WORKER_RANK_BANDS[WORKER_RANK_BANDS.length - 1].xpPerLevel;
 
 // Raids GATE your rank: you can grind XP to fill a rank, but you can't break past
 // it until you clear that rank's raid (Knight→B, Dragon→A, Demon→S, Vampire→SS+).
@@ -12727,11 +12735,11 @@ function calcWorkerLevel(workXp) {
     for (let i = 0; i < lvInBand; i++) {
       if (xpLeft < band.xpPerLevel) { raw = { level:lv, rank:band.rank, xpProgress:xpLeft, xpPerLevel:band.xpPerLevel }; break; }
       xpLeft -= band.xpPerLevel; lv++;
-      if (lv >= 99) { raw = { level:99, rank:'SSS', xpProgress:0, xpPerLevel:900 }; break; }
+      if (lv >= 99) { raw = { level:99, rank:'SSS', xpProgress:0, xpPerLevel:_SSS_PER_LEVEL }; break; }
     }
     if (raw) break;
   }
-  if (!raw) raw = { level:99, rank:'SSS', xpProgress:0, xpPerLevel:900 };
+  if (!raw) raw = { level:99, rank:'SSS', xpProgress:0, xpPerLevel:_SSS_PER_LEVEL };
   // clamp to the raid-gated cap — excess XP stays banked in state.workXp and releases on clear
   if (raw.level > cap.capLevel) {
     const cband = WORKER_RANK_BANDS.find(b => cap.capLevel >= b.from && cap.capLevel <= b.to) || WORKER_RANK_BANDS[WORKER_RANK_BANDS.length-1];
@@ -21092,7 +21100,7 @@ function _escWork(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&'
 
 // Every task pays out the SAME point pool at 100% — no difficulty tiers to pick.
 // The reward comes from PROGRESS, not from classifying the task up front.
-function workTaskPool(){ return WORK_TASK_REWARD.base.wxp; } // 25
+function workTaskPool(){ return WORK_TASK_REWARD.base.wxp; }   // 25 — only ~25 side quests a month, so each one counts
 function workTaskProgress(task){ return Math.max(0, Math.min(100, Math.round(task && task.progress || 0))); }
 
 // Set a task's completion %. Points are awarded proportionally and IMMEDIATELY,
@@ -21153,7 +21161,7 @@ function setWorkProgress(id, pct){
     const wt=_ensureWorkToday(); wt.finished += 1;
     _workerRecord().sideQuests += 1;
     flow = _bumpWorkFlow();
-    if(flow >= 2){ flowBonus = 5*(flow-1); state.workXp += flowBonus; wt.pts += flowBonus; }
+    if(flow >= 2){ flowBonus = 10*(flow-1); state.workXp += flowBonus; wt.pts += flowBonus; }
   }
   if(justFinished && !task.shardsClaimed){ task.shardsClaimed = true; _grantShards(SHARD_SIDEQUEST); }   // gacha: one grant per task, ever
   const after = calcWorkerLevel(state.workXp).level;
@@ -21387,10 +21395,14 @@ function renderWorkCurrentTask(){
 // WORK XP (worker level). Consistency (dailies/side quests) = low but steady;
 // events = big (limited-time); raids = huge (finite, and they GATE your rank).
 // Tunable from real use.
-const HUNT_POOL = { daily:20, weekly:50, monthly:80 };   // per-cadence, paid proportionally
+const HUNT_POOL = { daily:20, weekly:60, monthly:150 };  // per-cadence, paid proportionally
 function huntPool(h){ return (HUNT_POOL[h && h.cadence]) || 20; }
-const GATE_STEP = 150, GATE_CLEAR_BONUS = 1500;          // raids: each step + clear are massive (a rank-up)
-const REDGATE_STEP = 60, REDGATE_CLEAR_BONUS = 250;      // events: way more than dailies, less than raids
+// Gates are the rarest thing in WORK — 8 of them, ever — and each objective is a
+// real project milestone, so every tick pays like one. Clearing a Gate is worth
+// roughly a month of hunts on its own.
+const GATE_STEP = 400, GATE_CLEAR_BONUS = 3500;
+// Drops land 2-3 a month: bigger than a hunt, smaller than a Gate.
+const REDGATE_STEP = 100, REDGATE_CLEAR_BONUS = 700;
 let _wgSkips = new Set();             // session skips for the CURRENT-action hero
 
 const HUNTS_SEED = [
