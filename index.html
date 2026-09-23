@@ -22244,9 +22244,9 @@ const SHARD_RAID_STEP  = 5;      // per gate/raid step (×MULT)
 const PREMIUM_SSR_RATE = 0.30;   // Signet pull SSR chance (+ hard pity after 1 miss)
 
 const GACHA_RARITY = {
-  common:{ label:'COMMON', color:'#b0bec5', glow:'rgba(176,190,197,0.55)' },
-  r:     { label:'R',      color:'#4da3ff', glow:'rgba(77,163,255,0.65)'  },
-  sr:    { label:'SR',     color:'#c07bff', glow:'rgba(192,123,255,0.75)' },
+  common:['🎮 20-min gaming session','📺 One anime episode'],
+  r:     ['🎮 2-hour gaming block','📺 2 hours of anime','🛒 A cheap little something you want'],
+  sr:    ['🎮 Gaming night','📺 Anime binge — 12 episodes','🛍️ Buy a small wanted thing'],
   ssr:   { label:'SSR',    color:'#ffcf3f', glow:'rgba(255,207,63,0.9)'   },
 };
 // Tuni's real reward pools (rewritten 2026-09-23). Every tier is anime or games —
@@ -22255,10 +22255,10 @@ const GACHA_RARITY = {
 // he never takes: a reward he would not claim is not a reward.
 // Rarity = size of the permission, from a 20-minute session to a whole weekend.
 const GACHA_REWARDS = {
-  common:['🎮 20-min gaming session','📺 One anime episode','🎮 30-min gaming session','📺 Two anime episodes'],
-  r:     ['🎮 2-hour gaming block','📺 2 hours of anime','🛒 A cheap little something you want','📺 Anime movie night'],
-  sr:    ['🎮 Full gaming night (9pm–12)','📺 Anime binge — 12 episodes','🛍️ Buy a small wanted thing','🎮 A full Saturday of gaming'],
-  ssr:   ['🌈 FREE WEEKEND — no work Sat & Sun','🎮 A wanted game + gaming weekend','📺 Full-season anime binge weekend'],
+  common:['🎮 20-min gaming session','📺 One anime episode'],
+  r:     ['🎮 2-hour gaming block','📺 2 hours of anime','🛒 A cheap little something you want'],
+  sr:    ['🎮 Gaming night','📺 Anime binge — 12 episodes','🛍️ Buy a small wanted thing'],
+  ssr:   ['🌈 FREE WEEKEND — no work Sat & Sun','🎮 A wanted game + gaming weekend'],
 };
 
 function _ensureGacha(){
