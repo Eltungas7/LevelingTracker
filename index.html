@@ -12718,7 +12718,7 @@ function _migrateWorkCurve(){
 _migrateWorkCurve();
 
 // Raids GATE your rank: you can grind XP to fill a rank, but you can't break past
-// it until you clear that rank's raid (Knight→B, Dragon→A, Demon→S, Vampire→SS+).
+// it until you clear that rank's raid (Knight->B, Demon->A, Dragon->S, Vampire->SS+).
 // Cap = the rank of the lowest-ranked UNCLEARED raid; all raids cleared = uncapped.
 const WORKER_RANK_ORDER = ['F','E','D','C','B','A','S','SS','SSS'];
 
@@ -21541,7 +21541,7 @@ const GATES_SEED = [
     {id:'k6',text:'Mobile check on a phone',done:false},
     {id:'k7',text:'Note conversion before → after',done:false},
   ]},
-  { id:'g_dragon', rank:'B', codename:'The Dragon', goal:'Add an asian-streetwear line', steps:[
+  { id:'g_dragon', rank:'A', codename:'The Dragon', goal:'Add an asian-streetwear line', steps:[
     {id:'d1',text:'Define the line concept + moodboard',done:false},
     {id:'d2',text:'Decide the first product range (garments + how many designs)',done:false},
     {id:'d3',text:'Design / commission the first designs',done:false},
@@ -21552,7 +21552,7 @@ const GATES_SEED = [
     {id:'d8',text:'Set up the physical-store display for casual public',done:false},
     {id:'d9',text:'Launch & announce',done:false},
   ]},
-  { id:'g_demon', rank:'A', codename:'The Demon', goal:'Add MercadoLibre as a channel', steps:[
+  { id:'g_demon', rank:'B', codename:'The Demon', goal:'Add MercadoLibre as a channel', steps:[
     {id:'m1',text:'Create & verify the MercadoLibre seller account',done:false},
     {id:'m2',text:'Pick which embroidered designs + stock to list',done:false},
     {id:'m3',text:'Prepare listings (photos, titles, descriptions, prices)',done:false},
@@ -21644,6 +21644,15 @@ function _ensureWorkBattle(){
   if(!state.gates)    state.gates    = GATES_SEED.map(g => ({...g, steps:g.steps.map(s=>({...s}))}));
   if(!state.redGates) state.redGates = REDGATES_SEED.map(g => ({...g, steps:g.steps.map(s=>({...s}))}));
   _workerRecord();   // seed/backfill the lifetime dossier counters
+  // A Gate's RANK is content, not progress — re-sync it from the seed every load so
+  // re-ordering the roadmap reaches saves that already hold the old letter. Only the
+  // rank, codename and goal are synced; clearedAt, steps and payout flags are the
+  // player's and are never touched. (2026-09-23: MercadoLibre moved ahead of the
+  // streetwear line, so The Demon became B-rank and The Dragon A-rank.)
+  GATES_SEED.forEach(seed => {
+    const g = state.gates.find(x => x.id === seed.id); if(!g) return;
+    g.rank = seed.rank; g.codename = seed.codename; g.goal = seed.goal;
+  });
   if(!state.huntState) state.huntState = {};
   // migration (2026-09-22): gates/drops are now un-checkable even after a clear.
   // Anything already cleared is stamped as PAID so un-checking and re-clearing it
@@ -21670,6 +21679,17 @@ function _ensureWorkBattle(){
   state.redGates.forEach(rg => {
     const sch = _DROP_SCHEDULE[rg.id];
     if(sch && !rg.clearedAt && !rg.deadline2){ rg.deadline = sch.p1; rg.deadline2 = sch.p2; }
+  });
+  // migration (2026-09-23): Night City and 100% Psycho are SHIPPED in real life, but
+  // their windows had run out — and a collapsed drop is locked, so neither could be
+  // ticked to claim the ~1,900 pts, shards and Trophy that were actually earned. Work
+  // that got done should never be un-claimable because a timer beat you to it, so both
+  // windows reopen to Sep 30. Guarded on !clearedAt: once claimed this never fires.
+  [['rg_night','2026-09-30','2026-09-30'], ['rg_psycho','2026-09-30','2026-09-30']].forEach(([id, p1, p2]) => {
+    const rg = state.redGates.find(r => r.id === id);
+    if(!rg || rg.clearedAt) return;
+    if(rg.deadline < p1) rg.deadline = p1;
+    if(rg.deadline2 && rg.deadline2 < p2) rg.deadline2 = p2;
   });
   // migration: reconcile every anime drop onto the current 7-step launch flow.
   // Preserves already-checked steps by concept (order + wording changed over time)
