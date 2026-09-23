@@ -8464,6 +8464,76 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 .work-hero .wh-sub{display:flex;justify-content:space-between;gap:10px;margin-top:7px;font-size:11px;color:var(--sao-text-dim)}
 .work-hero .wh-total{color:#ffd54f;font-weight:600}
 
+/* ── WORKER RANK BLOCK (2026-09-23) — the rank sigil inside the WORK hero card.
+   Deliberately echoes .cse-grade-sigil / .rbm-* from the Hunter Grade so both
+   progressions read as one system. Amber-family by default; --gc is the rank colour. */
+.whr { display:flex; align-items:center; gap:13px; margin:12px -16px -14px; padding:12px 16px 13px;
+  border-top:1px solid rgba(255,255,255,0.07);
+  border-radius:0 0 6px 6px; cursor:pointer; position:relative; overflow:hidden;
+  background:radial-gradient(120% 140% at 8% 50%, color-mix(in srgb, var(--gc,#ffc107) 11%, transparent), transparent 62%);
+  transition:background 0.25s ease; -webkit-tap-highlight-color:transparent; }
+.whr:hover, .whr:active { background:radial-gradient(120% 140% at 8% 50%, color-mix(in srgb, var(--gc,#ffc107) 18%, transparent), transparent 66%); }
+.whr-sigil { position:relative; width:62px; height:62px; flex-shrink:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  border:2px solid color-mix(in srgb, var(--gc,#ffc107) 55%, transparent); border-radius:13px;
+  background:radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--gc,#ffc107) 22%, transparent), transparent 70%);
+  box-shadow:0 0 18px color-mix(in srgb, var(--gc,#ffc107) 28%, transparent), inset 0 0 14px color-mix(in srgb, var(--gc,#ffc107) 11%, transparent);
+  animation:cseSigil 3.4s ease-in-out infinite; }
+.whr-sigil::before, .whr-sigil::after { content:''; position:absolute; width:10px; height:10px;
+  border:2px solid color-mix(in srgb, var(--gc,#ffc107) 80%, white); }
+.whr-sigil::before { top:-2px; left:-2px; border-right:none; border-bottom:none; border-top-left-radius:5px; }
+.whr-sigil::after  { bottom:-2px; right:-2px; border-left:none; border-top:none; border-bottom-right-radius:5px; }
+.whr-letter { font-family:'Cinzel Decorative','Cinzel',serif; font-weight:900; line-height:1;
+  color:var(--gc,#ffc107); text-shadow:0 0 16px color-mix(in srgb, var(--gc,#ffc107) 65%, transparent); }
+.whr-cap { font-family:'Cinzel',serif; font-size:6.5px; letter-spacing:2.5px; margin-top:2px;
+  color:color-mix(in srgb, var(--gc,#ffc107) 75%, white); }
+.whr-right { flex:1; min-width:0; }
+.whr-top { display:flex; align-items:baseline; gap:6px; }
+.whr-lv-lbl { font-family:'Cinzel',serif; font-size:9px; letter-spacing:2px; color:rgba(255,255,255,0.45); }
+.whr-lv-num { font-family:'Orbitron','Cinzel',sans-serif; font-size:26px; font-weight:800; line-height:1;
+  text-shadow:0 0 14px currentColor; }
+.whr-pct { margin-left:auto; font-family:'Orbitron','Cinzel',sans-serif; font-size:13px; font-weight:700; opacity:0.85; }
+.whr-title { margin:3px 0 6px; font-family:'Rajdhani',sans-serif; font-size:11px; letter-spacing:0.3px;
+  color:rgba(255,255,255,0.62); }
+.whr-track { height:8px; border-radius:5px; background:rgba(255,255,255,0.09); overflow:hidden; }
+.whr-fill { height:100%; border-radius:5px; box-shadow:0 0 9px currentColor; transition:width 0.5s cubic-bezier(.22,1,.36,1); }
+.whr-note { display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-top:6px;
+  font-family:'Rajdhani',sans-serif; font-size:11px; color:var(--sao-text-dim); }
+.whr-note b { font-weight:700; }
+.whr-total { color:#ffd54f; font-weight:600; white-space:nowrap; }
+.whr-capped { color:#ff8a65; font-weight:600; }
+.whr-more { position:absolute; top:8px; right:10px; font-family:'Cinzel',serif; font-size:7.5px;
+  letter-spacing:1.6px; color:color-mix(in srgb, var(--gc,#ffc107) 70%, white); opacity:0.7; }
+/* glam escalation, same idea as .hg-* on the Hunter Grade: F is plain, A+ glows */
+.whr-lo .whr-sigil { animation:none; box-shadow:none; border-color:rgba(255,255,255,0.18); background:rgba(255,255,255,0.02); }
+.whr-lo .whr-letter { text-shadow:0 0 6px rgba(255,255,255,0.15); }
+.whr-hi .whr-sigil { animation-duration:2.1s; border-width:2.5px; }
+.whr-hi .whr-letter { text-shadow:0 0 24px color-mix(in srgb, var(--gc,#ffc107) 85%, transparent); }
+
+/* ── WORKER DOSSIER overlay ── */
+.wdo-inner { max-height:86vh; overflow-y:auto; -webkit-overflow-scrolling:touch; text-align:left; }
+.wdo-hero { display:flex; align-items:center; gap:13px; margin:8px 0 4px; }
+.wdo-sigil { animation:none; }
+.wdo-hero-right { flex:1; min-width:0; }
+.wdo-lv { font-family:'Orbitron','Cinzel',sans-serif; font-size:26px; font-weight:800; line-height:1; text-shadow:0 0 14px currentColor; }
+.wdo-title { font-family:'Cinzel',serif; font-size:11px; letter-spacing:1px; color:rgba(255,255,255,0.7); margin:3px 0 7px; }
+.wdo-sub { margin-top:6px; font-family:'Rajdhani',sans-serif; font-size:10px; color:rgba(255,255,255,0.42); }
+.wdo-cap { margin:10px 0 2px; padding:7px 10px; border-radius:6px; font-family:'Rajdhani',sans-serif; font-size:11px;
+  color:#ff8a65; background:rgba(255,138,101,0.09); border:1px solid rgba(255,138,101,0.28); }
+.wdo-sect { margin:16px 0 8px !important; font-size:8px !important; text-align:left; }
+.wdo-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:7px; }
+.wdo-tile { display:flex; flex-direction:column; align-items:center; gap:1px; padding:9px 4px 8px; border-radius:8px;
+  background:color-mix(in srgb, var(--tc,#ffc107) 9%, rgba(255,255,255,0.02));
+  border:1px solid color-mix(in srgb, var(--tc,#ffc107) 28%, transparent); }
+.wdo-ic { font-size:14px; line-height:1; }
+.wdo-num { font-family:'Orbitron','Cinzel',sans-serif; font-size:20px; font-weight:800; line-height:1.15;
+  color:var(--tc,#ffc107); text-shadow:0 0 10px color-mix(in srgb, var(--tc,#ffc107) 55%, transparent); }
+.wdo-lbl { font-family:'Cinzel',serif; font-size:6.5px; letter-spacing:0.8px; color:rgba(255,255,255,0.5); text-align:center; line-height:1.3; }
+.wdo-objline { margin-top:9px; font-family:'Rajdhani',sans-serif; font-size:11px; color:rgba(255,255,255,0.5); text-align:center; }
+.wdo-objline b { color:#ffc107; }
+.wml-rank-gate { font-family:'Rajdhani',sans-serif; font-size:9px; color:rgba(255,138,101,0.8); }
+@media (max-width:360px){ .wdo-grid { grid-template-columns:repeat(2, 1fr); } }
+
 /* ═══ WORK CURRENT TASK — the always-on default trigger (mirrors CURRENT QUEST) ═══ */
 .work-current{position:relative;overflow:hidden;border-radius:16px;padding:22px;margin:6px 0 12px;
   background:radial-gradient(ellipse at 30% -10%, #3a2c0e 0%, #241a06 45%, #120d02 100%);
@@ -12587,6 +12657,58 @@ const WORKER_RANK_BANDS = [
 // it until you clear that rank's raid (Knight→B, Dragon→A, Demon→S, Vampire→SS+).
 // Cap = the rank of the lowest-ranked UNCLEARED raid; all raids cleared = uncapped.
 const WORKER_RANK_ORDER = ['F','E','D','C','B','A','S','SS','SSS'];
+
+// ── Worker rank presentation (shared by the WORK hero card + the dossier) ──
+// One source of truth so the rank letter reads identically everywhere, the same
+// way the Hunter Grade sigil does on QUESTS/CHAR.
+const WORKER_RANK_CLR = { F:'#9e9e9e', E:'#80deea', D:'#82b1ff', C:'#69f0ae', B:'#ffc107', A:'#ffa726', S:'#ffd700', SS:'#ea80fc', SSS:'#ffffff' };
+const WORKER_RANK_TITLE = {
+  F:'Unranked Worker', E:'Apprentice', D:'Journeyman', C:'Expert Craftsman', B:'Senior Operative',
+  A:'Master-Class', S:'Legendary Worker', SS:'Sovereign Worker', SSS:'Transcendent',
+};
+function _workerRankStart(rank){
+  // Cumulative points needed to reach the FIRST level of a rank band.
+  let cum = 0;
+  for(const b of WORKER_RANK_BANDS){ if(b.rank === rank) return cum; cum += (b.to - b.from + 1) * b.xpPerLevel; }
+  return cum;
+}
+function _workerBand(rank){ return WORKER_RANK_BANDS.find(b => b.rank === rank) || null; }
+
+// ── Lifetime WORK record (2026-09-23) ───────────────────────────────────────
+// Everything the WORK tab has ever closed out, counted forever. huntState only
+// keeps the CURRENT period, so completions have to be tallied here as they land
+// or they are gone at the next rollover. Counts only ever go up — un-checking a
+// hunt or a task never claws a completion back (fill-only, like every other bar).
+function _workerRecord(){
+  if(!state.workRecord){
+    // Backfill from whatever history still exists so an established save does not
+    // open the dossier at all zeros.
+    const hs = state.huntState || {};
+    let d = 0, w = 0, m = 0;
+    Object.keys(hs).forEach(id => {
+      if((hs[id].pct || 0) < 100) return;
+      const cad = ((state.hunts || []).find(h => h.id === id) || {}).cadence || 'daily';
+      if(cad === 'weekly') w++; else if(cad === 'monthly') m++; else d++;
+    });
+    state.workRecord = {
+      huntsDaily:d, huntsWeekly:w, huntsMonthly:m,
+      sideQuests: (state.trabajo || []).filter(t => t.completed).length,
+      gateSteps:0, redGateSteps:0,
+    };
+  }
+  const r = state.workRecord;
+  ['huntsDaily','huntsWeekly','huntsMonthly','sideQuests','gateSteps','redGateSteps']
+    .forEach(k => { if(typeof r[k] !== 'number') r[k] = 0; });
+  return r;
+}
+// Gate clears are already tracked for achievements; fall back to a live count of
+// cleared gates so the dossier is right even on a save from before those counters.
+function _workerGateClears(){
+  return {
+    raids: Math.max(state.raidsCleared || 0, (state.gates || []).filter(g => g.clearedAt).length),
+    drops: Math.max(state.dropsShipped || 0, (state.redGates || []).filter(g => g.clearedAt).length),
+  };
+}
 function _workerRankCap() {
   const gates = (typeof state !== 'undefined' && state.gates) ? state.gates : [];
   if (!gates.length) return { capRank:'SSS', capLevel:99, nextGate:null };
@@ -21029,6 +21151,7 @@ function setWorkProgress(id, pct){
   let flow = 0, flowBonus = 0;
   if(justFinished){
     const wt=_ensureWorkToday(); wt.finished += 1;
+    _workerRecord().sideQuests += 1;
     flow = _bumpWorkFlow();
     if(flow >= 2){ flowBonus = 5*(flow-1); state.workXp += flowBonus; wt.pts += flowBonus; }
   }
@@ -21452,6 +21575,7 @@ function _ensureWorkBattle(){
   }
   if(!state.gates)    state.gates    = GATES_SEED.map(g => ({...g, steps:g.steps.map(s=>({...s}))}));
   if(!state.redGates) state.redGates = REDGATES_SEED.map(g => ({...g, steps:g.steps.map(s=>({...s}))}));
+  _workerRecord();   // seed/backfill the lifetime dossier counters
   if(!state.huntState) state.huntState = {};
   // migration (2026-09-22): gates/drops are now un-checkable even after a clear.
   // Anything already cleared is stamped as PAID so un-checking and re-clearing it
@@ -21538,7 +21662,13 @@ function setHuntProgress(h, pct){
   const lv = _awardWork(delta);
   if(delta > 0){ const wt=_ensureWorkToday(); if(!wt.touched.includes(h.id)) wt.touched.push(h.id); }
   const justDone = pct >= 100 && !wasDone;
-  if(justDone){ const wt=_ensureWorkToday(); wt.finished = (wt.finished||0) + 1; }
+  if(justDone){
+    const wt=_ensureWorkToday(); wt.finished = (wt.finished||0) + 1;
+    // lifetime tally — huntState resets every period, this never does
+    const rec = _workerRecord();
+    const key = h.cadence==='weekly' ? 'huntsWeekly' : h.cadence==='monthly' ? 'huntsMonthly' : 'huntsDaily';
+    rec[key] += 1;
+  }
   if(justDone && !e.shardsClaimed){ e.shardsClaimed = true; _grantShards(SHARD_HUNT); }   // gacha: once per hunt per period
   saveState(); renderAll();
   if(justDone) showWorkFinishCelebration(h.text, lv.after>lv.before ? lv.after : null, 0, 0);
@@ -21575,7 +21705,10 @@ function toggleGateStep(gate, stepId, isRed){
     units = st.done ? 1 : -1;
   }
   const lv = _awardWork(units * per);
-  if(units > 0){ const wt=_ensureWorkToday(); wt.stepsToday = (wt.stepsToday||0) + units; }
+  if(units > 0){
+    const wt=_ensureWorkToday(); wt.stepsToday = (wt.stepsToday||0) + units;
+    _workerRecord()[isRed ? 'redGateSteps' : 'gateSteps'] += units;
+  }
   let cleared = false, reopened = false;
   const allDone = gate.steps.every(s => s.done);
   if(allDone && !gate.clearedAt){
@@ -22116,13 +22249,16 @@ const GACHA_RARITY = {
   sr:    { label:'SR',     color:'#c07bff', glow:'rgba(192,123,255,0.75)' },
   ssr:   { label:'SSR',    color:'#ffcf3f', glow:'rgba(255,207,63,0.9)'   },
 };
-// Tuni's real reward pools (defined 2026-09-16). Common = FREE micro-cuts only,
-// kept clear of habits. Rarity = size of the permission; games span every tier.
+// Tuni's real reward pools (rewritten 2026-09-23). Every tier is anime or games —
+// the things he actually does in his free time — plus the two "spend money on
+// yourself" permissions (R + SR) and the FREE WEEKEND at SSR. No food, no breaks
+// he never takes: a reward he would not claim is not a reward.
+// Rarity = size of the permission, from a 20-minute session to a whole weekend.
 const GACHA_REWARDS = {
-  common:['🎮 15-min game break','☀️ 15-min balcony sun break','🍵 Mate / coffee break','🎧 One song, feet up'],
-  r:     ['🎮 2-hour gaming block','📺 2 hours of anime','🥐 3 medialunas for breakfast','🛒 A cheap little something you want'],
-  sr:    ['🎮 Full gaming night (9pm–12)','📺 Anime binge — 12 episodes','🍔 Order food you like','🛍️ Buy a small wanted thing'],
-  ssr:   ['🌈 FREE WEEKEND — no work Sat & Sun','🎮 A wanted game + gaming weekend','🍽️ Dinner out'],
+  common:['🎮 20-min gaming session','📺 One anime episode','🎮 30-min gaming session','📺 Two anime episodes'],
+  r:     ['🎮 2-hour gaming block','📺 2 hours of anime','🛒 A cheap little something you want','📺 Anime movie night'],
+  sr:    ['🎮 Full gaming night (9pm–12)','📺 Anime binge — 12 episodes','🛍️ Buy a small wanted thing','🎮 A full Saturday of gaming'],
+  ssr:   ['🌈 FREE WEEKEND — no work Sat & Sun','🎮 A wanted game + gaming weekend','📺 Full-season anime binge weekend'],
 };
 
 function _ensureGacha(){
@@ -22377,8 +22513,7 @@ function renderTrabajo(){
 
   const today = todayKey();
   const wlv = calcWorkerLevel(state.workXp||0);
-  const RANK_CLR = { F:'#9e9e9e', E:'#80deea', D:'#82b1ff', C:'#69f0ae', B:'#ffc107', A:'#ffa726', S:'#ffd700', SS:'#ea80fc', SSS:'#ffffff' };
-  const rc = RANK_CLR[wlv.rank] || '#ffc107';
+  const rc = WORKER_RANK_CLR[wlv.rank] || '#ffc107';
   const xpPct = wlv.level < 99 ? Math.round((wlv.xpProgress / wlv.xpPerLevel) * 100) : 100;
 
   // ── daily-quests-done acknowledgement — factual only, NO "go rest" language ──
@@ -22390,7 +22525,11 @@ function renderTrabajo(){
   // ── 🎏 LIVE DROPS — persistent gacha-style event banner shelf (always present) ──
   panelContent.appendChild(renderEventShelf());
 
-  // ── Progress hero — TODAY'S PROGRESS aggregate + worker level ──
+  // ── Progress hero — TODAY'S PROGRESS aggregate, then the WORKER RANK block ──
+  // The rank used to be a one-line footnote under the bar. It is the same kind of
+  // north star the Hunter Grade is on QUESTS/CHAR, so it now gets the same sigil
+  // treatment: big letter, rank title, level, and what the next step costs. Tapping
+  // it opens the full dossier (lifetime record + every milestone ahead).
   const wt = _workTodayData();
   const flow = _workFlowActive();
   const frontsWord = wt.fronts === 1 ? 'front' : 'fronts';
@@ -22402,8 +22541,9 @@ function renderTrabajo(){
     +   `</div>`
     +   (flow >= 2 ? `<div class="wh-flow">🔥 FLOW ×${flow} · you're on a roll</div>` : '')
     + `</div>`
-    + `<div class="wh-bar"><div class="wh-fill" style="width:${xpPct}%;background:${rc};color:${rc}"></div></div>`
-    + `<div class="wh-sub"><span>RANK ${wlv.rank} · WORK LV.${wlv.level}${wlv.level < 99 ? ` · ${wlv.xpProgress}/${wlv.xpPerLevel}` : ' · MAX'}</span><span class="wh-total">${(state.workXp||0).toLocaleString()} all-time</span></div>`;
+    + renderWorkerRankBlock(wlv);
+  const rankEl = ph.querySelector('.whr');
+  if(rankEl) rankEl.addEventListener('click', () => showWorkerDossier());
   panelContent.appendChild(ph);
   if(wlv.capped && wlv.nextGate){
     const capEl = document.createElement('div'); capEl.className = 'work-cap-note';
@@ -27853,67 +27993,147 @@ function showGuildRankUpOverlay(rank, matQty) {
   setTimeout(dismiss, 5500);
 }
 
-function showWorkerMilestoneOverlay() {
+// ── WORKER RANK BLOCK — the WORK tab's north star ───────────────────────────
+// Same visual language as the Hunter Grade sigil on QUESTS/CHAR (big letter in a
+// bracketed frame, rank-coloured, glowing harder the higher you climb) so the two
+// progressions read as one system instead of two unrelated numbers. Returns HTML;
+// the caller wires the click to showWorkerDossier().
+function renderWorkerRankBlock(wlv){
+  wlv = wlv || calcWorkerLevel(state.workXp || 0);
+  const rc   = WORKER_RANK_CLR[wlv.rank] || '#ffc107';
+  const band = _workerBand(wlv.rank);
+  const nextRank = WORKER_RANK_ORDER[WORKER_RANK_ORDER.indexOf(wlv.rank) + 1] || null;
+  const nc   = nextRank ? (WORKER_RANK_CLR[nextRank] || rc) : rc;
+  const pct  = wlv.level < 99 ? Math.round((wlv.xpProgress / wlv.xpPerLevel) * 100) : 100;
+  const fs   = wlv.rank.length > 2 ? '22px' : wlv.rank.length > 1 ? '28px' : '36px';
+  const total = state.workXp || 0;
+
+  // Sub-line: what this rank is called, and where the next letter starts.
+  const title = WORKER_RANK_TITLE[wlv.rank] || `Rank ${wlv.rank}`;
+  const nextBand = nextRank ? _workerBand(nextRank) : null;
+  const rankLine = nextBand
+    ? `${title} · <b style="color:${nc}">RANK ${nextRank}</b> at Lv.${nextBand.from}`
+    : `${title} · apex rank`;
+
+  // Note: the very next step, priced in the same points every hunt/step pays out.
+  const note = wlv.capped
+    ? `<span class="whr-capped">⚡ RANK CAP — clear a Gate to climb past ${wlv.rank}</span>`
+    : wlv.level < 99
+      ? `<span><b style="color:${rc}">${(wlv.xpPerLevel - wlv.xpProgress).toLocaleString()}</b> pts to Lv.${wlv.level + 1}</span>`
+      : `<span>MAX LEVEL</span>`;
+
+  const glam = ['A','S','SS','SSS'].includes(wlv.rank) ? ' whr-hi' : (wlv.rank === 'F' ? ' whr-lo' : '');
+  return ''
+    + `<div class="whr${glam}" style="--gc:${rc}" role="button" tabindex="0" title="Tap for your full work record">`
+    +   `<div class="whr-sigil"><span class="whr-letter" style="font-size:${fs}">${wlv.rank}</span><span class="whr-cap">RANK</span></div>`
+    +   `<div class="whr-right">`
+    +     `<div class="whr-top">`
+    +       `<span class="whr-lv-lbl">WORK LEVEL</span>`
+    +       `<span class="whr-lv-num" style="color:${rc}">${wlv.level}</span>`
+    +       `<span class="whr-pct" style="color:${rc}">${pct}%</span>`
+    +     `</div>`
+    +     `<div class="whr-title">${rankLine}</div>`
+    +     `<div class="whr-track"><div class="whr-fill" style="width:${pct}%;background:linear-gradient(90deg,${rc},${nc});color:${rc}"></div></div>`
+    +     `<div class="whr-note">${note}<span class="whr-total">${total.toLocaleString()} pts all-time</span></div>`
+    +   `</div>`
+    +   `<div class="whr-more">RECORD ›</div>`
+    + `</div>`;
+}
+
+// ── WORKER DOSSIER — everything the WORK tab has ever closed out ────────────
+// Opened by tapping the rank block. Two halves: RECORD (lifetime counts, fill-only)
+// and ROAD AHEAD (next level + every rank milestone left, with the Gate that gates
+// it). Rank perks from the old shop economy are gone, so the milestones state what
+// a rank actually means now: the letter, the level it starts at, and its Gate.
+function showWorkerDossier() {
   const wlv = calcWorkerLevel(state.workXp || 0);
-  const totalWxp = state.workXp || 0;
-  // Compute cumulative WXP threshold to START each rank
-  const rankThresholds = [];
-  let cumXp = 0;
-  for (const band of WORKER_RANK_BANDS) {
-    rankThresholds.push({ rank: band.rank, xp: cumXp, xpPerLevel: band.xpPerLevel, from: band.from, to: band.to });
-    cumXp += (band.to - band.from + 1) * band.xpPerLevel;
-  }
-  const RANK_ICONS = { F:'⚒', E:'⚒', D:'⚒', C:'🔨', B:'🔨', A:'⚙️', S:'👑', SS:'👑', SSS:'👑' };
-  const RANK_TITLES_MAP = { E:'Apprentice', D:'Journeyman', C:'Expert Craftsman', B:'Senior Operative', A:'Master-Class', S:'Legendary Worker', SS:'Mythic', SSS:'Transcendent' };
+  const total = state.workXp || 0;
+  const rc = WORKER_RANK_CLR[wlv.rank] || '#ffc107';
+  const rec = _workerRecord();
+  const clears = _workerGateClears();
   const pct = wlv.level < 99 ? Math.round((wlv.xpProgress / wlv.xpPerLevel) * 100) : 100;
-  // Build milestone rows (upcoming only)
-  let rowsHtml = '';
-  // Next level row
+
+  const tiles = [
+    ['🔴', clears.drops,        'RED GATES CLEARED', '#ff5252'],
+    ['🚪', clears.raids,        'GATES CLEARED',     '#ffc107'],
+    ['☀️', rec.huntsDaily,      'DAILY HUNTS',       '#69f0ae'],
+    ['📅', rec.huntsWeekly,     'WEEKLY HUNTS',      '#4dd0e1'],
+    ['🗓', rec.huntsMonthly,    'MONTHLY HUNTS',     '#82b1ff'],
+    ['⚡', rec.sideQuests,      'SIDE QUESTS',       '#ea80fc'],
+  ].map(([ic, n, lbl, col]) =>
+    `<div class="wdo-tile" style="--tc:${col}"><span class="wdo-ic">${ic}</span>`
+    + `<span class="wdo-num">${(n || 0).toLocaleString()}</span>`
+    + `<span class="wdo-lbl">${lbl}</span></div>`).join('');
+
+  const objectives = (rec.gateSteps || 0) + (rec.redGateSteps || 0);
+  const objLine = `<div class="wdo-objline">🗡 <b>${objectives.toLocaleString()}</b> gate objectives ticked · `
+    + `<b>${(rec.gateSteps||0).toLocaleString()}</b> on Gates · <b>${(rec.redGateSteps||0).toLocaleString()}</b> on Red Gates</div>`;
+
+  // ── ROAD AHEAD ──
+  const uncleared = (state.gates || []).filter(g => !g.clearedAt)
+    .sort((a,b) => WORKER_RANK_ORDER.indexOf(a.rank) - WORKER_RANK_ORDER.indexOf(b.rank));
+  let rows = '';
   if (wlv.level < 99) {
-    const wxpToNext = wlv.xpPerLevel - wlv.xpProgress;
-    rowsHtml += `<div class="wml-row"><span class="wml-target">→ Level ${wlv.level + 1}</span><span class="wml-wxp">${wxpToNext.toLocaleString()} WXP</span></div>`;
+    rows += `<div class="wml-row"><span class="wml-target">→ Level ${wlv.level + 1}</span>`
+          + `<span class="wml-wxp">${(wlv.xpPerLevel - wlv.xpProgress).toLocaleString()} pts</span></div>`;
   }
-  // Upcoming rank milestones
-  rankThresholds.forEach(rt => {
-    if (rt.rank === wlv.rank || rt.rank === 'F') return; // skip current & F (no milestone reward for F)
-    const wxpNeeded = rt.xp - totalWxp;
-    if (wxpNeeded <= 0) return; // already achieved
-    const ms = WORKER_RANK_MILESTONES[rt.rank];
-    const title = ms?.title || RANK_TITLES_MAP[rt.rank] || `Rank ${rt.rank}`;
-    const effect = ms?.effect || '';
-    rowsHtml += `
-      <div class="wml-row wml-rank-row">
-        <span class="wml-rank-badge">${RANK_ICONS[rt.rank]||'⚒'} RANK ${rt.rank}</span>
-        <div class="wml-rank-info">
-          <span class="wml-rank-title">${title}</span>
-          ${effect ? `<span class="wml-rank-effect">${effect}</span>` : ''}
-        </div>
-        <span class="wml-wxp">${wxpNeeded.toLocaleString()} WXP</span>
-      </div>`;
+  const curIdx = WORKER_RANK_ORDER.indexOf(wlv.rank);
+  WORKER_RANK_ORDER.forEach((rank, i) => {
+    if (i <= curIdx) return;
+    const band = _workerBand(rank); if (!band) return;
+    const need = _workerRankStart(rank) - total;
+    const col = WORKER_RANK_CLR[rank] || '#ffc107';
+    // A rank is locked until every lower-ranked Gate is down; name the LAST one that
+    // stands in the way rather than repeating the nearest blocker on every row.
+    const blockers = uncleared.filter(g => WORKER_RANK_ORDER.indexOf(g.rank) < i);
+    const gate = blockers[blockers.length - 1];
+    const gateLine = gate
+      ? `<span class="wml-rank-gate">${GATE_ICON[gate.id] || '🚪'} needs ${_escWork(gate.codename)} cleared</span>`
+      : '';
+    rows += `<div class="wml-row wml-rank-row">`
+      + `<span class="wml-rank-badge" style="color:${col};border-color:${col}55">RANK ${rank}</span>`
+      + `<div class="wml-rank-info">`
+      +   `<span class="wml-rank-title">${WORKER_RANK_TITLE[rank] || rank} · from Lv.${band.from}</span>`
+      +   gateLine
+      + `</div>`
+      + `<span class="wml-wxp">${need > 0 ? need.toLocaleString() + ' pts' : 'reached'}</span>`
+      + `</div>`;
   });
-  if (!rowsHtml) rowsHtml = `<div style="opacity:0.4;font-size:11px;text-align:center;padding:12px 0">MAX RANK ACHIEVED</div>`;
+  if (!rows) rows = `<div style="opacity:0.4;font-size:11px;text-align:center;padding:12px 0">MAX RANK ACHIEVED</div>`;
+
+  const capNote = (wlv.capped && wlv.nextGate)
+    ? `<div class="wdo-cap">⚡ RANK CAP · clear ${GATE_ICON[wlv.nextGate.id] || '🚪'} <b>${_escWork(wlv.nextGate.codename)}</b> to climb past ${wlv.rank}</div>`
+    : '';
+
   const ov = document.createElement('div'); ov.className = 'guild-milestone-ov';
   ov.style.cssText = 'background:rgba(10,8,0,0.97)';
   ov.innerHTML = `
-    <div class="gm-inner" style="border-color:rgba(255,193,7,0.45);max-height:82vh;overflow-y:auto;-webkit-overflow-scrolling:touch">
-      <div class="gm-scan"></div>
-      <div class="gm-eyebrow">⟦ WORKER PROGRESSION ⟧</div>
-      <div style="font-family:'Cinzel',serif;font-size:20px;color:#ffc107;margin:6px 0 2px">${RANK_ICONS[wlv.rank]||'⚒'} LV.${wlv.level} · RANK ${wlv.rank}</div>
-      <div style="font-size:10px;color:rgba(255,255,255,0.4);font-family:'Rajdhani',sans-serif;margin-bottom:8px">
-        ${totalWxp.toLocaleString()} total WXP${wlv.level < 99 ? ` · ${wlv.xpProgress}/${wlv.xpPerLevel} this level` : ''}
+    <div class="gm-inner wdo-inner" style="border-color:${rc}55">
+      <div class="gm-scan" style="background:linear-gradient(90deg,transparent,${rc}22,transparent)"></div>
+      <div class="gm-eyebrow">⟦ WORKER DOSSIER ⟧</div>
+      <div class="wdo-hero">
+        <div class="whr-sigil wdo-sigil" style="--gc:${rc}"><span class="whr-letter" style="font-size:${wlv.rank.length>2?'22px':wlv.rank.length>1?'28px':'36px'}">${wlv.rank}</span><span class="whr-cap">RANK</span></div>
+        <div class="wdo-hero-right">
+          <div class="wdo-lv" style="color:${rc}">LV.${wlv.level}</div>
+          <div class="wdo-title">${WORKER_RANK_TITLE[wlv.rank] || ('Rank ' + wlv.rank)}</div>
+          <div class="whr-track"><div class="whr-fill" style="width:${pct}%;background:${rc};color:${rc}"></div></div>
+          <div class="wdo-sub">${total.toLocaleString()} pts all-time${wlv.level < 99 ? ` · ${wlv.xpProgress}/${wlv.xpPerLevel} this level` : ''}</div>
+        </div>
       </div>
-      <div style="background:rgba(255,193,7,0.12);border-radius:4px;height:6px;width:100%;margin-bottom:14px;overflow:hidden">
-        <div style="height:100%;width:${pct}%;background:#ffc107;border-radius:4px;transition:width 0.4s"></div>
-      </div>
-      <div class="gm-eyebrow" style="margin-bottom:8px;font-size:8px">MILESTONES AHEAD</div>
-      <div class="wml-rows">${rowsHtml}</div>
+      ${capNote}
+      <div class="gm-eyebrow wdo-sect">RECORD</div>
+      <div class="wdo-grid">${tiles}</div>
+      ${objLine}
+      <div class="gm-eyebrow wdo-sect">ROAD AHEAD</div>
+      <div class="wml-rows">${rows}</div>
       <div class="gm-tap" style="margin-top:14px">TAP TO CLOSE</div>
     </div>`;
   document.body.appendChild(ov);
   const dismiss = () => { if (ov._dismissed) return; ov._dismissed = true; ov.classList.add('gm-out'); setTimeout(() => ov.remove(), 370); };
   ov.addEventListener('click', dismiss);
-  setTimeout(dismiss, 12000);
 }
+// legacy name — the CITY worker chip still calls this
+function showWorkerMilestoneOverlay() { showWorkerDossier(); }
 
 function showWorkerRankUpOverlay(rank, ms) {
   const RANK_ICONS = { E:'⚒', D:'⚒', C:'🔨', B:'🔨', A:'⚙️', S:'👑', SS:'👑', SSS:'👑' };
