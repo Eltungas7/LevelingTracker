@@ -21588,9 +21588,9 @@ const REDGATES_SEED = [
   ] },
   // deadline = Part 1 (launch & sell) · deadline2 = Part 2 (push & connect).
   { id:'rg_psycho',   codename:'100% Psycho',   drop:'Mob Psycho drop',   deadline:'2026-09-18', deadline2:'2026-09-23', steps:_dropSteps() },
-  { id:'rg_hero',     codename:'My Hero',       drop:'My Hero Academia drop', deadline:'2026-09-25', deadline2:'2026-09-30', steps:_dropSteps() },
-  { id:'rg_clover',   codename:'5 Leaf Clover', drop:'Black Clover drop', deadline:'2026-10-02', deadline2:'2026-10-10', steps:_dropSteps() },
-  { id:'rg_festival', codename:'The Festival',  drop:'10 designs → designer before Christmas', deadline:'2026-09-27', steps:[
+  { id:'rg_hero',     codename:'My Hero',       drop:'My Hero Academia drop', deadline:'2026-10-31', deadline2:'2026-10-31', steps:_dropSteps() },
+  { id:'rg_clover',   codename:'5 Leaf Clover', drop:'Black Clover drop', deadline:'2026-10-01', deadline2:'2026-10-01', steps:_dropSteps() },
+  { id:'rg_festival', codename:'The Festival',  drop:'10 designs → designer before Christmas', deadline:'2026-09-30', steps:[
     {id:'f1',text:'Pick 6 anime designs for serigraphy',done:false},
     {id:'f2',text:'Pick 4 asian-streetwear designs',done:false},
     {id:'f3',text:'Compile references / specs for each',done:false},
@@ -21660,9 +21660,6 @@ function _ensureWorkBattle(){
   [...(state.gates||[]), ...(state.redGates||[])].forEach(g => {
     if(g.clearedAt && g.clearRewarded === undefined) g.clearRewarded = true;
   });
-  // migration: Festival deadline moved Sep 30 → Sep 20 → Sep 27 (only if untouched/uncleared)
-  const _f = state.redGates.find(r => r.id === 'rg_festival');
-  if(_f && !_f.clearedAt && (_f.deadline === '2026-09-30' || _f.deadline === '2026-09-20')) _f.deadline = '2026-09-27';
   // migration: Night City (Cyberpunk) extended Sep 15 → Fri Sep 18 — more time for
   // the new TikTok + second-reel steps (only if untouched/uncleared)
   const _n = state.redGates.find(r => r.id === 'rg_night');
@@ -21680,6 +21677,30 @@ function _ensureWorkBattle(){
     const sch = _DROP_SCHEDULE[rg.id];
     if(sch && !rg.clearedAt && !rg.deadline2){ rg.deadline = sch.p1; rg.deadline2 = sch.p2; }
   });
+  // ── Drop schedule v3 (2026-09-23) — the authoritative dates ────────────────
+  // Real-world reschedule: The Festival pulled in to Sep 30, My Hero pushed back to
+  // Oct 31 to ride alongside Poke Cafe and Going Crazy, and Black Clover tightened to
+  // Oct 1 — it is the one that is actually live now.
+  //
+  // Version-stamped rather than "only if untouched": the earlier per-drop migrations
+  // could not reach a save whose dates had already moved, which is how The Festival
+  // ended up showing Oct 31. This one applies once, unconditionally, to any uncleared
+  // drop — then never again, so a collapsed drop that gets REOPENED (which hands out a
+  // fresh window via _setRedGateWindow) is not snapped back to a stale date on reload.
+  const _DROP_SCHEDULE_V3 = {
+    rg_festival: { p1:'2026-09-30' },                        // single-phase drop
+    rg_hero:     { p1:'2026-10-31', p2:'2026-10-31' },
+    rg_clover:   { p1:'2026-10-01', p2:'2026-10-01' },
+  };
+  if((state.dropSchedVersion || 0) < 3){
+    Object.keys(_DROP_SCHEDULE_V3).forEach(id => {
+      const rg = state.redGates.find(r => r.id === id); if(!rg || rg.clearedAt) return;
+      const d = _DROP_SCHEDULE_V3[id];
+      rg.deadline = d.p1;
+      if(d.p2) rg.deadline2 = d.p2; else delete rg.deadline2;
+    });
+    state.dropSchedVersion = 3;
+  }
   // migration (2026-09-23): Night City and 100% Psycho are SHIPPED in real life, but
   // their windows had run out — and a collapsed drop is locked, so neither could be
   // ticked to claim the ~1,900 pts, shards and Trophy that were actually earned. Work
