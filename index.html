@@ -12640,26 +12640,82 @@ const WORKER_RANK_MILESTONES = {
            body:'Beyond all limits. The work defines you now.<br>All forge crafts complete 25% faster total.',
            effect:'+25000g · +300 each mat · ⏱ -25% FORGE TIME total' },
 };
-
-// Re-fitted 2026-09-23 to Tuni's real cadence: hunts Mon-Fri, ~25 side quests a
-// month, 2-3 drops a month, 8 Gates ever. Costs now rise on EVERY band (the old
-// curve spiked at A then got cheaper, so S/SS were easier than the rank below).
-// F/E/D are untouched so no existing level is taken away. Target: rank SSS at
-// ~18 months of 75%-ish weeks; Lv.99 is the victory lap past it, not the goal.
+// ── Worker curve v2 (2026-09-23) ────────────────────────────────────────────
+// Paced on the HUNTER GRADE's own shape so the two ladders feel like one system.
+// Normalize TIERS (0/80/270/600/1500/2800/5000/7000/8750) against SSS and you get
+// A at 32%, S at 57%, SS at 80% of the climb — which is what "A at 6 months, S at
+// 12, SS at 15, SSS at 18" describes. Those percentages ARE this table.
+//
+// Modelled on the real cadence: hunts Mon-Fri, ~25 side quests a month, 2-3 drops
+// a month, 8 Gates ever. At ~75% weeks that is ~8,200 pts a month, so:
+//   E 0.2mo · D 0.6mo · C 1.3mo · B 3.1mo · A 6mo · S 12mo · SS 15mo · SSS 18mo
+// Early ranks are no longer free — C used to land in a week; it is over a month
+// now. Cost per level rises on EVERY band, and the level ranges widen where a
+// rank should take a while and narrow at the top where each level is precious.
 const WORKER_RANK_BANDS = [
-  { from:1,  to:4,  rank:'F',   xpPerLevel:50    },
-  { from:5,  to:14, rank:'E',   xpPerLevel:120   },
-  { from:15, to:24, rank:'D',   xpPerLevel:280   },
-  { from:25, to:34, rank:'C',   xpPerLevel:650   },
-  { from:35, to:44, rank:'B',   xpPerLevel:1400  },
-  { from:45, to:54, rank:'A',   xpPerLevel:2600  },
-  { from:55, to:69, rank:'S',   xpPerLevel:3100  },
-  { from:70, to:84, rank:'SS',  xpPerLevel:3500  },
-  { from:85, to:99, rank:'SSS', xpPerLevel:3900  },
+  { from:1,  to:6,  rank:'F',   xpPerLevel:240   },
+  { from:7,  to:16, rank:'E',   xpPerLevel:320   },
+  { from:17, to:26, rank:'D',   xpPerLevel:560   },
+  { from:27, to:40, rank:'C',   xpPerLevel:1080  },
+  { from:41, to:54, rank:'B',   xpPerLevel:1700  },
+  { from:55, to:74, rank:'A',   xpPerLevel:2450  },
+  { from:75, to:82, rank:'S',   xpPerLevel:3100  },
+  { from:83, to:89, rank:'SS',  xpPerLevel:3500  },
+  { from:90, to:99, rank:'SSS', xpPerLevel:3800  },
 ];
 // max-level fallbacks read the band instead of a hardcoded number, so re-tuning the
 // curve never leaves a stale value behind
 const _SSS_PER_LEVEL = WORKER_RANK_BANDS[WORKER_RANK_BANDS.length - 1].xpPerLevel;
+
+// The curve the existing save's points were EARNED under. Re-pricing the ladder
+// without this would silently demote a real level — points stay in state.workXp,
+// but each one buys less now. The migration below re-values them so the level and
+// the position inside it survive untouched; nothing is ever taken away.
+const WORKER_RANK_BANDS_V1 = [
+  { from:1,  to:4,  rank:'F',   xpPerLevel:50    },
+  { from:5,  to:14, rank:'E',   xpPerLevel:120   },
+  { from:15, to:24, rank:'D',   xpPerLevel:280   },
+  { from:25, to:34, rank:'C',   xpPerLevel:600   },
+  { from:35, to:44, rank:'B',   xpPerLevel:1200  },
+  { from:45, to:54, rank:'A',   xpPerLevel:2500  },
+  { from:55, to:69, rank:'S',   xpPerLevel:900   },
+  { from:70, to:84, rank:'SS',  xpPerLevel:810   },
+  { from:85, to:99, rank:'SSS', xpPerLevel:900   },
+];
+// Cumulative points to REACH a level on a given band table.
+function _ptsToLevel(bands, target){
+  let sum = 0, lv = 1;
+  for(const b of bands){
+    for(let i = b.from; i <= b.to; i++){
+      if(lv >= target) return sum;
+      sum += b.xpPerLevel; lv++;
+    }
+  }
+  return sum;
+}
+// Raw (uncapped) level + how far into it, on a given band table.
+function _levelOn(bands, xp){
+  let lv = 1, left = xp || 0;
+  for(const b of bands){
+    for(let i = b.from; i <= b.to; i++){
+      if(lv >= 99) return { level:99, frac:0 };
+      if(left < b.xpPerLevel) return { level:lv, frac:left / b.xpPerLevel };
+      left -= b.xpPerLevel; lv++;
+    }
+  }
+  return { level:99, frac:0 };
+}
+function _migrateWorkCurve(){
+  if((state.workCurveVersion || 1) >= 2) return;
+  const { level, frac } = _levelOn(WORKER_RANK_BANDS_V1, state.workXp || 0);
+  const band = WORKER_RANK_BANDS.find(b => level >= b.from && level <= b.to)
+            || WORKER_RANK_BANDS[WORKER_RANK_BANDS.length - 1];
+  state.workXp = Math.round(_ptsToLevel(WORKER_RANK_BANDS, level) + frac * band.xpPerLevel);
+  state.workCurveVersion = 2;
+}
+// Runs here rather than beside the loadState() call: WORKER_RANK_BANDS is a
+// const declared below that point, so calling any earlier hits its dead zone.
+_migrateWorkCurve();
 
 // Raids GATE your rank: you can grind XP to fill a rank, but you can't break past
 // it until you clear that rank's raid (Knight→B, Dragon→A, Demon→S, Vampire→SS+).
