@@ -21532,26 +21532,33 @@ function _reconcileDropSteps(oldSteps){
   });
 }
 const GATES_SEED = [
-  // Re-scoped 2026-09-24 after a full crawl of murasakiclothing.com (300 products,
-  // every info page, all structured data). The first re-scope still missed the four
-  // biggest holes, all of them catalog-level rather than design-level: 51 products
-  // with no anime category (5 whole franchises unbrowsable, incl. 18 Solo Leveling),
-  // 294 of 300 descriptions sharing one of 11 boilerplate bodies, not one product
-  // page carrying its own Product schema, and a delivery promise that contradicts
-  // the FAQ. Ordered as a fight: SEE → THE CATALOG → THE LANDING → THE PRODUCT PAGE
-  // → CLOSE THE LOOP. Old ids are kept so anything already ticked survives.
+  // Re-scoped 2026-09-24, third pass. The crawl fixed WHAT IS BROKEN; this pass adds
+  // what makes it a brand rather than a working shop. Two things drove it: quality
+  // over everything is what Murasaki actually competes on — and the site claims it in
+  // boilerplate ("algodón peinado 24/1") while proving it nowhere — and an asian /
+  // anime-streetwear line is coming (The Dragon, rank A), so the structure and the
+  // visual system have to be built to hold a SECOND line now, not retrofitted later.
+  // Ordered so nothing gets built twice: SEE → THE BRAND (define it) → THE CATALOG
+  // (structure it) → THE LANDING → THE PRODUCT PAGE → CLOSE THE LOOP. Old ids are
+  // kept, so anything already ticked survives.
   { id:'g_knight', rank:'C', codename:'The Damned Knight', goal:'Improve the online shop', steps:[
     // — SEE: never redesign blind —
     {id:'k1',text:'Audit the shop — screenshot pass, list what looks off',done:false},
     {id:'k8',text:'Baseline the numbers — check GA4 + Meta Pixel fire, write down visits / conversion rate / top pages',done:false},
+    // — THE BRAND: decide it once, everything downstream reads from it —
+    {id:'b1',text:'Visual system on one page — palette, type scale, buttons, spacing. The purple finally means something',done:false},
+    {id:'b2',text:'Brand voice + positioning one-pager — quality over everything; anime now, asian/anime streetwear next',done:false},
+    {id:'b3',text:'Design the banner set — promo bar, home hero, category headers',done:false},
+    {id:'b4',text:'The shoot — lifestyle on real people + macro detail of stitching and embroidery (the PROOF behind the quality claim)',done:false},
     // — THE CATALOG: 300 products nobody can find or tell apart —
     {id:'k14',text:'Create the missing anime categories (Solo Leveling, Bleach, Kaiju No.8, Death Note, Sailor Moon) + assign the 51 orphan products',done:false},
+    {id:'k17',text:'Restructure the top level so a second line slots in beside anime, not under it (anime · asian streetwear · anime streetwear)',done:false},
     {id:'k15',text:'Kill the boilerplate — one unique hook per design instead of 11 copy-pasted bodies across 294 products',done:false},
     {id:'k16',text:'Fix product structured data — every page carries its OWN Product schema (price, stock, images) + the 43 Google reviews as aggregateRating',done:false},
     // — THE LANDING: the first 5 seconds —
     {id:'k9',text:'Home hero above the fold — one image, one line of brand, one CTA',done:false},
     {id:'k10',text:'Add an "elegí tu anime" visual grid + a bestsellers row to the home',done:false},
-    {id:'k3',text:'CSS pass on the home / landing',done:false},
+    {id:'k3',text:'Apply the visual system across the theme — colours, type, buttons, banners, everywhere',done:false},
     {id:'k2',text:'Standardize product images (4:5, same crop) + shoot the 114 products that have 2 photos or fewer',done:false},
     // — THE PRODUCT PAGE: where the money is —
     {id:'k4',text:'Clean up the product-page layout (hook first, specs second, dead 1-item cross-sell fixed)',done:false},
@@ -21675,21 +21682,19 @@ function _ensureWorkBattle(){
     const g = state.gates.find(x => x.id === seed.id); if(!g) return;
     g.rank = seed.rank; g.codename = seed.codename; g.goal = seed.goal;
   });
-  // migration (2026-09-24): The Damned Knight re-scoped twice in one day — first
-  // after eyeballing the shop, then again after actually crawling all 300 products,
-  // which turned up the catalog-level holes (orphan franchises, boilerplate copy,
-  // missing Product schema, contradictory delivery times). Merged BY ID, so every
-  // step already ticked stays ticked and its points are never re-paid; new steps
-  // land unchecked in seed order. Skips a gate already cleared — a finished fight
-  // stays finished.
-  if((state.gateStepsVersion || 0) < 2){
+  // migration (2026-09-24): The Damned Knight grew from 7 → 13 → 16 → 21 steps in a
+  // day, as the shop went from "looks off" to crawled to "make it an actual brand".
+  // Merged BY ID every time, so every step already ticked stays ticked and its points
+  // are never re-paid; new steps land unchecked in seed order. Skips a gate already
+  // cleared — a finished fight stays finished. Bump the version to re-merge.
+  if((state.gateStepsVersion || 0) < 3){
     const _kn = state.gates.find(g => g.id === 'g_knight');
     const _knSeed = GATES_SEED.find(g => g.id === 'g_knight');
     if(_kn && _knSeed && !_kn.clearedAt && Array.isArray(_kn.steps)){
       const wasDone = new Set(_kn.steps.filter(s => s.done).map(s => s.id));
       _kn.steps = _knSeed.steps.map(s => ({ ...s, done: wasDone.has(s.id) }));
     }
-    state.gateStepsVersion = 2;
+    state.gateStepsVersion = 3;
   }
   if(!state.huntState) state.huntState = {};
   // migration (2026-09-22): gates/drops are now un-checkable even after a clear.
