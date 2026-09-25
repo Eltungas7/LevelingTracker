@@ -18533,46 +18533,109 @@ function renderCurrentQuest(){
   card.querySelector('.cq-skip').addEventListener('click', () => { _questSkips.add(h.id); renderAll(); });
   return card;
 }
-// Galactic / stellar completion cue — a rising sweep + shimmering bright chord +
-// cascading sparkle bells. Web Audio, same house style as playDailyComplete.
+// -- Variable-reward completion cues: one sound PER TIER, deliberately different --
+// They have to be told apart inside the first ~300ms, so each tier gets its own
+// shape, its own chord and its own direction -- not "the same sound, but louder":
+//   normal    -> the familiar rising sweep + C-major shimmer + ascending sparkles
+//   stellar   -> glass/crystal: reverse swell, ascending E-major bell arpeggio,
+//                held high dyad + a DESCENDING stardust fall (opposite direction)
+//   supernova -> a whole event: collapse/inhale, detonation, wide C major-9 +
+//                choir pad, octave rise + a long ringing stardust tail (~2.4s)
 function playStellarComplete(tier){
   if(!soundEnabled || !_ACtx) return;
-  const big = tier === 'stellar' || tier === 'supernova';
-  const huge = tier === 'supernova';
-  const boost = huge ? 1.35 : big ? 1.15 : 1;
   try{
     const ctx = _getCtx(), t = ctx.currentTime;
-    const comp = ctx.createDynamicsCompressor(); comp.threshold.value=-8; comp.knee.value=6; comp.ratio.value=3; comp.attack.value=0.001; comp.release.value=0.18; comp.connect(ctx.destination);
-    // deep power swell
-    const sub=ctx.createOscillator(), sg=ctx.createGain(); sub.type='sine';
-    sub.frequency.setValueAtTime(70,t); sub.frequency.exponentialRampToValueAtTime(170,t+0.5);
-    sg.gain.setValueAtTime(0,t); sg.gain.linearRampToValueAtTime(0.22,t+0.05); sg.gain.exponentialRampToValueAtTime(0.001,t+0.95);
-    sub.connect(sg); sg.connect(comp); sub.start(t); sub.stop(t+1.0);
-    // rising filtered sweep — whoosh into the stars
-    const sweep=ctx.createOscillator(), swg=ctx.createGain(), swf=ctx.createBiquadFilter();
-    sweep.type='sawtooth'; sweep.frequency.setValueAtTime(200,t); sweep.frequency.exponentialRampToValueAtTime(1500,t+0.55);
-    swf.type='lowpass'; swf.frequency.setValueAtTime(350,t); swf.frequency.exponentialRampToValueAtTime(7000,t+0.55); swf.Q.value=7;
-    swg.gain.setValueAtTime(0,t); swg.gain.linearRampToValueAtTime(0.10,t+0.05); swg.gain.exponentialRampToValueAtTime(0.001,t+0.72);
-    sweep.connect(swf); swf.connect(swg); swg.connect(comp); sweep.start(t); sweep.stop(t+0.78);
-    // shimmering bright major chord (detuned sines)
-    [523.25,659.25,783.99,1046.50].forEach((f,i)=>{ [0,4,-4].forEach(det=>{
-      const o=ctx.createOscillator(), g=ctx.createGain(); o.type='sine'; o.frequency.value=f; o.detune.value=det;
-      const st=t+0.28+i*0.05; g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime((0.085-i*0.013)*boost,st+0.03); g.gain.exponentialRampToValueAtTime(0.001,st+1.4);
-      o.connect(g); g.connect(comp); o.start(st); o.stop(st+1.5);
-    }); });
-    // cascading sparkle bells (a longer, higher cascade on the rarer tiers)
-    const sparkles = big ? [1567.98,2093.00,2637.02,3135.96,4186.01,5274.04] : [1567.98,2093.00,2637.02,3135.96];
-    sparkles.forEach((f,i)=>{
-      const o=ctx.createOscillator(), g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
-      const st=t+0.48+i*0.07; g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(Math.max(0.012,(0.05-i*0.007)*boost),st+0.008); g.gain.exponentialRampToValueAtTime(0.001,st+0.7);
-      o.connect(g); g.connect(comp); o.start(st); o.stop(st+0.75);
-    });
-    // SUPERNOVA — a final rising shimmer octave sweep on top
-    if(huge){
-      const o=ctx.createOscillator(), g=ctx.createGain(); o.type='triangle';
-      o.frequency.setValueAtTime(1046.50,t+0.6); o.frequency.exponentialRampToValueAtTime(4186.01,t+1.2);
-      g.gain.setValueAtTime(0,t+0.6); g.gain.linearRampToValueAtTime(0.08,t+0.7); g.gain.exponentialRampToValueAtTime(0.001,t+1.5);
-      o.connect(g); g.connect(comp); o.start(t+0.6); o.stop(t+1.55);
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value=-8; comp.knee.value=6; comp.ratio.value=3; comp.attack.value=0.001; comp.release.value=0.18; comp.connect(ctx.destination);
+    // tone(freq, start, dur, opts) - one enveloped oscillator
+    const tone = (f, st, d, o={}) => {
+      const { type='sine', peak=0.12, det=0, atk=0.012 } = o;
+      const osc=ctx.createOscillator(), g=ctx.createGain(); osc.type=type; osc.frequency.value=f; osc.detune.value=det;
+      g.gain.setValueAtTime(0, t+st); g.gain.linearRampToValueAtTime(peak, t+st+atk); g.gain.exponentialRampToValueAtTime(0.001, t+st+d);
+      osc.connect(g); g.connect(comp); osc.start(t+st); osc.stop(t+st+d+0.05);
+    };
+    // glide(f0,f1,start,dur,opts) - pitch + filter sweep; f1<f0 falls (the collapse)
+    const glide = (f0, f1, st, d, o={}) => {
+      const { type='sawtooth', peak=0.12, cut0=350, cut1=7000, q=6 } = o;
+      const osc=ctx.createOscillator(), g=ctx.createGain(), bf=ctx.createBiquadFilter();
+      osc.type=type; osc.frequency.setValueAtTime(f0, t+st); osc.frequency.exponentialRampToValueAtTime(f1, t+st+d);
+      bf.type='lowpass'; bf.frequency.setValueAtTime(cut0, t+st); bf.frequency.exponentialRampToValueAtTime(cut1, t+st+d); bf.Q.value=q;
+      g.gain.setValueAtTime(0, t+st); g.gain.linearRampToValueAtTime(peak, t+st+0.05); g.gain.exponentialRampToValueAtTime(0.001, t+st+d+0.08);
+      osc.connect(bf); bf.connect(g); g.connect(comp); osc.start(t+st); osc.stop(t+st+d+0.12);
+    };
+    // noise(start,dur,opts) - filtered noise burst; swell:true ramps IN instead of out
+    const noise = (st, d, o={}) => {
+      const { peak=0.3, hp=800, lp=null, swell=false } = o;
+      const len=Math.max(1, Math.floor(ctx.sampleRate*(d+0.02)));
+      const buf=ctx.createBuffer(1, len, ctx.sampleRate), nd=buf.getChannelData(0);
+      for(let i=0;i<len;i++) nd[i]=Math.random()*2-1;
+      const src=ctx.createBufferSource(); src.buffer=buf;
+      const hpf=ctx.createBiquadFilter(); hpf.type='highpass'; hpf.frequency.value=hp; src.connect(hpf);
+      let node=hpf;
+      if(lp){ const lpf=ctx.createBiquadFilter(); lpf.type='lowpass'; lpf.frequency.value=lp; node.connect(lpf); node=lpf; }
+      const g=ctx.createGain();
+      if(swell){ g.gain.setValueAtTime(0.0001, t+st); g.gain.exponentialRampToValueAtTime(peak, t+st+d); g.gain.linearRampToValueAtTime(0.0001, t+st+d+0.04); }
+      else { g.gain.setValueAtTime(0, t+st); g.gain.linearRampToValueAtTime(peak, t+st+0.004); g.gain.exponentialRampToValueAtTime(0.001, t+st+d); }
+      node.connect(g); g.connect(comp); src.start(t+st); src.stop(t+st+d+0.06);
+    };
+
+    if(tier === 'supernova'){
+      // 1. COLLAPSE (0-0.42) - the star caves in first: everything falls and is pulled
+      //    inward. Half a second of "something big is coming" no other cue has.
+      glide(420, 70, 0, 0.42, {type:'sawtooth', peak:0.13, cut0:2600, cut1:200, q:3});
+      noise(0, 0.40, {peak:0.10, hp:300, lp:3500, swell:true});
+      // 2. DETONATION (0.42) - wideband blast + sub drop + bright transient
+      noise(0.42, 0.55, {peak:0.46, hp:90, lp:9000});
+      glide(140, 34, 0.42, 0.70, {type:'sine', peak:0.34, cut0:800, cut1:120, q:1});
+      tone(1975.53, 0.42, 0.22, {type:'triangle', peak:0.12, atk:0.002});
+      // 3. THE CHORD - wide C major-9 (C-E-G-B-D), three detuned layers deep
+      [130.81, 261.63, 329.63, 392.00, 493.88, 587.33, 783.99].forEach((f,i)=>{
+        [0, 6, -6].forEach(det => tone(f, 0.50+i*0.025, 2.0, {type:'triangle', peak:Math.max(0.03, 0.085-i*0.008), det, atk:0.04}));
+      });
+      glide(261.63, 523.25, 0.52, 1.5, {type:'sawtooth', peak:0.07, cut0:400, cut1:2600, q:2}); // choir-ish pad
+      // 4. RISE - octave shimmer climbing out of the blast
+      glide(1046.50, 4186.01, 0.70, 0.85, {type:'triangle', peak:0.09, cut0:1500, cut1:12000, q:1});
+      // 5. STARDUST TAIL - long, slow, high; keeps ringing well after the hit
+      [1567.98,2093.00,2637.02,3135.96,4186.01,5274.04,6271.93].forEach((f,i)=>
+        tone(f, 0.82+i*0.10, 1.10, {type:'sine', peak:Math.max(0.014, 0.055-i*0.006)}));
+      [2637.02, 3951.07].forEach((f,i)=> tone(f, 1.55+i*0.18, 1.0, {type:'sine', peak:0.03, det:i?7:-7, atk:0.15}));
+    } else if(tier === 'stellar'){
+      // Crystal identity: no whoosh, no stacked chord - struck glass bells, a
+      // different key (E major), and a sparkle cascade that falls instead of climbs.
+      noise(0, 0.20, {peak:0.075, hp:2400, swell:true});   // reverse swell into the strike
+      tone(98.00, 0.18, 0.45, {type:'sine', peak:0.16});   // soft body under the bells
+      [[659.25,0.18],[987.77,0.27],[1318.51,0.36]].forEach(([f,s])=>{  // ascending arpeggio
+        tone(f,   s, 0.70, {type:'triangle', peak:0.13, atk:0.004});
+        tone(f*2, s, 0.35, {type:'sine',     peak:0.05, atk:0.004});   // glassy overtone
+      });
+      [1318.51, 1975.53].forEach((f,i)=>{                              // held "rare" ring
+        tone(f, 0.48, 1.50, {type:'sine', peak:0.075-i*0.020, det: 5, atk:0.03});
+        tone(f, 0.48, 1.50, {type:'sine', peak:0.055-i*0.015, det:-5, atk:0.03});
+      });
+      [3135.96,2637.02,2217.46,1975.53,1661.22].forEach((f,i)=>        // DESCENDING stardust
+        tone(f, 0.62+i*0.075, 0.55, {type:'sine', peak:Math.max(0.014, 0.05-i*0.006)}));
+    } else {
+      // NORMAL - unchanged. The ~78% case keeps the cue he already knows, which is
+      // what makes the other two read as "that was not the usual one".
+      const sub=ctx.createOscillator(), sg=ctx.createGain(); sub.type='sine';
+      sub.frequency.setValueAtTime(70,t); sub.frequency.exponentialRampToValueAtTime(170,t+0.5);
+      sg.gain.setValueAtTime(0,t); sg.gain.linearRampToValueAtTime(0.22,t+0.05); sg.gain.exponentialRampToValueAtTime(0.001,t+0.95);
+      sub.connect(sg); sg.connect(comp); sub.start(t); sub.stop(t+1.0);
+      const sweep=ctx.createOscillator(), swg=ctx.createGain(), swf=ctx.createBiquadFilter();
+      sweep.type='sawtooth'; sweep.frequency.setValueAtTime(200,t); sweep.frequency.exponentialRampToValueAtTime(1500,t+0.55);
+      swf.type='lowpass'; swf.frequency.setValueAtTime(350,t); swf.frequency.exponentialRampToValueAtTime(7000,t+0.55); swf.Q.value=7;
+      swg.gain.setValueAtTime(0,t); swg.gain.linearRampToValueAtTime(0.10,t+0.05); swg.gain.exponentialRampToValueAtTime(0.001,t+0.72);
+      sweep.connect(swf); swf.connect(swg); swg.connect(comp); sweep.start(t); sweep.stop(t+0.78);
+      [523.25,659.25,783.99,1046.50].forEach((f,i)=>{ [0,4,-4].forEach(det=>{
+        const o=ctx.createOscillator(), g=ctx.createGain(); o.type='sine'; o.frequency.value=f; o.detune.value=det;
+        const st=t+0.28+i*0.05; g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(0.085-i*0.013,st+0.03); g.gain.exponentialRampToValueAtTime(0.001,st+1.4);
+        o.connect(g); g.connect(comp); o.start(st); o.stop(st+1.5);
+      }); });
+      [1567.98,2093.00,2637.02,3135.96].forEach((f,i)=>{
+        const o=ctx.createOscillator(), g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
+        const st=t+0.48+i*0.07; g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(Math.max(0.012,0.05-i*0.007),st+0.008); g.gain.exponentialRampToValueAtTime(0.001,st+0.7);
+        o.connect(g); g.connect(comp); o.start(st); o.stop(st+0.75);
+      });
     }
   }catch(e){}
 }
