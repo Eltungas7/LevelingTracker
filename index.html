@@ -21619,6 +21619,14 @@ const GATES_SEED = [
     // purpose to free space for new drops. What IS real is the cleanup they leave behind.
     {id:'k14',text:'After the ÚLTIMO MES clearance: remove the 12 emptied subcategories so they are not dead pages, and confirm every surviving product has its anime category',done:false},
     {id:'k17',text:'Restructure the top level so a second line slots in beside anime, not under it (anime · asian streetwear · anime streetwear)',done:false},
+    // Anime is the PRIMARY axis, not a filter. Fandom is narrow and deep — a One Piece fan
+    // wants everything One Piece, across garments, and does not care about the other 15
+    // series. The top 5 series are 161 of ~249 products. Verified 2026-09-26: the Jujutsu
+    // page holds 50 products over 3 pages, its own title advertises "Remeras, Buzos y
+    // Shorts", and the only filters are colour and size. Grouping by garment inside each
+    // series beats a filter: nothing to click, and it cross-sells the same design across
+    // garments — which matters more with every product type added.
+    {id:'k18',text:'Make the series the main way in — group each anime page by garment type, and reorder the nav and home so anime comes before product type',done:false},
     {id:'k15',text:'Kill the boilerplate — one unique hook per design instead of 11 copy-pasted bodies across 294 products',done:false},
     {id:'k16',text:'Fix product structured data — every page carries its OWN Product schema (price, stock, images) + the 43 Google reviews as aggregateRating',done:false},
     // — THE LANDING: the first 5 seconds —
@@ -21753,14 +21761,14 @@ function _ensureWorkBattle(){
   // Merged BY ID every time, so every step already ticked stays ticked and its points
   // are never re-paid; new steps land unchecked in seed order. Skips a gate already
   // cleared — a finished fight stays finished. Bump the version to re-merge.
-  if((state.gateStepsVersion || 0) < 3){
+  if((state.gateStepsVersion || 0) < 4){
     const _kn = state.gates.find(g => g.id === 'g_knight');
     const _knSeed = GATES_SEED.find(g => g.id === 'g_knight');
     if(_kn && _knSeed && !_kn.clearedAt && Array.isArray(_kn.steps)){
       const wasDone = new Set(_kn.steps.filter(s => s.done).map(s => s.id));
       _kn.steps = _knSeed.steps.map(s => ({ ...s, done: wasDone.has(s.id) }));
     }
-    state.gateStepsVersion = 3;
+    state.gateStepsVersion = 4;
   }
   if(!state.huntState) state.huntState = {};
   // migration (2026-09-22): gates/drops are now un-checkable even after a clear.
