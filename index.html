@@ -287,84 +287,74 @@ body {
   font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.5px;
   color: rgba(77,208,225,0.45); margin-top: 8px;
 }
-/* ── LATE CHECK-IN OVERLAY ─────────────────────────────────── */
-.lco-overlay {
-  position: fixed; inset: 0; z-index: 10000;
-  background: rgba(3,12,25,0.97);
-  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-  animation: masteryFadeIn 0.5s ease forwards;
-  padding: 40px 20px 28px; overflow-y: auto;
+/* ── CATCH-UP CARD — log habits from days already gone ─────── */
+/* Replaces the one-shot LATE LOG overlay (2026-10-28). The night block is
+   structurally un-tickable when the phone goes down before it happens, so
+   logging it the next morning is the NORMAL path, not an exception. This card
+   lives on QUESTS, stays until it is cleared or dismissed, and never uses
+   late/missed/streak language. */
+.cu-card {
+  border: 1px solid rgba(77,208,225,0.28);
+  border-left: 3px solid var(--sao-cyan);
+  border-radius: 8px; margin: 0 0 12px;
+  background: linear-gradient(90deg, rgba(77,208,225,0.09), rgba(77,208,225,0.02));
+  overflow: hidden;
 }
-.lco-eyebrow {
-  font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 4px;
-  color: #b388ff; margin-bottom: 8px; opacity: 0.85;
+.cu-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px 8px;
 }
-.lco-title {
-  font-family: 'Cinzel', serif; font-size: 22px; font-weight: 700; letter-spacing: 3px;
-  color: #fff; margin-bottom: 4px; text-shadow: 0 0 20px rgba(179,136,255,0.4);
+.cu-title {
+  font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1.6px;
+  color: var(--sao-cyan); flex: 1; min-width: 0;
 }
-.lco-date {
-  font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px;
-  color: #80deea; margin-bottom: 8px;
+.cu-sub {
+  font-family: 'Rajdhani', sans-serif; font-size: 10px;
+  color: var(--sao-text-dim); padding: 0 12px 8px; letter-spacing: 0.3px;
 }
-.lco-desc {
-  font-family: 'Rajdhani', sans-serif; font-size: 13px; color: rgba(224,247,250,0.5);
-  margin-bottom: 18px; line-height: 1.5; text-align: center; max-width: 300px;
+.cu-dismiss {
+  background: none; border: none; cursor: pointer; flex-shrink: 0;
+  color: rgba(224,247,250,0.35); font-size: 14px; line-height: 1;
+  padding: 2px 4px; font-family: 'Rajdhani', sans-serif;
 }
-.lco-context {
-  font-family: 'Rajdhani', sans-serif; font-size: 12px; color: rgba(128,222,234,0.5);
-  margin-bottom: 10px; letter-spacing: 0.3px;
+.cu-dismiss:active { color: var(--sao-cyan); }
+.cu-daylabel {
+  font-family: 'Cinzel', serif; font-size: 8.5px; letter-spacing: 1.4px;
+  color: rgba(77,208,225,0.6); padding: 4px 12px 5px;
 }
-.lco-progress {
-  width: 100%; max-width: 320px; height: 3px; background: rgba(255,255,255,0.08);
-  border-radius: 2px; margin-bottom: 20px; overflow: hidden;
-}
-.lco-progress-fill {
-  height: 100%; width: 0%; background: #4dd0e1;
-  border-radius: 2px; transition: width 0.35s ease;
-}
-.lco-habit-list {
-  width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 8px;
-  margin-bottom: 24px;
-}
-.lco-habit-row {
+.cu-rows { display: flex; flex-direction: column; gap: 5px; padding: 0 10px 10px; }
+.cu-row {
   display: flex; align-items: center; gap: 10px;
   background: rgba(77,208,225,0.06); border: 1px solid rgba(77,208,225,0.18);
-  border-radius: 8px; padding: 10px 14px; cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
+  border-radius: 7px; padding: 9px 12px; cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, opacity 0.3s;
 }
-.lco-habit-row.lco-done {
-  background: rgba(77,208,225,0.11); border-color: rgba(77,208,225,0.4); cursor: default;
+.cu-row:active { background: rgba(77,208,225,0.16); }
+.cu-row.cu-logged {
+  background: rgba(77,208,225,0.13); border-color: rgba(77,208,225,0.45);
+  cursor: default; opacity: 0.55;
 }
-.lco-habit-row:not(.lco-done):active { background: rgba(77,208,225,0.14); }
-.lco-habit-check {
-  font-size: 15px; width: 18px; flex-shrink: 0; text-align: center;
-  color: rgba(77,208,225,0.3); transition: color 0.2s;
+.cu-check {
+  font-size: 14px; width: 16px; flex-shrink: 0; text-align: center;
+  color: rgba(77,208,225,0.35); transition: color 0.18s;
 }
-.lco-habit-row.lco-done .lco-habit-check { color: #4dd0e1; }
-.lco-habit-text {
-  flex: 1; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 600;
-  color: #e0f7fa; letter-spacing: 0.3px;
+.cu-row.cu-logged .cu-check { color: var(--sao-cyan); }
+.cu-text {
+  flex: 1; min-width: 0; font-family: 'Rajdhani', sans-serif; font-size: 13.5px;
+  font-weight: 600; color: #e0f7fa; letter-spacing: 0.3px;
 }
-.lco-habit-row.lco-done .lco-habit-text { color: rgba(224,247,250,0.45); text-decoration: line-through; }
-.lco-habit-xp {
-  font-family: 'Rajdhani', sans-serif; font-size: 11px;
-  color: rgba(77,208,225,0.55); letter-spacing: 0.5px; flex-shrink: 0;
+.cu-row.cu-logged .cu-text { text-decoration: line-through; color: rgba(224,247,250,0.5); }
+.cu-xp {
+  font-family: 'Rajdhani', sans-serif; font-size: 10.5px; flex-shrink: 0;
+  color: rgba(77,208,225,0.55); letter-spacing: 0.5px;
 }
-.lco-submit-btn {
-  background: none; border: 1px solid rgba(77,208,225,0.4); cursor: pointer;
-  font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2px;
-  color: #4dd0e1; padding: 11px 28px; border-radius: 4px;
-  transition: background 0.15s, border-color 0.15s;
+.cu-allbtn {
+  display: block; width: calc(100% - 20px); margin: 0 10px 10px;
+  background: none; border: 1px solid rgba(77,208,225,0.35); cursor: pointer;
+  font-family: 'Cinzel', serif; font-size: 9.5px; letter-spacing: 1.6px;
+  color: var(--sao-cyan); padding: 9px 0; border-radius: 5px;
 }
-.lco-submit-btn:active { background: rgba(77,208,225,0.12); }
-.lco-submit-btn.lco-all-done {
-  border-color: rgba(255,215,0,0.5); color: #ffd700;
-}
-.lco-restored-hint {
-  font-family: 'Rajdhani', sans-serif; font-size: 11px; color: rgba(255,215,0,0.6);
-  margin-top: 10px; letter-spacing: 0.3px; text-align: center;
-}
+.cu-allbtn:active { background: rgba(77,208,225,0.12); }
 /* ── ─────────────────────────────────────────────────────────── */
 .dquote-overlay {
   position: fixed; inset: 0; z-index: 9997;
@@ -9303,6 +9293,15 @@ details[open] .devt-hist-summary::after { content:'▲'; }
 const STORAGE_KEY = 'sao_habit_tracker_v4';
 const OLD_KEY_V3  = 'sao_habit_tracker_v3';
 
+// The hour the day winds down (2026-10-28). The phone goes away in the evening,
+// so everything that used to wait for 20:00–22:00 — the evening nudge, Close the
+// Day, the social-log review, the evening notification — has to happen while the
+// phone is still in hand, or it never happens at all.
+const WIND_DOWN_HOUR = 18;
+// How many past days the catch-up card will still offer. Yesterday plus the two
+// before it: enough for a weekend, short enough that it never becomes a backlog.
+const CATCH_UP_DAYS = 3;
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
@@ -9333,7 +9332,7 @@ function openSettingsModal() {
 function updateNotifSettingsUI() {
   const wrap = document.getElementById('notifSettingsWrap');
   if (!wrap) return;
-  if (!state.notifSettings) state.notifSettings = { enabled: false, morningTime: '08:00', eveningTime: '20:00' };
+  if (!state.notifSettings) state.notifSettings = { enabled: false, morningTime: '08:00', eveningTime: '18:30' };
   const s = state.notifSettings;
   const supported = ('Notification' in window) && ('serviceWorker' in navigator);
   const denied    = supported && Notification.permission === 'denied';
@@ -9365,7 +9364,7 @@ async function toggleNotifications() {
   if (!('Notification' in window) || !('serviceWorker' in navigator)) {
     showNotif('❌ Notifications not supported in this browser'); return;
   }
-  if (!state.notifSettings) state.notifSettings = { enabled: false, morningTime: '08:00', eveningTime: '20:00' };
+  if (!state.notifSettings) state.notifSettings = { enabled: false, morningTime: '08:00', eveningTime: '18:30' };
 
   if (!state.notifSettings.enabled) {
     if (Notification.permission === 'denied') {
@@ -11310,7 +11309,14 @@ function loadState() {
       if (s.dungeon && !s.dungeon.hasOwnProperty('reliquaryBreached'))s.dungeon.reliquaryBreached = false;
       if (s.dungeon && !s.dungeon.hasOwnProperty('sessionEventGold'))  s.dungeon.sessionEventGold  = 0;
       delete s.pomodoroWorkMins;
-      if (!s.notifSettings) s.notifSettings = { enabled: false, morningTime: '08:00', eveningTime: '20:00' };
+      if (!s.notifSettings) s.notifSettings = { enabled: false, morningTime: '08:00', eveningTime: '18:30' };
+      // Evening reminder moved 20:00 → 18:30 (2026-10-28): the phone goes away in
+      // the evening, so a 20:00 ping was never seen. Applies once, and only to a
+      // save still sitting on the old default — a time set by hand is left alone.
+      if (!s.eveningTimeMovedV1) {
+        if ((s.notifSettings.eveningTime || '') === '20:00') s.notifSettings.eveningTime = '18:30';
+        s.eveningTimeMovedV1 = true;
+      }
       if (typeof s.streakShields !== 'number') s.streakShields = 0;
       if (typeof s.lastShieldAwardedAtStreak !== 'number') s.lastShieldAwardedAtStreak = 0;
       if (typeof s.dailyCritCount !== 'number') s.dailyCritCount = 0;
@@ -15893,11 +15899,12 @@ function _getAchEntry(id) {
   return { awarded: raw.awarded ?? -1, claimable: raw.claimable ?? null, claimedAt: raw.claimedAt ?? null };
 }
 
-// True when we should nudge the player to Close the Day: from ~10pm onward, on a
-// day with habits, that hasn't been closed yet. (After midnight it's a fresh day,
-// so the nudge naturally stops until the next evening.)
+// True when we should nudge the player to Close the Day: from WIND_DOWN_HOUR
+// onward, on a day with habits, that hasn't been closed yet. (After midnight it's
+// a fresh day, so the nudge naturally stops until the next evening.)
+// Was 22:00 until 2026-10-28 — long after the phone was away, so it never showed.
 function _shouldPromptCloseDay() {
-  if (new Date().getHours() < 22) return false;
+  if (new Date().getHours() < WIND_DOWN_HOUR) return false;
   if (!(state.habitos && state.habitos.length)) return false;
   return !((state.dayReflections || {})[todayKey()]);
 }
@@ -16920,13 +16927,10 @@ function updateStreakOnLoad() {
         return;
       }
     }
-    // Late check-in: if any habits were missed yesterday, let the user log them first.
-    // Fires before the harvest briefing so the briefing reflects the final logged state.
-    const _missedYest = state.habitos.filter(h => !h.done || !h.done[y]);
-    if (_missedYest.length > 0 && !state.habitsPaused && state.habitos.length > 0) {
-      _pendingAnims.push(() => showLateCheckInOverlay(y));
-    }
-    // Defer _buildHarvestInfo so it captures any retroactive completions from late check-in
+    // The LATE LOG overlay used to fire here. It is gone (2026-10-28): catching up
+    // is now a card on QUESTS (renderCatchUpCard) that stays put, instead of one
+    // popup that vanished on the first tap outside it.
+    // Defer _buildHarvestInfo so it captures any retroactive completions
     _pendingAnims.push(() => showHarvestOverlay(_buildHarvestInfo(y))); // Daily Briefing (Yesterday + Today)
     // Daily stoic line — fires right after the harvest briefing, once per new day.
     _pendingAnims.push(() => showDailyQuoteOverlay());
@@ -17066,111 +17070,145 @@ function showShieldInfo() {
 // MASTERY SYSTEM  (Pasos 7 + 8 + 9 + 10)
 // ============================================================
 
-// ============================================================
-// LATE CHECK-IN OVERLAY
-// Shown when opening the app on a new day with uncompleted habits
-// from yesterday. Lets the user retroactively log them before
-// the harvest briefing fires, so rewards + streak are correct.
-// ============================================================
+// ── CATCH-UP CARD ────────────────────────────────────────────
+// Replaces the one-shot LATE LOG overlay. That overlay fired once, on the first
+// open of a new day, and if it was dismissed the only way back was
+// LOG → History → pick the day → ✎ EDIT DAY. A habit done at 22:00 with the
+// phone already away is not a miss, it is just an unrecorded win, so this card
+// sits on QUESTS until it is cleared or dismissed and says nothing about being
+// late, missing anything, or a streak.
 
-function showLateCheckInOverlay(yKey) {
-  const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-  const [yr,mo,dy] = yKey.split('-');
-  const dateStr = `${months[parseInt(mo,10)-1]} ${parseInt(dy,10)} · ${yr}`;
-  const total = state.habitos.length;
-  if (!total) { const nxt=_pendingAnims.shift(); if(nxt) nxt(); return; }
-
-  const countDone = () => state.habitos.filter(h => h.done && h.done[yKey]).length;
-
-  const ov = document.createElement('div');
-  ov.className = 'lco-overlay';
-  ov.id = 'lcoOverlay';
-
-  const _renderHtml = () => {
-    const done = countDone();
-    const pct  = total > 0 ? done/total : 0;
-    const allDone = done === total;
-    const streakWouldRestore = pct >= 0.7 && state.streakBrokenAt === todayKey();
-    return `
-      <div class="lco-eyebrow">SYSTEM NOTICE</div>
-      <div class="lco-title">LATE LOG</div>
-      <div class="lco-date">${dateStr}</div>
-      <div class="lco-desc">Log yesterday's habits before the day closes.</div>
-      <div class="lco-context" id="lcoCtx">${done} of ${total} logged</div>
-      <div class="lco-progress"><div class="lco-progress-fill" id="lcoFill" style="width:${Math.round(pct*100)}%"></div></div>
-      <div class="lco-habit-list">
-        ${state.habitos.map(h => {
-          const isDone = !!(h.done && h.done[yKey]);
-          return `<div class="lco-habit-row${isDone?' lco-done':''}" id="lco-${h.id}"
-            ${isDone ? '' : `onclick="lcoToggle('${h.id}','${yKey}')"`}>
-            <span class="lco-habit-check">${isDone ? '✓' : '○'}</span>
-            <span class="lco-habit-text">${h.text}</span>
-            <span class="lco-habit-xp">+${h.xp||0} XP</span>
-          </div>`;
-        }).join('')}
-      </div>
-      <button class="lco-submit-btn${allDone?' lco-all-done':''}" id="lcoBtn"
-        onclick="closeLateCheckIn('${yKey}')">
-        ${allDone ? '✓ ALL LOGGED' : done > 0 ? `CLOSE · ${done}/${total} LOGGED` : 'SKIP'}
-      </button>
-      ${streakWouldRestore ? `<div class="lco-restored-hint">🔥 Log 70 %+ to restore your streak</div>` : ''}
-    `;
-  };
-
-  ov.innerHTML = _renderHtml();
-  document.body.appendChild(ov);
+// Day keys for the past CATCH_UP_DAYS days, newest first (never today).
+// Formats inline because todayKey() takes no argument — it always returns today.
+function getCatchUpDayKeys() {
+  const keys = [];
+  for (let i = 1; i <= CATCH_UP_DAYS; i++) {
+    const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - i);
+    keys.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
+  }
+  return keys;
 }
 
-function lcoToggle(habitId, yKey) {
-  const task = state.habitos.find(t => t.id === habitId);
-  if (!task || (task.done && task.done[yKey])) return;
-  // Complete retroactively via the normal path (awards XP/stats, skips today-gated overlays)
-  toggleQuest('habitos', yKey, habitId);
-  // Update this row
-  const row = document.getElementById('lco-' + habitId);
-  if (row) {
-    row.classList.add('lco-done');
-    row.querySelector('.lco-habit-check').textContent = '✓';
-    row.onclick = null;
-  }
-  // Refresh progress + button
-  const total = state.habitos.length;
-  const done  = state.habitos.filter(h => h.done && h.done[yKey]).length;
-  const pct   = total > 0 ? done/total : 0;
-  const fill  = document.getElementById('lcoFill');
-  if (fill) fill.style.width = Math.round(pct*100) + '%';
-  const ctx = document.getElementById('lcoCtx');
-  if (ctx) ctx.textContent = `${done} of ${total} logged`;
-  const btn = document.getElementById('lcoBtn');
-  if (btn) {
-    const allDone = done === total;
-    btn.className = 'lco-submit-btn' + (allDone ? ' lco-all-done' : '');
-    btn.textContent = allDone ? '✓ ALL LOGGED' : `CLOSE · ${done}/${total} LOGGED`;
-  }
+// [{ dateKey, label, habits:[] }] for past days that still have something to log.
+// Three things are deliberately excluded, so the card only ever shows real
+// unclaimed wins rather than manufactured debt:
+//   · days the user marked as vacation — those were never meant to be done;
+//   · days before the save existed, so a fresh install doesn't open on three
+//     days of everything-unlogged;
+//   · habits created after the day in question (`createdAt`), which could not
+//     have been done then.
+function getCatchUpDays() {
+  const DAYS_EN = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+  const startDay = state.systemStartDay || todayKey();
+  const out = [];
+  getCatchUpDayKeys().forEach((dk, idx) => {
+    if (dk < startDay) return;
+    if (typeof isVacationDay === 'function' && isVacationDay(dk)) return;
+    const pending = (state.habitos || []).filter(h =>
+      !(h.done && h.done[dk]) && !(h.createdAt && h.createdAt > dk));
+    if (!pending.length) return;
+    const label = idx === 0 ? 'LAST NIGHT' : DAYS_EN[new Date(dk + 'T12:00:00').getDay()];
+    out.push({ dateKey: dk, label, habits: pending });
+  });
+  return out;
 }
 
-function closeLateCheckIn(yKey) {
-  const total = state.habitos.length;
-  const done  = state.habitos.filter(h => h.done && h.done[yKey]).length;
-  const pct   = total > 0 ? done/total : 0;
-  // Restore streak if ≥70 % done retroactively and streak was broken this morning.
-  // yKey now genuinely qualifies in the real history, so just recompute — no grace day needed.
-  if (pct >= 0.7 && state.streakBrokenAt === todayKey()) {
-    state.streakBrokenAt = null;
-    state.streakBrokenDay = null;
-    state.lastStreakPeak = 0;
-    state.streak = computeHistoryStreak();
-    saveState();
-    setTimeout(() => showNotif(`[SYSTEM] Late log accepted. Streak restored: ${state.streak} days.`), 350);
-  } else if (done > 0) {
-    saveState();
-  }
-  const ov = document.getElementById('lcoOverlay');
-  if (ov) {
-    ov.style.animation = 'masteryFadeOut 0.4s ease forwards';
-    setTimeout(() => { ov.remove(); const nxt=_pendingAnims.shift(); if(nxt) nxt(); }, 420);
-  }
+// Log one habit onto a past day. Goes through the normal completion path, so the
+// stats, XP and history are exactly as if it had been ticked on the day itself.
+function catchUpLog(habitId, dateKey) {
+  const task = (state.habitos || []).find(t => t.id === habitId);
+  if (!task || (task.done && task.done[dateKey])) return;
+  toggleQuest('habitos', dateKey, habitId);
+  renderAll();
 }
+
+// Log everything still open on one past day.
+function catchUpLogDay(dateKey) {
+  (state.habitos || []).slice().forEach(h => {
+    if (!(h.done && h.done[dateKey])) toggleQuest('habitos', dateKey, h.id);
+  });
+  saveState();
+  renderAll();
+}
+
+function dismissCatchUp() {
+  state.catchUpDismissedDay = todayKey();
+  saveState();
+  renderAll();
+}
+
+// Which older catch-up days the user has unfolded this session (not persisted —
+// it should start folded again next time the app opens).
+let _cuExpanded = {};
+
+function renderCatchUpCard() {
+  if (state.habitsPaused) return null;
+  if (!(state.habitos && state.habitos.length)) return null;
+  if (state.catchUpDismissedDay === todayKey()) return null;
+  const days = getCatchUpDays();
+  if (!days.length) return null;
+
+  const total = days.reduce((s, d) => s + d.habits.length, 0);
+  const card = document.createElement('div');
+  card.className = 'cu-card';
+
+  const head = document.createElement('div'); head.className = 'cu-head';
+  head.innerHTML = `<span class="cu-title">⟦ STILL TO LOG ⟧ · ${total}</span>`;
+  const x = document.createElement('button');
+  x.className = 'cu-dismiss'; x.type = 'button'; x.textContent = '✕';
+  x.title = 'Hide until tomorrow';
+  x.addEventListener('click', dismissCatchUp);
+  head.appendChild(x);
+  card.appendChild(head);
+
+  const sub = document.createElement('div'); sub.className = 'cu-sub';
+  sub.textContent = 'Tap anything you actually did. It lands on the day it happened.';
+  card.appendChild(sub);
+
+  days.forEach((day, idx) => {
+    // Last night is open; anything older is folded away. Coming back after a
+    // weekend would otherwise mean opening the app to a 30-row wall.
+    const collapsible = idx > 0;
+    const open = !collapsible || _cuExpanded[day.dateKey] === true;
+
+    const lbl = document.createElement('div'); lbl.className = 'cu-daylabel';
+    lbl.textContent = (collapsible ? (open ? '▾ ' : '▸ ') : '') + `${day.label} · ${day.habits.length} open`;
+    if (collapsible) {
+      lbl.style.cursor = 'pointer';
+      lbl.addEventListener('click', () => { _cuExpanded[day.dateKey] = !open; renderAll(); });
+    }
+    card.appendChild(lbl);
+    if (!open) return;
+
+    const rows = document.createElement('div'); rows.className = 'cu-rows';
+    day.habits.forEach(h => {
+      const row = document.createElement('div'); row.className = 'cu-row';
+      row.innerHTML = `<span class="cu-check">○</span>`
+        + `<span class="cu-text"></span>`
+        + `<span class="cu-xp">+${h.xp || 0} XP</span>`;
+      row.querySelector('.cu-text').textContent = h.text;
+      row.addEventListener('click', () => {
+        // Mark it here first so the tap feels instant, then commit.
+        row.classList.add('cu-logged');
+        row.querySelector('.cu-check').textContent = '✓';
+        setTimeout(() => catchUpLog(h.id, day.dateKey), 140);
+      });
+      rows.appendChild(row);
+    });
+    card.appendChild(rows);
+
+    if (day.habits.length > 1) {
+      const all = document.createElement('button');
+      all.className = 'cu-allbtn'; all.type = 'button';
+      all.textContent = `✓ LOG ALL · ${day.label}`;
+      all.addEventListener('click', () => catchUpLogDay(day.dateKey));
+      card.appendChild(all);
+    }
+  });
+
+  return card;
+}
+
 
 // DAILY_QUOTES → data/content.js
 function showHarvestOverlay(info) {
@@ -18506,7 +18544,7 @@ function renderCurrentQuest(){
   const moreLeft = state.habitos.filter(x=>!x.done[todayKey()]).length - 1;
   // Evening cue (2026-09) — at the couch-vs-habit hours, reinforce the trigger.
   const _hr = new Date().getHours();
-  const eveningCue = _hr >= 20 ? `<div class="cq-evening">🌙 Evening — before the couch wins, just do this one.</div>` : '';
+  const eveningCue = _hr >= WIND_DOWN_HOUR ? `<div class="cq-evening">🌙 Evening — before the couch wins, just do this one.</div>` : '';
   card.innerHTML =
     `<div class="cq-stars"></div>`
     + `<div class="cq-inner">`
@@ -18894,6 +18932,11 @@ function renderHabitos() {
   // ── CURRENT QUEST — the hero/trigger: one app-chosen habit, glowing, first thing. ──
   if (isToday && !state.habitsPaused && state.habitos.length > 0) panelContent.appendChild(renderCurrentQuest());
 
+  // ── CATCH-UP — days already gone that still have something to log. Sits BELOW
+  // the Current Quest on purpose: today's one action leads, yesterday's unclaimed
+  // wins follow. Opening on a list of what you didn't do is the wrong first thing.
+  if (isToday) { const _cu = renderCatchUpCard(); if (_cu) panelContent.appendChild(_cu); }
+
   if (isToday) panelContent.appendChild(renderDailyQuoteStrip());
 
   // Rank block — the Hunter Grade north star (replaces the weekly/monthly/365
@@ -18907,7 +18950,7 @@ function renderHabitos() {
   if (cqEl) panelContent.appendChild(cqEl);
 
   // ── EVENING SOCIAL NUDGE — from 21:00, if nothing hit the Social Log today ──
-  if (isToday && !state.habitsPaused && new Date().getHours() >= 21) {
+  if (isToday && !state.habitsPaused && new Date().getHours() >= WIND_DOWN_HOUR) {
     const _dayStart = new Date(); _dayStart.setHours(0,0,0,0);
     const _socialLoggedToday = (state.socialActsRecent || []).some(a => a.t >= _dayStart.getTime());
     if (!_socialLoggedToday) {
@@ -24736,10 +24779,10 @@ function maybeShowEveningRitual(opts) {
     if ((state.dayReflections || {})[dk]) return;   // already closed today
     if (_eveRitualShownSession) return;             // already popped this session
     const h = new Date().getHours();
-    const trigger = opts.dailiesDone === true || (h >= 21 && state.closeDayPromptedDay !== dk);
+    const trigger = opts.dailiesDone === true || (h >= WIND_DOWN_HOUR && state.closeDayPromptedDay !== dk);
     if (!trigger) return;
     _eveRitualShownSession = true;
-    if (h >= 21) { state.closeDayPromptedDay = dk; saveState(); }
+    if (h >= WIND_DOWN_HOUR) { state.closeDayPromptedDay = dk; saveState(); }
     setTimeout(() => { try { showEveningRitual(); } catch(e) {} }, opts.delay || 1000);
   } catch(e) {}
 }
@@ -24862,7 +24905,7 @@ function _renderHistoryExtras(container) {
   // ── MOOD · AVG RATING (week/month/year/all-time from Close-the-Day) ──
   renderRatingTrend(container);
   // ── CLOSE THE DAY — evening only (9pm onward) ──
-  if (new Date().getHours() >= 21) renderDailyCloseOut(container);
+  if (new Date().getHours() >= WIND_DOWN_HOUR) renderDailyCloseOut(container);
   renderDailyCloseOutList(container);
 }
 
@@ -28657,7 +28700,16 @@ function getNearestAchievements(limit) {
 // Notification bodies now surface the CURRENT QUEST so the reminder IS the trigger
 // reaching out — one glowing habit, no scan-and-decide. No streak-guilt, no economy.
 function _pickMorningNotifBody() {
+  // Anything done after the phone went down last night is sitting unlogged, so
+  // the morning ping leads with claiming it — that's a 10-second win before the
+  // day's first real quest.
+  let pending = 0;
+  try { pending = getCatchUpDays().reduce((s, d) => s + d.habits.length, 0); } catch (e) {}
   const q = getCurrentQuestHabit();
+  if (pending > 0) {
+    const what = pending === 1 ? '1 habit' : `${pending} habits`;
+    return `✓ ${what} from last night still to log — tap to claim them.`;
+  }
   if (q) return `▶ ${q.text} — your first quest. Just do this one.`;
   return 'A fresh day. Your quests are ready when you are.';
 }
