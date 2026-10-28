@@ -9193,28 +9193,12 @@ details[open] .devt-hist-summary::after { content:'▲'; }
   <nav class="tabs" id="mainTabs">
     <div class="tab tab-primary active" data-tab="habits"><span class="tab-icon">☀</span>QUESTS</div>
     <div class="tab" data-tab="character"><span class="tab-icon">👤</span>CHAR</div>
-    <div class="tab" data-tab="work"><span class="tab-icon">⚒</span>WORK</div>
     <div class="tab" data-tab="log"><span class="tab-icon">📋</span>LOG</div>
   </nav>
 
-  <!-- Quick capture (2026-09) — object-blindness / fear-of-forgetting tool: dump a
-       thought into the WORK backlog from anywhere, in one tap, before it evaporates. -->
-  <button id="quickCaptureFab" class="qc-fab" title="Quick capture — dump a task before you forget it" aria-label="Quick capture">＋</button>
-  <div id="quickCaptureOverlay" class="qc-overlay" hidden>
-    <div class="qc-card">
-      <div class="qc-title">⚡ Quick capture</div>
-      <div class="qc-sub">Dump it before it's gone. Enter to save — keep going, add as many as you want.</div>
-      <input id="qcInput" class="qc-input" type="text" placeholder="What's on your mind?" maxlength="120" autocomplete="off">
-      <div class="qc-row">
-        <span id="qcCount" class="qc-count"></span>
-        <div class="qc-actions">
-          <button id="qcClose" class="qc-btn-ghost" type="button">Done</button>
-          <button id="qcSave" class="qc-btn" type="button">Capture →</button>
-        </div>
-      </div>
-      <div id="qcRecent" class="qc-recent"></div>
-    </div>
-  </div>
+  <!-- WORK tab retired (2026-10-28) — the app is habits-only now. The quick-capture
+       FAB went with it: its only destination was the WORK backlog, so with WORK gone
+       a captured thought had nowhere to land. -->
 
   <div id="backupNudge">
     <span class="nudge-msg">⚠ Never backed up — data lives in this browser only</span>
@@ -13353,6 +13337,13 @@ function getDungeonCompletionReward(cfg) {
 
 // ACHIEVEMENTS (full array, 867-budget) → data/achievements.js
 
+// The WORK tab is retired (2026-10-28), so its six achievements can never be
+// earned again. They are filtered out of every live view and out of the claim
+// scan — a permanently-stuck row is exactly the kind of visible debt this app
+// is supposed to not have. ACHIEVEMENTS itself stays whole so that lookups by
+// id (old claim records, history entries) still resolve.
+const ACTIVE_ACHIEVEMENTS = ACHIEVEMENTS.filter(a => a.category !== 'trabajo');
+
 const TIER_LABELS  = ['🥉 BRONZE','🥈 SILVER','🥇 GOLD','💎 LEGENDARY','👑 UNIQUE'];
 const TIER_ICONS   = ['🥉','🥈','🥇','💎','👑'];
 const STAT_COLORS  = { STR:'#ff8a80', DEX:'#b9f6ca', CON:'#ffd180', INT:'#82b1ff', VOL:'#e040fb', CHA:'#ff8a65' };
@@ -13518,7 +13509,7 @@ function checkAchievements() {
   }
   // ─ Detect new tiers → mark claimable, do NOT award yet
   let newlyClaimable = false;
-  ACHIEVEMENTS.forEach(ach => {
+  ACTIVE_ACHIEVEMENTS.forEach(ach => {
     const count = getAchievementCount(ach);
     const entry = _getAchEntry(ach.id);
     const highestEarned  = getAchievementTierIndex(ach, count);
@@ -15410,7 +15401,7 @@ let _achTierFilter = localStorage.getItem('achTierFilter') || 'all';
 function renderLogros() {
   panelTitle.textContent = 'ACHIEVEMENTS'; panelSubtitle.textContent = 'Milestones & rewards';
   panelContent.innerHTML = '';
-  const _ACT = ACHIEVEMENTS;
+  const _ACT = ACTIVE_ACHIEVEMENTS;
 
   // ── Step 7: Arc summary header ─────────────────────────────
   const totalTiers = _ACT.reduce((s,a) => s + a.tiers.length, 0);
@@ -15489,7 +15480,6 @@ function renderLogros() {
     { key:'hitos',        label:'MILESTONES'  },
     { key:'maestria',     label:'MASTERY'     },
     { key:'racha',        label:'STREAK'      },
-    { key:'trabajo',      label:'WORK'        },
   ];
 
   const filterBar = document.createElement('div'); filterBar.className = 'logro-filter-bar';
@@ -15554,13 +15544,12 @@ function renderLogros() {
 
 function buildAchievementFeed(wrap) {
   wrap.innerHTML = '';
-  const _ACT = ACHIEVEMENTS;  // hide dead-system achievements here too
+  const _ACT = ACTIVE_ACHIEVEMENTS;  // hide dead-system achievements here too
   const CAT_DEFS = [
     { key:'progresion',   label:'⟦ PROGRESSION ⟧'  },
     { key:'hitos',        label:'⟦ MILESTONES ⟧'    },
     { key:'maestria',     label:'⟦ MASTERY ⟧'       },
     { key:'racha',        label:'⟦ STREAK ⟧'        },
-    { key:'trabajo',      label:'⟦ WORK ⟧'          },
   ];
   const visibleCats = _achFilter === 'all' ? CAT_DEFS : CAT_DEFS.filter(c => c.key === _achFilter);
 
@@ -15914,7 +15903,7 @@ function _shouldPromptCloseDay() {
 }
 
 function _updateAchBadge() {
-  const count = ACHIEVEMENTS.filter(a => {
+  const count = ACTIVE_ACHIEVEMENTS.filter(a => {
     const e = _getAchEntry(a.id);
     return e.claimable !== null && e.claimable > e.awarded;
   }).length;
@@ -16031,7 +16020,7 @@ function claimAchievementTier(ach, claimableIdx) {
 }
 
 function claimAllAchievements() {
-  const claimable = ACHIEVEMENTS.filter(a => {
+  const claimable = ACTIVE_ACHIEVEMENTS.filter(a => {
     const e = _getAchEntry(a.id);
     return e.claimable !== null && e.claimable > e.awarded;
   });
@@ -21410,38 +21399,12 @@ function renderWorkTaskList(tasks, isDone, opts){
 
 // ── QUICK CAPTURE — global brain-dump into the WORK backlog ────────────────────
 let _qcCount = 0;
-function openQuickCapture(){
-  _qcCount = 0;
-  const o = document.getElementById('quickCaptureOverlay'); if(!o) return;
-  o.hidden = false;
-  const inp = document.getElementById('qcInput'), rec = document.getElementById('qcRecent'), cnt = document.getElementById('qcCount');
-  if(rec) rec.innerHTML = ''; if(cnt) cnt.textContent = '';
-  if(inp){ inp.value = ''; setTimeout(() => inp.focus(), 30); }
-}
-function closeQuickCapture(){
-  const o = document.getElementById('quickCaptureOverlay'); if(o) o.hidden = true;
-  if(typeof currentTab !== 'undefined' && currentTab === 'work') renderAll(); // surface captured tasks
-}
-function qcSaveOne(){
-  const inp = document.getElementById('qcInput'); if(!inp) return;
-  const text = inp.value.trim(); if(!text) return;
-  state.trabajo.unshift({ id:'t'+Date.now(), text, progress:0, awardedPts:0, createdAt:Date.now(), done:{} });
-  saveState();
-  _qcCount++;
-  inp.value = ''; inp.focus();
-  const cnt = document.getElementById('qcCount'); if(cnt) cnt.textContent = `${_qcCount} captured → WORK`;
-  const rec = document.getElementById('qcRecent');
-  if(rec){ const chip = document.createElement('div'); chip.className = 'qc-recent-item'; chip.textContent = '✓ ' + text; rec.prepend(chip); }
-}
-(function _wireQuickCapture(){
-  const fab = document.getElementById('quickCaptureFab'); if(fab) fab.addEventListener('click', openQuickCapture);
-  const save = document.getElementById('qcSave'); if(save) save.addEventListener('click', qcSaveOne);
-  const close = document.getElementById('qcClose'); if(close) close.addEventListener('click', closeQuickCapture);
-  const inp = document.getElementById('qcInput');
-  if(inp) inp.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); qcSaveOne(); } else if(e.key === 'Escape'){ closeQuickCapture(); } });
-  const ov = document.getElementById('quickCaptureOverlay');
-  if(ov) ov.addEventListener('click', e => { if(e.target === ov) closeQuickCapture(); });
-})();
+// Quick capture retired with WORK (2026-10-28) — it wrote into state.trabajo, which
+// nothing renders any more. Stubs kept so any stale onclick= in a cached page is a
+// no-op rather than a thrown error.
+function openQuickCapture(){}
+function closeQuickCapture(){}
+function qcSaveOne(){}
 
 // One-thing-now spotlight: shows a SINGLE task big, hiding everything else, so
 // there's no "which do I pick" decision. Priority: closest-to-done first (finish it),
@@ -21691,8 +21654,8 @@ const REDGATES_SEED = [
   ] },
   // deadline = Part 1 (launch & sell) · deadline2 = Part 2 (push & connect).
   { id:'rg_psycho',   codename:'100% Psycho',   drop:'Mob Psycho drop',   deadline:'2026-09-18', deadline2:'2026-09-23', steps:_dropSteps() },
-  { id:'rg_hero',     codename:'My Hero',       drop:'My Hero Academia drop', deadline:'2026-10-31', deadline2:'2026-10-31', steps:_dropSteps() },
-  { id:'rg_clover',   codename:'5 Leaf Clover', drop:'Black Clover drop', deadline:'2026-10-02', deadline2:'2026-10-15', steps:_dropSteps() },
+  { id:'rg_hero',     codename:'My Hero',       drop:'My Hero Academia drop', deadline:'2026-11-15', deadline2:'2026-11-15', steps:_dropSteps() },
+  { id:'rg_clover',   codename:'5 Leaf Clover', drop:'Black Clover drop', deadline:'2026-10-31', deadline2:'2026-10-31', steps:_dropSteps() },
   { id:'rg_festival', codename:'The Festival',  drop:'10 designs → designer before Christmas', deadline:'2026-10-09', steps:[
     {id:'f1',text:'Pick 6 anime designs for serigraphy',done:false},
     {id:'f2',text:'Pick 4 asian-streetwear designs',done:false},
@@ -21700,9 +21663,9 @@ const REDGATES_SEED = [
     {id:'f4',text:'Send all 10 to the designer',done:false},
     {id:'f5',text:'Confirm she received them + agree a timeline',done:false},
   ]},
-  // Poke + Berserk = loose backup drops (both parts land Oct 31, can be done anytime).
+  // Oct 2026 release order: Black Clover + Poke land by Oct 31; Berserk + My Hero by Nov 15.
   { id:'rg_poke',     codename:'Poke Cafe',     drop:'Pokémon drop',   deadline:'2026-10-31', deadline2:'2026-10-31', steps:_dropSteps() },
-  { id:'rg_berserk',  codename:'Going Crazy',   drop:'Berserk drop',      deadline:'2026-10-31', deadline2:'2026-10-31', steps:_dropSteps() },
+  { id:'rg_berserk',  codename:'Going Crazy',   drop:'Berserk drop',      deadline:'2026-11-15', deadline2:'2026-11-15', steps:_dropSteps() },
 ];
 // Per-boss / per-drop skins — each Gate & Red Gate reads as its own franchise
 // (icon + accent + a CSS theme class). Keyed by id so it works without re-seeding.
@@ -21836,6 +21799,29 @@ function _ensureWorkBattle(){
       if(d.p2) rg.deadline2 = d.p2; else delete rg.deadline2;
     });
     state.dropSchedVersion = 4;
+  }
+  // ── Drop schedule v5 (2026-10-10) — the authoritative dates ────────────────
+  // Delays piled up, so the whole remaining banner queue is re-timed around the real
+  // release order: Black Clover (the last of it) and Poke Cafe go out this month —
+  // both parts land Oct 31 — while Berserk and My Hero Academia go out in the last
+  // week of October, so both of those get until Nov 15.
+  // Same version-stamped shape as v3/v4: applies once, unconditionally, to any
+  // uncleared drop — a drop whose window had already collapsed is handed a live one
+  // again — then never again, so a REOPENED drop keeps the fresh window it was given.
+  const _DROP_SCHEDULE_V5 = {
+    rg_clover:   { p1:'2026-10-31', p2:'2026-10-31' },
+    rg_poke:     { p1:'2026-10-31', p2:'2026-10-31' },
+    rg_berserk:  { p1:'2026-11-15', p2:'2026-11-15' },
+    rg_hero:     { p1:'2026-11-15', p2:'2026-11-15' },
+  };
+  if((state.dropSchedVersion || 0) < 5){
+    Object.keys(_DROP_SCHEDULE_V5).forEach(id => {
+      const rg = state.redGates.find(r => r.id === id); if(!rg || rg.clearedAt) return;
+      const d = _DROP_SCHEDULE_V5[id];
+      rg.deadline = d.p1;
+      if(d.p2) rg.deadline2 = d.p2; else delete rg.deadline2;
+    });
+    state.dropSchedVersion = 5;
   }
   // migration (2026-09-23): Night City and 100% Psycho are SHIPPED in real life, but
   // their windows had run out — and a collapsed drop is locked, so neither could be
@@ -22844,8 +22830,8 @@ function renderTrabajo(){
 function renderFooter(tabKey) {
   const today=todayKey(), week=isoWeekKey();
   let text='';
-  if (tabKey==='habitos') { const dD=state.habitos.filter(t=>t.done[today]).length, wD=state.weekly.filter(t=>t.done[week]).length; text=`${dD}/${state.habitos.length} DAY · ${wD}/${state.weekly.length} WEEK`; }
-  else { const active=state.trabajo.filter(t=>!isArchivedTask(t)); const done=active.filter(t=>t.done[today]).length; text=`${done}/${active.length} COMPLETE`; }
+  // Only the habits footer is reachable now — WORK was the other caller.
+  { const dD=state.habitos.filter(t=>t.done[today]).length, wD=state.weekly.filter(t=>t.done[week]).length; text=`${dD}/${state.habitos.length} DAY · ${wD}/${state.weekly.length} WEEK`; }
   const f=document.createElement('div'); f.className='footer-actions';
   if (tabKey==='habitos') {
     const vacLabel = state.habitsPaused ? '⛺ RESUME' : '🏕 VACATION';
@@ -22867,8 +22853,6 @@ function renderFooter(tabKey) {
       "Reset today's progress?<br><span style='font-size:11px;opacity:0.7'>All checks cleared and stats reversed.</span>",
       () => {
         state.habitos.forEach(t=>{ if(t.done[today]){const c=getCompletion(t,today);if(c){applyGains(c.gains,-1);state.totalXp=Math.max(0,state.totalXp-(c.xp||0));}delete t.done[today];}});
-        // WORK tasks: reverse the exact points awarded today and reopen them.
-        state.trabajo.forEach(t=>{ if(t.completed&&t.completedDate===today){ state.workXp=Math.max(0,(state.workXp||0)-(t.awardedPts||0)); t.completed=false; delete t.completedDate; delete t.awardedPts; if(t.done) delete t.done[today]; }});
         saveState(); renderAll();
       },
       { title: 'RESET DAY', okLabel: 'RESET' }
@@ -24382,7 +24366,10 @@ let historyCustomFrom = null;
 let historyCustomTo = null;
 let historyMonth = (()=>{ const n=new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`; })();
 let historyBreakdownSort = localStorage.getItem('hbd_sort') || 'desc'; // 'desc' = best first, 'asc' = worst first
+// 'work' was a valid source until the WORK tab was retired (2026-10-28); a save
+// that still remembers it is coerced back to the daily habit chart.
 let historyDataSource = localStorage.getItem('hist_ds') || 'daily';
+if (historyDataSource === 'work') { historyDataSource = 'daily'; localStorage.setItem('hist_ds', 'daily'); }
 let heatmapCollapsed = localStorage.getItem('hm_col') === '1';
 let _chronicleMonthA = null;
 let _chronicleMonthB = null;
@@ -24847,7 +24834,10 @@ function _renderHistoryExtras(container) {
     const _xp = state.totalXp || 0;
     const _best = Math.max(state.lastStreakPeak || 0, state.streak || 0);
     const _perfect = (state.logros && state.logros.perfectDayCount) || 0;   // replaces dead GOLD EARNED
-    const _workLv = calcWorkerLevel(state.workXp || 0).level;               // replaces dead DUNGEONS
+    // Lifetime habit check-ins — replaces WORK LV, which died with the WORK tab.
+    // A pure count of every daily habit ever ticked: it only ever goes up.
+    const _checkIns = (state.habitos || []).reduce((s, h) =>
+      s + Object.keys(h.done || {}).filter(k => h.done[k]).length, 0);
     const _topKey = STAT_KEYS.reduce((a, b) => (state.stats[a] || 0) >= (state.stats[b] || 0) ? a : b, STAT_KEYS[0]);
     const _topVal = state.stats[_topKey] || 0;
     const card = document.createElement('div');
@@ -24859,7 +24849,7 @@ function _renderHistoryExtras(container) {
         <div class="lst-cell"><div class="lst-val">${_xp.toLocaleString()}</div><div class="lst-label">TOTAL XP</div></div>
         <div class="lst-cell"><div class="lst-val" style="color:#b388ff">${_perfect}</div><div class="lst-label">PERFECT DAYS</div></div>
         <div class="lst-cell"><div class="lst-val" style="color:${STAT_COLORS[_topKey]}">${_topKey} ${_topVal}</div><div class="lst-label">TOP STAT</div></div>
-        <div class="lst-cell"><div class="lst-val" style="color:#ffc107">${_workLv}</div><div class="lst-label">WORK LV</div></div>
+        <div class="lst-cell"><div class="lst-val" style="color:#4dd0e1">${_checkIns.toLocaleString()}</div><div class="lst-label">CHECK-INS</div></div>
         <div class="lst-cell"><div class="lst-val" style="color:#ffd700">${_best}d</div><div class="lst-label">BEST STREAK</div></div>
       </div>`;
     container.appendChild(card);
@@ -25384,7 +25374,7 @@ function renderHistory() {
     // ── BAR CHART ────────────────────────────────────────────
     const MONTHS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
     const chartSec=document.createElement('div'); chartSec.className='chart-section';
-    const DS_TITLES={daily:'DAILY HABIT COMPLETION',work:'WORK TASK COMPLETION',avoid:'AVOID HABIT CLEAN RATE',weekly:'WEEKLY MISSION COMPLETION'};
+    const DS_TITLES={daily:'DAILY HABIT COMPLETION',avoid:'AVOID HABIT CLEAN RATE',weekly:'WEEKLY MISSION COMPLETION'};
     const chartTitle=document.createElement('div'); chartTitle.className='chart-title'; chartTitle.textContent=DS_TITLES[historyDataSource]||'DAILY HABIT COMPLETION';
     chartSec.appendChild(chartTitle);
 
@@ -25393,7 +25383,6 @@ function renderHistory() {
       const dsRow = document.createElement('div'); dsRow.className = 'hist-ds-row';
       const DS_OPTS = [
         {k:'daily',  l:'📿 DAILY'},
-        {k:'work',   l:'⚒ WORK',   skip: !(state.trabajo||[]).length},
         {k:'avoid',  l:'🚫 AVOID',  skip: !(state.negativos||[]).length},
         {k:'weekly', l:'📅 WEEKLY', skip: !(state.weekly||[]).length},
       ];
@@ -25478,11 +25467,7 @@ function renderHistory() {
       const isFuture=dateKey>todayDkBar;
       let info, pct;
       if (isFuture) { info = null; pct = 0; }
-      else if (historyDataSource === 'work') {
-        const tks=state.trabajo||[]; const dn=tks.filter(t=>!!t.done[dateKey]).length;
-        info = tks.length ? {pct:Math.round((dn/tks.length)*100), done:dn, total:tks.length} : null;
-        pct = info ? info.pct : 0;
-      } else if (historyDataSource === 'avoid') {
+      else if (historyDataSource === 'avoid') {
         const ngs=state.negativos||[]; const cl=ngs.filter(n=>!n.done[dateKey]).length;
         info = ngs.length ? {pct:Math.round((cl/ngs.length)*100), done:cl, total:ngs.length} : null;
         pct = info ? info.pct : 0;
@@ -26065,12 +26050,11 @@ function renderAll() {
   _updateAchBadge();
   if(currentTab==='habits') renderHabitos();
   else if(currentTab==='character') renderCharTab();
-  else if(currentTab==='work') renderTrabajo();
-  // SHOP tab fully deleted — shard sinks live in WORK → 🛠 WORKSHOP (gear rerolls
-  // + high-grade refinement). Streak Repair surfaces on the QUESTS tab when a
-  // streak has just broken (charges 25✦ inline). Any old `currentTab='shop'`
-  // value coming from legacy saves silently routes to WORK.
-  else if(currentTab==='shop') { currentTab='habits'; document.querySelector('[data-tab="habits"]')?.classList.add('active'); renderHabitos(); }
+  // WORK and SHOP tabs are both retired. Work ethic was never the thing this app
+  // was good at measuring, and a tab full of unmoved gates read as a daily
+  // reminder of debt. Habits are the whole app now. Any legacy save that comes
+  // back with currentTab='work' / 'shop' lands on QUESTS instead.
+  else if(currentTab==='work' || currentTab==='shop') { currentTab='habits'; document.querySelector('[data-tab="habits"]')?.classList.add('active'); renderHabitos(); }
   else if(currentTab==='log') renderLog();
   else if(currentTab==='inventory') renderInventory(); // legacy/programmatic
   else if(currentTab==='party') renderParty(); // legacy/programmatic
@@ -27296,15 +27280,8 @@ const ANNIVERSARY_MILESTONES = [100, 365, 730, 1095];
 const CENTURION_MILESTONES = [100, 365];
 function _checkMilestoneBanners() {
   const tk = todayKey();
-  // City tier-up — first run initializes without marking the day.
-  const curTierId = getCityTier().id;
-  if (state.lastSeenCityTier === undefined) {
-    state.lastSeenCityTier = curTierId;
-  } else if (state.lastSeenCityTier !== curTierId) {
-    state.lastCityTierUpDay = tk;
-    state.lastSeenCityTier = curTierId;
-    _queueMilestoneBanner('city_tier', curTierId);
-  }
+  // City tier-up and POPULATION checks removed (2026-10-28) — both were driven by
+  // guild upgrades bought with work gold, so with WORK retired neither can move.
   // High streak milestone — only specific thresholds, not every streak day.
   const streak = state.streak || 0;
   const STREAK_MILESTONES = [14, 30, 60, 100, 200, 365];
@@ -27334,18 +27311,10 @@ function _checkMilestoneBanners() {
     state.balancedFloorSeen = _floorIdx;
     if (_floorIdx >= 1) _queueMilestoneBanner('balanced', TIERS[_floorIdx].t);
   }
-  // POPULATION — city population crosses a threshold.
-  const _pop = getCityPopulation();
-  if (state.popMilestoneSeen === undefined) {
-    state.popMilestoneSeen = POPULATION_MILESTONES.filter(m => _pop >= m).pop() || 0;
-  } else {
-    const _nextPop = POPULATION_MILESTONES.find(m => m > state.popMilestoneSeen && _pop >= m);
-    if (_nextPop) { state.popMilestoneSeen = _nextPop; _queueMilestoneBanner('population', _nextPop); }
-  }
   // SYSTEM ANNIVERSARY — days since the earliest recorded activity.
   if (!state.systemStartDay) {
     let _earliest = tk;
-    [...(state.habitos || []), ...(state.trabajo || [])].forEach(h => {
+    (state.habitos || []).forEach(h => {
       Object.keys(h.done || {}).forEach(k => { if (/^\d{4}-\d{2}-\d{2}$/.test(k) && k < _earliest) _earliest = k; });
     });
     state.systemStartDay = _earliest;
@@ -27489,7 +27458,7 @@ function _buildMonthlyChronicle(monthKey) {
   if (parts.length !== 2 || !parts[0] || !parts[1]) return null;
   const [y, m] = parts;
   const daysIn = new Date(y, m, 0).getDate();
-  let perfect = 0, activeDays = 0, pctSum = 0, pctDays = 0, checks = 0, gold = 0, bestRun = 0, run = 0;
+  let perfect = 0, activeDays = 0, pctSum = 0, pctDays = 0, checks = 0, bestRun = 0, run = 0;
   for (let d = 1; d <= daysIn; d++) {
     const dk = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
     const inf = getHabitPct(dk);
@@ -27499,27 +27468,20 @@ function _buildMonthlyChronicle(monthKey) {
       if (inf.done > 0) activeDays++;
       if (inf.pct === 100) { perfect++; run++; bestRun = Math.max(bestRun, run); } else run = 0;
     }
-    (state.trabajo || []).forEach(t => {
-      const c = t.done && t.done[dk];
-      if (c && c.drops) gold += c.drops.gold || 0;
-    });
   }
-  const fullWorkDays = (state.rationDays || []).filter(dk => dk.startsWith(monthKey)).length;
-  return { monthKey, perfect, activeDays, avgPct: pctDays ? Math.round(pctSum / pctDays) : 0, checks, gold, bestRun, fullWorkDays };
+  return { monthKey, perfect, activeDays, avgPct: pctDays ? Math.round(pctSum / pctDays) : 0, checks, bestRun };
 }
 function showMonthlyChronicleOverlay(monthKey) {
   const s = _buildMonthlyChronicle(monthKey);
   if (!s) return;
   const MN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const [y, m] = monthKey.split('-').map(Number);
-  const _g = `<img src="img/gold.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;display:inline-block">`;
   const rows = [
     ['🌟', 'Perfect days',        `${s.perfect}`],
     ['⚡', 'Best perfect run',    `${s.bestRun}d`],
     ['📊', 'Avg completion',      `${s.avgPct}%`],
     ['✅', 'Habit quests cleared', s.checks.toLocaleString()],
-    ['📦', 'Full work days',      `${s.fullWorkDays}`],
-    [_g,  'Gold from work',       `${s.gold.toLocaleString()}g`],
+    ['📅', 'Days you showed up',  `${s.activeDays}`],
   ].map(([ic, lbl, val]) => `<div class="msb-stat-row"><span class="msb-stat-ic">${ic}</span><span class="msb-stat-lbl">${lbl}</span><span class="msb-stat-val">${val}</span></div>`).join('');
   const banner = document.createElement('div');
   banner.className = 'milestone-banner';
@@ -28677,7 +28639,7 @@ function showFortuneFloat(xp) {
 function getNearestAchievements(limit) {
   limit = limit || 3;
   const out = [];
-  ACHIEVEMENTS.forEach(ach => {
+  ACTIVE_ACHIEVEMENTS.forEach(ach => {
     if (!ach.tiers || !ach.tiers.length) return;
     if (!achievementHasHabit(ach)) return;
     const count = getAchievementCount(ach);
@@ -33578,16 +33540,13 @@ tickMasteryOnLoad();
 checkAchievements();
 _updateAchBadge();
 tickHpMp();
-// Open into the tab that fits the hour (2026-09). Habits are a morning-open /
-// night-close ritual, so the middle of the day belongs to WORK: open in WORK from
-// 10:00–18:59, QUESTS otherwise. (A comeback/first-load overlay still shows on top.)
-(function _openTabByHour(){
-  const h = new Date().getHours();
-  const target = (h >= 10 && h < 19) ? 'work' : 'habits';
-  if (target !== currentTab) {
-    currentTab = target;
+// Always open on QUESTS (2026-10-28). The hour-aware open existed to hand the
+// middle of the day to WORK; with WORK retired there is one front door.
+(function _openOnQuests(){
+  if (currentTab !== 'habits') {
+    currentTab = 'habits';
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelector(`[data-tab="${target}"]`)?.classList.add('active');
+    document.querySelector('[data-tab="habits"]')?.classList.add('active');
   }
 })();
 saveState();
